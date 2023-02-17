@@ -30,6 +30,7 @@ Window_DetailPages.prototype.initialize = function() {
 	
 	window.addEventListener("resize", function(){
 		_this.requestRedraw();
+		_this.resetRenderedTabs();
 	});	
 	this._subPilotIdx = 0;
 }
