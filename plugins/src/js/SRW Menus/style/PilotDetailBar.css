@@ -1,0 +1,58 @@
+#bar_pilot_stats_icon {
+	/*width: 12px;*/
+	margin-left: 2%;
+	background-color: rgba(85, 164, 255, 0.5);
+	border: 0.1vw solid #99e3ff;
+	--widthpixels: 133;
+	--heightpixels: 133;
+}
+
+.ability_block {
+	width: 25px;
+	margin-left: 5%;
+}
+
+.ability_block_label {
+	--fontsize: 1.6px;
+	color: var(--text-color-highlight);
+}
+
+.ability_block_row {
+	display: flex;
+	border-bottom: 0.1vw solid var(--underline-color);
+	height: 3px;
+    align-items: flex-end;
+}
+
+.ability_block_row .pilot_stat_container{
+	border: 0px;
+	margin-left: 1%;
+	margin-right: 1%;
+}
+
+.ability_block_row .pilot_stat_container {
+	width: 8px;
+}
+
+.ability_block_row.terrain .pilot_stat_container {
+	width: 4px;
+}
+
+.ability_block.skills {
+	margin-left: 3%;
+}
+
+.ability_block.skills .ability_block_row{
+}
+
+.ability_block.skills .pilot_stat_container{	
+	width: 12px;
+}
+
+.ability_block.skills .stat_value{
+	margin-left: 1%;
+}
+
+.unique_skill_mark {
+	width: 1px;
+}

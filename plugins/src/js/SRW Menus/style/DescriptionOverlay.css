@@ -1,0 +1,36 @@
+.description_container {
+	--widthpixels: 1110;
+	--heightpixels: 624;
+	position: absolute;
+	top: 0;
+	left: 0;
+	background-color: rgba(0,0,0,0.4);
+    z-index: 5;
+	display: none;
+}
+
+.description_text {
+	--widthpixels: 1110;
+	--heightpixels: 135;
+	background: -moz-linear-gradient(top,  rgba(0,47,66,1) 28%, rgba(0,47,66,1) 55%, rgba(0,0,0,0) 100%);
+	background: -webkit-linear-gradient(top,  rgba(0,47,66,1) 28%,rgba(0,47,66,1) 55%,rgba(0,0,0,0) 100%);
+	background: linear-gradient(to bottom,  rgba(0,47,66,1) 28%,rgba(0,47,66,1) 55%,rgba(0,0,0,0) 100%);
+	filter: progid:DXImageTransform.Microsoft.gradient( startColorstr='#002f42', endColorstr='#00000000',GradientType=0 );
+	color: white;
+	position: absolute;
+	top: 0;
+	left: 0;
+	z-index: 6;
+	--fontsize: 1.8px;
+	padding: 0.5%;
+}
+
+.described {
+	z-index: 10;
+    color: white !important; 
+    background-color: rgba(0,126,187,0.7);
+	animation-name: blink_elem;
+	animation-duration: 2s;
+	animation-fill-mode: forwards;
+	animation-iteration-count: infinite;
+}

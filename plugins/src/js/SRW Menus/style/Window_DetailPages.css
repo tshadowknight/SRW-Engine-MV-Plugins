@@ -1,0 +1,493 @@
+#detail_pages .menu_header {
+	width: 70%;
+	z-index: 1;
+}
+
+#detail_pages .tab_button {
+	top: 3%;
+	z-index: 2;
+}
+
+#detail_pages .tab_button.selected {
+	color: #FFFFFF;
+	border: 0.1vw solid #FFFFFF;
+	background-color: rgba(255,255,255,0.2);
+}
+
+#detail_pages .pilot_stats_button {
+	left: 1%;
+}
+
+#detail_pages .mech_stats_button {
+	left: 23%;
+}
+
+#detail_pages .weapon_info_button {
+	left: 45%;
+}
+
+#detail_pages .list_container {
+	height: 46%;
+}
+
+#detail_pages .list_detail {
+	width: 67.5%;
+    margin-left: 0%;
+    left: 6%;
+}
+
+#detail_pages .mech_stats_detail {
+	height: 25%;
+    top: 52%;
+	z-index: 1;	
+}
+
+#detail_pages .upgrade_mech_name {
+	z-index: 2;
+	width: 48%;
+}
+
+#detail_pages .upgrade_detail {
+	top: 78%;
+}
+
+#detail_pages .fub_detail {
+	height: 36%;
+    top: 52%;
+    left: 74%;
+    display: block;
+    width: 20%;
+}
+
+#detail_pages .mech_hp_en_container {
+	height: 100%;
+	width: 50%;
+}
+
+#detail_pages .left_items {
+	width: 40%;
+    height: 100%;	
+	display: inline-block;
+}
+
+#detail_pages .left_items .icon_hp_EN {
+	display: flex;
+	width: 100%;
+	height: 35%;
+}
+
+#detail_pages #detail_list_icon {
+	width: 16%;
+    margin-left: 3%;
+    margin-top: 1%;
+    margin-right: 7%;
+}
+
+#detail_pages .stat_section {
+	height: 20%;
+}
+
+#detail_pages .stat_section_armor {
+	left: 1%;
+    top: 0%;	
+    width: 22.5%;
+}
+
+#detail_pages .stat_section_mobility {
+	left: 1%;
+    top: 20%;
+	width: 22.5%;
+}
+
+#detail_pages .stat_section_accuracy {
+	left: 1%;
+    top: 40%;
+	width: 22.5%;
+}
+
+#detail_pages .stat_section_size {
+	left: 25%;
+    top: 40%;
+	width: 25%;
+}
+
+#detail_pages .stat_section_move {
+	top: 20%;
+	width: 25%;
+	left: 25%;
+}
+
+#detail_pages .stat_section_terrain {
+	top: 0%;
+    width: 25%;
+    display: flex;
+    left: 25%;
+    align-items: center;
+}
+
+#detail_pages .pilot_stat_container {
+	border: 0px;
+}
+
+#detail_pages .pilot_stat_container.on {
+	color: var(--text-color-highlight2);	
+}
+
+#detail_pages .pilot_stat_container.on2 {
+	color: var(--text-color-highlight);	
+}
+
+#detail_pages .pilot_stat_container.off {
+	color: #888888;	
+}
+
+#detail_pages .stat_section_terrain .stat_label {
+	color: var(--text-color-highlight2);	
+}
+
+#detail_pages .center_items {
+	width: 35%;
+    height: 100%;	
+	display: inline-block;
+	margin-left: 2%;
+}
+
+#detail_pages .right_items {
+	width: 20%;
+    height: 100%;	
+	display: inline-block;
+	margin-left: 2%;
+}
+
+#detail_pages .ability_block_row {
+	--heightscaling: 2.7px;
+}
+
+#detail_pages .right_items .ability_block_row {
+	justify-content: center;
+}
+
+#detail_pages .right_items .pilot_stat_container {
+	width: 100%;
+	text-align: center;
+}
+
+#detail_pages .right_items .pilot_stat_container .stat_value{
+	margin-left: 0px;
+	margin-right: 0px;
+}
+
+#detail_pages .center_items .pilot_stat_container {
+	width: 10px;
+}
+
+#detail_pages_upgrade_name_icon {
+	width: 10%;
+}
+
+#detail_pages_weapons_name_icon {
+	width: 10%;
+}
+
+#detail_pages .FUB_label {
+	color: var(--text-color-highlight);
+	margin-left: 2%;
+    height: 12%;
+	--fontsize: 1.6px;
+}
+
+#detail_pages .FUB_content {
+	color: #FFFFFF;
+	margin-left: 2%;
+	height: 88%;
+	width: 96%;
+	--fontsize: 1.6px;
+}
+
+#detail_pages .weapon_info {
+	height: 33%;
+    border: 0;
+    top: 24%;
+    width: 88%;
+}
+
+#detail_pages .weapon_detail {
+	width: 87.7%;
+    margin-left: 0%;
+    height: 22%;
+    left: 6%;
+    top: 58%;
+}
+
+#detail_pages .pilot_detail_1 {
+	width: 52%;
+	top: 13%;
+    height: 32%;
+}
+
+#detail_pages .pilot_detail_2 {
+	width: 88%;
+	height: 40%;
+    top: 46%;
+	align-items: baseline;
+}
+
+#detail_pages .pilot_detail_2 .spirit_label {
+	--widthscaling: 8;
+}
+
+#detail_pages .pilot_detail_2 .ability_block {
+	margin-left: 1%;
+    margin-top: 1%;
+	border: 0.1vw solid rgba(255,255,255,0.5);
+    padding: 0.5%;
+}
+
+#detail_pages .pilot_detail_2 .ability_block.ace_bonus {
+	border: 0.1vw solid rgba(255,255,255,0.5);
+    padding: 0.5%;
+	position: absolute;
+	--widthscaling: 50;
+	left: 0;
+	height: 36%;
+	width: 97%;
+}
+
+#detail_pages .pilot_detail_2 .spirit_list_entry .stat_value{
+	justify-content: flex-start;
+	display: flex;
+	text-align: left;
+}
+
+#detail_pages .pilot_detail_2 .ace_desc {
+	color: #FFFFFF;
+	--fontsize: 1.5px;
+}
+
+#detail_pages #pilot_summary_name {
+	left: 43%;
+    top: 24%;
+}
+
+#pilot_summary_card {
+	--widthscaling: 20;
+}
+
+#pilot_summary_card .ability_block_row{
+	width: 100%;
+}
+
+#detail_pages #pilot_summary_card {
+	margin: 0px;
+	left: 45%;
+    top: 23%;
+	position: absolute;
+}
+
+#pilot_summary_card .stat_label {
+	color: var(--text-color-highlight);
+}
+#pilot_summary_card .stat_value {
+   
+}
+
+.actor_battle_sprite {
+	position: absolute;
+	--widthpixels: 320;
+	--heightpixels: 320;
+	bottom: 49%;
+	margin-left: 34%;
+}
+
+.actor_battle_sprite img{
+	width: 100%;
+	image-rendering: pixelated;
+}
+
+#detail_pages .bar_pilot_stats {
+	width: 100%;
+    display: flex;
+    height: 100%;
+    white-space: nowrap;
+    align-items: center;
+    position: relative;
+}
+
+#detail_pages .bar_pilot_stats .type_indicator {
+	display: flex;
+    align-items: center;
+    justify-content: center;
+	--widthpixels: 100;
+	--heightpixels: 30;
+	position: absolute;
+	left: 11%;
+	/*background-color: red;*/
+	
+	--fontsize: 1.6px;
+}
+
+#detail_pages .bar_pilot_stats .twin_type {	
+	color: var(--text-color-highlight);
+	top: 2%;
+}
+	
+#detail_pages .bar_pilot_stats .pilot_type {	
+	color: var(--text-color-highlight2);
+	bottom: 2%;	
+}
+
+#detail_pages .selection_icon {
+	--widthpixels: 24;
+	--heightpixels: 24;
+	background-color: rgba(85, 164, 255, 0.5);
+    border: 0.1vw solid #99e3ff;
+	
+	flex-shrink: 0;
+	position: absolute;
+	
+}
+
+#detail_pages .selection_icon.twin.left{
+	top: 16%;
+    left: 1.5%;
+}
+
+#detail_pages .selection_icon.twin.right{
+	top: 16%;
+    left: 32.3%;
+}
+
+#detail_pages #bar_pilot_stats_icon {
+	margin-left: 7.4%;
+	position: absolute;
+    top: 16%;
+}
+
+#detail_pages .selection_icon.sub.left{
+	top: 70.5%;
+    left: 1.5%;
+}
+
+#detail_pages .selection_icon.sub.right{
+	top: 70.5%;
+    left: 32.3%;
+}
+
+#combined_terrain_card {
+	margin: 0px;
+    left: 77.5%;
+    top: 13%;
+    position: absolute;
+    width: 14.5%;
+    height: 28.5%;
+    background-color: var(--section-bg-color);
+    border: 0.1vw solid #FFFFFF;
+    border-radius: 1vw;
+    padding: 1%;
+}
+
+#combined_terrain_card .stat_label {
+	color: var(--text-color-highlight2);
+	margin-right: 2%;
+}
+
+#combined_terrain_card .stat_value {
+	margin-left: 35%;
+}
+
+#status_info {
+	margin: 0px;
+    left: 58.5%;
+    top: 13%;
+    position: absolute;
+    width: 16.5%;
+    height: 28.5%;
+    background-color: var(--section-bg-color);
+    border: 0.1vw solid #FFFFFF;
+    border-radius: 1vw;
+    padding: 1%;
+}
+
+#status_info .stat_label {
+	color: var(--text-color-highlight2);
+	margin-right: 2%;
+}
+
+#status_info .stat_value {
+	margin-left: 35%;
+}
+
+#status_info .ability_block_row {
+	display: flex;
+	color: #FF2222;	
+	white-space: nowrap;
+}
+
+#status_info .ability_block_row .value{	
+	--fontsize: 1.8px;
+}
+
+#status_info .ability_block_row.OK{	
+	justify-content: center;
+	border-bottom: 0px;
+	color: #228822;
+}
+
+
+#detail_pages .upgrade_mech_name_value{
+	width: 80%;
+}
+
+#detail_pages .attribute_display {
+	border: 0.1vw solid rgba(255,255,255,0.5);
+    padding-left: 0.5%;
+    padding-right: 0.5%;
+	position: absolute;
+	height: 10%;
+	right: 0;
+	background-color: var(--section-bg-color);
+	border-bottom-left-radius: 2vw;
+	border-right: 0;
+	display: none;
+	--fontsize: 2px;
+	color: #FFFFFF;
+}
+
+#detail_pages .attribute_display .label{
+	color: var(--text-color-highlight);
+	width: 100%;
+}
+
+#detail_pages .attribute_display .value{
+	width: 100%;
+	text-align: center;
+}
+
+#detail_pages .attribute_display.primary {
+	width: 15%;
+	top: 5%;
+}
+
+#detail_pages .attribute_display.secondary {
+	width: 12%;
+	top: 17%;
+}
+
+#detail_pages_map_preview {
+	--heightpixels: 140;
+	--widthpixels: 140;
+	background-color: #FFFFFF;
+	border: 0.1vw solid #FFFFFF;
+	border-top: none;
+	position: absolute;
+	top: 0;
+	left: 71%;	
+	border-bottom-left-radius: 1vw;
+	border-bottom-right-radius: 1vw;
+	display: none;
+	padding-bottom: 0.6vw;
+}
+
+#detail_pages_map_preview.active {
+	display: block;
+}

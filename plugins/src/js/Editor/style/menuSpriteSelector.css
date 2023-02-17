@@ -1,0 +1,111 @@
+#menu_selector_container {
+	position: fixed;
+	overflow: hidden;
+	-webkit-box-shadow: 0px 0px 2px 1px rgba(0,0,0,1);
+	-moz-box-shadow: 0px 0px 2px 1px rgba(0,0,0,1);
+	box-shadow: 0px 0px 2px 1px rgba(0,0,0,1);
+	background-color: var(--editor-theme-color);
+}
+
+.preview_selector {
+}
+
+.preview_selector .controls {
+	display: flex;
+	align-items: center;
+	padding: 4px;
+	background-color: var(--editor-theme-color3);
+	color: #FFFFFF;
+}
+
+.preview_selector .controls .label{
+	margin-left: auto;
+	margin-right: 5px;
+}
+
+.preview_selector .controls input{
+	margin-right: 5px;	
+}
+
+.preview_selector .face_file_list {
+	overflow-y: auto;
+	height: 100%;
+	border-right: 1px solid  var(--editor-theme-color-dark);
+	min-width: 150px;
+}
+
+.preview_selector .face_file_list .entry {
+	padding: 3px;
+	cursor: pointer;
+}
+
+.preview_selector .face_file_list .entry:hover {
+	background-color: var(--editor-theme-color2);
+	color: #FFFFFF;
+}
+
+.preview_selector .face_file_list .entry.selected {
+	background-color: var(--editor-theme-color-dark);
+	color: #FFFFFF;
+}
+
+.preview_selector .selection_pane {
+	height: 100%;
+}
+
+.preview_selector .selection_pane .label{
+	display: inline-block;
+	color: #FFFFFF;
+}
+
+.preview_selector .selection_pane .selector_container {
+	position: relative;
+	cursor: pointer;
+	overflow-y: scroll;
+	height: 500px;
+	padding: 4px;
+}
+
+.preview_selector .selection_pane .selector_container .row{
+	display: flex;
+}
+
+.preview_selector .entry_container {
+	margin: 4px;
+}
+
+.preview_selector .entry {
+	cursor: pointer;
+	width: 144px;
+	height: 144px;
+	background-color: rgba(0,0,0,0.5);
+	border: 1px solid rgba(0,0,0,0.8);
+	flex-shrink: 0;
+	font-size: 20px;
+	display: flex;
+	align-items: center;
+	justify-content: center;
+	color: #FFFFFF;
+}
+
+.preview_selector .entry:hover{
+	border: 1px solid rgba(255,0,0,0.8);
+}
+
+.preview_selector .entry.selected{
+	border: 1px solid rgba(0,255,0,0.8);
+}
+
+.preview_selector .entry img{
+	width: 100%;
+}
+
+.file_name {
+	width: 100%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    color: #FFFFFF;
+    background-color: var(--editor-theme-color3);
+	overflow: hidden;
+}

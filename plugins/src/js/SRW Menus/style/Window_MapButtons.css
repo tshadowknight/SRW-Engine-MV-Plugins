@@ -1,0 +1,68 @@
+.map_button {
+	background-color: var(--section-bg-color-solid);	
+	position: absolute;
+	cursor: pointer;
+	padding: 1%;
+}
+
+.map_button.center {
+	bottom: 0px;
+	margin-left: auto;
+	margin-right: auto;
+	border-top: 0.2vw solid #FFFFFF;
+	border-left: 0.2vw solid #FFFFFF;
+	border-right: 0.2vw solid #FFFFFF;
+	border-top-right-radius: 9999px;
+	border-top-left-radius: 9999px;
+	padding-left: 3%;
+    padding-right: 3%;
+}
+
+.map_button.menu {
+	border-radius: 99999px;
+    border: 0.2vw solid #FFFFFF;
+    margin-left: auto;
+    margin-right: -1vw;
+    height: 4vw;
+    width: 4vw;
+	background-color: var(--section-bg-color-solid);
+    position: relative; 
+    cursor: pointer;
+    padding: 1%;
+	top: 50%;
+}
+
+.map_button.menu.active {
+	background-color: #FFFFFF;
+}
+
+.map_button.menu img{
+	width: 4vw;
+	filter: var(--white-filter);
+}
+
+.map_button.menu.active img{
+	filter: var(--menu-bg-color-filter);
+}
+
+#map_buttons {
+	--fontsize: 3px;
+	color: #FFFFFF;
+}
+
+#map_buttons.menu_bg {
+	background: none;
+	position: fixed;
+    top: 0;
+    left: 0;
+	z-index: -1;
+}
+
+#map_buttons .bg_fade_container {
+	background: none;
+	-webkit-mask-image: none;
+	color: #FFFFFF;
+	display: flex;
+    justify-content: center;
+}
+

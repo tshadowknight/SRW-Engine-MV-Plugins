@@ -1,0 +1,17 @@
+#opening_crawl {
+	background: none;
+}
+
+#opening_crawl .bg_fade_container {
+	display: none;
+}
+
+#opening_crawl_text {
+	width: 65%;
+	margin-left: 17.5%;
+	white-space: wrap;
+	color: #FFFFFF;
+	left: 0;
+	position: absolute;
+	--fontsize: 2px;
+}

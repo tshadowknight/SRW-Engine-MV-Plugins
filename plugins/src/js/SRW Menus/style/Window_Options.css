@@ -1,0 +1,46 @@
+#options .list_container {
+	height: 62.5%;
+    border: 0.1vw solid #FFFFFF;
+    border-radius: 1vw;
+    display: block;
+    width: 77%;
+    align-items: center;
+	background-color: var(--section-bg-color);
+	overflow: hidden;
+	padding: 2%;
+}
+
+#options .entry {
+	display: flex;
+    align-items: center;
+    justify-content: center;
+    width: 95%;
+    --fontsize: 2px;
+    margin-left: auto;
+    margin-right: auto;
+	color: #FFFFFF;
+}
+
+#options .entry.selected {
+	background-color: var(--selected-color);
+	
+}
+
+#options .entry.title{
+	color: var(--text-color-highlight2);
+	--fontsize: 2.2px;
+}
+
+#options .entry .label {
+	width: 50%;
+	margin-left: 5%;
+	margin-right: 5%;
+	text-align: left;
+}
+
+#options .entry .value {
+	width: 30%;
+	margin-left: 5%;
+	margin-right: 5%;
+	text-align: center;
+}

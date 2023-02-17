@@ -1,0 +1,88 @@
+	export default {
+		patches: patches,
+	} 
+	
+	function patches(){};
+	
+	patches.apply = function(){
+		AudioManager.staticSeStates = {};
+		AudioManager.playStaticSe = function(se) {
+			if (se.name) {
+				this.loadStaticSe(se);
+				for (var i = 0; i < this._staticBuffers.length; i++) {
+					var buffer = this._staticBuffers[i];
+					if (buffer._reservedSeName === se.name) {
+						AudioManager.staticSeStates[se.name] = false;
+						
+						buffer._stopListeners.push(function(){
+							AudioManager.staticSeStates[se.name] = true;
+						});
+						
+						buffer.stop();
+						this.updateSeParameters(buffer, se);
+						buffer.play(false);
+						break;
+					}
+				}
+			}
+		};
+
+		AudioManager.seStates = {};		
+		AudioManager.playSe = function(se) {
+			if (se.name && !$gameTemp.isSkippingEvents) {
+				this._seBuffers = this._seBuffers.filter(function(audio) {
+					return audio.isPlaying();
+				});
+				var buffer = this.createBuffer('se', se.name);
+				this.updateSeParameters(buffer, se);
+				AudioManager.seStates[se.name] = false;
+				buffer.play(false);
+				buffer._stopListeners.push(function(){
+					AudioManager.seStates[se.name] = true;
+				});
+				this._seBuffers.push(buffer);
+			}
+		};
+		
+		AudioManager.isPlayingSE = function(){
+			let result = false;
+			for(var seName in this.seStates){
+				if(!this.seStates[seName]){
+					result = true;
+				}
+			}
+			return result;
+		}
+		
+		AudioManager.loadBgm = function(bgm) {
+			if (bgm.name && !this.isStaticSe(bgm)) {
+				var buffer = this.createBuffer('bgm', bgm.name);
+				buffer._reservedSeName = bgm.name;
+				this._staticBuffers.push(buffer);
+				if (this.shouldUseHtml5Audio()) {
+					Html5Audio.setStaticSe(buffer._url);
+				}
+			}
+		};
+		
+		AudioManager.playSe = function(se) {
+			if (se.name) {
+				this._seBuffers = this._seBuffers.filter(function(audio) {
+					return audio.isPlaying();
+				});
+				var buffer = this.createBuffer('se', se.name);
+				buffer._seName = se.name;
+				this.updateSeParameters(buffer, se);
+				buffer.play(false);
+				this._seBuffers.push(buffer);
+			}
+		};
+		
+		AudioManager.fadeOutSe = function(seName, duration) {
+			this._seBuffers.forEach(function(buffer) {
+				if(buffer._seName == seName){
+					buffer.fadeOut(duration);
+				}
+			});
+		};
+	}

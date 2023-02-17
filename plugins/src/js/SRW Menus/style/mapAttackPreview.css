@@ -1,0 +1,27 @@
+.preview_grid {
+	position: relative;
+	width: 100%;
+	height: 100%;
+}
+
+.preview_grid .grid_block {
+	position: absolute;
+	background-color: var(--section-bg-color-solid);
+	/*
+	-webkit-box-shadow: inset 0px 0px 0px 0.075vw rgba(255,255,255,0.75);
+	-moz-box-shadow: inset 0px 0px 0px 0.075vw rgba(255,255,255,0.75);
+	box-shadow: inset 0px 0px 0px 0.075vw rgba(255,255,255,0.75);
+	*/
+}
+
+.preview_grid .source_tile {
+	background-color: rgba(0,255,0,0.5);
+}
+
+.preview_grid .attack_tile {
+	background-color: rgba(255,0,0,0.5);
+}
+
+.preview_grid .attack_tile.ignore_friendlies {
+	background-color: rgba(0,0,255,0.5);
+}

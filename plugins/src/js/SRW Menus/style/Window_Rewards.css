@@ -1,0 +1,158 @@
+#rewards {
+	display: flex;
+	align-items: center;
+	justify-content: center;
+	background: rgba(0,0,0,0);
+	color: #FFFFFF;
+}
+
+#rewards .bg_fade_container {
+	width: 800px;
+	height: 300px;
+	background-color: var(--menu-bg-color);
+	-webkit-mask-image: none;
+	border-radius: 10px;
+	position: relative;
+	display: flex;
+    align-items: center;
+    justify-content: center;
+	border: 0.4vw solid #FFFFFF;
+	--fontsize: 2.4px;
+}
+
+#rewards .rewards_content {
+	padding: 3%;
+    width: 100%;
+    height: 87%;
+	white-space: nowrap;
+}
+
+#rewards .rewards_row {
+	width: 100%;
+	display: flex;
+}
+
+#rewards .funds_row {
+	height: 20%;
+	margin-bottom: 1%;
+}
+
+#rewards .funds_block {
+	border: 0.1vw solid #FFFFFF;
+	width: 100%;
+	display: flex;
+	align-items: center;
+}
+
+#rewards .funds_block .funds_gained{
+	color: var(--text-color-highlight);
+	margin-left: 2%;
+	display: flex;
+	align-items: center;
+}
+
+#rewards .funds_block .current_funds{
+	color: var(--text-color-highlight2);
+	margin-left: auto;
+	margin-right: 3%;
+	display: flex;
+	align-items: center;
+}
+
+#rewards .funds_gained_value {
+	width: 80px;
+	/*height: 20px;*/
+    margin-left: 5%;
+	text-align: right;
+}
+
+#rewards .current_funds_value {
+	width: 100px;
+	/*height: 20px;*/
+    margin-left: 5%;
+	text-align: right;
+}
+
+#rewards .pilot_items_row {
+	height: 78%;
+}
+
+#rewards .pilot_block {
+	border: 0.1vw solid #FFFFFF;
+	width: 60%;
+	margin-right: 1%;
+}
+
+#rewards .pilot_block .row {
+	width: 98%;
+	margin-left: 1%;
+	margin-right: 1%;
+	display: flex;
+	align-items: center;
+	color: #FFFFFF;
+	position: relative;
+	height: 20%;
+}
+
+#rewards .pilot_block .row.header {
+	color: var(--text-color-highlight);
+}
+
+#rewards .pilot_block .row .column:nth-child(1){
+	margin-right: auto;
+	left: 2%;
+	position: absolute;
+}
+
+#rewards .pilot_block .row .column:nth-child(2){
+	margin-right: auto;
+	right: 33%;
+	position: absolute;
+}
+
+#rewards .pilot_block .row .column:nth-child(3){
+	margin-right: auto;
+	right: 12%;
+	position: absolute;
+}
+
+#rewards .items_block {
+	border: 0.1vw solid #FFFFFF;
+	width: 40%;
+}
+
+#rewards .items_block .column{
+	width: 100%;
+	text-align: center;
+}
+
+#rewards .items_block .row {
+	width: 98%;
+	margin-left: 1%;
+	margin-right: 1%;
+	display: flex;
+	align-items: center;
+	color: #FFFFFF;
+}
+
+#rewards .items_block .row.header {
+	color: var(--text-color-highlight);
+}
+
+#rewards .items_scroll {
+	height: 81%;
+    display: block;
+    width: 100%;
+    align-items: center;
+    overflow: auto;
+    overflow-x: hidden;
+}
+
+#rewards .gains_scroll {
+	height: 80%;
+    display: block;
+    width: 100%;
+    align-items: center;
+    overflow: auto;
+    overflow-x: hidden;
+}

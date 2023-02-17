@@ -1,0 +1,619 @@
+#battle_scene_ui_layer_text_display {
+	position: absolute;
+	left: 0;
+	bottom: 0;
+	width: 100%;
+	height: 150px;
+	background-color: var(--menu-bg-color-solid);
+	display: flex;
+	align-items: center;
+	color: #FFFFFF;
+	transition: background .25s ease-out;
+}
+
+#battle_scene_ui_layer_text_display  #name_container{
+	--fontsize: 1.8px;
+}
+
+#battle_scene_ui_layer_text_display.fadeOut {
+	background-color: rgba(255,255,255,0.1);
+}
+
+#battle_scene_ui_layer_text_display_name_and_content {	
+	width: 100%;
+	height: 100%;
+	align-items: center;	
+	margin-top: 2%;
+}
+
+#battle_scene_ui_layer #icon_and_noise_container {
+	--widthpixels: 110;
+	--heightpixels: 110;
+	background-color: rgba(255, 255, 255, 0.5);	
+	margin: 2%;
+	position: relative;
+	flex-shrink: 0;
+}
+
+#battle_scene_ui_layer #icon_container {
+	width: 100%;
+	height: 100%;
+}
+
+#battle_scene_ui_layer #noise {
+	width: 100%;
+	height: 100%;
+	position: absolute;
+    top: 0;
+	display: none;
+}
+
+#battle_scene_ui_layer #noise.active {
+	display: block;
+}
+
+#battle_scene_ui_layer #icon_container {
+	overflow: hidden;
+}
+
+#battle_scene_ui_layer #icon_container.shake .face_pic_container{
+	animation-name: shake_pilot_portrait;
+	animation-duration: 1s;
+	animation-fill-mode: forwards;
+	animation-timing-function: step-end;
+}
+
+@keyframes shake_pilot_portrait {
+	/*0% { margin-left: 5%;}
+	50% { margin-left: -5%;}
+	100% { padding-left: 0%;}*/
+}
+
+#battle_scene_ui_layer #noise.fade_in {
+	animation-name: fade_in;
+	animation-duration: 1s;
+	animation-fill-mode: forwards;
+}
+
+@keyframes fade_in {
+	0% { opacity: 0;}
+	100% { opacity: 1;}
+}
+
+#battle_scene_ui_layer .text_container {
+	--fontsize: 2px;
+	height: 70%;
+	max-width: 80%;
+}
+
+#battle_scene_ui_layer {
+	position: fixed;
+	width: 0px;
+	height: 0px;	
+	top: 0;
+	left: 0;
+	z-index: 52;
+	margin: auto;
+	font-family: GameFont;
+	overflow: hidden;
+	background: none;
+	pointer-events: none;
+	display: none;
+}
+
+#battle_scene_ui_layer .bg_fade_container{
+	-webkit-mask-image: none;
+}
+
+#battle_scene_ui_layer .bg_container{
+	background: none;
+}
+
+#battle_scene_ui_layer .hp_en {
+	width: 100%;
+	font-size: 1.5px;
+}
+
+#battle_scene_ui_layer .stats_container {
+	position: absolute;
+	right: 0.5%;
+	top: 1%;
+	left: auto;
+	background-color:rgba(179, 201, 224, 0.8);	
+	border-bottom-left-radius: 0.5vw;
+	--widthpixels: 168;
+    --heightpixels: 54;
+	font-size: 1.8px;	
+	padding: 0.5%;
+	    text-shadow: 0.04vw 0.04vw 0.01vw rgb(0 0 0);
+}
+
+#battle_scene_ui_layer .stats_container.isMain.inTwinContext {
+	right: 17%;
+}
+
+#battle_scene_ui_layer .stats_container img{
+	width: 100%;
+}
+
+#battle_scene_ui_layer .stats_container .inner {
+	display: flex;
+	align-items: center;
+	position: relative;
+}
+
+#battle_scene_ui_layer .stats_container .icon {
+	--widthpixels: 40;
+	/*background-color: red;*/
+	--heightpixels: 40;
+	/*position: absolute;
+	top: 51%;
+    left: 16%;*/
+	flex-shrink: 0;
+}
+
+#battle_scene_ui_layer .stats_container .hp_row {
+	display: flex;
+	position: relative;
+	align-items: center;
+	margin-top: 0%;
+}
+
+#battle_scene_ui_layer .stats_container .hp_row .values .value {
+	--widthpixels: 45;
+}
+
+
+#battle_scene_ui_layer .stats_container .values .value.current {
+	text-align: right;
+}
+
+#battle_scene_ui_layer .stats_container .values .value.max {
+	text-align: left;
+}
+
+#battle_scene_ui_layer .stats_container .en_row {
+	display: flex;
+	position: relative;
+	align-items: center;
+	margin-top: 1%;
+}
+
+#battle_scene_ui_layer .stats_container .en_row .values .value {
+	--widthpixels: 20;
+}
+
+#battle_scene_ui_layer .stats_container .values .divider{
+	--widthpixels: 10;
+	text-align: center;
+}
+
+
+#battle_scene_ui_layer .stats_container .en_row .bar{
+	width: 40%;
+    margin-left: auto;
+}
+
+#battle_scene_ui_layer .stats_container .values {
+	position: absolute;
+    right: 23%;
+    display: flex;
+    --fontsize: 1.2px;
+    color: #FFFFFF;
+	width: fit-content;
+	text-align: right;
+	margin-top: -0.5%;
+	top: 45%;
+}
+
+#battle_scene_ui_layer .stats_container .bar {
+	background-color: black;
+	width: 100%;
+	--heightpixels: 5;	
+	
+    overflow: hidden;
+	border: 0.05vw solid #FFFFFF;
+}
+
+#battle_scene_ui_layer .stats_container .hp_row .bar {
+	margin-bottom: 5%;
+}
+
+#battle_scene_ui_layer .stats_container .en_row .bar {
+	margin-bottom: 4%;
+}
+
+#battle_scene_ui_layer .stats_container .bar .fill{
+	height: 100%;
+	background-color: #53e053;
+}
+
+#battle_scene_ui_layer .stats_container .label {
+	--fontsize: 1.5px;
+	color: #FFFFFF;
+	margin-left: 5%;
+	margin-right: 3%;
+}
+
+#battle_scene_ui_layer .stats_container .en_row .bar .fill{
+	background-color: #e08a53;
+}
+
+#battle_scene_ui_layer_enemy_stats.stats_container{
+	right: auto;
+	left: 0.5%;
+	top: 1%;
+	border-bottom-left-radius: 0px;
+	border-bottom-right-radius: 0.5vw;
+	background-color:rgba(224, 181, 179, 0.8);	
+}
+
+#battle_scene_ui_layer_enemy_stats.stats_container.isMain.inTwinContext {
+	left: 17%;
+	right: auto;
+}
+
+#battle_scene_ui_layer_enemy_stats.stats_container .icon {
+	/*top: 51%;
+    right: 16%;
+	left: auto;*/
+	transform: scaleX(-1);
+}
+
+#battle_scene_ui_layer_enemy_stats.stats_container .label{
+	margin-right: 5%;
+	margin-left: 3%;
+}
+
+#battle_scene_ui_layer_enemy_stats.stats_container .en_row .bar {
+	margin-left: 0;
+	margin-right: auto;
+}
+
+#battle_scene_ui_layer_enemy_stats.stats_container .values{
+	left: 23%;
+}
+
+@font-face {
+    font-family: 'digital';
+    src: url('./digital-7.regular.ttf');
+}
+
+@font-face {
+    font-family: 'Northstar';
+    src: url('./NorthstarRegular-9lEy.otf');
+}
+
+@font-face {
+    font-family: 'Rapier';
+    src: url('./RapierZero-325M.ttf');
+}
+
+@font-face {
+    font-family: 'EditUndo';
+    src: url('./edit-undo.brk.ttf');
+}
+
+
+#battle_scene_ui_layer_damage_display {
+	/*--widthpixels: 400;
+	--heightpixels: 50;*/
+	width: 100%;
+	--fontsize: 10px;	
+	/*font-style: italic;*/
+	position: absolute;
+	left: 0px;
+	/*color: #FFFFFF;*/
+	/*text-shadow: 0.1vw 0.1vw 0 #222222;*/
+	align-items: center;
+	justify-content: center;
+	display: none;
+	font-family: EditUndo;	
+	top: 42%;
+}
+
+#battle_scene_ui_layer_damage_display.twin {
+	top: 60%;
+}
+
+@keyframes show_damage_display {
+  0% { display: flex; background-color: rgba(0,0,0,0);}
+  100% { display: flex; background-color: rgba(0,0,0,0.3);}
+}
+
+#battle_scene_ui_layer_damage_display.show {
+	display: flex;
+	opacity: 1;
+	animation: show_damage_display 0.2s;
+	animation-fill-mode: forwards;
+}
+
+@keyframes hide_damage_display {
+  0% {   opacity: 1; transform: scaleY(1);}
+  100% { opacity: 0; transform: scaleY(0);}
+}
+
+#battle_scene_ui_layer_damage_display.hide {
+	display: flex;
+	animation: hide_damage_display 0.25s;
+	animation-fill-mode: forwards;
+}
+
+#battle_scene_ui_layer_damage_display .digit {
+/* Permalink - use to edit and share this gradient: https://colorzilla.com/gradient-editor/#fff2b5+0,fff2b5+26,ff9c3f+66,ff1f1f+83,ff1f1f+100 */
+background: rgb(255,242,181); /* Old browsers */
+background: -moz-linear-gradient(top,  rgba(255,242,181,1) 0%, rgba(255,242,181,1) 26%, rgba(255,156,63,1) 66%, rgba(255,31,31,1) 83%, rgba(255,31,31,1) 100%); /* FF3.6-15 */
+background: -webkit-linear-gradient(top,  rgba(255,242,181,1) 0%,rgba(255,242,181,1) 26%,rgba(255,156,63,1) 66%,rgba(255,31,31,1) 83%,rgba(255,31,31,1) 100%); /* Chrome10-25,Safari5.1-6 */
+background: linear-gradient(to bottom,  rgba(255,242,181,1) 0%,rgba(255,242,181,1) 26%,rgba(255,156,63,1) 66%,rgba(255,31,31,1) 83%,rgba(255,31,31,1) 100%); /* W3C, IE10+, FF16+, Chrome26+, Opera12+, Safari7+ */
+filter: progid:DXImageTransform.Microsoft.gradient( startColorstr='#fff2b5', endColorstr='#ff1f1f',GradientType=0 ); /* IE6-9 */
+	-webkit-text-stroke-width: 0.2vw;
+	-webkit-text-stroke-color: #e92f00;
+	background-clip: text;
+	-webkit-background-clip: text;
+	color: rgba(0,0,0,0);
+	/*font-style: italic;*/
+}
+
+#battle_scene_ui_layer_damage_display .digit.disabled {
+	visibility: hidden;
+}
+
+#battle_scene_ui_layer_damage_display .digit.reveal {
+	animation: reveal_digit 0.5s;
+	animation-iteration-count: 1; 
+}
+
+
+
+#battle_scene_ui_layer_damage_display.shake {
+	animation: shake_damage 0.25s;
+	
+	animation-iteration-count: 1; 
+}
+
+
+
+
+
+#battle_scene_ui_layer_damage_display_twin {
+	/*--widthpixels: 400;
+	--heightpixels: 50;*/
+	width: 100%;
+	--fontsize: 10px;	
+	/*font-style: italic;*/
+	position: absolute;
+	left: 0px;
+	/*color: #FFFFFF;*/
+	/*text-shadow: 0.1vw 0.1vw 0 #222222;*/
+	align-items: center;
+	justify-content: center;
+	display: none;
+	font-family: EditUndo;	
+	top: 59%;
+}
+
+#battle_scene_ui_layer_damage_display_twin.show {
+	display: flex;
+	opacity: 1;
+	animation: show_damage_display 0.2s;
+	animation-fill-mode: forwards;
+}
+
+
+#battle_scene_ui_layer_damage_display_twin.hide {
+	display: flex;
+	animation: hide_damage_display 0.25s;
+	animation-fill-mode: forwards;
+}
+
+#battle_scene_ui_layer_damage_display_twin .digit {
+/* Permalink - use to edit and share this gradient: https://colorzilla.com/gradient-editor/#fff2b5+0,fff2b5+26,ff9c3f+66,ff1f1f+83,ff1f1f+100 */
+background: rgb(255,242,181); /* Old browsers */
+background: -moz-linear-gradient(top,  rgba(255,242,181,1) 0%, rgba(255,242,181,1) 26%, rgba(255,156,63,1) 66%, rgba(255,31,31,1) 83%, rgba(255,31,31,1) 100%); /* FF3.6-15 */
+background: -webkit-linear-gradient(top,  rgba(255,242,181,1) 0%,rgba(255,242,181,1) 26%,rgba(255,156,63,1) 66%,rgba(255,31,31,1) 83%,rgba(255,31,31,1) 100%); /* Chrome10-25,Safari5.1-6 */
+background: linear-gradient(to bottom,  rgba(255,242,181,1) 0%,rgba(255,242,181,1) 26%,rgba(255,156,63,1) 66%,rgba(255,31,31,1) 83%,rgba(255,31,31,1) 100%); /* W3C, IE10+, FF16+, Chrome26+, Opera12+, Safari7+ */
+filter: progid:DXImageTransform.Microsoft.gradient( startColorstr='#fff2b5', endColorstr='#ff1f1f',GradientType=0 ); /* IE6-9 */
+	-webkit-text-stroke-width: 0.2vw;
+	-webkit-text-stroke-color: #e92f00;
+	background-clip: text;
+	-webkit-background-clip: text;
+	color: rgba(0,0,0,0);
+	/*font-style: italic;*/
+}
+
+#battle_scene_ui_layer_damage_display_twin .digit.disabled {
+	visibility: hidden;
+}
+
+#battle_scene_ui_layer_damage_display_twin .digit.reveal {
+	animation: reveal_digit 0.5s;
+	animation-iteration-count: 1; 
+}
+
+
+
+#battle_scene_ui_layer_damage_display_twin.shake {
+	animation: shake_damage 0.25s;
+	
+	animation-iteration-count: 1; 
+}
+
+
+@keyframes reveal_digit {
+  0% { transform: translate(0px, 0px) scaleX(3) scaleY(3); opacity: 0;}
+  100% { transform: translate(0px, 0px)  scaleX(1) scaleY(1); opacity: 1;}
+}
+
+
+@keyframes shake_damage {
+  0% { transform: translate(1px, 0px); }
+  10% { transform: translate(-1px, -0px); }
+  20% { transform: translate(-1px, 0px); }
+  30% { transform: translate(1px, 0px); }
+  40% { transform: translate(1px, -0px); }
+  50% { transform: translate(-1px, 0px); }
+  60% { transform: translate(-1px, 0px); }
+  70% { transform: translate(1px, 0px); }
+  80% { transform: translate(-1px, -0px); }
+  90% { transform: translate(1px, 0px); }
+  100% { transform: translate(1px, -0px);}
+}
+
+#battle_scene_ui_layer .notification {
+	position: absolute;
+	top: 11%;
+	height: 10%;
+	width: 30%;
+	color: #FFFFFF;
+	font-style: italic;
+	--fontsize: 2.5px;
+	padding-left: 1%;
+	padding-right: 1%;
+	text-shadow: 0.1vw 0.1vw 0 #222222;
+}
+
+#battle_scene_ui_layer_ally_notification {
+	right: 0;
+	text-align: right;
+}
+
+#battle_scene_ui_layer_enemy_notification {
+	left: 0;
+	text-align: left;
+}
+
+#battle_scene_ui_layer .barrier_notification {
+	position: absolute;
+	top: 25%;
+	color: #FFFFFF;
+	--fontsize: 2.5px;
+	text-shadow: 0.1vw 0.1vw 0 #222222;
+}
+
+#battle_scene_ui_layer_ally_barrier_notification {
+	right: 0;
+	text-align: left;
+}
+
+#battle_scene_ui_layer_enemy_barrier_notification {
+	left: 0;
+	text-align: right;
+}
+
+#battle_scene_ui_layer .barrier_name {
+	--widthpixels: 200;
+	--heightpixels: 24;
+	border: 0.1vw solid #ffc400;
+	color: #fffbec;
+	background-color: rgba(255, 196, 0, 0.5);
+	padding: 5%;
+	--fontsize: 2px;
+	display: flex;
+    align-items: center;
+	/*width: fit-content;*/
+	justify-content: center;
+	/*border-radius: 9999px;*/
+	white-space: nowrap;
+}
+
+#battle_scene_ui_layer .barrier_name.evasion{
+	background-color: rgba(110, 234, 165, 0.5);
+	border: 0.1vw solid rgb(110, 234, 165);
+}
+
+#battle_scene_ui_layer .barrier_name.status{
+	background-color: rgba(234, 48, 48, 0.5);
+	border: 0.1vw solid rgb(234, 48, 48);
+}
+
+#battle_scene_ui_layer_ally_barrier_notification .barrier_name{
+	border-top-left-radius: 9999px;
+	border-bottom-left-radius: 9999px;
+	border-right: 0;
+	margin-top: 5%;
+	margin-bottom: 5%;
+	
+	animation-name: slide_in_right;
+	animation-duration: 0.5s;
+	animation-fill-mode: forwards;
+	margin-left: 150%;
+	/*justify-content: flex-start;*/
+	/*justify-content: flex-end;*/
+}
+
+@keyframes slide_in_right {
+	0% { margin-left: 150%;}
+	100% { margin-left: 1%;}
+}
+
+#battle_scene_ui_layer_enemy_barrier_notification .barrier_name{
+	border-top-right-radius: 9999px;
+	border-bottom-right-radius: 9999px;
+	border-left: 0;
+	margin-top: 5%;
+	margin-bottom: 5%;
+	
+	animation-name: slide_in_left;
+	animation-duration: 0.5s;
+	animation-fill-mode: forwards;
+	margin-left: -150%;
+	/*justify-content: flex-end;*/
+}
+
+@keyframes slide_in_left {
+	0% { margin-left: -150%;}
+	100% { margin-left: -1%;}
+}
+
+#battle_scene_ui_layer .slot {
+	position: absolute;
+	bottom: -22%;
+	--fontsize: 1px;
+	color: var(--text-color-highlight);
+}
+
+#battle_scene_ui_layer .slot.ally {
+	right: 4.5%;
+}
+
+#battle_scene_ui_layer .slot.enemy {
+	left: 4.5%;
+}
+
+#battle_scene_ui_layer_enemy_twin_stats {
+	display: none;
+}
+
+#battle_scene_ui_layer_ally_twin_stats {
+	display: none;
+}
+
+#battle_scene_ui_layer_enemy_twin_stats.stats_container{
+	right: auto;
+	left: 0.5%;
+	top: 1%;
+	border-bottom-left-radius: 0px;
+	border-bottom-right-radius: 0.5vw;
+	background-color:rgba(224, 181, 179, 0.8);	
+}
+
+#battle_scene_ui_layer_enemy_twin_stats.stats_container .icon {
+	/*top: 51%;
+    right: 16%;
+	left: auto;*/
+	transform: scaleX(-1);
+}
+
+#battle_scene_ui_layer_enemy_twin_stats.stats_container .label{
+	margin-right: 5%;
+	margin-left: 3%;
+}
+
+#battle_scene_ui_layer_enemy_twin_stats.stats_container .en_row .bar {
+	margin-left: 0;
+	margin-right: auto;
+}
+
+#battle_scene_ui_layer_enemy_twin_stats.stats_container .values{
+	left: 23%;
+}

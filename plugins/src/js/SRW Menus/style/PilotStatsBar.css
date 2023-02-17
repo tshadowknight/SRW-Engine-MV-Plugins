@@ -1,0 +1,38 @@
+.bar_pilot_stats {
+	width: 100%;
+	display: flex;
+	white-space: nowrap;
+}
+
+.pilot_stats_label {
+	--fontsize: 1.6px;
+	text-align: center;
+	width: 10px;
+	color: var(--text-color-highlight);
+	margin-left: 1.5%;
+	margin-right: 1.5%;
+}
+
+.pilot_stat_container {
+	--fontsize: 1.6px;
+	text-align: center;
+	width: 9px;
+	color: #FFFFFF;
+	margin-left: 0.5%;
+	margin-right: 0.5%;
+	border-bottom: 0.1vw solid var(--underline-color);
+	display: flex;
+	white-space: nowrap;
+}
+
+.pilot_stat_container .stat_label{
+	color: var(--text-color-highlight2);
+}
+
+.pilot_stat_container .stat_value{
+	
+}
+
+.bar_pilot_stats.spirits .stat_value {
+	margin-right: auto;
+}

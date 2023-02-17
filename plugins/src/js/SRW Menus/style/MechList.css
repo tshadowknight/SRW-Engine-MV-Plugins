@@ -1,0 +1,572 @@
+
+#mech_list_control {
+	border: 0.1vw solid #FFFFFF;
+	border-radius: 1vw;
+	border-top-right-radius: 0px;
+	border-top-left-radius: 0px;
+	width: calc(100% - 2vw);
+	height: calc(100% - 2vw);
+	padding: 1vw;
+	background-color: rgba(0,67,99,0.5);
+	position: relative;
+}
+
+#mech_list_control_page {
+	display: flex;
+    align-items: center;
+    justify-content: center;
+	border: 0.1vw solid #FFFFFF;
+	border-radius: 999px;
+	height: 5%;
+	width: 10%;
+	position: absolute;
+	right: 0%;
+	top: -6%;
+	background-color: rgba(0,67,99,0.5);
+	color: #FFFFFF;
+	--fontsize: 1.6px;
+	text-align: center;
+}
+
+#mech_list_control_page #prev_page{
+	transform: scaleX(-1);
+	width: 23%;
+    margin-right: auto;
+    filter: var(--white-filter);
+	cursor: pointer;
+}
+
+#mech_list_control_page #next_page{
+	width: 23%;
+    margin-left: auto;
+    filter: var(--white-filter);
+	cursor: pointer;
+}
+
+#mech_list_control_top_border {
+	border-top: 0.1vw solid #FFFFFF;
+	width: 90%;
+	position: absolute;
+	left: 0%;
+	top: 0%;
+	display: none;
+}
+
+#mech_list {
+	
+}
+
+.list_container {
+	position: relative;
+	top: 15%;
+	width: 70%;
+	margin-left: auto;
+	margin-right: auto;
+	height: 60%;
+}
+
+.unit_list_table {
+	width: 100%;
+	color: #FFFFFF;
+
+	text-align: left;
+	border-collapse: collapse;
+}
+
+.list_table_row {
+	display: flex;
+	align-items: center;
+	width: 100%;
+	height: 5px;
+}
+
+.list_table_row.off {
+	opacity: 0.5;
+}
+
+.sort_col span{
+	background-color: rgba(255, 200, 255, 0.3);
+}
+
+.list_table_row .list_table_block:nth-child(1){
+	width: 10%;
+	--fontsize: 1.8px;	
+}
+
+.list_table_row .list_table_block:nth-child(2){
+	width: 30%;
+	--fontsize: 1.8px;		
+}
+
+.list_table_row .list_table_block:nth-child(3){
+	width: 15%;
+	--fontsize: 1.8px;
+}
+
+.list_table_row .list_table_block:nth-child(4){
+	width: 10%;
+	--fontsize: 1.8px;
+}
+
+.list_table_row .list_table_block:nth-child(5){
+	width: 10%;
+	--fontsize: 1.8px;
+}
+
+.list_table_row .list_table_block:nth-child(6){
+	width: 10%;
+	--fontsize: 1.8px;
+}
+
+.list_table_row .list_table_block:nth-child(7){
+	width: 10%;
+	--fontsize: 1.8px;
+}
+
+.unit_list_table.pilot_stats .list_table_row .list_table_block:nth-child(4){
+	width: 10%;
+}
+
+.unit_list_table.pilot_stats .list_table_row .list_table_block:nth-child(5){
+	width: 20%;
+}
+
+.unit_list_table.pilot_stats .list_table_row .list_table_block:nth-child(6){
+	width: 10%;
+}
+
+.unit_list_table.mech_stats_2 .list_table_row .list_table_block:nth-child(4){
+	width: 7%;
+}
+
+.unit_list_table.mech_stats_2 .list_table_row .list_table_block:nth-child(5){
+	width: 12%;
+}
+
+.unit_list_table.mech_stats_2 .list_table_row .list_table_block:nth-child(6){
+	width: 12%;
+}
+
+.unit_list_table.mech_ability .list_table_row .list_table_block:nth-child(4){
+	width: 10%;
+	text-align: center;
+}
+
+.unit_list_table.mech_ability .list_table_row .list_table_block:nth-child(5){
+	width: 12%;
+	text-align: center;
+}
+
+.unit_list_table.mech_ability .list_table_row .list_table_block:nth-child(6){
+	width: 10%;
+	text-align: center;
+}
+
+.unit_list_table.mech_ability .list_table_row .list_table_block:nth-child(7){
+	width: 10%;
+	text-align: center;
+}
+
+.unit_list_table.mech_stats_2 .list_table_row .list_table_block.header:nth-child(7){
+	width: 3.5%;
+	--fontsize: 1.4px;
+	text-align: center;
+	color: var(--text-color-highlight2);
+}
+.unit_list_table.mech_stats_2 .list_table_row .list_table_block.header:nth-child(8){
+	width: 3.5%;
+	--fontsize: 1.4px;
+	text-align: center;
+	color: var(--text-color-highlight2);
+}
+.unit_list_table.mech_stats_2 .list_table_row .list_table_block.header:nth-child(9){
+	width: 3.5%;
+	--fontsize: 1.4px;
+	text-align: center;
+	color: var(--text-color-highlight2);
+}
+.unit_list_table.mech_stats_2 .list_table_row .list_table_block.header:nth-child(10){
+	width: 3.5%;
+	--fontsize: 1.4px;
+	text-align: center;
+	color: var(--text-color-highlight2);
+}
+
+.unit_list_table.mech_stats_2 .list_table_row .list_table_block:nth-child(7){
+	width: 3.5%;
+	--fontsize: 1.8px;
+	text-align: center;
+}
+.unit_list_table.mech_stats_2 .list_table_row .list_table_block:nth-child(8){
+	width: 3.5%;
+	--fontsize: 1.8px;
+	text-align: center;
+}
+.unit_list_table.mech_stats_2 .list_table_row .list_table_block:nth-child(9){
+	width: 3.5%;
+	--fontsize: 1.8px;
+	text-align: center;
+}
+.unit_list_table.mech_stats_2 .list_table_row .list_table_block:nth-child(10){
+	width: 3.5%;
+	--fontsize: 1.8px;
+	text-align: center;
+}
+
+.unit_list_table.mech_upgrades .list_table_row .list_table_block:nth-child(4){
+	width: 20%;
+	text-align: center;
+}
+
+.unit_list_table.mech_upgrades .list_table_row .list_table_block:nth-child(5){
+	width: 20%;
+	text-align: center;
+}
+
+.unit_list_table.pilot_default .list_table_row .list_table_block:nth-child(1){
+	--fontsize: 1.8px;
+	width: 10%;
+}
+
+.unit_list_table.pilot_default .list_table_row .list_table_block:nth-child(2){
+	--fontsize: 1.8px;
+	width: 20%;
+}
+
+.unit_list_table.pilot_default .list_table_row .list_table_block:nth-child(3){
+	--fontsize: 1.8px;
+	width: 10%;	
+}
+
+.unit_list_table.pilot_default .list_table_row .list_table_block:nth-child(4){
+	--fontsize: 1.8px;
+	width: 13%;
+}
+
+.unit_list_table.pilot_default .list_table_row .list_table_block:nth-child(6){
+	width: 30%;
+}
+
+.unit_list_table.pilot_ability_1 .list_table_row .list_table_block:nth-child(1){
+	--fontsize: 1.8px;
+	width: 10%;
+}
+
+.unit_list_table.pilot_ability_1 .list_table_row .list_table_block:nth-child(2){
+	--fontsize: 1.8px;
+	width: 20%;
+}
+
+.unit_list_table.pilot_ability_1 .list_table_row .list_table_block:nth-child(3){
+	--fontsize: 1.8px;
+	width: 10%;	
+}
+
+.unit_list_table.pilot_ability_1 .list_table_row .list_table_block:nth-child(4){
+	--fontsize: 1.8px;
+	width: 13%;
+}
+
+.unit_list_table.pilot_ability_1 .list_table_row .list_table_block:nth-child(5){
+	--fontsize: 1.8px;
+	width: 7%;
+	text-align: center;
+}
+
+.unit_list_table.pilot_ability_1 .list_table_row .list_table_block:nth-child(6){
+	--fontsize: 1.8px;
+	width: 8%;
+	text-align: center;
+}
+
+.unit_list_table.pilot_ability_1 .list_table_row .list_table_block:nth-child(7){
+	--fontsize: 1.8px;
+	width: 8%;
+	text-align: center;
+}
+.unit_list_table.pilot_ability_1 .list_table_row .list_table_block:nth-child(8){
+	--fontsize: 1.8px;
+	width: 8%;
+	text-align: center;
+}
+.unit_list_table.pilot_ability_1 .list_table_row .list_table_block:nth-child(9){
+	--fontsize: 1.8px;
+	width: 8%;
+	text-align: center;
+}
+.unit_list_table.pilot_ability_1 .list_table_row .list_table_block:nth-child(10){
+	--fontsize: 1.8px;
+	width: 8%;
+	text-align: center;
+}
+
+.unit_list_table.pilot_ability_1 .list_table_row .list_table_block.header:nth-child(n+5){
+	--fontsize: 1.5px;
+}
+
+
+.unit_list_table.pilot_ability_2 .list_table_row .list_table_block:nth-child(1){
+	--fontsize: 1.8px;
+	width: 10%;
+}
+
+.unit_list_table.pilot_ability_2 .list_table_row .list_table_block:nth-child(2){
+	--fontsize: 1.8px;
+	width: 20%;
+}
+
+.unit_list_table.pilot_ability_2 .list_table_row .list_table_block:nth-child(3){
+	--fontsize: 1.8px;
+	width: 10%;	
+}
+
+.unit_list_table.pilot_ability_2 .list_table_row .list_table_block:nth-child(4){
+	--fontsize: 1.8px;
+	width: 13%;
+}
+
+.unit_list_table.pilot_ability_2 .list_table_row .list_table_block:nth-child(5){
+	--fontsize: 1.8px;
+	width: 8%;
+	text-align: center;
+}
+
+.unit_list_table.pilot_ability_2 .list_table_row .list_table_block:nth-child(6){
+	--fontsize: 1.8px;
+	width: 8%;
+	text-align: center;
+}
+
+.unit_list_table.pilot_ability_2 .list_table_row .list_table_block:nth-child(7){
+	--fontsize: 1.8px;
+	width: 2%;
+	text-align: right;
+}
+
+.unit_list_table.pilot_ability_2 .list_table_row .list_table_block:nth-child(8){
+	--fontsize: 1.8px;
+	width: 8%;
+	text-align: right;
+	margin-right: 4%;
+}
+
+.unit_list_table.pilot_ability_2 .list_table_row .list_table_block.header:nth-child(9){
+	width: 3.5%;
+	--fontsize: 1.4px;
+	text-align: center;
+	color: var(--text-color-highlight2);
+}
+.unit_list_table.pilot_ability_2 .list_table_row .list_table_block.header:nth-child(10){
+	width: 3.5%;
+	--fontsize: 1.4px;
+	text-align: center;
+	color: var(--text-color-highlight2);
+}
+.unit_list_table.pilot_ability_2 .list_table_row .list_table_block.header:nth-child(11){
+	width: 3.5%;
+	--fontsize: 1.4px;
+	text-align: center;
+	color: var(--text-color-highlight2);
+}
+.unit_list_table.pilot_ability_2 .list_table_row .list_table_block.header:nth-child(12){
+	width: 3.5%;
+	--fontsize: 1.4px;
+	text-align: center;
+	color: var(--text-color-highlight2);
+}
+
+.unit_list_table.pilot_ability_2 .list_table_row .list_table_block:nth-child(9){
+	width: 3.5%;
+	--fontsize: 1.8px;
+	text-align: center;
+}
+.unit_list_table.pilot_ability_2 .list_table_row .list_table_block:nth-child(10){
+	width: 3.5%;
+	--fontsize: 1.8px;
+	text-align: center;
+}
+.unit_list_table.pilot_ability_2 .list_table_row .list_table_block:nth-child(11){
+	width: 3.5%;
+	--fontsize: 1.8px;
+	text-align: center;
+}
+.unit_list_table.pilot_ability_2 .list_table_row .list_table_block:nth-child(12){
+	width: 3.5%;
+	--fontsize: 1.8px;
+	text-align: center;
+}
+
+.unit_list_table.pilot_special_skill .list_table_row .list_table_block:nth-child(1){
+	--fontsize: 1.8px;
+	width: 10%;
+}
+
+.unit_list_table.pilot_special_skill .list_table_row .list_table_block:nth-child(2){
+	--fontsize: 1.8px;
+	width: 20%;
+}
+
+.unit_list_table.pilot_special_skill .list_table_row .list_table_block:nth-child(3){
+	--fontsize: 1.8px;
+	width: 10%;	
+}
+
+.unit_list_table.pilot_special_skill .list_table_row .list_table_block:nth-child(4){
+	--fontsize: 1.8px;
+	width: 10%;
+}
+
+.unit_list_table.pilot_special_skill .list_table_row .list_table_block:nth-child(5){
+	--fontsize: 1.8px;
+	width: 20%;
+	text-align: center;
+}
+
+.unit_list_table.pilot_special_skill .list_table_row .list_table_block:nth-child(6){
+	--fontsize: 1.8px;
+	width: 20%;
+	text-align: center;
+}
+
+.unit_list_table.pilot_upgrade .list_table_row .list_table_block:nth-child(1){
+	--fontsize: 1.8px;
+	width: 10%;
+}
+
+.unit_list_table.pilot_upgrade .list_table_row .list_table_block:nth-child(2){
+	--fontsize: 1.8px;
+	width: 19%;
+	padding: 0.5%;
+}
+
+.unit_list_table.pilot_upgrade .list_table_row .list_table_block:nth-child(3){
+	--fontsize: 1.8px;
+	width: 4%;	
+	padding: 0.5%;
+}
+
+.unit_list_table.pilot_upgrade .list_table_row .list_table_block:nth-child(4){
+	--fontsize: 1.8px;
+	width: 4%;
+	padding: 0.5%;
+}
+
+.unit_list_table.pilot_upgrade .list_table_row .list_table_block:nth-child(5){
+	--fontsize: 1.8px;
+	width: 11%;
+	padding: 0.5%;
+}
+
+.unit_list_table.pilot_upgrade .list_table_row .list_table_block:nth-child(6){
+	--fontsize: 1.8px;
+	width: 7%;
+	padding: 0.5%;
+}
+
+.unit_list_table.pilot_upgrade .list_table_row .list_table_block:nth-child(7){
+	--fontsize: 1.8px;
+	width: 29%;
+	padding: 0.5%;
+}
+
+.unit_list_table.equip .list_table_row .list_table_block:nth-child(1){
+	--fontsize: 1.8px;
+	width: 10%;
+}
+
+.unit_list_table.equip .list_table_row .list_table_block:nth-child(2){
+	--fontsize: 1.8px;
+	width: 20%;
+}
+
+.unit_list_table.equip .list_table_row .list_table_block:nth-child(3){
+	--fontsize: 1.8px;
+	width: 10%;	
+}
+
+.unit_list_table.equip .list_table_row .list_table_block:nth-child(4){
+	--fontsize: 1.8px;
+	width: 13%;
+}
+
+.list_table_row.selected {
+	background-color: var(--selected-color);
+	color: #FFFFFF;
+}
+
+.list_table_block.header {
+	color: var(--text-color-highlight);
+	margin-top: 1%;
+	margin-bottom: 1%;
+}
+
+#mech_list_control_details {
+	position: absolute;
+	width: 48%;
+	height: 97%;
+	left: 51%;
+	top: 1%;
+	background-color: rgba(174, 219, 241, 0.5);
+	border: 0.1vw solid rgba(174, 219, 241, 0.9);
+}
+
+.list_pilot_icon {
+	width: 50%;
+	margin-top: 10%;
+}
+
+.list_mech_icon {
+	margin-top: 10%;
+	width: 50%;
+    margin-left: 10%;
+}
+
+.page_indicator {
+    width: 38%;
+    height: 5%;
+    top: -4.2%;
+    right: 10%;
+    position: absolute;
+    display: flex;
+}
+
+.page_indicator .page_block {
+	margin-left: 1%;
+	margin-right: 1%;
+	height: 100%;
+	/*width: 20%;*/
+	--fontsize: 1.2px;
+	text-align: center;
+	border: 0.1vw solid rgba(174, 219, 241, 0.9);
+	background-color: #538ca7;
+	border-bottom: 0px;
+	font-weight: bold;
+	padding-left: 2%;
+    padding-right: 2%;
+	white-space: nowrap;
+}
+
+.page_indicator .page_block.selected {
+	color: white;
+}
+
+.slot_container {
+	width: 6px;
+	height: 2.5px;
+	border-radius: 999px;
+	background-color: #FFFFFF;	
+	display: flex;
+	align-items: center;
+}
+
+.slot_container .slot_icon {
+	width: 1px;
+	height: 1px;
+	border-radius: 999px;
+	background-color: #111111;	
+	margin-left: 6.5%;
+}
+
+.slot_container .slot_icon.used {
+	background-color: var(--text-color-highlight2);	
+}

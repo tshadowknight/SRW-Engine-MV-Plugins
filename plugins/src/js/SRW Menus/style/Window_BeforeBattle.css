@@ -1,0 +1,963 @@
+#before_battle_enemy_header {
+	position: absolute;
+	border: 0.1vw solid #FFFFFF;
+	height: 10%;
+	width: 48%;
+	border-top-right-radius: 999px;
+	border-bottom-right-radius: 999px;
+	top: 2%;
+	left: 0%;	
+	color: #FFFFFF;
+	--fontsize: 3px;
+	border-left: 0px;
+	display: flex;
+	align-items: center;
+}
+
+#before_battle_enemy_header.support_selection_header {
+	background-color: rgba(38, 110, 172, 0.7);
+}
+
+#before_battle .enemy_label {
+	margin-left: auto;
+	margin-right: 10%;
+}
+
+#before_battle_ally_header {
+	position: absolute;
+	border: 0.1vw solid #FFFFFF;
+	height: 10%;
+	width: 48%;
+	border-top-left-radius: 999px;
+	border-bottom-left-radius: 999px;
+	top: 2%;
+	right: 0%;
+	color: #FFFFFF;
+	--fontsize: 3px;
+	border-right: 0px;
+	display: flex;
+	align-items: center;
+}
+
+#before_battle .ally_label {
+	margin-right: auto;
+	margin-left: 10%;
+}
+
+#before_battle_ally_main {
+	position: absolute;
+	border: 0.1vw solid #FFFFFF;
+	height: 30%;
+	width: 48%;
+	border-top-left-radius: 5px;
+	border-bottom-left-radius: 5px;
+	top: 17%;
+	right: 0%;
+	color: #FFFFFF;
+	border-right: 0px;
+	display: flex;
+	align-items: center;
+}
+
+#before_battle_ally_support {
+	position: absolute;
+	border: 0.1vw solid #FFFFFF;
+	height: 30%;
+	width: 48%;
+	border-top-left-radius: 5px;
+	border-bottom-left-radius: 5px;
+	top: 51%;
+	right: 0%;
+	color: #FFFFFF;
+	border-right: 0px;
+	display: flex;
+	align-items: center;
+}
+
+#before_battle_enemy_main {
+	position: absolute;
+	border: 0.1vw solid #FFFFFF;
+	height: 30%;
+	width: 48%;
+	border-top-right-radius: 5px;
+	border-bottom-right-radius: 5px;
+	top: 17%;
+	left: 0%;
+	color: #FFFFFF;
+	border-left: 0px;
+	display: flex;
+	align-items: center;
+}
+
+#before_battle_enemy_support {
+	position: absolute;
+	border: 0.1vw solid #FFFFFF;
+	height: 30%;
+	width: 48%;
+	border-top-right-radius: 5px;
+	border-bottom-right-radius: 5px;
+	top: 51%;
+	left: 0%;
+	color: #FFFFFF;
+	border-left: 0px;
+	display: left;
+	align-items: center;
+}
+
+.participant_block {
+	width: 100%;
+	height: 100%;
+}
+
+.participant_block .action_row {
+	width: 100%;
+	background-color: rgba(255,255,255,0.1);
+	color: #FFFFFF;
+	display: flex;
+	padding-left: 2%;
+	--fontsize: 2.5px;
+	margin-bottom: auto;
+	height: 21%;
+}
+
+.participant_block .main_row {
+	height: 79%;
+	width: 100%;
+	display: flex;
+}
+
+.participant_block .main_row .percent_indicator {
+	margin-right: auto;
+	height: 100%;
+	width: 9%;
+	background-color: rgba(255,255,255,0.1);
+	color: #FFFFFF;
+	--fontsize: 1.5px;
+	display: flex;
+	align-items: center;
+	justify-content: center;	
+}
+
+.participant_block .percent_indicator .percent_indicator_containers.twin {
+	margin-top: 50%;
+}
+
+.participant_block .percent_indicator .percent_indicator_containers .percent_indicator_container {
+	margin-top: 17%;
+}
+
+.participant_block .percent_indicator_containers {
+	position: relative;
+}
+
+.participant_block .percent_indicator_containers .target_arrow_container {
+	position: absolute;
+	right: 85%;
+	top: 22%	;
+	width: 100%;
+}
+
+.participant_block .percent_indicator_containers .target_arrow_container.twin {
+	top: 13%;
+	
+}
+
+.participant_block .percent_indicator_containers .target_arrow_container.sub_twin {
+	transform: scaleY(-1);
+	top: 5%;
+}
+
+.participant_block .percent_indicator_containers .target_arrow_container.enemy {
+	left: 85%;
+	transform: scaleX(-1);
+}
+
+.participant_block .support .percent_indicator_containers .target_arrow_container.enemy {
+	left: 111%;	
+}
+
+.participant_block .percent_indicator_containers .target_arrow_container.enemyTwin {
+	left: 85%;
+	transform: scaleX(-1);
+}
+
+.participant_block .percent_indicator_containers .target_arrow_container.enemyTwin.sub_twin {
+	transform: scaleX(-1) scaleY(-1);
+}
+
+.participant_block .percent_indicator_containers .target_arrow {
+	width: 70%;
+}
+
+.participant_block .percent_indicator_containers .target_arrow.twin {
+	margin-top: 20%;
+}
+
+.participant_block .percent_indicator.support .percent_indicator_containers {
+	display: flex;
+	margin-top: 0;
+	margin-right: 5%;
+}
+	
+.participant_block .percent_indicator .entry {
+	text-align: center;	
+	position: relative;
+	display: flex;
+	--font-size: 1.5px;
+	align-items: center;
+	--widthpixels: 43;
+	--heightpixels: 18;
+}
+
+.participant_block .percent_indicator .entry img{
+	width: 1px;
+	filter: var(--white-filter);
+}
+
+.participant_block .percent_indicator .entry.actor img {
+	margin-right: auto;
+}
+
+.participant_block .percent_indicator .entry.actorTwin img {
+	margin-right: auto;
+}
+
+.participant_block .percent_indicator .entry.enemy .text{
+	margin-left: auto;
+}
+
+.participant_block .percent_indicator .entry.enemyTwin .text{
+	margin-left: auto;
+}
+
+
+.participant_block .main_row .main_content {
+	height: 100%;
+	width: 91%;
+	--fontsize: 2px;
+	position: relative;
+	overflow: hidden;
+}
+
+.participant_block .main_row .main_content .pilot_icon {
+	--heightpixels: 120;
+	--widthpixels: 120;
+	background-color: rgba(85, 164, 255, 0.5);
+	position: absolute;
+	left: 0;
+	top: 0;
+}
+
+.participant_block .main_row .main_content .enemy_icon {
+	--heightpixels: 120;
+	--widthpixels: 120;
+	background-color: rgba(85, 164, 255, 0.5);
+	position: absolute;
+	left: 0;
+	top: 0;
+	transform: scaleX(-1);
+}
+
+.participant_block .main_row .main_content .pilot_name{
+	--fontsize: 2.2px;
+	--widthscaling: 12;
+	position: absolute;
+	top: 0%;
+    left: 27%;
+}
+
+.participant_block .main_row .main_content .pilot_stats {
+	--fontsize: 2.2px;
+	display: flex;
+	align-items: center;
+	color: #FFFFFF;
+	position: absolute;
+	top: 0%;
+    right: 1%;
+}
+
+.participant_block .main_row .main_content .pilot_stats .label{ 
+	color: var(--text-color-highlight);
+	margin-right: auto;
+}
+
+.participant_block .main_row .main_content .pilot_stats .level{
+	display: flex;
+	align-items: center;
+	--widthscaling: 8;
+	margin-left: 10%;
+}
+
+.participant_block .main_row .main_content .pilot_stats .will{
+	display: flex;
+	align-items: center;
+	--widthscaling: 12;
+	margin-left: 10%;
+}
+
+.participant_block .main_row .main_content .mech_hp_en_container {
+	width: 100%;
+    height: 100%;
+	margin-top: 0.5%;
+}
+
+.participant_block .main_row .main_content .mech_hp_en_container .hp_bar{
+	width: 20%;
+    height: 5%;
+    top: 38%;
+    left: 29%;
+}
+
+.participant_block .main_row .main_content .mech_hp_en_container .en_bar{
+	width: 13%;
+    height: 5%;
+    top: 38%;  
+    left: 59%;
+}
+
+.participant_block .main_row .main_content .mech_hp_en_container .hp_label{
+	top: 23%;
+    left: 31%;
+    z-index: 2;
+}
+
+.participant_block .main_row .main_content .mech_hp_en_container .en_label{
+	top: 23%;
+    left: 61%;
+    z-index: 2;
+}
+
+.participant_block .main_row .main_content .mech_hp_en_container .en_display{
+	top: 23%;
+}
+
+.participant_block .main_row .main_content .mech_hp_en_container .en_display .divider{
+	display: none;
+}
+
+.participant_block .main_row .main_content .mech_hp_en_container .en_display .max_en{
+	display: none;
+}
+
+.participant_block .main_row .main_content .mech_hp_en_container .hp_display{
+	top: 23%;
+}
+
+.participant_block .main_row .main_content .mech_hp_en_container .hp_display .divider{
+	display: none;
+}
+
+.participant_block .main_row .main_content .mech_hp_en_container .hp_display .max_hp{
+	display: none;
+}
+
+.participant_block .main_row .main_content .attack_name {
+	--fontsize: 2.2px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    position: absolute;
+
+    right: 0%;
+    color: #FFFFFF;
+    width: 74%;
+    top: 56%;
+    background-color: rgba(255,255,255,0.2);
+	white-space: nowrap;
+}
+
+.participant_block .main_row .main_content .attack_name .attack_list_type {
+	margin-right: 2%;
+}
+
+.participant_block .active_spirits {
+	width: 100%;
+	height: 10%;
+	--fontsize: 1.5px;
+	display: flex;
+	align-items: center;
+	justify-content: center;
+	position: absolute;
+    top: 91%;
+    left: 0%;
+}
+
+.participant_block .active_spirits .spirit_entry {
+	--widthpixels: 28;
+	--heightpixels: 20;
+	display: flex;
+	align-items: flex-end;
+	justify-content: center;
+	border-top: 0.1vw solid #FFFFFF;
+	border-right: 0.1vw solid #FFFFFF;
+	border-bottom: 0.1vw solid #FFFFFF;
+	color: rgba(222,222,222,0.6);
+}
+
+.participant_block .active_spirits .spirit_entry.active {
+	background-color: rgba(255,255,255,1);
+	color: #0f1c36;
+}
+
+.participant_block .active_spirits .spirit_entry:nth-child(1) {
+	border-left: 0.1vw solid #FFFFFF;
+}
+
+.participant_block.enemy .main_row .main_content .enemy_icon{
+	right: 0;
+	left: auto;
+}
+
+.participant_block.enemy .main_row .main_content .pilot_stats  {
+	right: 27%;
+	left: auto;
+}
+
+.participant_block.enemy .main_row .main_content .pilot_name{
+	right: auto;
+	left: 1%;
+}
+
+.participant_block.enemy .main_row .main_content .attack_name{
+	right: auto;
+	left: 0;
+}
+
+.participant_block.enemy .action_row{
+	width: 98%;
+	padding-right: 2%;
+	justify-content: flex-end;
+	padding-left: 0;
+}   
+
+.participant_block.enemy .mech_hp_en_container {
+	margin-left: -2%;
+}
+
+#before_battle .action_btn {
+	width: 14%;
+	height: 6%;
+	border: 0.1vw solid #FFFFFF;
+	font-style: italic;
+	color: #FFFFFF;
+	--fontsize: 2px;
+	position: absolute;
+	border-radius: 999px;
+	display: flex;
+	align-items: center;
+	justify-content: center;
+	background-color: var(--section-bg-color);
+}
+
+#before_battle .action_btn.selected {
+	background-color: var(--selected-color);
+}
+
+#before_battle_btn_start {
+	left: 77%;
+    top: 83%;
+	color: var(--text-color-highlight);
+}
+
+#before_battle_btn_demo {
+	left: 61%;
+    top: 83%;
+}
+
+#before_battle_btn_asssist {
+	left: 45%;
+    top: 83%;
+}
+
+#before_battle_btn_action {
+	left: 40%;
+    top: 92.5%;
+}
+
+#before_battle_btn_spirit {
+	left: 25%;
+    top: 92.5%;
+}
+
+#before_battle_support_selection {
+	width: 48%;
+	height: 64%;
+	border: 0.1vw solid #FFFFFF;	
+	border-left: 0;
+	color: #FFFFFF;
+	--fontsize: 2px;
+	position: absolute;
+	border-bottom-right-radius: 5px;
+	border-top-right-radius: 5px;
+	top: 17%;
+	left: 0;
+	background-color: var(--section-bg-color);
+}
+
+#before_battle_support_selection .support_candiate_block {
+	width: 100%;
+	height: 21%;
+	position: relative;
+}
+
+#before_battle_support_selection #selected_candidate {
+	background-color: var(--selected-color); 
+}
+
+#before_battle_support_selection .support_candiate_block:nth-child(even) {
+	background-color: rgba(255,255,255,0.1);
+}
+
+#before_battle_support_selection .support_candiate_block.none {
+	height: 16%;
+	display: flex;
+	justify-content: center;
+	align-items: center;
+	color: #EEEEEE;
+} 
+
+.support_candiate_block .action_row{ 
+	display: none;
+}
+
+.support_candiate_block .participant_block .main_row .main_content .attack_name{ 
+	display: none;
+}
+
+.support_candiate_block .active_spirits {
+	display: none;
+}
+
+.support_candiate_block .main_row{ 
+	height: 100%;
+}
+
+
+.support_candiate_block .main_row .percent_indicator {
+	display: none;
+}
+
+.support_candiate_block .participant_block .main_row .main_content .mech_hp_en_container .en_bar {
+	top: 68%;
+}
+
+.support_candiate_block .participant_block .main_row .main_content .mech_hp_en_container .hp_bar {
+	top: 68%;
+}
+
+.support_candiate_block .participant_block .main_row .main_content .mech_hp_en_container .hp_label{
+	top: 41%;
+}
+
+.support_candiate_block .participant_block .main_row .main_content .mech_hp_en_container .en_label{
+	top: 41%;
+}
+
+.support_candiate_block .participant_block .main_row .main_content .mech_hp_en_container .hp_display{
+	top: 41%;
+}
+
+.support_candiate_block .participant_block .main_row .main_content .mech_hp_en_container .en_display{
+	top: 41%;
+}
+
+.support_candiate_block .participant_block .main_row .main_content .pilot_icon {
+	--heightpixels: 80;
+	--widthpixels: 80;
+}
+
+.support_candiate_block_divider {
+	height: 0.5%;
+	min-height: 1px;
+	width: 100%;
+	
+}
+
+#before_battle_action_selection {
+	position: absolute;
+	width: 10%;
+	height: 16%;
+	top: 66%;
+    left: 31%;
+	border-radius: 5px;
+	border: 0.1vw solid #FFFFFF;
+	background-color: var(--section-bg-color-solid);
+	--fontsize: 2px;
+	color: #FFFFFF;
+	display: none;
+}
+
+#before_battle_action_selection .action_block {	
+	display: flex;
+	align-items: center;
+	padding-left: 10%;
+}
+
+#before_battle_action_selection .action_block.selected {
+	background-color: var(--selected-color);
+}
+
+#before_battle.full_scene_disabled #before_battle_btn_demo {
+	display: none;
+}
+
+#before_battle.full_scene_disabled #before_battle_btn_asssist {
+	left: 61%;
+}
+
+#before_battle.full_scene_disabled #before_battle_btn_action {
+
+}
+
+#before_battle.full_scene_disabled #before_battle_action_selection {
+	left: 47%;
+}
+
+/*Twin window*/
+
+#before_battle.twin #before_battle_btn_start {
+	left: 85%;
+    top: 92.5%;
+}
+
+#before_battle.twin #before_battle_btn_demo {
+	left: 70%;
+    top: 92.5%;
+}
+
+#before_battle.twin #before_battle_btn_asssist {
+	left: 55%;
+    top: 92.5%;
+}
+
+#before_battle.twin #before_battle_btn_action {
+	/*display: none;*/
+}
+
+#before_battle.twin #before_battle_enemy_header {
+	top: -1%;
+	border-top-right-radius: 0px;
+}
+
+#before_battle.twin #before_battle_ally_header {
+	top: -1%;
+	border-top-left-radius: 0px;
+}
+
+#before_battle.twin #before_battle_ally_main {
+	top: 12%;
+	width: 46%;
+}
+
+#before_battle.twin.no_twins #before_battle_ally_main {
+	top: 29%;
+}
+
+#before_battle.twin #before_battle_ally_main.selected {
+	border-color: var(--text-color-highlight);
+    box-shadow: 0px 0px 1px 5px var(--text-color-highlight);
+}
+
+#before_battle_ally_twin {
+	position: absolute;
+	border: 0.1vw solid #FFFFFF;
+	height: 30%;
+	width: 46%;
+	border-top-left-radius: 5px;
+	border-bottom-left-radius: 5px;
+	top: 44%;
+	right: 0%;
+	color: #FFFFFF;
+	border-right: 0px;
+	display: flex;
+	align-items: center;
+}
+
+#before_battle_ally_twin.selected {
+	border-color: var(--text-color-highlight);
+    box-shadow: 0px 0px 1px 5px var(--text-color-highlight);
+}
+
+#before_battle.twin #before_battle_enemy_main {
+	top: 12%;
+	width: 46%;
+}
+
+#before_battle.twin.no_twins #before_battle_enemy_main {
+	top: 29%;
+	width: 46%;
+}
+
+
+#before_battle.twin #before_battle_enemy_main.selected {
+	border-color: var(--text-color-highlight);
+    box-shadow: 0px 0px 1px 5px var(--text-color-highlight);
+}
+
+#before_battle_enemy_twin {
+	position: absolute;
+	border: 0.1vw solid #FFFFFF;
+	height: 30%;
+	width: 46%;
+	border-top-right-radius: 5px;
+	border-bottom-right-radius: 5px;
+	top: 44%;
+	left: 0%;
+	color: #FFFFFF;
+	border-left: 0px;
+	display: left;
+	align-items: center;
+}
+
+#before_battle_enemy_twin.selected {
+	border-color: var(--text-color-highlight);
+    box-shadow: 0px 0px 1px 5px var(--text-color-highlight);
+}
+
+.participant_block_small .pilot_icon {
+	--heightpixels: 40;
+	--widthpixels: 40;
+	background-color: rgba(85, 164, 255, 0.5);
+	flex-shrink: 0;
+}
+
+.participant_block_small .enemy_icon {
+	--heightpixels: 40;
+	--widthpixels: 40;
+	background-color: rgba(85, 164, 255, 0.5);
+	transform: scaleX(-1);
+	flex-shrink: 0;
+}
+
+
+.participant_block_small .action_row {
+	height: 100%;
+	align-items: center;
+	padding-left: 0;
+}
+
+.participant_block_small .attack_name {
+	--fontsize: 2.2px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    margin-left: 2%;
+	margin-right: 2%;
+	white-space: nowrap;
+	width: 61%;
+}
+
+.participant_block_small .percent_indicator {
+	--fontsize: 1.5px;
+	margin-right: 0%;
+	margin-left: 0%;
+}
+
+.participant_block_small .percent_indicator.all {
+	--fontsize: 1.5px;
+}
+
+.participant_block_small .percent_indicator .percent_indicator_containers .percent_indicator_container {
+	margin-top: 0%;
+}
+
+#before_battle_ally_support_1 {
+	position: absolute;
+	border: 0.1vw solid #FFFFFF;
+	height: 7%;
+	width: 36%;
+	border-top-left-radius: 5px;
+	border-bottom-left-radius: 5px;
+	top: 76%;
+	right: 0%;
+	color: #FFFFFF;
+	border-right: 0px;
+	display: flex;
+	align-items: center;
+}
+
+#before_battle_ally_support_1.selected {
+	border-color: var(--text-color-highlight);
+    box-shadow: 0px 0px 1px 5px var(--text-color-highlight);
+}
+
+#before_battle_ally_support_2 {
+	position: absolute;
+	border: 0.1vw solid #FFFFFF;
+	height: 7%;
+	width: 36%;
+	border-top-left-radius: 5px;
+	border-bottom-left-radius: 5px;
+	top: 84%;
+	right: 0%;
+	color: #FFFFFF;
+	border-right: 0px;
+	display: flex;
+	align-items: center;
+}
+
+#before_battle_enemy_support_1 {
+	position: absolute;
+	border: 0.1vw solid #FFFFFF;
+	height: 7%;
+	width: 36%;
+	border-top-right-radius: 5px;
+	border-bottom-right-radius: 5px;
+	top: 76%;
+	left: 0%;
+	color: #FFFFFF;
+	border-left: 0px;
+	display: flex;
+	align-items: center;
+	justify-content: flex-end;
+}
+
+#before_battle_enemy_support_1 .action_row {
+	justify-content: flex-end;
+}
+
+#before_battle_enemy_support_2 {
+	position: absolute;
+	border: 0.1vw solid #FFFFFF;
+	height: 7%;
+	width: 36%;
+	border-top-right-radius: 5px;
+	border-bottom-right-radius: 5px;
+	top: 84%;
+	left: 0%;
+	color: #FFFFFF;
+	border-left: 0px;
+	display: flex;
+	align-items: center;
+	display: none;
+	justify-content: flex-end;
+}
+
+#before_battle_enemy_support_2 .action_row {
+	justify-content: flex-end;
+}
+
+#before_battle_targeting_arrows_1 {
+    position: fixed;
+    top: 24%;
+    left: 50.5%;
+}
+
+#before_battle_targeting_arrows_2 {
+	position: fixed;
+    top: 60.5%;
+    left: 50.5%;
+}
+
+#before_battle_targeting_arrows_enemy_1 {
+    position: fixed;
+    top: 24%;
+    right: 50.5%;
+	transform: scaleX(-1);
+}
+
+#before_battle_targeting_arrows_enemy_2 {
+	position: fixed;
+    top: 56%;
+    right: 50.5%;
+	transform: scaleX(-1);
+}
+
+#before_battle.twin #before_battle_support_selection {
+    width: 52%;
+    height: 79%;
+    border: 0.1vw solid #FFFFFF;
+    border-left: 0;
+    color: #FFFFFF;
+    --fontsize: 2px;
+    position: absolute;
+    border-bottom-right-radius: 5px;
+    border-top-right-radius: 5px;
+    top: 12%;
+    left: 0;
+    z-index: 1;
+    background-color: var(--section-bg-color-solid);
+}
+
+#before_battle.twin #before_battle_action_selection.slot_0 {
+	z-index: 5;
+	top: 24%;
+    left: 43.5%;
+}
+
+#before_battle.twin #before_battle_action_selection.slot_1 {
+	z-index: 5;
+	top: 56%;
+    left: 43.5%;
+}
+
+#before_battle .participant_block .mech_icon{
+	position: absolute;
+	
+	--widthpixels: 39;
+	--heightpixels: 39;
+	top: 21%;
+    left: 0.5%;
+}
+
+#before_battle .participant_block .mech_icon img{
+	width: 100%;
+}
+
+#before_battle .participant_block .mech_icon.enemy{	
+	top: 21%;
+    right: 0.5%;
+	left: auto;
+	transform: scaleX(-1);
+}
+
+#before_battle .participant_block .mech_icon_small{	
+	--widthpixels: 39;
+	--heightpixels: 39;
+}
+
+#before_battle .participant_block .mech_icon_small img{
+	width: 100%;
+}
+
+#before_battle .participant_block .mech_icon_small.enemy{	
+	transform: scaleX(-1);
+}
+
+#before_battle .participant_block .shoot_down_indicator{
+	--fontsize: 1px;
+	position: absolute;
+	top: 34.5%;
+    left: 4.5%;
+	display: flex;
+}
+
+#before_battle .participant_block .shoot_down_indicator.enemy{
+	left: auto;
+	top: 34.5%;
+    right: 4.5%;
+}
+
+#before_battle .participant_block .shoot_down_indicator .mech_icon_small{	
+	--widthpixels: 20;
+	--heightpixels: 20;
+	filter: var(--color-highlight-filter);
+}
+
+#before_battle_new_attack_inidicator {
+	border-radius: 0.3vw;
+    
+	--widthpixels: 24;
+	--heightpixels: 16;
+    position: absolute;
+    top: 94.5%;
+    left: 70.5%;
+
+    background-color: #FFFFFF;
+    color: #FF2222;
+    display: flex;
+    align-items: center;
+    justify-content: left;
+	font-style: italic;
+	--fontsize: 1.3px;
+}

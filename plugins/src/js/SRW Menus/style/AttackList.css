@@ -1,0 +1,343 @@
+.pages_container {
+	position: relative;
+	width: 100%;
+}
+
+.page {
+	position: absolute;
+	display: none;
+	top: 0;
+	left: 0;
+	width: 100%;
+}
+
+.page.selected {
+	display: block;
+}
+
+#attack_list_control {
+	border: 0.1vw solid #FFFFFF;
+	border-radius: 1vw;
+	border-top-right-radius: 0px;
+	border-top-left-radius: 0px;
+	width: 98%;
+	height: 98%;
+	padding-left: 1%;
+	padding-right: 1%;
+	background-color: rgba(0,67,99,0.5);
+	position: relative;
+	
+}
+
+#attack_list_control_page {
+	display: flex;
+    align-items: center;
+    justify-content: center;
+	border: 0.1vw solid #FFFFFF;
+	border-radius: 999px;
+	height: 10%;
+	width: 10%;
+	position: absolute;
+	right: -0.3%;
+	top: -12%;
+	background-color: rgba(0,67,99,0.5);
+	color: #FFFFFF;
+	--fontsize: 1.6px;
+	text-align: center;
+}
+
+#attack_list_control_page #prev_page{
+	transform: scaleX(-1);
+	width: 17%;
+    margin-right: auto;
+    filter: var(--white-filter);
+	cursor: pointer;
+}
+
+#attack_list_control_page #next_page{
+	width: 17%;
+    margin-left: auto;
+    filter: var(--white-filter);
+	cursor: pointer;
+}
+
+#attack_list_control_top_border {
+	display: none;
+}
+
+#attack_list {
+	
+}
+
+.list_container {
+	position: relative;
+	top: 15%;
+	width: 70%;
+	margin-left: auto;
+	margin-right: auto;
+	height: 60%;
+}
+
+.unit_list_table {
+	width: 100%;
+	color: #FFFFFF;
+
+	text-align: left;
+	border-collapse: collapse;
+}
+
+.attack_list_row {
+	display: flex;
+	align-items: center;
+	width: 100%;
+	padding: 0.1%;
+	border-bottom: 0.1vw solid var(--underline-color);
+	color: #FFFFFF;
+	white-space: nowrap;
+}
+
+.attack_list_row.header {
+	border-bottom: 0.1vw solid rgba(0,0,0,0);
+}
+
+#attack_list .attack_list_row .attack_list_block {
+	white-space: nowrap;
+}
+
+.attack_list_row .attack_list_block:nth-child(1){
+	width: 5%;
+	--fontsize: 1.8px;	
+	position: relative;
+}
+
+.attack_list_row .attack_list_block:nth-child(2){
+	width: 25%;
+	--fontsize: 1.8px;		
+}
+
+.attack_list_row .attack_list_block:nth-child(3){
+	width: 10%;
+	--fontsize: 1.8px;
+	margin-right: 2%;
+	text-align: center;
+}
+
+.attack_list_row .attack_list_block:nth-child(4){
+	width: 5%;
+	--fontsize: 1.8px;
+	text-align: right;
+}
+
+.attack_list_row .attack_list_block:nth-child(5){
+	width: 3%;
+	--fontsize: 1.8px;
+	text-align: center;
+}
+
+.attack_list_row .attack_list_block:nth-child(5) .chevron_right {
+	margin-left: 100%;
+}
+
+.attack_list_row .attack_list_block:nth-child(6){
+	width: 8%;
+	--fontsize: 1.8px;
+	text-align: right;
+}
+
+.attack_list_row .attack_list_block:nth-child(7){
+	width: 10%;
+	--fontsize: 1.8px;
+}
+
+.attack_list_row.summary .attack_list_block:nth-child(4){
+	width: 9%;
+	--fontsize: 1.8px;
+	text-align: right;
+}
+
+.attack_list_row.summary .attack_list_block:nth-child(5){
+	width: 9%;
+	--fontsize: 1.8px;
+	text-align: right;
+}
+
+.attack_list_row.summary .attack_list_block:nth-child(6){
+	width: 9%;
+	--fontsize: 1.8px;
+	text-align: right;
+	margin-left: 6%;
+}
+
+.attack_list_row.summary .attack_list_block:nth-child(7){
+	width: 9%;
+	--fontsize: 1.8px;
+	text-align: right;
+}
+
+.attack_list_row.selected {
+	background-color: var(--selected-color);
+}
+
+.attack_list_row.disabled {
+	color: #666666;
+}
+
+.attack_list_block.header {
+	color: var(--text-color-highlight);
+}
+
+.attack_list_type {
+	width: 2.2px;
+	filter: var(--white-filter);
+	display: flex;
+}
+
+.attribute_block {
+	display: flex;
+    background: rgb(228,245,252);
+	background: -moz-linear-gradient(top,  rgba(228,245,252,1) 0%, rgba(191,232,249,1) 50%, rgba(159,216,239,1) 51%, rgba(42,176,237,1) 100%);
+	background: -webkit-linear-gradient(top,  rgba(228,245,252,1) 0%,rgba(191,232,249,1) 50%,rgba(159,216,239,1) 51%,rgba(42,176,237,1) 100%);
+	background: linear-gradient(to bottom,  rgba(228,245,252,1) 0%,rgba(191,232,249,1) 50%,rgba(159,216,239,1) 51%,rgba(42,176,237,1) 100%);
+	filter: progid:DXImageTransform.Microsoft.gradient( startColorstr='#e4f5fc', endColorstr='#2ab0ed',GradientType=0 );
+    width: fit-content;
+    padding-left: 1%;	
+	padding-right: 1%;
+	margin-left: auto;
+	margin-right: auto;
+}
+
+.attribute_block_entry{
+	--fontsize: 1.5px;
+	width: 1.8px;
+	--widthscaling: 1.8;
+	height: 1.8px;
+	display: flex;
+    align-items: center;
+    justify-content: center;
+    background-color: black;
+    margin: 2%;	
+	font-weight: bold;
+}
+
+.attribute_block_entry.all{
+	--widthscaling: 3;
+	/*padding-left: 1.5%;
+	padding-right: 1.5%;*/
+}
+
+#attack_list_control_details {
+	position: absolute;
+	width: 48%;
+	height: 97%;
+	left: 51%;
+	top: 1%;
+	background-color: rgba(174, 219, 241, 0.5);
+	border: 0.1vw solid rgba(174, 219, 241, 0.9);
+}
+
+.list_pilot_icon {
+	width: 50%;
+	margin-top: 10%;
+}
+
+.list_mech_icon {
+	margin-top: 10%;
+	width: 50%;
+    margin-left: 10%;
+}
+
+.page_indicator {
+    width: 38%;
+    height: 5%;
+    top: -4.2%;
+    right: 10%;
+    position: absolute;
+    display: flex;
+}
+
+.page_indicator .page_block {
+	margin-left: 1%;
+	margin-right: 1%;
+	height: 100%;
+	/*width: 20%;*/
+	--fontsize: 1.2px;
+	text-align: center;
+	border: 0.1vw solid rgba(174, 219, 241, 0.9);
+	background-color: #538ca7;
+	border-bottom: 0px;
+	font-weight: bold;
+	padding-left: 2%;
+    padding-right: 2%;
+	white-space: nowrap;
+}
+
+.page_indicator .page_block.selected {
+	color: white;
+}
+
+.summary_flex {
+	display: flex;
+	width: 100%;
+    height: 100%;
+}
+
+.summary_column {
+	width: 45%;
+	margin: 1%;
+}
+
+.summary_row {
+	width: 100%;
+	height: 20%;
+	margin-bottom: 1%;
+	border-bottom: 0.1vw solid var(--underline-color);
+	display: flex;
+	align-items: center;
+}
+
+.summary_row.usage_detail {
+	color: #FF0000;
+	--fontsize: 1.8px;
+}
+
+.summary_row_label {
+	width: 35%;
+	--fontsize: 1.8px;
+	color: var(--text-color-highlight);
+}
+
+.summary_row_value {
+	--fontsize: 1.8px;
+	color: #FFFFFF;
+}
+
+.summary_row_value .ability_block_row {
+	border: 0px;
+}
+
+.summary_row_value.disabled {
+	color: #555555;
+	display: flex;
+	position: relative;
+
+}
+
+.summary_row_value.insufficient {
+	color: #FF0000;
+}
+
+.required_will_label {
+	/*--fontsize: 1.4px;*/
+}
+
+.summary_row_value .upgrade_bar {
+    height: 1.2px;
+    padding: 1%;
+    position: relative;
+}
+
+.summary_row_value .upgrade_bar .upgrade_bar_part {
+	width: 1px;
+	--widthscaling: 1;
+}
+   

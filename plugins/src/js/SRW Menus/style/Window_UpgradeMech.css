@@ -1,0 +1,231 @@
+.upgrade_controls {
+	position: absolute;	
+	height: 36%;
+	top: 54%;	
+	border: 0.1vw solid #FFFFFF;
+	border-radius: 1vw;
+	left: 37%;
+    width: 58%;
+	background-color: var(--section-bg-color);
+	z-index: 1;
+}
+
+.weapon_upgrade_container {
+	margin: 1%;
+	width: 98%;
+	height: 15%;
+	border: 0.1vw solid var(--underline-color);
+}
+
+.stat_upgrade_container {
+	margin: 1%;
+	width: 98%;
+	height: 73%;
+	border: 0.1vw solid var(--underline-color);
+}
+
+.upgrade_entry {
+	display: flex;
+	align-items: center;
+	position: relative;
+}
+
+.upgrade_entry.selected {
+	background-color: var(--selected-color);
+}
+
+.upgrade_entry_label {
+	--fontsize: 2px;
+	color: var(--text-color-highlight);
+	margin-left: 3%;
+}
+
+.upgrade_entry_current {
+	--fontsize: 2px;
+	color: #FFFFFF;
+	margin-left: auto;
+
+}
+
+
+.upgrade_entry_new {
+	--fontsize: 2px;
+	color: #FFFFFF;
+	width: 12%;
+	margin-right: 30%;
+	text-align: right;
+}
+
+.upgrade_entry_bar .upgrade_bar {
+	position: absolute;
+    width: 20%;
+    height: 50%;
+    right: 5%;
+    top: 21%;
+	padding: 0.2%;
+}
+
+.fund_display {
+	position: absolute;
+	height: 36%;
+	top: 54%;
+	border: 0.1vw solid #FFFFFF;
+	border-radius: 1vw;
+	width: 30%;
+    left: 5%;
+	background-color: var(--section-bg-color);
+}
+
+.fund_entries {
+	height: 90%;
+}
+
+#upgrade_mech #btn_apply {
+	width: 33%;
+    color: #FFFFFF;
+    border: 0.1vw solid #FFFFFF;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    top: 5%;
+    padding: 0.4%;
+    border-radius: 999px;
+    margin-left: auto;
+    margin-right: auto;
+    margin-top: 4.5%;
+    --fontsize: 2.4px;
+}
+
+#upgrade_mech #btn_apply.disabled {
+	color: #888888;
+	border: 0.1vw solid #FFFFFF;
+}
+
+#upgrade_mech .fund_entry {
+	display: flex;
+	align-items: flex-end;
+	width: 90%;
+	margin-left: 5%;
+	border-bottom: 0.1vw solid var(--underline-color);
+	height: 25%;
+}
+
+#upgrade_mech .fund_entry:first {
+	
+}
+
+#upgrade_mech .fund_entry_label {
+	color: var(--text-color-highlight);
+}
+
+#upgrade_mech .fund_entry_value {
+	color: #FFFFFF;
+	margin-left: auto;
+}
+
+#upgrade_mech .fund_entry_value.underflow {
+	color: #FF0000;
+}
+
+.upgrade_level_display {
+	position: absolute;
+    display: flex;
+    left: 73%;
+    top: 47.5%;
+    width: 20%;
+    height: 2%;
+    background-color: var(--section-bg-color);
+    border-radius: 999px;
+    padding: 1%;
+    align-items: center;
+	border: 0.1vw solid #FFFFFF;
+}
+
+.upgrade_level_label {
+	color: var(--text-color-highlight);
+}
+
+.upgrade_level_value {
+	color: #FFFFFF;
+	margin-left: auto;
+}
+
+.upgrade_mech_name {
+	position: absolute;
+    left: 5%;
+    top: 17%;
+    width: 40%;
+    height: 0.5%;
+    display: flex;
+    z-index: 1;
+    align-items: flex-end;
+    padding-left: 2%;
+    background: -moz-linear-gradient(left,  rgba(148,211,252,1) 45%, rgba(134,198,241,1) 66%, rgba(112,176,224,0) 100%);
+	background: -webkit-linear-gradient(left,  rgba(148,211,252,1) 45%,rgba(134,198,241,1) 66%,rgba(112,176,224,0) 100%);
+	background: linear-gradient(to right,  rgba(148,211,252,1) 45%,rgba(134,198,241,1) 66%,rgba(112,176,224,0) 100%);
+	filter: progid:DXImageTransform.Microsoft.gradient( startColorstr='#94d3fc', endColorstr='#0070b0e0',GradientType=1 );
+}
+
+#upgrade_name_icon {
+	width: 10%;
+}
+
+.upgrade_mech_name_value {
+	color: #FFFFFF;
+	margin-left: 5%;
+}
+
+.attack_list_container {
+	position: absolute;	
+	left: 5%;
+    top: 18.5%;
+    width: 90%;
+    height: 34%;
+}
+
+.generic_fub_display {
+	position: absolute;
+	height: 35%;
+    top: 32.5%;
+	border: 0.1vw solid #FFFFFF;
+	border-radius: 1vw;
+	width: 35%;
+    left: 32.5%;
+	background-color: var(--section-bg-color-solid);
+	display: none;
+	z-index: 1;
+}
+
+.generic_fub_display.active {
+	display: block;
+}
+
+.generic_fub_header {
+	display: flex;
+	align-items: flex-end;
+	width: 90%;
+	margin-left: 5%;
+	/*border-bottom: 0.1vw solid var(--underline-color);*/
+	height: 14%;
+}
+
+.generic_fub_entry {
+	display: flex;
+	align-items: center;
+	position: relative;
+	color: #FFFFFF;
+	padding-left: 5%;
+	height: 12%;
+}
+
+.generic_fub_entry.disabled {
+	opacity: 0.5;
+}
+
+.generic_fub_entry.selected {
+	background-color: var(--selected-color);
+}
+
+#upgrade_mech #attack_list_control {
+	z-index: 1;
+}

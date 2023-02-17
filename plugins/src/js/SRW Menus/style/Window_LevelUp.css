@@ -1,0 +1,203 @@
+#level_up {
+	display: flex;
+	align-items: center;
+	justify-content: center;
+	background: rgba(0,0,0,0);
+	color: #FFFFFF;
+}
+
+#level_up .bg_fade_container {
+	width: 600px;
+	height: 380px;
+	background-color: var(--menu-bg-color);
+	-webkit-mask-image: none;
+	border-radius: 10px;
+	position: relative;
+	display: flex;
+    align-items: center;
+    justify-content: center;
+	border: 0.4vw solid #FFFFFF;
+	--fontsize: 2.4px;
+}
+
+#level_up .level_up_content {
+	padding: 3%;
+    width: 100%;
+    height: 91%;
+	white-space: nowrap;
+	color: #FFFFFF;
+}
+
+#level_up .level_up_row {
+	width: 100%;
+	display: flex;
+}
+
+#level_up .level_up_row.level_up {
+	height: 40%;
+	margin-bottom: 1%;
+	display: flex;
+}
+
+#level_up .level_up_row.details {
+	height: 59%;
+	display: flex;
+}
+
+#level_up .level_up_block {
+	border: 0.1vw solid #94c2ee;
+	width: 72%;
+	margin-left: auto;
+	background-color: rgba(10, 26, 75, 0.8);
+	position: relative;
+}
+
+#level_up .level_up_block .name{
+	position: absolute;
+	top: 0%;
+    left: 2%;
+}
+
+#level_up .level_up_block .level_up_text{
+	position: absolute;
+	top: 31%;
+    left: 29%;
+    font-style: italic;
+	--fontsize: 3px;
+}
+
+#level_up .level_up_block .level_up_delta{
+	position: absolute;
+	display: flex;
+	align-items: center;
+	top: 73%;
+    left: 68%;
+}
+
+
+#level_up .level_up_block .level_up_delta .chevron_right{
+	width: 2px;
+	margin-left: 5%;
+}
+
+#level_up .level_up_block .level_up_delta .level_label{
+	color: var(--text-color-highlight);
+}
+
+#level_up .level_up_block .level_up_delta .level_value.new{
+	color: var(--text-color-highlight2);
+}
+
+#level_up #level_up_icon {
+	width: 136px;
+	height: 136px;
+	background-color: rgba(85, 164, 255, 0.5);
+    border: 0.1vw solid #99e3ff;
+}
+
+#level_up .skills_block {
+	width: 35%;
+	height: 100%;
+	border: 0.1vw solid #FFFFFF;
+	margin-right: 1%;
+}
+
+#level_up .spirits_block {
+	width: 30%;
+	height: 100%;
+	border: 0.1vw solid #FFFFFF;
+	margin-right: 1%;
+}
+
+#level_up .stats_block {
+	width: 35%;
+	height: 100%;
+	border: 0.1vw solid #FFFFFF;
+}
+ 
+#level_up .stats_block .row {
+	width: 94%;
+	margin-left: 3%;
+	display: flex;	
+	--fontsize: 1.8px;
+}
+
+#level_up .stats_block .row .column:nth-child(1){
+	color: var(--text-color-highlight2);
+	margin-right: auto;
+}
+
+#level_up .stats_block .row .column:nth-child(2){
+	margin-right: 10%;
+	width: 15%;
+	text-align: right;
+}
+
+#level_up .stats_block .row .column:nth-child(3){
+	color: #41e658;
+	font-style: italic;
+	width: 15%;
+	text-align: right;
+}
+
+#level_up .stats_block .row.SP .column:nth-child(1){
+	color: var(--text-color-highlight);
+}
+
+#level_up .stats_block .row .column.delta:nth-child(1){
+	
+}
+
+#level_up .stats_block .row .column.delta:nth-child(2){
+	color: #41e658;
+}
+
+#level_up .skills_block .row {
+	width: 94%;
+	margin-left: 3%;
+	text-align: left;
+	--fontsize: 1.8px;
+}
+
+#level_up .skills_block .row.header {
+	color: var(--text-color-highlight);
+	text-align: center;
+	
+}
+
+#level_up .row.header {
+	height: 13%;
+}
+
+#level_up .skills_scroll {
+	height: 87%;
+	overflow-y: auto;
+}
+
+#level_up .skills_scroll.styled_scroll::-webkit-scrollbar {
+    width: 0.5vw;
+}
+
+#level_up .skills_block .updated_skill {
+	color: #41e658;
+}
+
+#level_up .skills_block .skill_entry {
+	display: flex;
+}
+
+#level_up .spirits_block .row {
+	width: 94%;
+	margin-left: 3%;
+	text-align: left;
+	--fontsize: 1.8px;
+}
+
+#level_up .spirits_block .row.header {
+	color: var(--text-color-highlight);
+	text-align: center;
+}
+
+#level_up .spirits_block .updated_spirit {
+	color: #41e658;
+}

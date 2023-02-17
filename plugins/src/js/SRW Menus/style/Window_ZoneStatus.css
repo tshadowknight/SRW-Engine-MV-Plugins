@@ -1,0 +1,56 @@
+#zone_status .list_container {
+	margin: 0px;
+    left: 19%;
+    top: 16%;
+    position: absolute;
+    width: 62.5%;
+    height: 67.5%;
+    background-color: var(--section-bg-color);
+    border: 0.1vw solid #FFFFFF;
+	border-top-left-radius: 1vw;
+    border-bottom-left-radius: 1vw;
+    padding: 1%;
+    overflow-y: scroll;
+}   
+   
+   
+#zone_status .list_container .entry {
+	margin-top: 1%;
+    margin-bottom: 1%;
+    height: 47%;
+	width: 98%;
+	background-color: var(--section-bg-color);
+    border: 0.1vw solid #FFFFFF;
+	border-top-left-radius: 1vw;
+	border-bottom-left-radius: 1vw;
+	border-bottom-right-radius: 1vw;
+	color: #FFFFFF;
+	overflow: hidden;
+}  
+
+#zone_status .list_container .entry .title {
+	display: flex;
+	align-items: left;
+	justify-content: center;
+	--fontsize: 2px;
+	background-color: rgba(255,0,0,0.5);
+}
+
+#zone_status .list_container .entry.friendly .title {
+	background-color: rgba(0,200,0,0.5);
+}
+
+#zone_status .list_container .entry .title .label {
+	width: 80%;
+	padding: 1%;
+}
+
+#zone_status .list_container .entry .title .level_indic {
+	width: 16%;
+	padding: 1%;
+}
+
+#zone_status .list_container .entry .desc {
+	padding: 1%;
+	--fontsize: 1.6px;
+}

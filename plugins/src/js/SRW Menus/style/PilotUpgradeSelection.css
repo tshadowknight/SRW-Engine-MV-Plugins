@@ -1,0 +1,8 @@
+#pilot_upgrade_list .list_container {
+	height: 46%;
+}
+
+#pilot_upgrade_list .list_detail {
+	height: 25%;
+    top: 62%;
+}

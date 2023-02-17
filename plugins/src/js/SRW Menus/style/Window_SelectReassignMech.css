@@ -1,0 +1,43 @@
+#mech_reassign_select_slot_selection_container {
+	--widthpixels: 1110;
+	--heightpixels: 624;
+	display: flex;
+	align-items: center;
+	justify-content: center;
+	
+	position: absolute;
+	top: 0;
+	left: 0;
+}
+
+#mech_reassign_select_slot_selection_container .content {
+	border: 0.1vw solid #FFFFFF;
+    border-radius: 1vw;
+    width: calc(30% - 2vw);
+    padding: 1vw;
+    background-color: rgba(0,67,99,1);
+    position: relative;
+}
+
+#mech_reassign_select_slot_selection_container .content .entry{
+	display: flex;
+    align-items: center;
+	--fontsize: 2px;
+	color: white;
+	padding: 0.3vw;
+}
+
+#mech_reassign_select_slot_selection_container .content .entry.selected {
+    background-color: var(--selected-color);
+    color: #FFFFFF;
+}
+
+#mech_reassign_select_slot_selection_container .content .entry .slot_value{
+	margin-left: auto;
+}
+
+#mech_reassign_select_slot_selection_container .content .entry .slot_icon{
+	margin-left: 6%;
+    width: 13%;
+}
+   

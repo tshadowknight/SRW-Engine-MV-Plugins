@@ -1,0 +1,263 @@
+#battle_scene_layer {
+	position: fixed;
+	width: 0px;
+	height: 0px;	
+	top: 0;
+	left: 0;
+	z-index: 51;
+	margin: auto;
+	font-family: GameFont;
+	overflow: hidden;
+	display: none;
+}
+
+#render_canvas {
+	width: 100%;
+	height: 100%;
+	touch-action: none;
+}
+
+#_testcanvas {
+	width: 100%;
+	height: 100%;
+	touch-action: none;
+	position: absolute;
+	top: 0;
+	left: 0;
+}
+
+.fade_container {
+	position: absolute;
+	width: 100%;
+	height: 100%;
+	pointer-events: none;
+	touch-action: none;
+	z-index: 59;	
+	opacity: 0;
+	left: 0;
+    top: 0;
+}
+
+#fade_container {
+	display: none;
+}
+
+#system_fade_container {
+	z-index: 60;	
+}
+
+#swipe_container {
+	z-index: 58;	
+	overflow: hidden;	
+	
+	opacity: 1;
+}
+
+.fade_container.fade_to_black {
+	background-color: #000000;
+	animation-name: fade_to;
+	animation-duration: 0.2s;
+	animation-fill-mode: forwards;
+}
+
+.fade_container.fade_to_white {
+	background-color: #FFFFFF;
+	animation-name: fade_to;
+	animation-duration: 0.2s;
+	animation-fill-mode: forwards;
+}
+
+.fade_container.fade_to_white_slow {
+	background-color: #FFFFFF;
+	animation-name: fade_to;
+	animation-duration: 0.6s;
+	animation-fill-mode: forwards;
+}
+
+@keyframes fade_to {
+	 0% { opacity: 0;}
+  100% { opacity: 1;}
+}
+
+.fade_container.fade_from_black {
+	background-color: #000000;
+	animation-name: fade_from;
+	animation-duration: 0.2s;
+	animation-fill-mode: forwards;
+}
+
+.fade_container.fade_from_white {
+	background-color: #FFFFFF;
+	animation-name: fade_from;
+	animation-duration: 0.2s;
+	animation-fill-mode: forwards;
+}
+
+.fade_container.fade_from_white_slow {
+	background-color: #FFFFFF;
+	animation-name: fade_from;
+	animation-duration: 0.6s;
+	animation-fill-mode: forwards;
+}
+
+@keyframes fade_from {
+	 0% { opacity: 1;}
+  100% { opacity: 0;}
+}
+
+#swipe_box {
+	width: 100%;
+	height: 100%;
+	position: relative;
+	background-color: #000000;
+	display: none;
+}
+
+#swipe_image {
+	height: 100%;
+	position: absolute;
+	top: 0;
+	
+}
+
+#swipe_box.swipe_left {	
+	display: block;
+}
+
+#swipe_box.swipe_left.in #swipe_image {
+	transform: scaleX(-1);
+	right: 100%;
+}
+
+#swipe_box.swipe_left.out #swipe_image {
+	transform: scaleX(1);
+	left: 100%;
+}
+
+#swipe_box.swipe_left.in {
+	animation-name: swipe_left_in;
+	animation-duration: 0.2s;
+	animation-fill-mode: forwards;
+	animation-timing-function: linear;
+}
+
+#swipe_box.swipe_left.out {
+	animation-name: swipe_left_out;
+	animation-duration: 0.2s;
+	animation-fill-mode: forwards;
+	animation-timing-function: linear;
+}
+
+@keyframes swipe_left_in {
+	 0% { margin-left: 120%;}
+  100% { margin-left: 0%;}
+}
+
+@keyframes swipe_left_out {
+	 0% { margin-left: 0%;}
+  100% { margin-left: -120%;}
+}
+
+#swipe_box.swipe_right {	
+	display: block;
+}
+
+#swipe_box.swipe_right.in #swipe_image {
+	transform: scaleX(1);
+	left: 100%;
+}
+
+#swipe_box.swipe_right.out #swipe_image {
+	transform: scaleX(-1);
+	right: 100%;
+}
+
+#swipe_box.swipe_right.in {
+	animation-name: swipe_right_in;
+	animation-duration: 0.2s;
+	animation-fill-mode: forwards;
+	animation-timing-function: linear;
+}
+
+#swipe_box.swipe_right.out {
+	animation-name: swipe_right_out;
+	animation-duration: 0.2s;
+	animation-fill-mode: forwards;
+	animation-timing-function: linear;
+}
+
+@keyframes swipe_right_in {
+	 0% { margin-left: -120%;}
+  100% { margin-left: 0%;}
+}
+
+@keyframes swipe_right_out {
+	 0% { margin-left: 0%;}
+  100% { margin-left: 120%;}
+}
+
+#fps_counter {
+	position: fixed;
+	background-color: black;
+	border: 2px solid red;
+	text-align: center;
+	--fontsize: 16px;
+	color: white;
+	top: 15px;
+	right: 10px;
+	width: 60px;
+	height: 20px;
+	z-index: 60;
+	display: none;
+}
+
+#spriter_layer {
+	position: fixed;
+	width: 0px;
+	height: 0px;	
+	top: 0;
+	left: 0;
+	z-index: 52;
+	margin: auto;
+	font-family: GameFont;
+	overflow: hidden;
+	display: none;
+}
+
+#spriter_layer_canvas {
+	touch-action: none;
+	position: absolute;
+	top: 0;
+	left: 0;
+	pointer-events: none;
+}
+
+#battle_scene_pixi_layer {
+	position: fixed;
+	width: 0px;
+	height: 0px;	
+	top: 0;
+	left: 0;
+	z-index: 51;
+	margin: auto;
+	font-family: GameFont;
+	overflow: hidden;
+	background: none;
+	pointer-events: none;
+	display: none;
+}
+
+#battle_scene_movie_layer {
+	position: fixed;
+	width: 100%;
+	height: 100%;	
+	top: 0;
+	left: 0;
+	z-index: 51;
+	margin: auto;
+	font-family: GameFont;
+	overflow: hidden;
+	background: none;
+	pointer-events: none;
+	display: none;
+}

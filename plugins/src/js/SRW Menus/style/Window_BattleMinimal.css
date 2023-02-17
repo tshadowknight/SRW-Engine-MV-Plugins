@@ -1,0 +1,29 @@
+#battle_basic {
+	display: flex;
+	align-items: center;
+	justify-content: center;
+	background: rgba(0,0,0,0);
+}
+
+#battle_basic .bg_fade_container {
+	width: 50%;
+	height: 50%;
+	background-color: white;
+	-webkit-mask-image: none;
+	border-radius: 999px;
+	position: relative;
+}
+
+#battle_basic .bg_container {
+	display: none;
+}	
+
+#battle_basic_actor {
+	width: 4px;
+	background-color: red;
+	height: 8px;
+	position: absolute;
+	top: 0;
+	left: 0;
+	z-index: 1;
+}

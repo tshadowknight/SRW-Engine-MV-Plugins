@@ -1,0 +1,99 @@
+#spirit_activation {
+	display: flex;
+	align-items: center;
+	justify-content: center;
+	background: rgba(0,0,0,0);
+}
+
+#spirit_activation .bg_fade_container {
+	width: 192px;
+	height: 192px;
+	background-color: var(--menu-bg-color);
+	-webkit-mask-image: none;
+	border-radius: 10px;
+	position: relative;
+	display: flex;
+    align-items: center;
+    justify-content: center;
+	border: 0.4vw solid #FFFFFF;
+}
+
+#spirit_activation_actor {
+	position: absolute;
+	left: auto; 
+	right: auto;
+	z-index: 1;
+	overflow: hidden;
+	filter: var(--shadow-actor);
+	--widthpixels: 128;
+	--heightpixels: 128;
+}
+
+#spirit_activation_actor img {
+	width: 100%;	
+}
+
+
+#spirit_activation_spirit_anim {
+	--widthpixels: 192;
+    --heightpixels: 192;
+    position: absolute;
+    top: -20px;
+    z-index: 5;	
+}
+
+.spirit_anim_container {
+	overflow: hidden;
+	width: 100%;
+	height: 100%;
+	position: relative;
+}
+
+.spirit_anim {
+	position: absolute;
+	top: 0px;
+	left: 0px;
+	animation: playSpiritX 0.3s steps(5) infinite,  playSpiritY 1.2s steps(4) infinite;
+}
+
+@keyframes playSpiritX {
+  from {left: 0px;}
+  to {left: -500%;}
+}
+
+@keyframes playSpiritY {
+  from {top: 0px;}
+  to {top: -400%;}
+}
+
+#spirit_activation_HPBar {
+	position: absolute;
+    background-color: #000000;
+    --widthpixels: 60;
+    --heightpixels: 10;
+    top: 15%;
+    margin-left: auto;
+    margin-right: auto;
+    display: none;
+    z-index: 5;
+}
+
+#spirit_activation_HPBarFill {
+	height: 100%;
+	width: 50%;
+	background-color: #FF0000;
+}
+
+#spirit_activation_message {
+	display: flex;
+	align-items: center;
+	justify-content: center;
+	color: white;
+	--widthpixels: 128;
+	--heightpixels: 20;
+	margin-left: auto;
+	margin-right: auto;
+	position: absolute;
+	top: 2%;
+	white-space: nowrap;
+}

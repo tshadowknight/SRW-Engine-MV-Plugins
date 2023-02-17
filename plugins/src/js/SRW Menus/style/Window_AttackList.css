@@ -1,0 +1,282 @@
+#attack_list .menu_header {
+	
+}
+
+#attack_list .tab_button {
+	top: 3%;
+}
+
+#attack_list .pilot_stats_button {
+	left: 1%;
+}
+
+#attack_list .mech_stats_button {
+	left: 23%;
+}
+
+#attack_list .weapon_info_button {
+	left: 45%;
+}
+
+#attack_list .list_container {
+	height: 46%;
+}
+
+#attack_list .list_detail {
+	width: 67.5%;
+    margin-left: 0%;
+    left: 6%;
+}
+
+#attack_list .mech_stats_detail {
+	height: 25%;
+    top: 52%;
+}
+
+#attack_list .upgrade_detail {
+	top: 78%;
+}
+
+#attack_list .fub_detail {
+	height: 36%;
+    top: 52%;
+    left: 74%;
+    display: block;
+    width: 20%;
+}
+
+#attack_list .mech_hp_en_container {
+	height: 100%;
+	width: 50%;
+}
+
+#attack_list .left_items {
+	width: 40%;
+    height: 100%;	
+	display: inline-block;
+}
+
+#attack_list .left_items .icon_hp_EN {
+	display: flex;
+	width: 100%;
+	height: 35%;
+}
+
+#attack_list #detail_list_icon {
+	width: 16%;
+    margin-left: 3%;
+    margin-top: 1%;
+    margin-right: 7%;
+}
+
+#attack_list .stat_section {
+	height: 20%;
+}
+
+#attack_list .stat_section_armor {
+	left: 1%;
+    top: 0%;	
+    width: 22.5%;
+}
+
+#attack_list .stat_section_mobility {
+	left: 1%;
+    top: 20%;
+	width: 22.5%;
+}
+
+#attack_list .stat_section_accuracy {
+	left: 1%;
+    top: 40%;
+	width: 22.5%;
+}
+
+#attack_list .stat_section_move {
+	top: 20%;
+	width: 25%;
+	left: 25%;
+}
+
+#attack_list .stat_section_terrain {
+	top: 0%;
+    width: 25%;
+    display: flex;
+    left: 25%;
+    align-items: center;
+}
+
+#attack_list .pilot_stat_container {
+	border: 0px;
+}
+
+#attack_list .stat_section_terrain .stat_label {
+	color: var(--text-color-highlight2);	
+}
+
+#attack_list .center_items {
+	width: 35%;
+    height: 100%;	
+	display: inline-block;
+	margin-left: 2%;
+}
+
+#attack_list .right_items {
+	width: 20%;
+    height: 100%;	
+	display: inline-block;
+	margin-left: 2%;
+}
+
+#attack_list .ability_block_row {
+	height: 2.7px;
+}
+
+#attack_list .right_items .ability_block_row {
+	justify-content: center;
+}
+
+#attack_list .right_items .pilot_stat_container {
+	width: 100%;
+	text-align: center;
+}
+
+#attack_list .right_items .pilot_stat_container .stat_value{
+	margin-left: 0px;
+	margin-right: 0px;
+}
+
+#attack_list .center_items .pilot_stat_container {
+	width: 10px;
+}
+
+#attack_list_upgrade_name_icon {
+	width: 10%;
+}
+
+#attack_list_weapons_name_icon {
+	width: 10%;
+}
+
+#attack_list .FUB_label {
+	color: var(--text-color-highlight);
+	margin-left: 2%;
+    height: 12%;
+	--fontsize: 1.6px;
+}
+
+#attack_list .FUB_content {
+	color: #FFFFFF;
+	margin-left: 2%;
+	height: 88%;
+	width: 96%;
+	--fontsize: 1.6px;
+}
+
+#attack_list .weapon_info {
+	height: 33%;
+    border: 0;
+    top: 24%;
+    width: 88%;
+	border-top-left-radius: 0px;
+	border-top-right-radius: 0px;
+}
+
+#attack_list .weapon_detail {
+	width: 87.7%;
+    margin-left: 0%;
+    height: 22%;
+    left: 6%;
+    top: 58%;
+}
+
+#attack_list .pilot_detail_1 {
+	width: 88%;
+	top: 13%;
+    height: 32%;
+}
+
+#attack_list .pilot_detail_2 {
+	width: 88%;
+	height: 40%;
+    top: 46%;
+	align-items: baseline;
+}
+
+#attack_list .pilot_detail_2 .spirit_label {
+	--widthscaling: 8;
+}
+
+#attack_list .pilot_detail_2 .ability_block {
+	margin-left: 1%;
+    margin-top: 1%;
+	border: 0.1vw solid rgba(255,255,255,0.5);
+    padding: 0.5%;
+}
+
+#attack_list .pilot_detail_2 .ability_block.ace_bonus {
+	border: 0.1vw solid rgba(255,255,255,0.5);
+    padding: 0.5%;
+	position: absolute;
+	--widthscaling: 50;
+	left: 0;
+	height: 36%;
+	width: 97%;
+}
+
+#attack_list .pilot_detail_2 .spirit_list_entry .stat_value{
+	justify-content: flex-start;
+	display: flex;
+	text-align: left;
+}
+
+#attack_list .pilot_detail_2 .ace_desc {
+	color: #FFFFFF;
+	--fontsize: 1.5px;
+}
+
+#attack_list #pilot_summary_name {
+	left: 18%;
+    top: 23%;
+}
+
+#pilot_summary_card {
+	--widthscaling: 20;
+}
+
+#pilot_summary_card .ability_block_row{
+	width: 100%;
+}
+
+#pilot_summary_card {
+	margin: 0px;
+	left: 20%;
+    top: 23%;
+	position: absolute;
+}
+
+#pilot_summary_card .stat_label {
+	color: var(--text-color-highlight);
+}
+#pilot_summary_card .stat_value {
+   
+}
+
+#attack_list_map_preview {
+	--heightpixels: 140;
+	--widthpixels: 140;
+	background-color: #FFFFFF;
+	border: 0.1vw solid #FFFFFF;
+	border-top: none;
+	position: absolute;
+	top: 0;
+	left: 69%;
+	border-bottom-left-radius: 1vw;
+	border-bottom-right-radius: 1vw;
+	display: none;
+	padding-bottom: 0.6vw;
+}
+
+#attack_list_map_preview.active {
+	display: block;
+}
+

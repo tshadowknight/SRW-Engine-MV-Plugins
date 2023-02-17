@@ -1,0 +1,427 @@
+#search .menu_header {
+	width: 19%;
+	z-index: 1;
+}
+
+#search .tab_button {
+	top: 3%;
+}
+
+#search .tab_button.selected {
+	color: #FFFFFF;
+	border: 0.1vw solid #FFFFFF;
+	background-color: rgba(255,255,255,0.2);
+}
+
+#search .pilot_stats_button {
+	left: 42%;
+}
+
+#search .mech_stats_button {
+	left: 64%;
+}
+
+#search .spirit_info_button {
+	left: 20%;
+}
+
+#search .list_container {
+	height: 57.5%;
+    border: 0.1vw solid #FFFFFF;
+    border-top-left-radius: 1vw;
+	border-bottom-left-radius: 1vw;
+    display: block;
+    width: 77%;
+    align-items: center;
+	background-color: var(--section-bg-color);
+	overflow: scroll;
+	overflow-x: hidden;
+}
+
+#search .list_container .row {
+	display: flex;
+	width: 100%;
+}
+
+#search .list_container .entry {
+	width: 13.7%;
+    padding: 1%;
+    margin: 1%;
+	padding-left: 2%;
+	padding-right: 2%;
+    --fontsize: 2.2px;
+    flex-shrink: 0;
+    border-radius: 9999px;
+    display: flex;
+	align-items: center;
+	justify-content: center;
+    color: #FFFFFF;
+    border: 0.1vw solid #AAAAAA;
+	white-space: nowrap;
+}
+
+#search .list_container .entry.disabled {
+	color: #888888;
+	border: 0.1vw solid #888888;
+}
+
+#search .list_container .entry.selected {
+	color: #FFFFFF;
+	border: 0.1vw solid #FFFFFF;
+	background-color: rgba(255,255,255,0.2);
+}
+
+#search .list_container .entry.selected.disabled {
+	color: #888888;
+	border: 0.1vw solid #FFFFFF;
+	background-color: rgba(255,255,255,0.2);
+}
+
+#search .list_detail {
+	width: 75.5%;
+    margin-left: auto;
+    margin-right: auto;
+    position: relative;
+    /* left: 6%; */
+    height: 15%;
+    top: 18%;
+    left: auto;
+    right: auto;
+    color: #FFFFFF;
+    display: flex;
+    align-items: flex-start;
+    padding: 1%;
+	--fontsize: 1.8px;
+}
+
+#search .mech_stats_detail {
+	height: 25%;
+    top: 52%;
+	z-index: 1;	
+}
+
+#search .upgrade_mech_name {
+	z-index: 2;
+}
+
+#search .upgrade_detail {
+	top: 78%;
+}
+
+#search .fub_detail {
+	height: 36%;
+    top: 52%;
+    left: 74%;
+    display: block;
+    width: 20%;
+}
+
+#search .mech_hp_en_container {
+	height: 100%;
+	width: 50%;
+}
+
+#search .left_items {
+	width: 40%;
+    height: 100%;	
+	display: inline-block;
+}
+
+#search .left_items .icon_hp_EN {
+	display: flex;
+	width: 100%;
+	height: 35%;
+}
+
+#search #detail_list_icon {
+	width: 16%;
+    margin-left: 3%;
+    margin-top: 1%;
+    margin-right: 7%;
+}
+
+#search .stat_section {
+	height: 20%;
+}
+
+#search .stat_section_armor {
+	left: 1%;
+    top: 0%;	
+    width: 22.5%;
+}
+
+#search .stat_section_mobility {
+	left: 1%;
+    top: 20%;
+	width: 22.5%;
+}
+
+#search .stat_section_accuracy {
+	left: 1%;
+    top: 40%;
+	width: 22.5%;
+}
+
+#search .stat_section_size {
+	left: 25%;
+    top: 40%;
+	width: 25%;
+}
+
+#search .stat_section_move {
+	top: 20%;
+	width: 25%;
+	left: 25%;
+}
+
+#search .stat_section_terrain {
+	top: 0%;
+    width: 25%;
+    display: flex;
+    left: 25%;
+    align-items: center;
+}
+
+#search .pilot_stat_container {
+	border: 0px;
+}
+
+#search .pilot_stat_container.on {
+	color: var(--text-color-highlight2);	
+}
+
+#search .pilot_stat_container.off {
+	color: #888888;	
+}
+
+#search .stat_section_terrain .stat_label {
+	color: var(--text-color-highlight2);	
+}
+
+#search .center_items {
+	width: 35%;
+    height: 100%;	
+	display: inline-block;
+	margin-left: 2%;
+}
+
+#search .right_items {
+	width: 20%;
+    height: 100%;	
+	display: inline-block;
+	margin-left: 2%;
+}
+
+#search .ability_block_row {
+	height: 2.7px;
+}
+
+#search .right_items .ability_block_row {
+	justify-content: center;
+}
+
+#search .right_items .pilot_stat_container {
+	width: 100%;
+	text-align: center;
+}
+
+#search .right_items .pilot_stat_container .stat_value{
+	margin-left: 0px;
+	margin-right: 0px;
+}
+
+#search .center_items .pilot_stat_container {
+	width: 10px;
+}
+
+#search_upgrade_name_icon {
+	width: 10%;
+}
+
+#search_weapons_name_icon {
+	width: 10%;
+}
+
+#search .FUB_label {
+	color: var(--text-color-highlight);
+	margin-left: 2%;
+    height: 12%;
+	--fontsize: 1.6px;
+}
+
+#search .FUB_content {
+	color: #FFFFFF;
+	margin-left: 2%;
+	height: 88%;
+	width: 96%;
+	--fontsize: 1.6px;
+}
+
+#search .weapon_info {
+	height: 31%;
+    border: 0;
+    top: 24%;
+    width: 88%;
+}
+
+#search .weapon_detail {
+	width: 87.7%;
+    margin-left: 0%;
+    height: 22%;
+    left: 6%;
+    top: 56%;
+}
+
+#search .pilot_detail_1 {
+	width: 88%;
+	top: 13%;
+    height: 32%;
+}
+
+#search .pilot_detail_2 {
+	width: 88%;
+	height: 40%;
+    top: 46%;
+	align-items: baseline;
+}
+
+#search .pilot_detail_2 .spirit_label {
+	--widthscaling: 8;
+}
+
+#search .pilot_detail_2 .ability_block {
+	margin-left: 1%;
+    margin-top: 1%;
+	border: 0.1vw solid rgba(255,255,255,0.5);
+    padding: 0.5%;
+}
+
+#search .pilot_detail_2 .ability_block.ace_bonus {
+	border: 0.1vw solid rgba(255,255,255,0.5);
+    padding: 0.5%;
+	position: absolute;
+	--widthscaling: 50;
+	left: 0;
+	height: 36%;
+	width: 97%;
+}
+
+#search .pilot_detail_2 .spirit_list_entry .stat_value{
+	justify-content: flex-start;
+	display: flex;
+	text-align: left;
+}
+
+#search .pilot_detail_2 .ace_desc {
+	color: #FFFFFF;
+	--fontsize: 1.5px;
+}
+
+#search #pilot_summary_name {
+	left: 22%;
+    top: 23%;
+}
+
+#pilot_summary_card {
+	--widthscaling: 20;
+}
+
+#pilot_summary_card .ability_block_row{
+	width: 100%;
+}
+
+#search #pilot_summary_card {
+	margin: 0px;
+	left: 23%;
+    top: 23%;
+	position: absolute;
+}
+
+#pilot_summary_card .stat_label {
+	color: var(--text-color-highlight);
+}
+#pilot_summary_card .stat_value {
+   
+}
+
+#search .actor_battle_sprite {
+	position: absolute;
+	--widthpixels: 350;
+	--heightpixels: 350;
+	bottom: 40%;
+	margin-left: 32%;
+}
+
+#search .actor_battle_sprite img{
+	width: 100%;
+	image-rendering: pixelated;
+}
+
+#search .bar_pilot_stats {
+	width: 100%;
+    display: flex;
+    height: 100%;
+    white-space: nowrap;
+    align-items: center;
+    position: relative;
+}
+
+#search .bar_pilot_stats .type_indicator {
+	display: flex;
+    align-items: center;
+    justify-content: center;
+	--widthpixels: 100;
+	--heightpixels: 30;
+	position: absolute;
+	left: 5.5%;
+	/*background-color: red;*/
+	
+	--fontsize: 1.6px;
+}
+
+#search .bar_pilot_stats .twin_type {	
+	color: var(--text-color-highlight);
+	top: 2%;
+}
+	
+#search .bar_pilot_stats .pilot_type {	
+	color: var(--text-color-highlight2);
+	bottom: 2%;	
+}
+
+#search .selection_icon {
+	--widthpixels: 24;
+	--heightpixels: 24;
+	background-color: rgba(85, 164, 255, 0.5);
+    border: 0.1vw solid #99e3ff;
+	
+	flex-shrink: 0;
+	position: absolute;
+	
+}
+
+#search .selection_icon.twin.left{
+	top: 16%;
+    left: 0.5%;
+}
+
+#search .selection_icon.twin.right{
+	top: 16%;
+    left: 18%;
+}
+
+#search #bar_pilot_stats_icon {
+	margin-left: 3.7%;
+	position: absolute;
+    top: 16%;
+}
+
+#search .selection_icon.sub.left{
+	top: 70.5%;
+    left: 0.5%;
+}
+
+#search .selection_icon.sub.right{
+	top: 70.5%;
+    left: 18%;
+}

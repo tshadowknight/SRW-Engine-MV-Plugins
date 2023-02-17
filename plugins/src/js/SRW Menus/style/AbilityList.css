@@ -1,0 +1,180 @@
+
+#ability_list_control {
+	border: 0.1vw solid #FFFFFF;
+	border-radius: 1vw;
+	border-top-right-radius: 0px;
+	border-top-left-radius: 0px;
+	width: 98%;
+	height: 98%;
+	padding-left: 1%;
+	padding-right: 1%;
+	background-color: rgba(0,67,99,0.5);
+	position: relative;
+}
+
+#ability_list_control_page {
+	display: flex;
+    align-items: center;
+    justify-content: center;
+	border: 0.1vw solid #FFFFFF;
+	border-radius: 999px;
+	height: 10%;
+	width: 10%;
+	position: absolute;
+	right: -0.3%;
+	top: -12%;
+	background-color: rgba(0,67,99,0.5);
+	color: #FFFFFF;
+	--fontsize: 1.6px;
+	text-align: center;
+}
+
+#ability_list_control_top_border {
+	display: none;
+}
+
+#ability_list {
+	
+}
+
+.list_container {
+	position: relative;
+	top: 15%;
+	width: 70%;
+	margin-left: auto;
+	margin-right: auto;
+	height: 60%;
+}
+
+.unit_list_table {
+	width: 100%;
+	color: #FFFFFF;
+
+	text-align: left;
+	border-collapse: collapse;
+}
+
+.ability_list_row {
+	display: flex;
+	align-items: center;
+	width: 80%;
+    margin-left: auto;
+	margin-right: auto;
+	padding: 0.1%;
+	border-bottom: 0.1vw solid var(--underline-color);
+}
+
+.ability_list_row.header {
+	border-bottom: 0.1vw solid rgba(0,0,0,0);
+}
+
+.ability_list_row .ability_list_block {
+	color: #FFFFFF;
+}
+
+.ability_list_row .ability_list_block.underflow {
+	color: #888888;
+}
+
+.ability_list_row .ability_list_block:nth-child(1){
+	width: 70%;
+	--fontsize: 2px;	
+	position: relative;
+}
+
+.ability_list_row .ability_list_block:nth-child(2){
+	width: 30%;
+	--fontsize: 2px;		
+	text-align: center;
+}
+
+.ability_list_row.selected {
+	background-color: var(--selected-color);
+	color: #FFFFFF;
+}
+
+.ability_list_block.header {
+	color: var(--text-color-highlight);
+}
+
+.ability_list_type {
+	width: 2.2px;
+	filter: var(--white-filter);
+	display: flex;
+}
+
+.attribute_block {
+	display: flex;
+    background: rgb(228,245,252);
+	background: -moz-linear-gradient(top,  rgba(228,245,252,1) 0%, rgba(191,232,249,1) 50%, rgba(159,216,239,1) 51%, rgba(42,176,237,1) 100%);
+	background: -webkit-linear-gradient(top,  rgba(228,245,252,1) 0%,rgba(191,232,249,1) 50%,rgba(159,216,239,1) 51%,rgba(42,176,237,1) 100%);
+	background: linear-gradient(to bottom,  rgba(228,245,252,1) 0%,rgba(191,232,249,1) 50%,rgba(159,216,239,1) 51%,rgba(42,176,237,1) 100%);
+	filter: progid:DXImageTransform.Microsoft.gradient( startColorstr='#e4f5fc', endColorstr='#2ab0ed',GradientType=0 );
+    width: fit-content;
+    padding-left: 1%;	
+	padding-right: 1%;
+	margin-left: auto;
+	margin-right: auto;
+}
+
+.attribute_block_entry{
+	--fontsize: 1.5px;
+	width: 1.8px;
+	height: 1.8px;
+	display: flex;
+    align-items: center;
+    justify-content: center;
+    background-color: black;
+    margin: 2%;	
+	font-weight: bold;
+}
+
+#ability_list_control_details {
+	position: absolute;
+	width: 48%;
+	height: 97%;
+	left: 51%;
+	top: 1%;
+	background-color: rgba(174, 219, 241, 0.5);
+	border: 0.1vw solid rgba(174, 219, 241, 0.9);
+}
+
+.list_pilot_icon {
+	width: 50%;
+	margin-top: 10%;
+}
+
+.list_mech_icon {
+	margin-top: 10%;
+	width: 50%;
+    margin-left: 10%;
+}
+
+.page_indicator {
+    width: 38%;
+    height: 5%;
+    top: -4.2%;
+    right: 10%;
+    position: absolute;
+    display: flex;
+}
+
+.page_indicator .page_block {
+	margin-left: 1%;
+	margin-right: 1%;
+	height: 100%;
+	/*width: 20%;*/
+	--fontsize: 1.2px;
+	text-align: center;
+	border: 0.1vw solid rgba(174, 219, 241, 0.9);
+	background-color: #538ca7;
+	border-bottom: 0px;
+	font-weight: bold;
+	padding-left: 2%;
+    padding-right: 2%;
+	white-space: nowrap;
+}
+
+.page_indicator .page_block.selected {
+	color: #FFFFFF;
+}
