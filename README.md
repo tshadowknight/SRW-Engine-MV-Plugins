@@ -7,7 +7,7 @@ Includes third party plugins, the plugins.js config file and the source for the 
 
 ## Usage
 
-Run 'npx webpack' in plugins/src/js, this will build:  
+Run 'npx webpack' in plugins/src, this will build:  
 
 * SRW_Menus.js
 * SRW_BattleSene.js
