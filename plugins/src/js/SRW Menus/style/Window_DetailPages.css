@@ -143,6 +143,9 @@
 
 #detail_pages .stat_section_terrain .stat_label {
 	color: var(--text-color-highlight2);	
+	font-size: 70%;
+	padding-left: 4px;
+	padding-top: 3px;
 }
 
 #detail_pages .center_items {
