@@ -11,7 +11,6 @@ import SpineManager from "./SpineManager.js";
 
 import DragonBonesManager from "./dragonBones/DragonBonesManager.js";
 
-
 export default function BattleSceneManager(){
 	this._initialized = false;
 	this._isLoading = 0;
