@@ -373,13 +373,14 @@
 .participant_block .active_spirits {
 	width: 100%;
 	height: 10%;
-	--fontsize: 1.5px;
+	--fontsize: 1px;
 	display: flex;
 	align-items: center;
 	justify-content: center;
 	position: absolute;
     top: 91%;
     left: 0%;
+	margin-top: 0%;
 }
 
 .participant_block .active_spirits .spirit_entry {
@@ -388,9 +389,9 @@
 	display: flex;
 	align-items: flex-end;
 	justify-content: center;
-	border-top: 0.1vw solid #FFFFFF;
-	border-right: 0.1vw solid #FFFFFF;
-	border-bottom: 0.1vw solid #FFFFFF;
+	border-top: 0.2vw solid #FFFFFF;
+	border-right: 0.2vw solid #FFFFFF;
+	border-bottom: 0.2vw solid #FFFFFF;
 	color: rgba(222,222,222,0.6);
 }
 

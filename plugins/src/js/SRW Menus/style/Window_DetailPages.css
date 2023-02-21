@@ -87,6 +87,14 @@
 	height: 20%;
 }
 
+#detail_pages .stat_section_armor .stat_label, #detail_pages .stat_section_armor .stat_value, #detail_pages .stat_section_mobility .stat_label, #detail_pages .stat_section_mobility .stat_value, #detail_pages .stat_section_accuracy .stat_label, #detail_pages .stat_section_accuracy .stat_value {
+	margin-top: 10%;
+}
+
+#detail_pages .stat_section_size .stat_label, #detail_pages .stat_section_size .stat_value, #detail_pages .stat_section_move .stat_label, #detail_pages .stat_section_move .stat_value {
+	margin-top: 9%;
+}
+
 #detail_pages .stat_section_armor {
 	left: 1%;
     top: 0%;	
@@ -121,7 +129,7 @@
 	top: 0%;
     width: 25%;
     display: flex;
-    left: 25%;
+    left: 24%;
     align-items: center;
 }
 
@@ -146,6 +154,11 @@
 	font-size: 70%;
 	padding-left: 4px;
 	padding-top: 3px;
+	margin-top: 3%;
+}
+
+#detail_pages .stat_section_terrain .stat_value {
+	margin-top: 3%;
 }
 
 #detail_pages .center_items {

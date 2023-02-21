@@ -77,8 +77,20 @@ body {
 	height: 100%;
 	position: absolute;
 	background:url(
-		data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAAQAAAAECAYAAACp8Z5+AAAAEklEQVQImWNgwALS0DCmAAoAAGfcAzFaxkR4AAAAAElFTkSuQmCC
+		data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAALYAAABfAgMAAAA41dXdAAAABGdBTUEAALGPC/xhBQAAAAFzUkdCAK7OHOkAAAAMUExURRUgJiEzPBwrMxglLHwDmRQAAAdFSURBVFjDlZhPjBNlFMBf50uBLp2ul9UrB0pg4UCiRVpWbbxhopmE/aalW+MYRNZaQg0nSIyTEA+SmPTALKAcNoYSdnaDc1IDxExCvOgGPdAl0cteCiwYIDEeEBN9733zr93uit8mszP9fvP6fe+97/0pSCmnHEnDdHHQzf05fnadTxsmTbnzeMW5rjTAbNhie77suPcvAoB458TbNvDIQuZjv63ulzbDCMDKTBtOl/mD3wAmCD9wIqDp4d0Q/wtgFEDzluG0mv46IA68afshrn2UwOl5uQ1vKPy1AD90ohXjkfSnfE0hflItZmuAWNKPF3MQAlzNarNt2K/w50M8b0V4rhrit2nnkJqNFhPhuakIz3sh/gKQZgThfviBwiEfqeYswGyEb1L4W/3SW7QENVY8AE/d3mJcs3DtCs8HO8T5nrrVq/w277ka4Z8pXLPYTDQvLigBNoTS057CW2343AJBH22HrWJBidvGEmfoqra6DxjPlNtwaibSBNxVuE5y9aZaW7gTVKSDVrOLsaL1Zf52Qe9keActPdgs+gyCiIuZ2I7zLF1YEe79E5lYw2UY0ITidGzHr2L8J/rgfOyf+WkoGSBnV6SdmxU+a8YhUqsTfoRelAE7Mj8uWyN4PGQVenSUFF6sR/h3dBdstEtnDgqmAadNEHiwnBbsJh8lEn71+bygwg2lAjyXczZ0vUgzupIj2H81OzDQjMK7TdJ7rk6aIU/C0bPZqg1+eS9aja3JZtKn2Exdm/FMK7voQ0pWWNF36FqAC8ol27xwMvzI+AIZuQyae+XhShP2dslfWjqpsnCjjnbRDVQ0ZHCZhSMzsgbkz8rn4I4PY1XyNMbTiL8Mekvgzrs+CDNwWQOs8KCVLo6hZqwUSz9Vh82Io0q1qgYF3PcGYDw4L9Bzz6RtPDBaiIOSnqpvuDPFPsNnLYoSxq00nXKWnsHFZBGH6yDqmzLkCRr0jw31NJK7Wbp+g6Xz64bGh30Qz1iZBiosFeMpkrrS0ngJYgDXrSwaArR4MSmUrplbtBYMGbq1t1uGULoVSE9VdmnlYXiuwqdZm2bpVXQoWrs2CRl7GA7SLuCETpmgAuTTEnExCT8OpSFvOohnpnrk/PkpZyFjkYtWhtOQM90yeWbwuI+jnnZ0LZy2CGNWUrfN7C5Yb7wik0/i/My6NOyo9z2mV60kDjJ0mvS632fpanS7mS5bEnMvxUc2HIX4yzYoPLbBptV4egCfhal7farpx3UjusWQOvGqAceLSQ9KrYnTAcnSSS+tgycV9VRtNV9zqHjw0J5Cn+zf6lTJ5crCvbyDVvEcnBrvXL3iznVkdcnsUHlRyS6G46bEiqOB8Jx83/nBEhhnPnEozmlFWbkb1CkPo/GEHin65ZyO/LN282kb/GyeKVl3pnPunNm3mG6lqyZlpfsEvekXWqC3k+dKq7dKen8Q6CXn0drt3PVn1Aym+WVo3LGfUe+Q3deG5kTCbutYFV1sQhj/z8V2Jxx4L+P9DhzjGwcdGMJUlsAr/3GaKgPBYV06J5w+PdV2blmTHb0nbkKplhTuw4t/zK+BFyWFrYJVcjFplbwxn9KxtmZY6k5TjNRN9JAmOKY0OxT0zIWfh9KYgSlGpsi/O8J05bE5FVLT/tAINj1BATuI7wYGPSqDtMrEs8R3MjcF9jXju26NOL6AKDcJzh5CesOlpw1KZcncpGoyi+uVVblp/hwlyt1RbuLMl8UEKr5JZL7HoXsYtwl/nAqTfJCGtfrGTDOU/jhKxGcLkwUfa4IoyWdVktfrmXtLPp+lRE1QnIVtZ/tqgrCEMFUgDmoC2v2NF0tngBOHiCuOjbhLwvPoEp3LD5wFDqk26B9eu/bQFpe4rmoVSR0FPyjh2uQGrj1yze2Qr1K1pM52sUGNEBw/R9c9wP+2ce8xPlfncP4F46pe10zlGZJN+Lcqt3PH+CwLmtuEvkr4JTuRlDR2V1rQAhc5ShE7qqQZ8SXinQqMUFSzuY5UcYi+r7AYhyUh2anz022Q9YdOo1NzfY4EPSOsPTPvRV+Gy+9Ix7TTWNTW/KLpRw5xsKU6BcS/5a0Evi584ViiY2Cl1/MivyndiCtsWgxc8ZJBBKOYnWiUtAur6vdcnJl61EbZcZ8EGSAj87EIqphZrRlF0FwN8derytkm8O+c6j2KJDg1qRLp73HWzdvYCAWt0QXVB3qqqcIx5kPYle3xVSNUjtqsohd2ZRAk2nQz6pv05mBXFjdxIihK2PRBDXuG8ZS1qkVsQdQYjS4M9HzDOkrhRIpy/EQDulnhg+1twUjmvT6cuuET5X7piYiNZXuMg+qGT6rpnQFy6IMY146Grfm9CA+a50dR419et/EPflaIfidI/qwwiHvLcJV0VbKXgHsfcWD/8SG/E9zlOJO6vIzFbmN+xmlI6dBRELXDsoG9Dg2/t9+u38ebxUXn0vzoqN91DKqNq+NuR8aj0TXnDvNd8On3j1Tp4kjjXxGbhJ67TFT6AAAAAElFTkSuQmCC
 	) repeat;
+	-webkit-animation: backgroundScroll 20s linear infinite;
+	animation: backgroundScroll 20s linear infinite;
+}
+
+@-webkit-keyframes backgroundScroll {
+from {background-position: 0 0;}
+to {background-position: -182px -95;}
+}
+
+@keyframes backgroundScroll {
+from {background-position: 0 0;}
+to {background-position: -182px -95;}
 }
 
 .menu_header {
@@ -106,9 +118,9 @@ body {
 
 .menu_bg {
 	background: rgb(113,178,232);
-	background: -moz-linear-gradient(left,  rgba(50,161,215,1) 0%, rgba(0,67,99,1) 24%, rgba(0,67,99,1) 50%, rgba(0,67,99,1) 79%, rgba(50,161,215,1) 100%);
-	background: -webkit-linear-gradient(left,  rgba(50,161,215,1) 0%,rgba(0,67,99,1) 24%,rgba(0,67,99,1) 50%,rgba(0,67,99,1) 79%,rgba(50,161,215,1) 100%);
-	background: linear-gradient(to right,  rgba(50,161,215,1) 0%,rgba(0,67,99,1) 24%,rgba(0,67,99,1) 50%,rgba(0,67,99,1) 79%,rgba(50,161,215,1) 100%);
+	background: -moz-linear-gradient(left,  rgba(50,161,215,0.8) 0%, rgba(0,67,99,0.8) 24%, rgba(0,67,99,0.8) 50%, rgba(0,67,99,0.8) 79%, rgba(50,161,215,0.8) 100%);
+	background: -webkit-linear-gradient(left,  rgba(50,161,215,0.8) 0%,rgba(0,67,99,0.8) 24%,rgba(0,67,99,0.8) 50%,rgba(0,67,99,0.8) 79%,rgba(50,161,215,0.8) 100%);
+	background: linear-gradient(to right,  rgba(50,161,215,0.8) 0%,rgba(0,67,99,0.8) 24%,rgba(0,67,99,0.8) 50%,rgba(0,67,99,0.8) 79%,rgba(50,161,215,0.8) 100%);
 	filter: progid:DXImageTransform.Microsoft.gradient( startColorstr='#71b2e8', endColorstr='#71b2e8',GradientType=1 );
 
 }
