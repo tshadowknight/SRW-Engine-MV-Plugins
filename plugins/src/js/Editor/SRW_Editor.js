@@ -287,7 +287,7 @@ SRWEditor.prototype.init = function(){
 		},
 		create_bg: {
 			hasTarget: true,
-			params: ["path", "parent", "position", "size", "alpha", "billboardMode", "rotation", "frameSize", "lineCount", "columnCount", "animationLoop", "animationFrames", "animationDelay", "holdFrame", "scrollSpeed", "clamp"],
+			params: ["isPilotCutin", "path", "parent", "position", "size", "alpha", "billboardMode", "rotation", "frameSize", "lineCount", "columnCount", "animationLoop", "animationFrames", "animationDelay", "holdFrame", "scrollSpeed", "clamp"],
 			aliases: {"animationLoop": "loopFromFrame", "animationFrames": "loopToFrame"},
 			desc: "Create a new background."
 		},
@@ -630,6 +630,7 @@ SRWEditor.prototype.init = function(){
 		size: "The size of the asset.",
 		alpha: "The alpha of the object.",
 		billboardMode: "Set the billboarding mode for the object: 'none' or 'full'",
+		isPilotCutin: "If 1, path is ignored and the active main pilot's defined cutin is used",
 		frameSize: "The size of the frames in the spritesheet.",
 		lineCount: "The number of lines in the spritesheet.",
 		columnCount: "The number of columns in the spritesheet.",
@@ -964,6 +965,9 @@ SRWEditor.prototype.init = function(){
 		billboardMode: function(value){
 		
 		},
+		isPilotCutin: function(value){
+		
+		}, 
 		frameSize: function(value){
 		
 		},

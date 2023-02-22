@@ -1363,6 +1363,7 @@ StatCalc.prototype.initSRWStats = function(actor, level, itemIds, preserveVolati
 	actor.SRWStats.pilot.name = actor.name();
 	actor.SRWStats.pilot.statsLabel = actorProperties.pilotStatsLabel || "";
 	actor.SRWStats.pilot.usesClassName = actorProperties.pilotUsesClassName * 1;
+	actor.SRWStats.pilot.cutinPath = actorProperties.pilotCutinPath;	
 	
 	actor.SRWStats.pilot.expYield = parseInt(actorProperties.pilotExpYield || 0);
 	actor.SRWStats.pilot.PPYield = parseInt(actorProperties.pilotPPYield || 0);

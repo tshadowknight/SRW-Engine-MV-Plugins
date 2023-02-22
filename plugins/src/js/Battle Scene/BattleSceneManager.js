@@ -2440,7 +2440,17 @@ BattleSceneManager.prototype.getTargetObject = function(name){
 	} else if(name == "enemy_main"){
 		obj = _this._enemySprite.sprite;
 	} else {
-		obj = _this._scene.getMeshByName(name);
+		
+		if(!obj){//check models
+			var ctr = 0;
+			while(!obj && ctr < _this._unitModelInfo.length){
+				if(_this._unitModelInfo[ctr].sprite.name == name+"_model"){
+					obj = _this._unitModelInfo[ctr].sprite;
+				}
+				ctr++;
+			}
+		}
+		
 		if(!obj){//check sprites
 			var ctr = 0;
 			while(!obj && ctr < _this._animationSpritesInfo.length){
@@ -2507,14 +2517,8 @@ BattleSceneManager.prototype.getTargetObject = function(name){
 			}
 		}
 		
-		if(!obj){//check models
-			var ctr = 0;
-			while(!obj && ctr < _this._unitModelInfo.length){
-				if(_this._unitModelInfo[ctr].sprite.name == name+"_model"){
-					obj = _this._unitModelInfo[ctr].sprite;
-				}
-				ctr++;
-			}
+		if(!obj){
+			obj = _this._scene.getMeshByName(name);
 		}
 		
 	}
@@ -3168,8 +3172,13 @@ BattleSceneManager.prototype.executeAnimation = function(animation, startTick){
 					height: sizeParts[1]
 				}
 			} 
-			
-			var bg = _this.createSceneBg(target, params.path, _this.applyAnimationDirection(position), size, alpha, params.billboardMode, _this._animationDirection == -1 ? true : false, params.clamp);
+			let path;
+			if(params.isPilotCutin * 1){
+				path = _this._currentAnimatedAction.ref.SRWStats.pilot.cutinPath;
+			} else {
+				path = params.path;
+			}
+			var bg = _this.createSceneBg(target, path, _this.applyAnimationDirection(position), size, alpha, params.billboardMode, _this._animationDirection == -1 ? true : false, params.clamp);
 			if(params.rotation){
 				bg.rotation = _this.applyAnimationDirection(params.rotation);
 			}
@@ -5238,7 +5247,15 @@ BattleSceneManager.prototype.preloadSceneAssets = function(){
 			}
 			
 			if(animCommand.type == "create_bg"){
-				var bg = _this.createSceneBg(animCommand.target+"_preload", params.path, new BABYLON.Vector3(0,0,-1000), 1, 1, 0);
+				
+				let path;
+				if(params.isPilotCutin){
+					path = _this._actionQueue[0].ref.SRWStats.pilot.cutinPath;
+				} else {
+					path = params.path;
+				}
+				
+				var bg = _this.createSceneBg(animCommand.target+"_preload", path, new BABYLON.Vector3(0,0,-1000), 1, 1, 0);
 				promises.push(_this.getBgPromise(bg));
 				_this._animationBackgroundsInfo.push(bg);
 			}	

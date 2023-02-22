@@ -660,6 +660,32 @@ AllyPilotUI.prototype.initPropertyHandlers = function(){
 		will_on_evade: handleDefaultProp("pilotOnEvadeWill", "On Evading"),
 		will_on_destroy: handleDefaultProp("pilotOnDestroyWill", "On Destroying"),
 		will_on_ally_down: handleDefaultProp("pilotOnAllyDownWill", "On Ally Destroyed"),
+		assets: {
+			createControls(entry){
+				entry = _this.getCurrentEntry();
+				var content = "";			
+			
+				content+="<div class='cell'>";
+				content+="Cutin path";
+				content+="</div>";
+				content+="<div class='cell'>";
+				content+="img/SRWBattleScene/";
+				
+				content+="<input id='cutin_path' value='"+_this.getMetaValue("pilotCutinPath")+"'></input>";
+				content+=".png";
+				content+="</div>";
+				
+				return content;
+			},
+			hook(entry){
+				entry = _this.getCurrentEntry();
+				containerNode.querySelector("#cutin_path").addEventListener("change", function(){
+					_this.setMetaValue("pilotCutinPath", this.value);
+					_this.show();
+					_this._mainUIHandler.setModified();
+				});						
+			}
+		},
 		relationships: {
 			createControls(){		
 				var abilityDefs = $relationshipBonusManager.getDefinitions()
@@ -933,11 +959,26 @@ AllyPilotUI.prototype.show = async function(){
 	
 	content+="</div>";
 	content+="</div>";
-	
+
 	
 	
 	content+=_this.createRelationshipSection();
+	content+="</div>";
+	content+="<div class='row'>";
+	content+="<div class='section'>";
+	content+="<div class='title'>";
+	content+="Assets";	
+	content+="</div>";
+	content+="<div class='content'>";
 	
+	content+="<div class='table'>";
+	
+	content+="<div class='row'>";
+	content+=_this._propertyHandlers.assets.createControls();
+	content+="</div>";
+	content+="</div>";
+	content+="</div>";
+	content+="</div>";	
 	
 	content+="</div>";	
 	content+="</div>";
