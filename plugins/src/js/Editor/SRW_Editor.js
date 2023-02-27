@@ -323,7 +323,7 @@ SRWEditor.prototype.init = function(){
 		},
 		create_model: {
 			hasTarget: true,
-			params: ["path", "animGroup",  "animName", "parent", "position", "rotation", "size"],
+			params: ["path", "parent", "position", "rotation", "size"],//"animGroup",  "animName", 
 			desc: "Create a new model."
 		},			
 		remove_spriter_bg: {
@@ -458,8 +458,13 @@ SRWEditor.prototype.init = function(){
 		},
 		set_sprite_frame: {
 			hasTarget: true,
-			params: ["name", "snap"],
+			params: ["name", "snap", "loop"],
 			desc: "Set the source frame of a sprite(in, out, dodge, hurt, main)."
+		},
+		set_model_animation: {
+			hasTarget: true,
+			params: ["name", "snap", "loop"],
+			desc: "Set the animation by name of a model specified by target."
 		},
 		hide_attachment: {
 			hasTarget: true,
@@ -648,7 +653,7 @@ SRWEditor.prototype.init = function(){
 		ratio: "The factor by which the scroll speed is multiplied.",
 		smooth: "If set to 1 the ratio change will be smoothed out over the specified duration.",
 		animId: "The id of the RMMV animation.",
-		loop: "If set to 1 the RMMV animation will continue looping.",
+		loop: "If set to 1 the animation will continue looping.",
 		noFlash: "If set to 1 the flashing effects of the RMMV animation are not shown.",
 		noSfx: "If set to 1 the built in sound effects of the animation will not play.",
 		delay: "The delay between frames of the animation, default 4.",

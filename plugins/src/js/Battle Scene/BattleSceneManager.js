@@ -661,7 +661,7 @@ BattleSceneManager.prototype.playShaderEffect = function(id, params, duration){
 	}
 }
 
-BattleSceneManager.prototype.registerAnimationBlend = function(targetObj, newAnim){
+BattleSceneManager.prototype.registerAnimationBlend = function(targetObj, newAnim, newAnimLoops){
 	const prevAnimInfo = targetObj.animationRef[targetObj.lastAnim];
 	const animInfo = targetObj.animationRef[newAnim];
 	
@@ -669,7 +669,7 @@ BattleSceneManager.prototype.registerAnimationBlend = function(targetObj, newAni
 		if(prevAnimInfo){
 			//animInfo.start(animInfo._loopAnimation, 1.0, animInfo.from, animInfo.to, false); 
 			//TODO: Figure out how to manage the loopAnimation flag from blender or add different method of handling loop settings
-			animInfo.start(false, 1.0, animInfo.from, animInfo.to, false);
+			animInfo.start(newAnimLoops, 1.0, animInfo.from, animInfo.to, false);
 			prevAnimInfo.setWeightForAllAnimatables(1);
 			animInfo.setWeightForAllAnimatables(0);
 			this._animationBlends[this._animationBlendCtr++] = {
@@ -680,7 +680,7 @@ BattleSceneManager.prototype.registerAnimationBlend = function(targetObj, newAni
 				duration: 10
 			};
 		} else {
-			animInfo.start(false, 1.0, animInfo.from, animInfo.to, false);
+			animInfo.start(newAnimLoops, 1.0, animInfo.from, animInfo.to, false);
 		}		
 	}	
 }
@@ -975,8 +975,8 @@ BattleSceneManager.prototype.updateMainSprite = async function(type, name, sprit
 			pivothelper.position.y+=spriteConfig.referenceSize / 2 - spriteConfig.yOffset;				
 		} else if(spriteConfig.type == "3D"){
 			spriteInfo = await _this.createUnitModel(name+"_displayed", path,  new BABYLON.Vector3(0, spriteConfig.yOffset, 0), flipX, spriteConfig.animGroup, "main",  spriteConfig.scale, new BABYLON.Vector3(0, BABYLON.Tools.ToRadians(spriteConfig.rotation || 0), 0));
-			pivothelper.position.y+=spriteConfig.referenceSize / 2 - spriteConfig.yOffset;	
-			
+			pivothelper.position.y+=spriteConfig.referenceSize / 2 - spriteConfig.yOffset + spriteConfig.centerYOffset;	
+			pivothelper.position.x+=spriteConfig.centerXOffset;
 			/*if(flipX){
 				spriteParent.rotation.y = -BABYLON.Tools.ToRadians(spriteConfig.rotation || 0) ;
 				spriteParent.scaling = new BABYLON.Vector3(spriteConfig.scale * -1, spriteConfig.scale, spriteConfig.scale);	
@@ -990,7 +990,7 @@ BattleSceneManager.prototype.updateMainSprite = async function(type, name, sprit
 			}
 			const animInfo = spriteInfo.sprite.animationRef["main"];
 			if(animInfo){
-				animInfo.start(animInfo._loopAnimation, 1.0, animInfo.from, animInfo.to, false);
+				animInfo.start(false, 1.0, animInfo.from, animInfo.to, false);
 			}
 		} 	
 			
@@ -1148,8 +1148,15 @@ BattleSceneManager.prototype.createModel = async function(name, path, position, 
 		animationGroupLookup[group.name] = group;
 	}
 	root.animationRef = animationGroupLookup;
+	
+	for(let animName in root.animationRef){
+		root.animationRef[animName].stop();
+	}
+	body.spriteConfig = {
+		type: "3D"
+	};
 	const unitModelInfo = {
-		sprite: body
+		sprite: body		
 	};
 	this._unitModelInfo.push(unitModelInfo);
 	this._isLoading--;
@@ -3812,7 +3819,7 @@ BattleSceneManager.prototype.executeAnimation = function(animation, startTick){
 						const animInfo = targetObj.animationRef[params.name];
 						animInfo.start(false, 1.0, animInfo.from, animInfo.to, false);	
 					} else {
-						_this.registerAnimationBlend(targetObj, params.name);	
+						_this.registerAnimationBlend(targetObj, params.name, params.loop * 1);	
 					}				
 					targetObj.lastAnim = params.name;
 				}						
@@ -4305,6 +4312,8 @@ BattleSceneManager.prototype.executeAnimation = function(animation, startTick){
 		}
 		
 	};
+	
+	animationHandlers["set_model_animation"] = animationHandlers["set_sprite_frame"];
 	if(animationHandlers[animation.type] && _this._currentAnimatedAction){
 		animationHandlers[animation.type](animation.target, animation.params || {});
 	}
@@ -4638,6 +4647,8 @@ BattleSceneManager.prototype.readBattleCache = async function() {
 		spriteInfo.rotation = $statCalc.getBattleSceneInfo(battleEffect.ref).rotation;
 		spriteInfo.animGroup = $statCalc.getBattleSceneInfo(battleEffect.ref).animGroup;
 		spriteInfo.yOffset = $statCalc.getBattleSceneInfo(battleEffect.ref).yOffset;
+		spriteInfo.centerYOffset = $statCalc.getBattleSceneInfo(battleEffect.ref).centerYOffset;
+		spriteInfo.centerXOffset = $statCalc.getBattleSceneInfo(battleEffect.ref).centerXOffset;
 		spriteInfo.dragonbonesWorldSize = $statCalc.getBattleSceneInfo(battleEffect.ref).dragonbonesWorldSize;
 		spriteInfo.canvasDims = $statCalc.getBattleSceneInfo(battleEffect.ref).canvasDims;
 		spriteInfo.armatureName = $statCalc.getBattleSceneInfo(battleEffect.ref).armatureName;

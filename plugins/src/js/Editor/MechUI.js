@@ -1547,7 +1547,10 @@ MechUI.prototype.initPropertyHandlers = function(){
 				}		
 				content+="<div title='' class='row'>";
 				content+=_this.createValueInput("mechBattleYOffset", "Y Offset", "", "world units");
-				content+="</div>";				
+				content+="</div>";			
+				content+="<div title='' class='row'>";
+				content+=_this.createValueInput("mechBattleCenterYOffset", "Root Y Offset", "", "world units");
+				content+="</div>";					
 				content+="<div title='Scale for the shadow of the unit' class='row'>";
 				content+=_this.createValueInput("mechBattleSceneShadowSize", "Shadow Scale");
 				content+="</div>";	
@@ -1659,6 +1662,7 @@ MechUI.prototype.initPropertyHandlers = function(){
 				
 				let hookedProperties = [					
 					"mechBattleYOffset",
+					"mechBattleCenterYOffset",
 					"mechBattleSceneShadowSize",
 					"mechBattleSceneShadowOffsetZ",				
 					"mechBattleSceneShadowOffsetX",					

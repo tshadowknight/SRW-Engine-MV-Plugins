@@ -3090,6 +3090,9 @@ StatCalc.prototype.getBattleSceneInfo = function(actor){
 		
 		result.yOffset = parseFloat(mechProperties.mechBattleYOffset) || 0;
 		
+		result.centerYOffset =  parseFloat(mechProperties.mechBattleCenterYOffset) || 0;
+		result.centerXOffset =  parseFloat(mechProperties.mechBattleCenterXOffset) || 0;
+		
 		result.scale = parseFloat(mechProperties.mechBattleSceneSpriteScale) || 0;
 		
 		result.rotation = parseInt(mechProperties.mechBattleSceneSpriteRotation) || 0;
