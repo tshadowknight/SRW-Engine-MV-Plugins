@@ -91,6 +91,7 @@ export default function BattleSceneManager(){
 	this._unitModelInfo = [];
 	this._RMMVSpriteInfo = [];
 	this._RMMVScreenSpriteInfo = [];
+	this._movieBGInfo = [];
 	this._dragonBonesSpriteInfo = [];
 	this._effekseerInfo = [];
 	this._barrierEffects = [];
@@ -145,6 +146,30 @@ export default function BattleSceneManager(){
 	this._cachedBgs = {};
 	this._bgLayerInfo = {};
 	this._textBoxState = true;
+	
+	this.createVideoPlayers();
+}
+
+BattleSceneManager.prototype.createVideoPlayers = function(){
+	this._videoPlayers = [];
+	for(var i = 0; i < 8; i++){
+		let player = document.createElement("video");
+		player.isReleased = true;
+		this._videoPlayers.push(player);	
+	}	
+}
+
+BattleSceneManager.prototype.requestVideoPlayer = function(){
+	let result;
+	let ctr = 0;
+	while(!result && ctr < this._videoPlayers.length){
+		if(this._videoPlayers[ctr].isReleased){
+			result = this._videoPlayers[ctr];
+			result.isReleased = false;
+		}
+		ctr++;
+	}
+	return result;
 }
 
 BattleSceneManager.prototype.createApplicationCanvas = function(){
@@ -1703,7 +1728,7 @@ BattleSceneManager.prototype.hookBeforeRender = function(){
 							
 							//_this.disposeSpriterBackgrounds();
 							_this.disposeRMMVBackgrounds();
-							
+							_this.disposeMovieBackgrounds();
 							_this._animationResolve();
 						}						
 					}					
@@ -2041,6 +2066,16 @@ BattleSceneManager.prototype.disposeRMMVBackgrounds = function(){
 	this._RMMVSpriteInfo = [];
 }
 
+BattleSceneManager.prototype.disposeMovieBackgrounds = function(){
+	const _this = this;
+	this._movieBGInfo.forEach(function(bg){
+		bg.sprite.dispose();
+		bg.canvas.isReleased = true;
+		bg.video.isReleased = true;
+	});
+	this._movieBGInfo = [];
+}
+
 BattleSceneManager.prototype.disposeSpriterBackgrounds = function(){
 	this._spritersBackgroundsInfo.forEach(function(bg){
 		bg.sprite.dispose();
@@ -2243,6 +2278,32 @@ BattleSceneManager.prototype.startScene = function(){
 			}			
 		});
 		_this._RMMVSpriteInfo = tmp;
+		
+		var tmp = [];
+		_this._movieBGInfo.forEach(function(movieBG){
+			if(!movieBG.sprite.isDisposed() && !movieBG.video.completed){
+				//movieBG.RMMVSprite.update(_this._engine.getDeltaTime() * ratio);
+				//movieBG.renderer.render(movieBG.stage);
+
+				const canvas = movieBG.canvas;
+				/*var rect = _this._movieContainer.getBoundingClientRect();
+				canvas.width = rect.width;
+				canvas.height = rect.height;*/
+				var video = movieBG.video;
+				
+				if(_this._animsPaused){
+					video.playbackRate = 0;
+				} else {
+					video.playbackRate = ratio;
+				}
+				
+				canvas.getContext('2d', { alpha: true }).drawImage(video, 0, 0, canvas.width, canvas.height);
+				
+				movieBG.texture.update();
+				tmp.push(movieBG);
+			}			
+		});
+		_this._movieBGInfo = tmp;
 		
 		var tmp = [];
 		_this._RMMVScreenSpriteInfo.forEach(function(RMMVBg){
@@ -2491,6 +2552,15 @@ BattleSceneManager.prototype.getTargetObject = function(name){
 			while(!obj && ctr < _this._RMMVSpriteInfo.length){
 				if(_this._RMMVSpriteInfo[ctr].sprite.name == name+"_rmmv"){
 					obj = _this._RMMVSpriteInfo[ctr].sprite;
+				}
+				ctr++;
+			}
+		}
+		if(!obj){//check movie bgs
+			var ctr = 0;
+			while(!obj && ctr < _this._movieBGInfo.length){
+				if(_this._movieBGInfo[ctr].sprite.name == name+"_moviebg"){
+					obj = _this._movieBGInfo[ctr].sprite;
 				}
 				ctr++;
 			}
@@ -3214,6 +3284,105 @@ BattleSceneManager.prototype.executeAnimation = function(animation, startTick){
 				}
 			}
 			_this._animationBackgroundsInfo.push(bg);
+		},
+		create_movie_bg: function(target, params){
+			var position;
+			if(params.position){
+				position = new BABYLON.Vector3(params.position.x, params.position.y, params.position.z);
+			} else {
+				position = new BABYLON.Vector3(0, 0, 0);
+			}
+			var alpha;
+			if(params.alpha != "" && params.alpha != null){
+				alpha = params.alpha*1;
+			}
+			
+			var size = params.size || "4";
+			var sizeParts = size.split(",");
+			if(sizeParts && sizeParts.length == 2){
+				size = {
+					width: sizeParts[0],
+					height: sizeParts[1]
+				}
+			} 
+			let path = params.path;
+			const canvas = _this.requestCanvas();
+			canvas.setAttribute("width", 1000);
+			canvas.setAttribute("height", 1000);
+			
+			var dynamicBgInfo = _this.createSpriterBg(target+"_moviebg", position, size, 1, 0, _this._animationDirection == -1, canvas, true);			
+			
+			
+			
+			var video = _this.requestVideoPlayer();
+			//video.id = "movie_video_"+target;
+			video.style.display = "none";
+			video.style.width = "100%";
+			video.style.height = "100%";
+			
+			//debug
+			/*video.style.display = "block";
+			video.style.width = "100px";
+			video.style.height = "100px";
+			video.style.position = "fixed";
+			video.style.top = 0;
+			video.style.left = 0;*/
+			
+			video.autoplay = true;
+			video.muted = true;
+			//_this._movieContainer.appendChild(video);
+			_this._container.appendChild(video);
+			
+			video.src = "img/SRWBattleScene/"+path;
+			video.crossOrigin = 'anonymous';
+			/*if(_this._animationDirection == -1){
+				_this._movieCanvas.style.transform = "scaleX(-1)";
+			} else {
+				_this._movieCanvas.style.transform = "";
+			}*/
+			/*video.onended = function(){
+				video.completed = true;
+			}*/
+			video.play();
+			
+			//document.body.appendChild(canvas);
+			
+			
+			dynamicBgInfo.canvas = canvas;
+			dynamicBgInfo.video = video;
+			
+			var bg = dynamicBgInfo.sprite;
+			if(params.rotation){
+				bg.rotation = _this.applyAnimationDirection(params.rotation);
+			}
+			
+			if(ENGINE_SETTINGS.BATTLE_SCENE.USE_RENDER_GROUPS){
+				if(params.isFront){
+					bg.renderingGroupId = 3;
+				} else {
+					bg.renderingGroupId = 1;
+				}
+			}		
+
+			_this._movieBGInfo.push(dynamicBgInfo);
+			
+			/*
+			params.animationDelay*=_this.getTickDuration();
+			
+			if(params.animationFrames){
+				_this.registerBgAnimation(bg, startTick, params.frameSize, params.lineCount, params.columnCount, 0, params.animationFrames*1, params.animationLoop*1, params.animationDelay*1, params.holdFrame*1, _this._animationDirection == -1 ? true : false);
+			}
+			if(params.scrollSpeed){
+				var speed = params.scrollSpeed * _this._animationDirection;				
+				_this.registerBgScroll(bg, speed);
+			}
+			if(params.parent){
+				var parentObj = getTargetObject(params.parent);
+				if(parentObj){
+					bg.parent = parentObj;
+				}
+			}*/
+			//_this._animationBackgroundsInfo.push(bg);
 		},
 		remove_bg: function(target, params){
 			var targetObj = getTargetObject(target);
@@ -4971,8 +5140,15 @@ BattleSceneManager.prototype.setBgMode = function(mode) {
 BattleSceneManager.prototype.resetScene = function() {
 	var _this = this;
 	this.initScene();
-	_this.disposeSpriterBackgrounds();
 	_this.disposeBarrierEffects();
+	
+	_this.disposeAnimationSprites();
+	_this.disposeAnimationBackgrounds();
+	_this.disposeSpriterBackgrounds();
+	_this.disposeEffekseerInstances();
+	_this.disposeMovieBackgrounds();
+	_this.disposeRMMVBackgrounds();
+	
 	_this._spriteManagers = {};
 	_this.setBgScrollRatio(1);
 	_this.setAnimRatio(1);
@@ -5270,6 +5446,12 @@ BattleSceneManager.prototype.preloadSceneAssets = function(){
 				promises.push(_this.getBgPromise(bg));
 				_this._animationBackgroundsInfo.push(bg);
 			}	
+			if(animCommand.type == "create_movie_bg"){
+				var r = new XMLHttpRequest();			
+				r.open("GET", "img/SRWBattleScene/"+params.path);
+				r.responseType = "blob";
+				r.send();
+			}
 			if(animCommand.type == "set_sprite_animation" || animCommand.type == "set_sprite_frame"){
 				
 				var action = nextAction;
@@ -5762,6 +5944,7 @@ BattleSceneManager.prototype.endScene = function(force) {
 			_this.disposeAnimationBackgrounds();
 			_this.disposeSpriterBackgrounds();
 			_this.disposeEffekseerInstances();
+			_this.disposeMovieBackgrounds();
 			_this.disposeRMMVBackgrounds();
 			_this._animationList = [];
 			_this._UIcontainer.style.display = "";
@@ -5787,6 +5970,7 @@ BattleSceneManager.prototype.endScene = function(force) {
 			_this.disposeSpriterBackgrounds();
 			_this.disposeEffekseerInstances();
 			_this.disposeRMMVBackgrounds();
+			_this.disposeMovieBackgrounds();
 			_this._animationList = [];
 			_this._UIcontainer.style.display = "";
 			_this._PIXIContainer.style.display = "";	

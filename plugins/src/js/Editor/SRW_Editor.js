@@ -291,6 +291,12 @@ SRWEditor.prototype.init = function(){
 			aliases: {"animationLoop": "loopFromFrame", "animationFrames": "loopToFrame"},
 			desc: "Create a new background."
 		},
+		create_movie_bg: {
+			hasTarget: true,
+			params: ["path", "parent", "position", "size", "alpha", "billboardMode", "rotation"],
+			aliases: {"animationLoop": "loopFromFrame", "animationFrames": "loopToFrame"},
+			desc: "Create a new background that plays the movie file with the specified path on it."
+		},
 		remove_bg: {
 			hasTarget: true,
 			params: [],
@@ -561,6 +567,7 @@ SRWEditor.prototype.init = function(){
 	if(ENGINE_SETTINGS.BATTLE_SCENE.USE_RENDER_GROUPS){
 		_this._commandDisplayInfo["play_rmmv_anim"].params.push("isFront");
 		_this._commandDisplayInfo["create_bg"].params.push("isFront");
+		_this._commandDisplayInfo["create_movie_bg"].params.push("isFront");
 	}
 		
 	
