@@ -2907,7 +2907,9 @@ SRWEditor.prototype.showCameraState = function(){
 		const name = document.querySelector("#helper_target").value;
 		let targetObj = $battleSceneManager.getTargetObject(name);
 		if(targetObj) {
-			
+			if(targetObj.parent_handle){
+				targetObj = targetObj.parent_handle;
+			}
 			var content = "";
 			var position = targetObj.position;
 			if(targetObj.handle){
@@ -3377,9 +3379,18 @@ SRWEditor.prototype.showAttackEditorControls = function(){
 				let targetObj = $battleSceneManager.getTargetObject(name);
 				if(targetObj){
 					var data = targetObj[prop]; 
+				
+					if(targetObj.handle){
+						if(prop == "position"){
+							data = targetObj.handle.position;
+						} else if(prop == "rotation"){
+							data = targetObj.handle.rotation;
+						}						
+					}
+					
 			
 					var xInput = referenceNode.querySelector(".param_value[data-dataid='x']");	
-					xInput.value = (data.x || data._x || 0).toFixed(3);
+					xInput.value = ((data.x || data._x || 0).toFixed(3)) * $battleSceneManager.getAnimationDirection();
 					var event = new Event('change');
 					xInput.dispatchEvent(event);
 					

@@ -523,7 +523,8 @@ BattleSceneManager.prototype.initScene = function(){
 
 	// Add lights to the scene
 	var light1 = new BABYLON.HemisphericLight("light1", new BABYLON.Vector3(1, 1, 0), scene);
-	var light2 = new BABYLON.PointLight("light2", new BABYLON.Vector3(0, 1, -1), scene);
+	 light1.groundColor = new BABYLON.Color3(1,1,1);
+	//var light2 = new BABYLON.PointLight("light2", new BABYLON.Vector3(0, 1, -1), scene);
 	
 	/*var pipeline = new BABYLON.DefaultRenderingPipeline(
 		"defaultPipeline", // The name of the pipeline
@@ -986,20 +987,24 @@ BattleSceneManager.prototype.updateMainSprite = async function(type, name, sprit
 		spriteParent.isVisible = false;
 		var pivothelper = _this.createBg(name+"_pivot", "", new BABYLON.Vector3(0, 0, 0), 0, 1, null, true);
 		pivothelper.isVisible = false;
+		let xOffset = spriteConfig.xOffset;
+		if(flipX){
+			xOffset*=-1;
+		}
 		if(!spriteConfig || spriteConfig.type == "default"){
-			spriteInfo = _this.createPlanarSprite(name+"_displayed", path,  new BABYLON.Vector3(0, spriteConfig.yOffset, 0), frameSize, flipX, spriteConfig.referenceSize);		
+			spriteInfo = _this.createPlanarSprite(name+"_displayed", path,  new BABYLON.Vector3(xOffset, spriteConfig.yOffset, 0), frameSize, flipX, spriteConfig.referenceSize);		
 			spriteInfo.sprite.setPivotMatrix(BABYLON.Matrix.Translation(-0, spriteInfo.size.height/2, -0), false);
 		} else if(spriteConfig.type == "spriter"){
-			spriteInfo = _this.createSpriterSprite(name+"_displayed", path,  new BABYLON.Vector3(0, spriteConfig.yOffset, 0), flipX);
+			spriteInfo = _this.createSpriterSprite(name+"_displayed", path,  new BABYLON.Vector3(xOffset, spriteConfig.yOffset, 0), flipX);
 			pivothelper.position.y+=spriteConfig.referenceSize / 2;			
 		} else if(spriteConfig.type == "dragonbones"){
-			spriteInfo = _this.createDragonBonesSprite(name+"_displayed", path, spriteConfig.armatureName, new BABYLON.Vector3(0, spriteConfig.yOffset, 0), flipX, spriteConfig.dragonbonesWorldSize, spriteConfig.canvasDims);
+			spriteInfo = _this.createDragonBonesSprite(name+"_displayed", path, spriteConfig.armatureName, new BABYLON.Vector3(xOffset, spriteConfig.yOffset, 0), flipX, spriteConfig.dragonbonesWorldSize, spriteConfig.canvasDims);
 			pivothelper.position.y+=spriteConfig.referenceSize / 2 - spriteConfig.yOffset;			
 		} else if(spriteConfig.type == "spine"){
-			spriteInfo = _this.createSpineSprite(name+"_displayed", path,  new BABYLON.Vector3(0, spriteConfig.yOffset, 0), flipX, "main", spriteConfig.referenceSize, spriteConfig.canvasDims.width, spriteConfig.canvasDims.height);
+			spriteInfo = _this.createSpineSprite(name+"_displayed", path,  new BABYLON.Vector3(xOffset, spriteConfig.yOffset, 0), flipX, "main", spriteConfig.referenceSize, spriteConfig.canvasDims.width, spriteConfig.canvasDims.height);
 			pivothelper.position.y+=spriteConfig.referenceSize / 2 - spriteConfig.yOffset;				
 		} else if(spriteConfig.type == "3D"){
-			spriteInfo = await _this.createUnitModel(name+"_displayed", path,  new BABYLON.Vector3(0, spriteConfig.yOffset, 0), flipX, spriteConfig.animGroup, "main",  spriteConfig.scale, new BABYLON.Vector3(0, BABYLON.Tools.ToRadians(spriteConfig.rotation || 0), 0));
+			spriteInfo = await _this.createUnitModel(name+"_displayed", path,  new BABYLON.Vector3(xOffset, spriteConfig.yOffset, 0), flipX, spriteConfig.animGroup, "main",  spriteConfig.scale, new BABYLON.Vector3(0, BABYLON.Tools.ToRadians(spriteConfig.rotation || 0), 0));
 			pivothelper.position.y+=spriteConfig.referenceSize / 2 - spriteConfig.yOffset + spriteConfig.centerYOffset;	
 			pivothelper.position.x+=spriteConfig.centerXOffset;
 			/*if(flipX){
@@ -1236,7 +1241,7 @@ BattleSceneManager.prototype.createUnitModel = async function(name, path, positi
 	for(let defaultAnim of defaultAnims){
 		let animData = animationGroupLookup[defaultAnim];
 		if(!animData){
-			throw("Did not find required animation '"+defaultAnim+"' while loading model:"+path);
+			console.log("Did not find required animation '"+defaultAnim+"' while loading model:"+path);
 		}
 		animationRef[defaultAnim] = animData;
 	}
@@ -1423,6 +1428,10 @@ BattleSceneManager.prototype.createPlanarSprite = function(name, path, position,
 BattleSceneManager.prototype.applyAnimationDirection = function(position){
 	var result = new BABYLON.Vector3(position.x * this._animationDirection, position.y, position.z);
 	return result;
+}
+
+BattleSceneManager.prototype.getAnimationDirection = function(){
+	return this._animationDirection;
 }
 
 BattleSceneManager.prototype.getBattleTextId = function(action){
@@ -2790,6 +2799,7 @@ BattleSceneManager.prototype.executeAnimation = function(animation, startTick){
 				} else {
 					startPosition = targetObj.position;
 				}
+				startPosition = startPosition || new BABYLON.Vector3(0,0,0);	
 				var targetPosition = params.position || new BABYLON.Vector3(0,0,0);				
 				targetPosition = {x: targetPosition.x, y:  targetPosition.y, z: targetPosition.z};
 				if(params.relative == 1){
@@ -4112,13 +4122,8 @@ BattleSceneManager.prototype.executeAnimation = function(animation, startTick){
 				_this._enemyTwinSupporterSprite.sprite.parent_handle.position.x+=targetOffset;
 			}
 			
-			_this._bgs.forEach(function(bg){
-				var width = (bg.sizeInfo.width || _this._bgWidth) * 1;
-				var offset = (targetOffset % width);				
-				bg.position.x+=offset;
-				if(Math.abs(bg.position.x - bg.originPosition.x) > width){
-					bg.position.x-=width * Math.sign(offset);
-				} 			
+			_this._bgs.forEach(function(bg){	
+				bg.position.x+=targetOffset;	
 			});
 			if(targetObj){
 				//targetObj.playAnimation(1, 1, false, 100)			
@@ -4811,16 +4816,20 @@ BattleSceneManager.prototype.readBattleCache = async function() {
 			spriteInfo.path = imgPath+"/3D/";
 			spriteInfo.id = "main";
 		}
+		
 		spriteInfo.referenceSize = $statCalc.getBattleReferenceSize(battleEffect.ref);
-		spriteInfo.scale = $statCalc.getBattleSceneInfo(battleEffect.ref).scale;
-		spriteInfo.rotation = $statCalc.getBattleSceneInfo(battleEffect.ref).rotation;
-		spriteInfo.animGroup = $statCalc.getBattleSceneInfo(battleEffect.ref).animGroup;
-		spriteInfo.yOffset = $statCalc.getBattleSceneInfo(battleEffect.ref).yOffset;
-		spriteInfo.centerYOffset = $statCalc.getBattleSceneInfo(battleEffect.ref).centerYOffset;
-		spriteInfo.centerXOffset = $statCalc.getBattleSceneInfo(battleEffect.ref).centerXOffset;
-		spriteInfo.dragonbonesWorldSize = $statCalc.getBattleSceneInfo(battleEffect.ref).dragonbonesWorldSize;
-		spriteInfo.canvasDims = $statCalc.getBattleSceneInfo(battleEffect.ref).canvasDims;
-		spriteInfo.armatureName = $statCalc.getBattleSceneInfo(battleEffect.ref).armatureName;
+		const battleSceneInfo = $statCalc.getBattleSceneInfo(battleEffect.ref);
+		spriteInfo.scale = battleSceneInfo.scale;
+		spriteInfo.rotation = battleSceneInfo.rotation;
+		spriteInfo.animGroup = battleSceneInfo.animGroup;
+		spriteInfo.yOffset = battleSceneInfo.yOffset;
+		spriteInfo.xOffset = battleSceneInfo.xOffset;
+		
+		spriteInfo.centerYOffset = battleSceneInfo.centerYOffset;
+		spriteInfo.centerXOffset = battleSceneInfo.centerXOffset;
+		spriteInfo.dragonbonesWorldSize = battleSceneInfo.dragonbonesWorldSize;
+		spriteInfo.canvasDims = battleSceneInfo.canvasDims;
+		spriteInfo.armatureName = battleSceneInfo.armatureName;
 		if(battleEffect.side == "actor"){
 			if(battleEffect.type == "initiator" || battleEffect.type == "defender"){
 				 

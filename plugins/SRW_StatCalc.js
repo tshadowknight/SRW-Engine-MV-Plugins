@@ -3089,6 +3089,7 @@ StatCalc.prototype.getBattleSceneInfo = function(actor){
 		result.deathAnimId = mechProperties.mechBattleSceneDeathAnim;
 		
 		result.yOffset = parseFloat(mechProperties.mechBattleYOffset) || 0;
+		result.xOffset = parseFloat(mechProperties.mechBattleXOffset) || 0;
 		
 		result.centerYOffset =  parseFloat(mechProperties.mechBattleCenterYOffset) || 0;
 		result.centerXOffset =  parseFloat(mechProperties.mechBattleCenterXOffset) || 0;
