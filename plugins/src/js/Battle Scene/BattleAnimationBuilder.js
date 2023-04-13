@@ -1,4 +1,4 @@
-import * as BABYLON from "babylonjs";
+import * as BABYLON from "@babylonjs/core";
 
 export default function BattleAnimationBuilder(){	
 	this._animLookup = {

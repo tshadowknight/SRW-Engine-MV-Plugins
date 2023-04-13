@@ -67,8 +67,8 @@ PatternUI.prototype.show = async function(){
 	content+="</div>";
 	content+="<div class='edit_pane'>";
 	content+="<div class='controls'>";
-	content+="<button class='cancel'>Cancel</button>";
-	content+="<button class='save'>Save</button>";	
+	content+="<button class='cancel'>"+EDITORSTRINGS.GENERAL.label_cancel+"</button>";
+	content+="<button class='save'>"+EDITORSTRINGS.GENERAL.label_save+"</button>";	
 	content+="</div>";
 	content+="<div class='main_info'>";
 	
@@ -78,13 +78,13 @@ PatternUI.prototype.show = async function(){
 	
 	content+="<div class='section'>";
 	content+="<div class='title abilities'>";
-	content+="General";	
+	content+=EDITORSTRINGS.GENERAL.label_general;	
 	content+="</div>";
 	content+="<div class='content'>";
 	
 	content+="<div class='row'>";
 	content+="<div class='cell'>";
-	content+="Name";
+	content+=EDITORSTRINGS.GENERAL.label_name;
 	content+="</div>";
 	content+="<div class='cell'>";
 	content+="<input id='prop_name' value='"+(currentEntry ? currentEntry.name : "")+"'></input>";

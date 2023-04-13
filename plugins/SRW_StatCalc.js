@@ -3096,6 +3096,8 @@ StatCalc.prototype.getBattleSceneInfo = function(actor){
 		
 		result.scale = parseFloat(mechProperties.mechBattleSceneSpriteScale) || 0;
 		
+		result.BBHack = (mechProperties.mechBattleSceneBBHack || 0) * 1;
+		
 		result.rotation = parseInt(mechProperties.mechBattleSceneSpriteRotation) || 0;
 		
 		result.animGroup = mechProperties.mechBattleSceneAnimGroup;
@@ -5727,11 +5729,24 @@ StatCalc.prototype.clearSpiritOnAll = function(type, spirit, factionId){
 	});
 }
 
+StatCalc.prototype.hasTempEffect = function(actor, type){
+	let result = false;
+	if(this.isActorSRWInitialized(actor)){	
+		var tmp = [];
+		actor.SRWStats.pilot.activeEffects.forEach(function(effect){
+			if(effect.type == type){
+				result = true;
+			}
+		});
+	}
+	return result;
+}
+
 StatCalc.prototype.getActiveTempEffects = function(actor){
 	if(this.isActorSRWInitialized(actor)){
 		return actor.SRWStats.pilot.activeEffects;
 	} else {
-		return {};
+		return [];
 	}	
 }	
 

@@ -31,7 +31,7 @@ MechUI.prototype.initPropertyHandlers = function(){
 				content+="<div>";
 				content+="<div class='menu_preview unit_img_preview'></div>";
 				if(!_this.getMetaValue("mechMenuSprite")){
-					content+="<div class='menu_preview_warning' title='Falling back to Battle Scene sprite because no Menu Sprite is defined!'>Using fallback!</div>";
+					content+="<div class='menu_preview_warning' title='"+EDITORSTRINGS.MECH.hint_fallback+"'>"+EDITORSTRINGS.MECH.label_warn_fallback+"</div>";
 				}
 				content+="</div>";
 				return content;
@@ -73,7 +73,7 @@ MechUI.prototype.initPropertyHandlers = function(){
 				var content = "";
 				content+="<div class='row'>";
 				content+="<div class='cell'>";
-				content+="Name";
+				content+=EDITORSTRINGS.GENERAL.label_name;
 				content+="</div>";
 				content+="<div class='cell'>";
 				content+="<input id='prop_name' value='"+entry.name+"'></input>";
@@ -82,7 +82,7 @@ MechUI.prototype.initPropertyHandlers = function(){
 				
 				content+="<div class='row'>";
 				content+="<div class='cell'>";
-				content+="Editor tag";
+				content+=EDITORSTRINGS.GENERAL.label_editor_tag;
 				content+="</div>";
 				content+="<div class='cell'>";
 				content+="<input id='editor_tag' value='"+_this.getMetaValue("editorTag")+"'></input>";
@@ -91,7 +91,7 @@ MechUI.prototype.initPropertyHandlers = function(){
 				
 				content+="<div class='row'>";
 				content+="<div class='cell'>";
-				content+="Stats Label";
+				content+=EDITORSTRINGS.MECH.label_stats_label;
 				content+="</div>";
 				content+="<div class='cell'>";
 				content+="<input id='stats_name' value='"+_this.getMetaValue("mechStatsLabel")+"'></input>";
@@ -123,7 +123,7 @@ MechUI.prototype.initPropertyHandlers = function(){
 				var content = "";
 				content+="<div class='row'>";
 				content+="<div class='cell'>";
-				content+="Is Ship";
+				content+=EDITORSTRINGS.MECH.label_is_ship;
 				content+="</div>";
 				content+="<div class='cell'>";
 				content+="<input id='is_ship' type=checkbox "+(_this.getMetaValue("mechIsShip")*1 ? "checked" : "")+"></input>";
@@ -145,7 +145,7 @@ MechUI.prototype.initPropertyHandlers = function(){
 				var content = "";
 				content+="<div class='row'>";
 				content+="<div class='cell'>";
-				content+="Sync Parts With";
+				content+=EDITORSTRINGS.MECH.label_sync_parts;
 				content+="</div>";
 				content+="<div class='cell'>";
 				content+=_this.createMechSelect("sync_parts_with", "", _this.getMetaValue("mechInheritsPartsFrom"));
@@ -154,7 +154,7 @@ MechUI.prototype.initPropertyHandlers = function(){
 				
 				content+="<div class='row'>";
 				content+="<div class='cell'>";
-				content+="Sync Upgrades With";
+				content+=EDITORSTRINGS.MECH.label_sync_upgrades;
 				content+="</div>";
 				content+="<div class='cell'>";
 				content+=_this.createMechSelect("sync_upgrades_with", "", _this.getMetaValue("mechInheritsUpgradesFrom"));
@@ -184,7 +184,7 @@ MechUI.prototype.initPropertyHandlers = function(){
 				content+="";
 				content+="<div class='row'>";	
 				content+="<div class='cell'>";
-				content+="Enabled";
+				content+=EDITORSTRINGS.MECH.label_enabled;
 				content+="</div>";
 				content+="<div class='cell'>";
 				content+="<div class='terrain_container'>";
@@ -199,9 +199,9 @@ MechUI.prototype.initPropertyHandlers = function(){
 						//content+="<input data-terrainidx='"+i+"' class='terrain_enabled_select' type=checkbox "+(value >= 1 ? "checked" : "")+"></input>";
 						content+="<select id='terrain_enabled_select'>";
 						var options = [
-							"No",
-							"With Movement Penalty",
-							"Yes"
+							EDITORSTRINGS.GENERAL.label_no,
+							EDITORSTRINGS.MECH.label_move_penalty,
+							EDITORSTRINGS.GENERAL.label_yes
 						];
 						for(var j = 0; j < options.length; j++){					
 							content+="<option "+(j == value ? "selected" : "")+" value='"+j+"'>"+options[j]+"</option>";										
@@ -225,7 +225,7 @@ MechUI.prototype.initPropertyHandlers = function(){
 				
 				content+="</div>";
 				content+="<div class='row'>";	
-				content+=_this.createTerrainControls("mechTerrain", "Rank");
+				content+=_this.createTerrainControls("mechTerrain", EDITORSTRINGS.MECH.label_terrain_rank);
 				content+="</div>";
 				return content;
 			},
@@ -259,12 +259,12 @@ MechUI.prototype.initPropertyHandlers = function(){
 				});
 			}
 		},
-		exp_yield: handleDefaultProp("mechExpYield", "Exp. Yield"),
-		pp_yield: handleDefaultProp("mechPPYield", "PP Yield"),
-		fund_yield: handleDefaultProp("mechFundYield", "Fund Yield"),
-		tags: handleDefaultProp("mechTags", "Tags"),
-		attribute1: handleDefaultProp("mechAttribute1", "Attribute 1"),
-		attribute2: handleDefaultProp("mechAttribute2", "Attribute 2"),
+		exp_yield: handleDefaultProp("mechExpYield",  EDITORSTRINGS.MECH.label_exp_yield),
+		pp_yield: handleDefaultProp("mechPPYield",  EDITORSTRINGS.MECH.label_pp_yield),
+		fund_yield: handleDefaultProp("mechFundYield",  EDITORSTRINGS.MECH.label_fund_yield),
+		tags: handleDefaultProp("mechTags",  EDITORSTRINGS.MECH.label_tags),
+		attribute1: handleDefaultProp("mechAttribute1",  EDITORSTRINGS.MECH.label_attribute1),
+		attribute2: handleDefaultProp("mechAttribute2",  EDITORSTRINGS.MECH.label_attribute2),
 		fub: {
 			createControls(){		
 				var abilityDefs = $mechAbilityManager.getDefinitions()
@@ -277,8 +277,8 @@ MechUI.prototype.initPropertyHandlers = function(){
 					id = -1;
 				}				
 					
-				content+="<div title='Full Upgrade Bonus' class='cell'>";
-				content+="FUB";
+				content+="<div title='"+EDITORSTRINGS.MECH.title_FUB+"' class='cell'>";
+				content+=EDITORSTRINGS.MECH.label_FUB;
 				content+="</div>";
 				content+="<div class='cell'>";
 				content+="<select id='fub_select'>";
@@ -315,7 +315,7 @@ MechUI.prototype.initPropertyHandlers = function(){
 				}				
 					
 				content+="<div class='cell'>";
-				content+="Item Slots";
+				content+=EDITORSTRINGS.MECH.label_item_slots;
 				content+="</div>";
 				content+="<div class='cell'>";
 				content+="<select id='item_slot_select'>";
@@ -342,7 +342,7 @@ MechUI.prototype.initPropertyHandlers = function(){
 				function createGrowthControls(growthTypeProp, growthAmountProp){
 					var content = "";
 					content+="<div class='cell'>";
-					content+="Cost Type";
+					content+=EDITORSTRINGS.MECH.label_cost_type;
 					content+="</div>";
 					content+="<div class='cell'>";
 					var value = _this.getMetaValue(growthTypeProp);
@@ -384,7 +384,7 @@ MechUI.prototype.initPropertyHandlers = function(){
 							mechUpgradAccuracyAmount: 6
 						};
 						content+="<div class='cell'>";
-						content+="Upgrade Amount";
+						content+=EDITORSTRINGS.MECH.label_upgrade_amount;
 						content+="</div>";
 						
 						content+="<div class='cell'>";
@@ -401,33 +401,33 @@ MechUI.prototype.initPropertyHandlers = function(){
 				}
 				var content = "";
 				content+="<div class='row'>";	
-				content+=_this.createValueInput("mechHP", "HP");
+				content+=_this.createValueInput("mechHP", EDITORSTRINGS.MECH.label_HP);
 				content+=createGrowthControls("mechUpgradeHPCost", "mechUpgradeHPAmount");
 				content+="</div>";
 				
 				content+="<div class='row'>";	
-				content+=_this.createValueInput("mechEN", "EN");
+				content+=_this.createValueInput("mechEN", EDITORSTRINGS.MECH.label_EN);
 				content+=createGrowthControls("mechUpgradeENCost", "mechUpgradeENAmount");
 				content+="</div>";
 				
 				content+="<div class='row'>";	
-				content+=_this.createValueInput("mechArmor", "Armor");
+				content+=_this.createValueInput("mechArmor", EDITORSTRINGS.MECH.label_armor);
 				content+=createGrowthControls("mechUpgradeArmorCost", "mechUpgradeArmorAmount");
 				content+="</div>";
 				
 				content+="<div class='row'>";	
-				content+=_this.createValueInput("mechMobility", "Mobility");
+				content+=_this.createValueInput("mechMobility", EDITORSTRINGS.MECH.label_mobility);
 				content+=createGrowthControls("mechUpgradeMobilityCost", "mechUpgradeMobilityAmount");
 				content+="</div>";
 				
 				content+="<div class='row'>";	
-				content+=_this.createValueInput("mechAccuracy", "Accuracy");
+				content+=_this.createValueInput("mechAccuracy", EDITORSTRINGS.MECH.label_accuracy);
 				content+=createGrowthControls("mechUpgradAccuracyCost", "mechUpgradAccuracyAmount");
 				content+="</div>";
 				
 				content+="<div class='row'>";	
 				content+="<div class='cell'>";
-				content+="Weapons";
+				content+=EDITORSTRINGS.MECH.label_weapons;
 				content+="</div>";
 				content+="<div class='cell'>";
 				content+="</div>";
@@ -475,18 +475,12 @@ MechUI.prototype.initPropertyHandlers = function(){
 					"mechEN",
 					"mechArmor",
 					"mechMobility",
-					"mechAccuracy",
-				
-					"mechUpgradeHPAmount",
-					
-					"mechUpgradeENAmount",	
-					
-					"mechUpgradeArmorAmount",
-					
-					"mechUpgradeMobilityAmount",
-					
-					"mechUpgradAccuracyAmount",
-				
+					"mechAccuracy",				
+					"mechUpgradeHPAmount",					
+					"mechUpgradeENAmount",						
+					"mechUpgradeArmorAmount",					
+					"mechUpgradeMobilityAmount",					
+					"mechUpgradAccuracyAmount",				
 					"mechMove",		
 						
 					
@@ -503,24 +497,14 @@ MechUI.prototype.initPropertyHandlers = function(){
 					});
 				});
 				
-				hookedProperties = [			
-					
-					
-					
+				hookedProperties = [						
 					"mechUpgradeHPCost",
-					
 					"mechUpgradeENCost",
-					
 					"mechUpgradeArmorCost",
-					
 					"mechUpgradeMobilityCost",
-					
 					"mechUpgradAccuracyCost",
-					
 					"mechUpgradeWeaponCost",
-				
 					"mechSize",		
-					
 				];
 				hookedProperties.forEach(function(prop){
 					containerNode.querySelector("#prop_"+prop).addEventListener("change", function(){
@@ -613,7 +597,7 @@ MechUI.prototype.initPropertyHandlers = function(){
 					content+="</select>";
 					content+="</div>";
 					content+="<div class='cell'>";
-					content+="Locked";
+					content+=EDITORSTRINGS.MECH.label_locked;
 					content+="</div>";
 					content+="<div class='cell'>";
 					content+="<input data-idx='"+idx+"' id='weapon_locked_"+idx+"' type=checkbox "+(isLocked ? "checked" : "")+"></input>";
@@ -663,7 +647,7 @@ MechUI.prototype.initPropertyHandlers = function(){
 				
 				content+="<div class='row'>";	
 				content+="<div class='cell'>";
-				content+="Command Name";
+				content+=EDITORSTRINGS.MECH.label_command_name;
 				content+="</div>";
 				content+="<div class='cell'>";
 				content+="<input id='transform_cmd_name' value='"+_this.getMetaValue("mechTransformCmd")+"'></input>";
@@ -672,7 +656,7 @@ MechUI.prototype.initPropertyHandlers = function(){
 				
 				content+="<div class='row'>";	
 				content+="<div class='cell'>";
-				content+="Available";
+				content+=EDITORSTRINGS.MECH.label_available;
 				content+="</div>";
 				content+="</div>";
 				content+="</div>";
@@ -693,7 +677,7 @@ MechUI.prototype.initPropertyHandlers = function(){
 					content+="</div>";
 			
 					content+="<div class='cell'>";
-					content+="Required Will";
+					content+=EDITORSTRINGS.MECH.label_required_will;
 					content+="</div>";
 					content+="<div class='cell'>";
 					content+="<input id='transform_will_"+i+"' class='transform_will' data-idx="+i+" value='"+willReqs[i]+"'></input>";
@@ -717,7 +701,7 @@ MechUI.prototype.initPropertyHandlers = function(){
 				
 				content+="<div class='row transform_restore_controls_header'>";	
 				content+="<div class='cell'>";
-				content+="Restores";
+				content+=EDITORSTRINGS.MECH.label_restores;
 				content+="</div>";
 				content+="</div>";
 				
@@ -733,14 +717,14 @@ MechUI.prototype.initPropertyHandlers = function(){
 				
 				content+="<div class='row transform_restore_controls'>";	
 				content+="<div class='cell'>";
-				content+="HP";
+				content+=EDITORSTRINGS.MECH.label_HP;
 				content+="</div>";
 				content+="<div class='cell'>";
 				content+="<input id='transform_restores_hp' type=checkbox "+(restoresHP ? "checked" : "")+"></input>";
 				content+="</div>";
 			
 				content+="<div class='cell'>";
-				content+="EN";
+				content+=EDITORSTRINGS.MECH.label_EN;
 				content+="</div>";
 				content+="<div class='cell'>";
 				content+="<input id='transform_restores_en' type=checkbox "+(restoresEN ? "checked" : "")+"></input>";
@@ -848,13 +832,13 @@ MechUI.prototype.initPropertyHandlers = function(){
 				content+="<div class='table sub_section'>";
 				content+="<div class='row'>";	
 				content+="<div class='cell'>";
-				content+="On Destruction";
+				content+=EDITORSTRINGS.MECH.label_on_destruction;
 				content+="</div>";
 				content+="</div>";
 				
 				content+="<div class='row'>";	
 				content+="<div class='cell'>";
-				content+="Mech";
+				content+=EDITORSTRINGS.MECH.label_mech;
 				content+="</div>";
 				content+="<div class='cell'>";
 				content+=_this.createMechSelect("destroy_transform_mech_select", "", _this.getMetaValue("mechDestroyTransformInto"));
@@ -863,7 +847,7 @@ MechUI.prototype.initPropertyHandlers = function(){
 				
 				content+="<div class='row'>";	
 				content+="<div class='cell'>";
-				content+="Pilot";
+				content+=EDITORSTRINGS.MECH.label_pilot;
 				content+="</div>";
 				content+="<div class='cell'>";
 				content+=_this.createPilotSelect("destroy_transform_pilot_select", "", _this.getMetaValue("mechDestroyTransformedActor"));
@@ -879,14 +863,14 @@ MechUI.prototype.initPropertyHandlers = function(){
 				content+="<div class='table sub_section'>";
 				content+="<div class='row'>";	
 				content+="<div class='cell'>";
-				content+="If Other Unit Present";
+				content+=EDITORSTRINGS.MECH.label_if_other_unit_present;
 				content+="</div>";
 				content+="</div>";
 
 				
 				content+="<div class='row'>";	
 				content+="<div class='cell'>";
-				content+="Other Unit";
+				content+=EDITORSTRINGS.MECH.label_other_unit;
 				content+="</div>";
 				content+="<div class='cell'>";
 				content+=_this.createMechSelect("other_unit_present_select", "", otherUnit);
@@ -895,7 +879,7 @@ MechUI.prototype.initPropertyHandlers = function(){
 				
 				content+="<div class='row'>";	
 				content+="<div class='cell'>";
-				content+="Tranform Into";
+				content+=EDITORSTRINGS.MECH.label_transform_into;
 				content+="</div>";
 				content+="<div class='cell'>";
 				content+=_this.createMechSelect("other_unit_present_target_select", "", targetUnit);
@@ -911,14 +895,14 @@ MechUI.prototype.initPropertyHandlers = function(){
 				content+="<div class='table sub_section'>";
 				content+="<div class='row'>";	
 				content+="<div class='cell'>";
-				content+="If Other Unit Missing";
+				content+=EDITORSTRINGS.MECH.label_if_other_unit_missing;
 				content+="</div>";
 				content+="</div>";
 
 				
 				content+="<div class='row'>";	
 				content+="<div class='cell'>";
-				content+="Other Unit";
+				content+=EDITORSTRINGS.MECH.label_other_unit;
 				content+="</div>";
 				content+="<div class='cell'>";
 				content+=_this.createMechSelect("other_unit_missing_select", "", otherUnit);
@@ -927,7 +911,7 @@ MechUI.prototype.initPropertyHandlers = function(){
 				
 				content+="<div class='row'>";	
 				content+="<div class='cell'>";
-				content+="Tranform Into";
+				content+=EDITORSTRINGS.MECH.label_transform_into;
 				content+="</div>";
 				content+="<div class='cell'>";
 				content+=_this.createMechSelect("other_unit_missing_target_select", "", targetUnit);
@@ -985,7 +969,7 @@ MechUI.prototype.initPropertyHandlers = function(){
 				content+="<div class='table'>";
 				content+="<div class='row'>";	
 				content+="<div class='cell'>";
-				content+="From";
+				content+=EDITORSTRINGS.MECH.label_from;
 				content+="</div>";
 				content+="</div>";
 				content+="</div>";
@@ -1029,7 +1013,7 @@ MechUI.prototype.initPropertyHandlers = function(){
 				content+="<div class='table'>";
 				content+="<div class='row'>";	
 				content+="<div class='cell'>";
-				content+="Into";
+				content+=EDITORSTRINGS.MECH.label_into;
 				content+="</div>";
 		
 				
@@ -1048,7 +1032,7 @@ MechUI.prototype.initPropertyHandlers = function(){
 				content+="<div class='table'>";
 				content+="<div class='row'>";	
 				content+="<div class='cell'>";
-				content+="Required Will";
+				content+=EDITORSTRINGS.MECH.label_required_will;
 				content+="</div>";
 		
 						
@@ -1117,9 +1101,9 @@ MechUI.prototype.initPropertyHandlers = function(){
 				
 				content+="<div class='table'>";
 				
-				content+="<div title='If enabled the mech can be deployed directly' class='row'>";
+				content+="<div title='"+EDITORSTRINGS.MECH.hint_can_deploy+"' class='row'>";
 				content+="<div class='cell'>";
-				content+="Can Deploy";
+				content+=EDITORSTRINGS.MECH.label_can_deploy
 				content+="</div>";
 				content+="<div class='cell'>";
 
@@ -1130,16 +1114,16 @@ MechUI.prototype.initPropertyHandlers = function(){
 				
 				content+="<div title='' class='row'>";
 				content+="<div class='cell'>";
-				content+="Deploy Actions";
+				content+=EDITORSTRINGS.MECH.label_deploy_actions;
 				content+="</div>";
 				content+="<div class='cell'>";
-				content+="<button id='edit_deploy_actions'>Edit</button>";
+				content+="<button id='edit_deploy_actions'>"+EDITORSTRINGS.MECH.label_edit+"</button>";
 				content+="</div>";
 				content+="</div>";
 				
-				content+="<div title='If enabled setting a pilot for this mech will immediately reconfigure other pilots if needed according to the deploy actions' class='row'>";
+				content+="<div title='"+EDITORSTRINGS.MECH.hint_force_pilots+"' class='row'>";
 				content+="<div class='cell'>";
-				content+="Force Pilots";
+				content+=EDITORSTRINGS.MECH.label_force_pilots;
 				content+="</div>";
 				content+="<div class='cell'>";
 
@@ -1148,9 +1132,9 @@ MechUI.prototype.initPropertyHandlers = function(){
 				content+="</div>";
 				content+="</div>";
 				
-				content+="<div title='If enabled a menu option to swap between the available pilots will be enabled on the unit's map menu' class='row'>";
+				content+="<div title='"+EDITORSTRINGS.MECH.hint_quick_swap+"' class='row'>";
 				content+="<div class='cell'>";
-				content+="Quick Swap";
+				content+=EDITORSTRINGS.MECH.label_quick_swap;
 				content+="</div>";
 				content+="<div class='cell'>";
 
@@ -1162,7 +1146,7 @@ MechUI.prototype.initPropertyHandlers = function(){
 				
 				content+="<div class='row'>";	
 				content+="<div class='cell'>";
-				content+="Allowed Pilots";
+				content+=EDITORSTRINGS.MECH.label_allowed_pilots;
 				content+="</div>";
 				content+="</div>";
 				content+="</div>";
@@ -1207,7 +1191,7 @@ MechUI.prototype.initPropertyHandlers = function(){
 				content+="<div class='table'>";
 				content+="<div class='row'>";	
 				content+="<div class='cell'>";
-				content+="Sub Pilot Slots";
+				content+=EDITORSTRINGS.MECH.label_sub_pilots;
 				content+="</div>";
 				content+="</div>";
 				content+="</div>";
@@ -1233,11 +1217,11 @@ MechUI.prototype.initPropertyHandlers = function(){
 					content+="<div class='row'>";	
 					
 					content+="<div class='cell'>";
-					content+="Slot "+(i+1);
+					content+=EDITORSTRINGS.MECH.label_slot+" "+(i+1);
 					content+="</div>";
 					
 					content+="<div class='cell'>";
-					content+="Default Pilot";
+					content+=EDITORSTRINGS.MECH.label_default_pilot;
 					content+="</div>";
 					
 					content+="<div class='cell'>";
@@ -1255,7 +1239,7 @@ MechUI.prototype.initPropertyHandlers = function(){
 					content+="</div>";
 					
 					content+="<div class='cell top'>";
-					content+="Allowed";
+					content+=EDITORSTRINGS.MECH.label_allowed;
 					content+="</div>";
 					
 					content+="<div class='cell'>";
@@ -1441,10 +1425,10 @@ MechUI.prototype.initPropertyHandlers = function(){
 				content+="<div title='' class='table sub_section'>";
 				content+="<div title='' class='row'>";
 				content+="<div class='cell'>";
-				content+="Basic Battle";
+				content+=EDITORSTRINGS.MECH.label_basic_battle;
 				content+="</div>";
 				content+="<div class='cell'>";
-				content+="Overworld";
+				content+=EDITORSTRINGS.MECH.label_overworld;
 				content+="</div>";
 				content+="</div>";
 				content+="<div title='' class='row'>";
@@ -1465,12 +1449,12 @@ MechUI.prototype.initPropertyHandlers = function(){
 				
 				content+="<div title='' class='row'>";
 				content+="<div class='cell'>";
-				content+="Battle Scene";
+				content+=EDITORSTRINGS.MECH.label_battle_scene;
 				content+="</div>";
 				content+="</div>";
 				content+="<div title='' class='row'>";
 				content+="<div class='cell'>";
-				content+="Folder";
+				content+=EDITORSTRINGS.MECH.label_folder;
 				content+="</div>";
 				content+="<div class='cell'>";
 				content+="<div class='hint_text'>img/SRWBattleScene/</div>";
@@ -1495,7 +1479,7 @@ MechUI.prototype.initPropertyHandlers = function(){
 				
 				content+="<div title='' class='row'>";
 				content+="<div class='cell'>";
-				content+="Sprite Type";
+				content+=EDITORSTRINGS.MECH.label_sprite_type;
 				content+="</div>";
 				content+="<div class='cell'>";
 				content+="<select id='sprite_type_select'>";
@@ -1516,65 +1500,68 @@ MechUI.prototype.initPropertyHandlers = function(){
 				
 				if(spriteType == "DragonBones"){
 					content+="<div title='' class='row'>";
-					content+=_this.createValueInput("mechBattleSceneArmatureName", "Armature Name");
+					content+=_this.createValueInput("mechBattleSceneArmatureName", EDITORSTRINGS.MECH.label_armature_name);
 					content+="</div>";
 					content+="<div title='' class='row'>";
-					content+=_this.createValueInput("mechBattleSceneDragonBonesSize", "DragonBones World Size");
+					content+=_this.createValueInput("mechBattleSceneDragonBonesSize", EDITORSTRINGS.MECH.label_dragonbones_world_size);
 					content+="</div>";
 				}
 				if(spriteType == "Spine" || spriteType == "DragonBones"){
-					content+="<div title='Determines the width for the canvas on which the DragonBones sprite is rendered' class='row'>";
-					content+=_this.createValueInput("mechBattleSceneCanvasWidth", "Internal Canvas Width");
+					content+="<div title='"+EDITORSTRINGS.MECH.hint_dragonbones_width+"' class='row'>";
+					content+=_this.createValueInput("mechBattleSceneCanvasWidth", EDITORSTRINGS.MECH.label_canvas_width);
 					content+="</div>";
-					content+="<div title='Determines the height for the canvas on which the DragonBones sprite is rendered' class='row'>";
-					content+=_this.createValueInput("mechBattleSceneCanvasHeight", "Internal Canvas Height");
+					content+="<div title='"+EDITORSTRINGS.MECH.hint_dragonbones_height+"' class='row'>";
+					content+=_this.createValueInput("mechBattleSceneCanvasHeight", EDITORSTRINGS.MECH.label_canvas_height);
 					content+="</div>";
 				}
 				
 				if(spriteType == "Default"){
-					content+="<div title='The width and height of the texture files for this sprite in pixels' class='row'>";
-					content+=_this.createValueInput("mechBattleSceneSpriteSize", "Source Size", "", "px");
+					content+="<div title='"+EDITORSTRINGS.MECH.hint_default_size+"' class='row'>";
+					content+=_this.createValueInput("mechBattleSceneSpriteSize", EDITORSTRINGS.MECH.label_source_size, "", "px");
 					content+="</div>";	
 				}	
 
 				if(spriteType == "3D"){
-					content+="<div title='A scaling factor for the 3D model ' class='row'>";
-					content+=_this.createValueInput("mechBattleSceneSpriteScale", "Scale", "", "");
+					content+="<div title='"+EDITORSTRINGS.MECH.hint_blockbench_hack+"' class='row'>";
+					content+=_this.createValueInput("mechBattleSceneBBHack", EDITORSTRINGS.MECH.label_blockbench_hack, "", "");
 					content+="</div>";
-					content+="<div title='The default rotation of the 3D model' class='row'>";
-					content+=_this.createValueInput("mechBattleSceneSpriteRotation", "Rotation", "", "°");
+					content+="<div title='"+EDITORSTRINGS.MECH.hint_3D_scale+"' class='row'>";
+					content+=_this.createValueInput("mechBattleSceneSpriteScale", EDITORSTRINGS.MECH.label_scale, "", "");
+					content+="</div>";
+					content+="<div title='"+EDITORSTRINGS.MECH.hint_3D_rotation+"' class='row'>";
+					content+=_this.createValueInput("mechBattleSceneSpriteRotation", EDITORSTRINGS.MECH.label_rotation, "", "°");
 					content+="</div>";						
 				}		
 				content+="<div title='' class='row'>";
-				content+=_this.createValueInput("mechBattleYOffset", "Y Offset", "", "world units");
+				content+=_this.createValueInput("mechBattleYOffset", EDITORSTRINGS.MECH.label_y_offset, "", EDITORSTRINGS.MECH.label_world_units);
 				content+="</div>";			
 				content+="<div title='' class='row'>";
-				content+=_this.createValueInput("mechBattleXOffset", "X Offset", "", "world units");
+				content+=_this.createValueInput("mechBattleXOffset", EDITORSTRINGS.MECH.label_x_offset, "", EDITORSTRINGS.MECH.label_world_units);
 				content+="</div>";	
 				content+="<div title='' class='row'>";
-				content+=_this.createValueInput("mechBattleCenterYOffset", "Root Y Offset", "", "world units");
+				content+=_this.createValueInput("mechBattleCenterYOffset", EDITORSTRINGS.MECH.label_root_y_offset, "", EDITORSTRINGS.MECH.label_world_units);
 				content+="</div>";					
-				content+="<div title='Scale for the shadow of the unit' class='row'>";
-				content+=_this.createValueInput("mechBattleSceneShadowSize", "Shadow Scale");
+				content+="<div title='"+EDITORSTRINGS.MECH.hint_shadow+"' class='row'>";
+				content+=_this.createValueInput("mechBattleSceneShadowSize", EDITORSTRINGS.MECH.label_shadow_scale);
 				content+="</div>";	
 				content+="<div title='' class='row'>";
-				content+=_this.createValueInput("mechBattleSceneShadowOffsetZ", "Shadow Z Offset", "", "world units");
+				content+=_this.createValueInput("mechBattleSceneShadowOffsetZ", EDITORSTRINGS.MECH.label_shadow_z_offset, "", EDITORSTRINGS.MECH.label_world_units);
 				content+="</div>";
 				content+="<div title='' class='row'>";
-				content+=_this.createValueInput("mechBattleSceneShadowOffsetX", "Shadow X Offset", "", "world units");
+				content+=_this.createValueInput("mechBattleSceneShadowOffsetX", EDITORSTRINGS.MECH.label_shadow_x_offset, "", EDITORSTRINGS.MECH.label_world_units);
 				content+="</div>";
-				content+="<div title='The size at which the sprite is displayed in World units(default 3)' class='row'>";
-				content+=_this.createValueInput("mechBattleReferenceSize", "World Size", "", "world units");
+				content+="<div title='"+EDITORSTRINGS.MECH.hint_world_size+"' class='row'>";
+				content+=_this.createValueInput("mechBattleReferenceSize", EDITORSTRINGS.MECH.label_world_size, "", EDITORSTRINGS.MECH.label_world_units);
 				content+="</div>";
 				content+="<div title='' class='row'>";
 				content+="<div class='cell'>";
-				content+="Death Animation";
+				content+=EDITORSTRINGS.MECH.label_death_anim;
 				content+="</div>";
 				content+="<div class='cell'>";
 				content+="<select id='death_anim_select'>";
 				var animData = _this._mainUIHandler.getAnimationDefs();
 				var value = _this.getMetaValue("mechBattleSceneDeathAnim");
-				content+="<option title='' value=''>System Default</option>";
+				content+="<option title='' value=''>"+EDITORSTRINGS.MECH.label_system_default+"</option>";
 				var options = Object.keys(animData);
 				for(var j = 0; j < options.length; j++){					
 					content+="<option "+(options[j] == value ? "selected" : "")+" value='"+options[j]+"'>"+animData[options[j]].name+"</option>";										
@@ -1679,7 +1666,8 @@ MechUI.prototype.initPropertyHandlers = function(){
 				
 				if(spriteType == "3D"){
 					hookedProperties.unshift("mechBattleSceneSpriteRotation");
-					hookedProperties.unshift("mechBattleSceneSpriteScale");					
+					hookedProperties.unshift("mechBattleSceneSpriteScale");	
+					hookedProperties.unshift("mechBattleSceneBBHack");						
 				}
 				
 				if(spriteType == "DragonBones"){
@@ -1733,13 +1721,13 @@ MechUI.prototype.initPropertyHandlers = function(){
 				content+="<div title='' class='table sub_section'>";
 				content+="<div title='' class='row'>";
 				content+="<div class='cell'>";
-				content+="Spawn";
+				content+=EDITORSTRINGS.MECH.label_spawn;
 				content+="</div>";
 				content+="</div>";
 				
 				content+="<div class='row'>";	
 				content+="<div class='cell'>";
-				content+="Animation";
+				content+=EDITORSTRINGS.MECH.label_animation;
 				content+="</div>";
 				content+="<div class='cell'>";
 				content+="<div class='hint_text'>img/animations/</div>";
@@ -1749,27 +1737,27 @@ MechUI.prototype.initPropertyHandlers = function(){
 				content+="</div>";
 				
 				content+="<div title='' class='row'>";
-				content+=_this.createValueInput("mechSpawnAnimFrameSize", "Frame Size", "", "px");
+				content+=_this.createValueInput("mechSpawnAnimFrameSize", EDITORSTRINGS.MECH.label_frame_size, "", "px");
 				content+="</div>";
 				
 				content+="<div title='' class='row'>";
-				content+=_this.createValueInput("mechSpawnAnimFrames", "Frames");
+				content+=_this.createValueInput("mechSpawnAnimFrames", EDITORSTRINGS.MECH.label_frames);
 				content+="</div>";
 				
 				content+="<div title='' class='row'>";
-				content+=_this.createValueInput("mechSpawnAnimSheetWidth", "Sheet Width", "", "px");
+				content+=_this.createValueInput("mechSpawnAnimSheetWidth", EDITORSTRINGS.MECH.label_sheet_width, "", "px");
 				content+="</div>";
 				
 				content+="<div title='' class='row'>";
-				content+=_this.createValueInput("mechSpawnAnimSpeed", "Animation Speed", "", "frames");
+				content+=_this.createValueInput("mechSpawnAnimSpeed", EDITORSTRINGS.MECH.label_anim_speed, "", "frames");
 				content+="</div>";
 				
 				content+="<div title='' class='row'>";
-				content+=_this.createValueInput("mechSpawnAnimAppearFrame", "Change on Frame");
+				content+=_this.createValueInput("mechSpawnAnimAppearFrame", EDITORSTRINGS.MECH.label_change_on_frame);
 				content+="</div>";
 				
 				content+="<div title='' class='row'>";
-				content+=_this.createValueInput("mechSpawnAnimSoundEffect", "Sound Effect", "audio/se/", ".ogg");
+				content+=_this.createValueInput("mechSpawnAnimSoundEffect", EDITORSTRINGS.MECH.label_SE, "audio/se/", ".ogg");
 				content+="</div>";
 				
 				content+="</div>";
@@ -1778,13 +1766,13 @@ MechUI.prototype.initPropertyHandlers = function(){
 				content+="<div title='' class='table sub_section'>";
 				content+="<div title='' class='row'>";
 				content+="<div class='cell'>";
-				content+="Destroy";
+				content+=EDITORSTRINGS.MECH.label_destroy;
 				content+="</div>";
 				content+="</div>";
 				
 				content+="<div class='row'>";	
 				content+="<div class='cell'>";
-				content+="Animation";
+				content+=EDITORSTRINGS.MECH.label_animation;
 				content+="</div>";
 				content+="<div class='cell'>";
 				content+="<div class='hint_text'>img/animations/</div>";
@@ -1794,27 +1782,27 @@ MechUI.prototype.initPropertyHandlers = function(){
 				content+="</div>";
 				
 				content+="<div title='' class='row'>";
-				content+=_this.createValueInput("mechDestroyAnimFrameSize", "Frame Size", "", "px");
+				content+=_this.createValueInput("mechDestroyAnimFrameSize", EDITORSTRINGS.MECH.label_frame_size, "", "px");
 				content+="</div>";
 				
 				content+="<div title='' class='row'>";
-				content+=_this.createValueInput("mechDestroyAnimFrames", "Frames");
+				content+=_this.createValueInput("mechDestroyAnimFrames", EDITORSTRINGS.MECH.label_frames);
 				content+="</div>";
 				
 				content+="<div title='' class='row'>";
-				content+=_this.createValueInput("mechDestroyAnimSheetWidth", "Sheet Width", "", "px");
+				content+=_this.createValueInput("mechDestroyAnimSheetWidth", EDITORSTRINGS.MECH.label_sheet_width, "", "px");
 				content+="</div>";
 				
 				content+="<div title='' class='row'>";
-				content+=_this.createValueInput("mechDestroyAnimSpeed", "Animation Speed", "", "frames");
+				content+=_this.createValueInput("mechDestroyAnimSpeed", EDITORSTRINGS.MECH.label_anim_speed, "", "frames");
 				content+="</div>";
 				
 				content+="<div title='' class='row'>";
-				content+=_this.createValueInput("mechDestroyAnimAppearFrame", "Change on Frame");
+				content+=_this.createValueInput("mechDestroyAnimAppearFrame", EDITORSTRINGS.MECH.label_change_on_frame);
 				content+="</div>";
 				
 				content+="<div title='' class='row'>";
-				content+=_this.createValueInput("mechDestroyAnimSoundEffect", "Sound Effect", "audio/se/", ".ogg");
+				content+=_this.createValueInput("mechDestroyAnimSoundEffect", EDITORSTRINGS.MECH.label_SE, "audio/se/", ".ogg");
 				content+="</div>";
 				
 				content+="</div>";
@@ -1915,15 +1903,15 @@ MechUI.prototype.show = async function(){
 	content+="</div>";
 	content+="<div class='edit_pane'>";
 	content+="<div class='controls'>";
-	content+="<button class='cancel'>Cancel</button>";
-	content+="<button class='save'>Save</button>";	
+	content+="<button class='cancel'>"+EDITORSTRINGS.GENERAL.label_cancel+"</button>";
+	content+="<button class='save'>"+EDITORSTRINGS.GENERAL.label_save+"</button>";	
 	content+="</div>";
 	content+="<div class='main_info'>";
 	content+="<div class='row'>";
 	
 	content+="<div class='section'>";
 	content+="<div class='title'>";
-	content+="General Info";	
+	content+=EDITORSTRINGS.MECH.label_general_info;	
 	content+="</div>";
 	content+="<div class='content'>";
 	content+=_this._propertyHandlers.menu_sprite.createControls();
@@ -1961,7 +1949,7 @@ MechUI.prototype.show = async function(){
 
 	content+="<div class='section'>";
 	content+="<div class='title'>";
-	content+="Stats";	
+	content+=EDITORSTRINGS.MECH.label_stats;		
 	content+="</div>";
 	content+="<div class='content stats'>";
 	
@@ -1983,7 +1971,7 @@ MechUI.prototype.show = async function(){
 	
 	content+="<div class='section'>";
 	content+="<div class='title'>";
-	content+="Terrain";	
+	content+=EDITORSTRINGS.MECH.label_terrain;		
 	content+="</div>";
 	content+="<div class='content stats'>";
 	
@@ -2001,7 +1989,7 @@ MechUI.prototype.show = async function(){
 	
 	content+="<div class='section'>";
 	content+="<div class='title abilities'>";
-	content+="Abilities";	
+	content+=EDITORSTRINGS.MECH.label_abilities;
 	content+="</div>";
 	content+="<div class='content stats'>";
 	
@@ -2015,7 +2003,7 @@ MechUI.prototype.show = async function(){
 	
 	content+="<div class='section'>";
 	content+="<div class='title abilities'>";
-	content+="Weapons";	
+	content+=EDITORSTRINGS.MECH.label_weapons;
 	content+="</div>";
 	content+="<div class='content stats'>";
 	
@@ -2029,7 +2017,7 @@ MechUI.prototype.show = async function(){
 	
 	content+="<div class='section'>";
 	content+="<div class='title abilities'>";
-	content+="Transformation";	
+	content+=EDITORSTRINGS.MECH.label_transformation;
 	content+="</div>";
 	content+="<div class='content transformation stats'>";
 	
@@ -2044,7 +2032,7 @@ MechUI.prototype.show = async function(){
 	
 	content+="<div class='section'>";
 	content+="<div class='title abilities'>";
-	content+="Auto Transformation";	
+	content+=EDITORSTRINGS.MECH.label_auto_transformation;	
 	content+="</div>";
 	content+="<div class='content transformation stats'>";
 	
@@ -2062,7 +2050,7 @@ MechUI.prototype.show = async function(){
 	
 	content+="<div class='section'>";
 	content+="<div class='title abilities'>";
-	content+="Combination";	
+	content+=EDITORSTRINGS.MECH.label_auto_combination;	
 	content+="</div>";
 	content+="<div class='content transformation stats'>";
 	
@@ -2080,7 +2068,7 @@ MechUI.prototype.show = async function(){
 	
 	content+="<div class='section'>";
 	content+="<div class='title abilities'>";
-	content+="Deployment";	
+	content+=EDITORSTRINGS.MECH.label_deployment;		
 	content+="</div>";
 	content+="<div class='content transformation stats'>";
 	
@@ -2095,7 +2083,7 @@ MechUI.prototype.show = async function(){
 	
 	content+="<div class='section'>";
 	content+="<div class='title abilities'>";
-	content+="Sprites";	
+	content+=EDITORSTRINGS.MECH.label_sprites;	
 	content+="</div>";
 	content+="<div class='content transformation stats'>";
 	
@@ -2110,7 +2098,7 @@ MechUI.prototype.show = async function(){
 	
 	content+="<div class='section'>";
 	content+="<div class='title abilities'>";
-	content+="Animations";	
+	content+=EDITORSTRINGS.MECH.label_animations;	
 	content+="</div>";
 	content+="<div class='content transformation stats'>";
 	

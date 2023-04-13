@@ -921,4 +921,23 @@ $SRWConfig.spirits = function(){
 			duration: 800
 		}
 	);
+	
+	this.addDefinition(
+		43, 
+		"Fortune", 
+		"Increases critical rate by 30% and next time this unit defeats an enemy, increases money gained by 100%.", 
+		function(target){
+			$statCalc.setSpirit(target, "fortune");
+			$statCalc.setTempEffect(target, [{type: "crit", modType: "mult", value: 1.3, phaseCount: 2}, {type: "spirit_43", phaseCount: 2}]);
+		},
+		"self",
+		function(actor){
+			return !$statCalc.getActiveSpirits(actor).fortune && !$statCalc.hasTempEffect(actor, "spirit_43");
+		}, 
+		null,
+		{
+			src: "Fortune",
+			duration: 800
+		}
+	);
 }

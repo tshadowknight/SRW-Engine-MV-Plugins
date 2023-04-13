@@ -8,22 +8,31 @@ import PatternUI from "./PatternUI.js";
 
 export default function SRWEditor(){
 	this._currentEditor = "attack_editor";
-	this._title = "SRW Engine MV Editor v2.0";
+	this._initialized = false;
+	
 	this._referenceAnimationBuilder = new BattleAnimationBuilder();
-	this._editorData = {		
-		weapon_editor: {title: "Weapon Editor Editor", func: this.showWeaponEditor},
-		mech_editor: {title: "Mech Editor", func: this.showMechEditor},
-		enemy_pilot_editor: {title: "Enemy Pilot Editor", func: this.showEnemyPilotEditor},
-		ally_pilot_editor: {title: "Ally Pilot Editor", func: this.showAllyPilotEditor},
-		pattern_editor: {title: "Pattern Editor", func: this.showPatternEditor},
-		attack_editor: {title: "Attack Editor", func: this.showAttackEditor},
-		environment_editor: {title: "Environment Editor", func: this.showEnvironmentEditor},
-		battle_text_editor: {title: "Battle Text", func: this.showBattleTextEditor},
-	}
+	
 	
 	window.addEventListener("resize", function(){
 		Graphics.updatePreviewWindowWidth();	
 	});
+}
+
+SRWEditor.prototype.initTitles = function(){
+	if(!this._initialized){
+		this._initialized = true;
+		this._title = EDITORSTRINGS.GENERAL.title;
+		this._editorData = {		
+			weapon_editor: {title: EDITORSTRINGS.GENERAL.weapon_editor_label, func: this.showWeaponEditor},
+			mech_editor: {title: EDITORSTRINGS.GENERAL.mech_editor_label, func: this.showMechEditor},
+			enemy_pilot_editor: {title: EDITORSTRINGS.GENERAL.enemy_pilot_editor_label, func: this.showEnemyPilotEditor},
+			ally_pilot_editor: {title: EDITORSTRINGS.GENERAL.ally_pilot_editor_label, func: this.showAllyPilotEditor},
+			pattern_editor: {title: EDITORSTRINGS.GENERAL.pattern_editor_label, func: this.showPatternEditor},
+			attack_editor: {title: EDITORSTRINGS.GENERAL.attack_editor_label, func: this.showAttackEditor},
+			environment_editor: {title: EDITORSTRINGS.GENERAL.environment_editor_label, func: this.showEnvironmentEditor},
+			battle_text_editor: {title: EDITORSTRINGS.GENERAL.battle_text_editor_label, func: this.showBattleTextEditor},
+		}
+	}
 }
 
 SRWEditor.prototype.getAnimationDefs = function(){
@@ -39,6 +48,8 @@ SRWEditor.prototype.init = function(){
 	link.href = 'js/plugins/editor/editor.css';
 	link.media = 'all';
 	head.appendChild(link);*/
+	
+	_this.initTitles();
 	
 	_this._svgPath = "svg/editor/";
 	
@@ -72,6 +83,8 @@ SRWEditor.prototype.init = function(){
 	_this._previewAttackDestroys = false;
 	_this._enemySideAttack = false;
 	_this._playBGM = true;
+	_this._playUntil = -1;
+	_this._fastForward = false;
 	_this._currentDefinition = 0;
 	_this._currentEnvironmentDefinition = 0;
 	_this._sequenceTypes = [
@@ -92,6 +105,10 @@ SRWEditor.prototype.init = function(){
 		{name: "active_target", id: "active_target"},
 		{name: "active_target_twin", id: "active_target_twin"},
 		{name: "Camera", id: "Camera"},
+	];
+	
+	_this._specialLights = [
+		{name: "scene_light", id: "scene_light"},
 	];
 	
 	_this._easingFunctions = {
@@ -222,6 +239,7 @@ SRWEditor.prototype.init = function(){
 		set_attack_text: {
 			hasTarget: false,
 			params: ["id"],
+			paramAlias: {id: "id_text"},
 			desc: "Show attack text for the current target."
 		},
 		clear_attack_text: {
@@ -285,6 +303,13 @@ SRWEditor.prototype.init = function(){
 			params: [],
 			desc: "Remove a sprite."
 		},
+		set_light_color: {
+			isLightCommand: true,
+			hasTarget: true,
+			hasTarget: true,
+			params: ["r", "g", "b", "duration", "easingFunction", "easingMode"],
+			desc: "Set the groundColor and diffuse color of specified light. scene_light is the global hemispheric light"
+		},
 		create_bg: {
 			hasTarget: true,
 			params: ["isPilotCutin", "path", "parent", "position", "size", "alpha", "billboardMode", "rotation", "frameSize", "lineCount", "columnCount", "animationLoop", "animationFrames", "animationDelay", "holdFrame", "scrollSpeed", "clamp"],
@@ -329,9 +354,15 @@ SRWEditor.prototype.init = function(){
 		},
 		create_model: {
 			hasTarget: true,
-			params: ["path", "parent", "position", "rotation", "size"],//"animGroup",  "animName", 
+			params: ["path", "parent", "moveOriginToParent", "position", "rotation", "size"],//"animGroup",  "animName", 
+			aliases: {"moveOriginToParent": "syncOrigin"},
 			desc: "Create a new model."
-		},			
+		},	
+		create_model_instance: {
+			hasTarget: true,
+			params: ["parent"],
+			desc: "Create an instance of a loaded model."
+		},
 		remove_spriter_bg: {
 			hasTarget: true,
 			params: [],
@@ -396,6 +427,11 @@ SRWEditor.prototype.init = function(){
 			hasTarget: true,
 			params: [],
 			desc: "Stop the root of the effekseer effect, letting the particle system fade out."
+		},
+		send_effekseer_trigger: {
+			hasTarget: true,
+			params: ["id"],
+			desc: "Send the trigger with the specified id to the target effekseer effect."
 		},
 		play_rmmv_anim: {
 			hasTarget: true,
@@ -464,12 +500,12 @@ SRWEditor.prototype.init = function(){
 		},
 		set_sprite_frame: {
 			hasTarget: true,
-			params: ["name", "snap", "loop"],
+			params: ["name", "snap", "loop", "playAll", "speed", "from", "to", "isPassive"],
 			desc: "Set the source frame of a sprite(in, out, dodge, hurt, main)."
 		},
 		set_model_animation: {
 			hasTarget: true,
-			params: ["name", "snap", "loop"],
+			params: ["name", "snap", "loop", "playAll", "speed", "from", "to", "isPassive"],
 			desc: "Set the animation by name of a model specified by target."
 		},
 		hide_attachment: {
@@ -596,6 +632,7 @@ SRWEditor.prototype.init = function(){
 		armatureName: "The name of Armature that will be shown", 
 		animGroup: "The name of the group of the model's animations",
 		animName: "The name of the animation that will be shown",
+		moveOriginToParent: "If 1 set the origin of the object to the parent's absolute position",
 		canvasWidth: "The width of the rendering surface for the external renderer", 
 		canvasHeight: "The height of the rendering surface for the external renderer",
 		parent: "The id of the object that will be the parent of this object.",
@@ -629,6 +666,10 @@ SRWEditor.prototype.init = function(){
 		commands: "A list of commands to be run to during the phase transition to set up the next phase.",
 		animationFrames: "The number of animation frames in the spritesheet.",
 		snap: "If set to 1 no blending will be done into the new sprite frame(if applicable)",
+		playAll: "If set to 1 every animation available in the model will be played at once",
+		isPassive: "If set to 1 the animation will play alongside other model animations",
+		from: "The frame to start playing from",
+		to: "The frame to play until",
 		attachId: "The name/id of the attachment",
 		holdFrame: "If 1 the sprite will hold the final frame of the animation, ignored if animation looping is enabled.",
 		scrollSpeed: "Sets the horizontal scroll speed of the background, use negative values to change the scroll direction",
@@ -734,6 +775,9 @@ SRWEditor.prototype.init = function(){
 		animName: function(value){
 			
 		},
+		moveOriginToParent: function(value){
+			
+		},
 		animGroup: function(value){
 			
 		},
@@ -760,7 +804,7 @@ SRWEditor.prototype.init = function(){
 				result+="<option "+(value == type ? "selected" : "")+" value='"+type+"'>"+type+"</option>";
 			});
 			result+="</select>";	
-			result+="<button class='copy_from_cam' data-prop='position'>Copy from Helper</button>";
+			result+="<button class='copy_from_cam' data-prop='position'>"+EDITORSTRINGS.ATTACKS.label_copy_helper+"</button>";
 			result+="</div>";
 			return result;
 		},
@@ -782,7 +826,7 @@ SRWEditor.prototype.init = function(){
 			});
 			result+="</select>";	
 			
-			result+="<button class='copy_from_cam' data-prop='rotation'>Copy from Helper</button>";
+			result+="<button class='copy_from_cam' data-prop='rotation'>"+EDITORSTRINGS.ATTACKS.label_copy_helper+"</button>";
 			result+="</div>";
 			return result;
 		},
@@ -873,6 +917,22 @@ SRWEditor.prototype.init = function(){
 		id: function(value){
 		
 		},
+		id_text: function(value){
+			let result = "";
+			
+			result+="<input value='"+(value || "")+"'></input>";
+			
+				
+			
+			
+			result+="<div class='quote_selector_container'>";
+			result+="<img class='quote_selector_control' src='"+_this._svgPath+"pencil-fill.svg'>";
+			result+="<div class='quote_selector'>";
+			
+			result+="</div>";
+			result+="</div>";
+			return result;
+		},
 		magnitude_x: function(value){
 		
 		},
@@ -935,6 +995,18 @@ SRWEditor.prototype.init = function(){
 		snap: function(value){
 		
 		}, 
+		playAll: function(value){
+			
+		},
+		isPassive: function(value){
+			
+		},
+		from: function(value){
+			
+		},
+		to: function(value){
+			
+		},
 		animationLoop: function(value){
 		
 		},
@@ -1154,8 +1226,8 @@ SRWEditor.prototype.show = function(){
 			if(c){
 				_this._modified = false;
 				$battleSceneManager.endScene();
-				_this._currentDefinition = 0;
-				_this._currentEnvironmentDefinition = 0;
+				//_this._currentDefinition = 0;
+				//_this._currentEnvironmentDefinition = 0;
 				_this._currentEditor = this.value;
 				_this.show();
 			} else {
@@ -1312,8 +1384,8 @@ SRWEditor.prototype.showBattleTextEditorControls = function(){
 		var content = "";
 		
 		content+="<div id='info_section' class='section'>";
-		content+="<button id='save_def'>Save</button>";
-		content+="<div class='section_label'>Info</div>";
+		content+="<button id='save_def'>"+EDITORSTRINGS.GENERAL.label_save+"</button>";
+		content+="<div class='section_label'>"+EDITORSTRINGS.GENERAL.label_info+"</div>";
 		content+="<div class='section_content' id='text_editor_section_tools'>";
 		
 		var currentTextInfo;
@@ -1322,7 +1394,7 @@ SRWEditor.prototype.showBattleTextEditorControls = function(){
 		
 		content+="<div class='row'>";
 		content+="<div class='select_label'>";
-		content+="Text type";
+		content+=EDITORSTRINGS.TEXT.label_text_type;
 		content+="</div>";
 		content+="<select id='battle_text_type_select'>";
 		content+="<option value='default' "+(_this._currentBattleTextType == "default" ? "selected" : "")+">Default</option>";
@@ -1332,7 +1404,7 @@ SRWEditor.prototype.showBattleTextEditorControls = function(){
 		
 		if(_this._currentBattleTextType == "event"){
 			content+="<div class='select_label'>";
-			content+="Event";
+			content+=EDITORSTRINGS.TEXT.label_event;
 			content+="</div>";
 			content+="<select id='battle_text_event_select'>";
 			content+="<option value='-1'></option>";
@@ -1361,7 +1433,7 @@ SRWEditor.prototype.showBattleTextEditorControls = function(){
 		content+="</div>";
 		content+="<div class='row'>";
 		content+="<div class='select_label'>";
-		content+="Unit type";
+		content+=EDITORSTRINGS.TEXT.label_unit_type;
 		content+="</div>";
 		content+="<select id='battle_text_actor_type_select'>";
 		content+="<option value='actor' "+(_this._currentBattleTextActorType == "actor" ? "selected" : "")+">Actor</option>";
@@ -1370,14 +1442,14 @@ SRWEditor.prototype.showBattleTextEditorControls = function(){
 		content+="</select>";
 		
 		content+="<div class='select_label'>";
-		content+="Unit";
+		content+=EDITORSTRINGS.TEXT.label_unit;
 		content+="</div>";
 		content+=_this.createUnitSelect(_this._currentTextUnit, null, false, "main_unit_select");
 		
 		
 		var textHooks = _this._battleTextBuilder.getAvailableTextHooks();
 		content+="<div class='select_label'>";
-		content+="Text Type";
+		content+=EDITORSTRINGS.TEXT.label_text_type;
 		content+="</div>";
 		content+="<select id='text_type_select'>";
 		
@@ -1393,13 +1465,13 @@ SRWEditor.prototype.showBattleTextEditorControls = function(){
 		if(_this._currentBattleTextType == "event"){
 			content+="<div class='event_controls'>";
 			if(_this._currentBattleTextEvent != -1){
-				content+="<div class='command_label reference_id_label'>Reference id:</div>";
+				content+="<div class='command_label reference_id_label'>"+EDITORSTRINGS.TEXT.label_reference_id+":</div>";
 				content+="<input class='event_id' value='"+_this._battleTextBuilder.getDefinitions()[_this._currentBattleTextType][_this._currentBattleTextEvent].refId+"'></input>";
 			}
 			content+="<button class='event_new'>New</button>";
 			if(_this._currentBattleTextEvent != -1){
-				content+="<button class='event_copy'>Copy</button>";
-				content+="<button class='event_delete'>Delete</button>";
+				content+="<button class='event_copy'>"+EDITORSTRINGS.GENERAL.label_copy+"</button>";
+				content+="<button class='event_delete'>"+EDITORSTRINGS.GENERAL.label_delete+"</button>";
 			}		
 			content+="</div>";
 		}
@@ -1426,8 +1498,8 @@ SRWEditor.prototype.showBattleTextEditorControls = function(){
 			var content = "";
 			content+="<div class='unit_text'>";
 			content+="<div data-subtype='default' class='text_category_controls'>";
-			content+="<div class='text_label'>Default</div>";
-			content+="<button class='add_category_quote'>New</button>";
+			content+="<div class='text_label'>"+EDITORSTRINGS.TEXT.label_default+"</div>";
+			content+="<button class='add_category_quote'>"+EDITORSTRINGS.TEXT.label_new+"</button>";
 			content+="</div>"
 			
 			var ctr = 0;
@@ -1439,8 +1511,8 @@ SRWEditor.prototype.showBattleTextEditorControls = function(){
 			
 			content+="<div class='unit_text'>";
 			content+="<div data-subtype='target_mech' class='text_category_controls'>";
-			content+="<div class='text_label'>Target Mech</div>";
-			content+="<button class='add_category_quote'>New</button>";
+			content+="<div class='text_label'>"+EDITORSTRINGS.TEXT.label_target_mech+"</div>";
+			content+="<button class='add_category_quote'>"+EDITORSTRINGS.TEXT.label_new+"</button>";
 			content+="</div>"
 			
 			var ctr = 0;
@@ -1452,8 +1524,8 @@ SRWEditor.prototype.showBattleTextEditorControls = function(){
 			
 			content+="<div class='unit_text'>";
 			content+="<div data-subtype='mech' class='text_category_controls'>";
-			content+="<div class='text_label'>Mech</div>";
-			content+="<button class='add_category_quote'>New</button>";
+			content+="<div class='text_label'>"+EDITORSTRINGS.TEXT.label_mech+"</div>";
+			content+="<button class='add_category_quote'>"+EDITORSTRINGS.TEXT.label_new+"</button>";
 			content+="</div>"
 			
 			var ctr = 0;
@@ -1465,8 +1537,8 @@ SRWEditor.prototype.showBattleTextEditorControls = function(){
 			
 			content+="<div class='unit_text'>";
 			content+="<div data-subtype='actor' class='text_category_controls'>";
-			content+="<div class='text_label'>Actors</div>";
-			content+="<button class='add_category_quote'>New</button>";
+			content+="<div class='text_label'>"+EDITORSTRINGS.TEXT.label_actors+"</div>";
+			content+="<button class='add_category_quote'>"+EDITORSTRINGS.TEXT.label_new+"</button>";
 			content+="</div>"	
 			
 			var ctr = 0;
@@ -1478,8 +1550,8 @@ SRWEditor.prototype.showBattleTextEditorControls = function(){
 			
 			content+="<div class='unit_text'>";
 			content+="<div data-subtype='enemy' class='text_category_controls'>";
-			content+="<div class='text_label'>Enemies</div>";
-			content+="<button class='add_category_quote'>New</button>";
+			content+="<div class='text_label'>"+EDITORSTRINGS.TEXT.label_enemies+"</div>";
+			content+="<button class='add_category_quote'>"+EDITORSTRINGS.TEXT.label_new+"</button>";
 			content+="</div>"
 								
 			var ctr = 0;
@@ -1492,8 +1564,8 @@ SRWEditor.prototype.showBattleTextEditorControls = function(){
 			
 			content+="<div class='unit_text'>";
 			content+="<div data-subtype='target_actor_tag' class='text_category_controls'>";
-			content+="<div class='text_label'>Target Pilot Tags</div>";
-			content+="<button class='add_category_quote'>New</button>";
+			content+="<div class='text_label'>"+EDITORSTRINGS.TEXT.label_target_pilots_tags+"</div>";
+			content+="<button class='add_category_quote'>"+EDITORSTRINGS.TEXT.label_new+"</button>";
 			content+="</div>"
 								
 			var ctr = 0;
@@ -1505,8 +1577,8 @@ SRWEditor.prototype.showBattleTextEditorControls = function(){
 			
 			content+="<div class='unit_text'>";
 			content+="<div data-subtype='target_mech_tag' class='text_category_controls'>";
-			content+="<div class='text_label'>Target Mech Tags</div>";
-			content+="<button class='add_category_quote'>New</button>";
+			content+="<div class='text_label'>"+EDITORSTRINGS.TEXT.label_target_mech_tags+"</div>";
+			content+="<button class='add_category_quote'>"+EDITORSTRINGS.TEXT.label_new+"</button>";
 			content+="</div>"
 								
 			var ctr = 0;
@@ -1545,7 +1617,7 @@ SRWEditor.prototype.showBattleTextEditorControls = function(){
 							}
 						});
 						content+="</select>"
-						content+="<button class='add_attack'>Add</button>";
+						content+="<button class='add_attack'>"+EDITORSTRINGS.TEXT.label_add+"</button>";
 						content+="</div>"
 						Object.keys(textInfo).forEach(function(weaponId){
 							content+="<div data-weaponid='"+weaponId+"' class='attack_text'>";
@@ -1716,7 +1788,7 @@ SRWEditor.prototype.showBattleTextEditorControls = function(){
 		var buttons = containerNode.querySelectorAll(".delete_text_btn");
 		buttons.forEach(function(button){
 			button.addEventListener("click", function(){
-				if(confirm("Delete this line?")){
+				if(confirm(EDITORSTRINGS.TEXT.confirm_delete_text)){
 					var params = getLocatorInfo(this);				
 					_this._battleTextBuilder.deleteText(params);
 					_this._modified = true;
@@ -1728,7 +1800,7 @@ SRWEditor.prototype.showBattleTextEditorControls = function(){
 		var buttons = containerNode.querySelectorAll(".delete_weapon_entry");
 		buttons.forEach(function(button){
 			button.addEventListener("click", function(){
-				if(confirm("Delete this weapon entry and all its quotes?")){
+				if(confirm(EDITORSTRINGS.TEXT.confirm_delete_entry)){
 					var params = getLocatorInfo(this);				
 					_this._battleTextBuilder.deleteWeaponEntry(params);
 					_this._modified = true;
@@ -1931,7 +2003,7 @@ SRWEditor.prototype.showBattleTextEditorControls = function(){
 		var eventDeleteBtn = containerNode.querySelector(".event_delete");
 		if(eventDeleteBtn){
 			eventDeleteBtn.addEventListener("click", function(){
-				if(confirm("Delete this event entry and all its quotes?")){
+				if(confirm(EDITORSTRINGS.TEXT.confirm_delete_event_entry)){
 					_this._battleTextBuilder.deleteEvent(_this._currentBattleTextEvent);
 					_this._currentBattleTextEvent = -1;
 					_this._modified = true;
@@ -1982,7 +2054,7 @@ SRWEditor.prototype.createQuoteContent = function(type, idx, quote, unitBaseInfo
 	
 	var lineCounter = 0;
 	content+="<div data-subtype='"+type+"' data-idx='"+idx+"'class='quote'>";
-	content+="<div class='quote_title'>Quote</div>";
+	content+="<div class='quote_title'>"+EDITORSTRINGS.TEXT.label_quote+"</div>";
 	lines.forEach(function(quote){			
 		var mechInfo;
 		if(mechBaseInfo){
@@ -2008,14 +2080,14 @@ SRWEditor.prototype.createQuoteContent = function(type, idx, quote, unitBaseInfo
 		
 		//hack to pretend that the quote id is stored for an entire quote instead of for each line of the quote		
 		if(quote.quoteId != null && lineCounter == 0){		
-			content+="<div class='command_label quote_id_label'>Quote ID:</div>";
+			content+="<div class='command_label quote_id_label'>"+EDITORSTRINGS.TEXT.label_quote_id+":</div>";
 			content+="<input class='quote_id' value='"+quote.quoteId+"'></input>";		
 		}	
 		
 		
 		content+="<div data-lineidx='"+(lineCounter)+"'  data-targetunit='"+(quote.unitId)+"'  class='quote_line'>";
 		
-		content+="<div class='line_title'>Line "+(lineCounter+1)+"</div>";		
+		content+="<div class='line_title'>"+EDITORSTRINGS.TEXT.label_line+" "+(lineCounter+1)+"</div>";		
 		content+="<div class='quote_config'>";
 		
 		
@@ -2023,33 +2095,33 @@ SRWEditor.prototype.createQuoteContent = function(type, idx, quote, unitBaseInfo
 		content+="<div class='portrait_preview'></div>";
 		
 		content+="<div class='face_controls'>";
-		content+="<button class='portrait_copy'>Copy Face</button>";
+		content+="<button class='portrait_copy'>"+EDITORSTRINGS.TEXT.label_copy_face+"</button>";
 		if(_this._faceBuffer){
-			content+="<button class='portrait_paste'>Paste Face</button>";
+			content+="<button class='portrait_paste'>"+EDITORSTRINGS.TEXT.label_paste_face+"</button>";
 		}
 		content+="</div>";
 		
 		content+="<div class='face_inputs'>";
 		
-		content+="<div class='command_label '>Face name:</div>";
+		content+="<div class='command_label '>"+EDITORSTRINGS.TEXT.label_face_name+":</div>";
 		content+="<input class='quote_face_name' value='"+quote.faceName+"'></input>";
-		content+="<div class='command_label '>Face index:</div>";
+		content+="<div class='command_label '>"+EDITORSTRINGS.TEXT.label_face_index+":</div>";
 		content+="<input class='quote_face_index' value='"+quote.faceIndex+"'></input>";
 		
 		content+="</div>";
 		
 		
 		content+="<div class='quote_controls'>";
-		content+="<div title='Preview this quote' class='view_text_btn'><img src='"+_this._svgPath+"eye-line.svg'></div>"
-		content+="<div title='Delete this quote' class='delete_text_btn'><img src='"+_this._svgPath+"close-line.svg'></div>"
+		content+="<div title='"+EDITORSTRINGS.TEXT.hint_preview+"' class='view_text_btn'><img src='"+_this._svgPath+"eye-line.svg'></div>"
+		content+="<div title='"+EDITORSTRINGS.TEXT.hint_delete+"' class='delete_text_btn'><img src='"+_this._svgPath+"close-line.svg'></div>"
 		content+="</div>";
 		content+="</div>";
 		
 		content+="<div>";
-		content+="<div class='command_label name'>Name:</div>";
+		content+="<div class='command_label name'>"+EDITORSTRINGS.TEXT.label_name+":</div>";
 		content+="<input class='quote_display_name' value='"+(quote.displayName || "")+"'></input>";
 		
-		content+="<div class='command_label duration'>Duration:</div>";
+		content+="<div class='command_label duration'>"+EDITORSTRINGS.TEXT.label_duration+":</div>";
 		content+="<input class='quote_duration' value='"+(quote.duration ||  "")+"'></input>";
 		content+="</div>";
 		
@@ -2058,17 +2130,17 @@ SRWEditor.prototype.createQuoteContent = function(type, idx, quote, unitBaseInfo
 		
 		if(unitInfo && lineCounter == 0){
 			if(unitInfo.type != "tag"){
-				content+="<div class='command_label '>Other unit:</div>";
+				content+="<div class='command_label '>"+EDITORSTRINGS.TEXT.label_other_unit+":</div>";
 				content+=_this.createUnitSelect(unitInfo.id, unitInfo.type);
 			} else {
-				content+="<div class='command_label '>Tag:</div>";
+				content+="<div class='command_label '>"+EDITORSTRINGS.TEXT.label_tag+":</div>";
 				content+="<input class='quote_tag' value='"+unitInfo.tag+"'></input>";
 			}			
 		}
 	
 		
 		if(mechInfo && lineCounter == 0){
-			content+="<div class='command_label '>Mech:</div>";
+			content+="<div class='command_label '>"+EDITORSTRINGS.TEXT.label_mech+":</div>";
 			content+="<select class='mech_select'>";
 			content+="<option value='-1'></option>";
 			$dataClasses.forEach(function(classInfo){
@@ -2080,7 +2152,7 @@ SRWEditor.prototype.createQuoteContent = function(type, idx, quote, unitBaseInfo
 		}
 		
 		if(targetMechInfo && lineCounter == 0){
-			content+="<div class='command_label '>Target Mech:</div>";
+			content+="<div class='command_label '>"+EDITORSTRINGS.TEXT.label_target_mech+":</div>";
 			content+="<select class='target_mech_select'>";
 			content+="<option value='-1'></option>";
 			$dataClasses.forEach(function(classInfo){
@@ -2282,28 +2354,28 @@ SRWEditor.prototype.showEnvironmentEditorControls = function(){
 		}
 		content+="</select>";
 		content+="<div class='selection_control_buttons'>";
-		content+="<button id='new_def'>New</button>";
-		content+="<button id='copy_def'>Copy</button>";
-		content+="<button id='delete_def'>Delete</button>";
-		content+="<button id='export_def'>Export</button>";
-		content+="<button id='import_def'>Import</button>";
+		content+="<button id='new_def'>"+EDITORSTRINGS.GENERAL.label_new+"</button>";
+		content+="<button id='copy_def'>"+EDITORSTRINGS.GENERAL.label_copy+"</button>";
+		content+="<button id='delete_def'>"+EDITORSTRINGS.GENERAL.label_delete+"</button>";
+		content+="<button id='export_def'>"+EDITORSTRINGS.GENERAL.label_export+"</button>";
+		content+="<button id='import_def'>"+EDITORSTRINGS.GENERAL.label_import+"</button>";
 
 		content+="</div>";
 		content+="</div>";
 		
 		content+="<div id='info_section' class='section'>";
-		content+="<button id='save_def'>Save</button>";
-		content+="<div class='section_label'>Info</div>";
+		content+="<button id='save_def'>"+EDITORSTRINGS.GENERAL.label_save+"</button>";
+		content+="<div class='section_label'>"+EDITORSTRINGS.GENERAL.label_info+"</div>";
 		content+="<div class='section_content'>";
-		content+="Name<input id='def_name' value='"+definitions[_this._currentEnvironmentDefinition].name+"'></input>";
+		content+=""+EDITORSTRINGS.GENERAL.label_name+"<input id='def_name' value='"+definitions[_this._currentEnvironmentDefinition].name+"'></input>";
 		content+="</div>";
 		content+="</div>";
 		
 		content+="<div class='section'>";
-		content+="<div class='section_label'>Layers</div>";
+		content+="<div class='section_label'>"+EDITORSTRINGS.BG.label_layers+"</div>";
 		content+="<div id='timeline_section' class='section_content'>";
 		
-		content+="<button id='new_bg'>New</button>";
+		content+="<button id='new_bg'>"+EDITORSTRINGS.GENERAL.label_new+"</button>";
 		
 		
 		content+="<div class='commands_scroll'>";
@@ -2313,22 +2385,22 @@ SRWEditor.prototype.showEnvironmentEditorControls = function(){
 		bgs.forEach(function(bg){
 			content+="<div data-bgid='"+bg.id+"' class='bg_block tick_block'>";
 			content+="<div class='bg_controls' data-bgid='"+bg.id+"'>";
-			content+="<button class='bg_delete_button'>Delete</button>";	
+			content+="<button class='bg_delete_button'>"+EDITORSTRINGS.GENERAL.label_delete+"</button>";	
 			
-			content+="<div class='bg_label label_visible'>Visible:</div> <input type='checkbox' data-dataid='hidden' class='param_value' "+(!bg.hidden ? "checked" : "")+"></input>";
+			content+="<div class='bg_label label_visible'>"+EDITORSTRINGS.BG.label_visible+":</div> <input type='checkbox' data-dataid='hidden' class='param_value' "+(!bg.hidden ? "checked" : "")+"></input>";
 			content+="</div>";
 			content+="<div data-bgid='"+bg.id+"' class='cmd_block cmd_block_outer'>";
 			content+="<div class='param_values'>";	
-			content+="<div class='bg_label'>Path:</div> <input data-dataid='path' class='param_value' value='"+(bg.path || "")+"'></input>";
-			content+="<div class='bg_label'>Fixed:</div> <input type='checkbox' data-dataid='isfixed' class='param_value' "+(bg.isfixed ? "checked" : "")+"></input>";
+			content+="<div class='bg_label'>"+EDITORSTRINGS.BG.label_path+":</div> <input data-dataid='path' class='param_value' value='"+(bg.path || "")+"'></input>";
+			content+="<div class='bg_label'>"+EDITORSTRINGS.BG.label_fixed+":</div> <input type='checkbox' data-dataid='isfixed' class='param_value' "+(bg.isfixed ? "checked" : "")+"></input>";
 			content+="</div>";
 			content+="<div class='param_values'>";			
-			content+="<div class='bg_label'>Width:</div> <input data-dataid='width' class='param_value' value='"+(bg.width || 0)+"'></input>";
-			content+="<div class='bg_label'>Height: </div><input data-dataid='height' class='param_value' value='"+(bg.height || 0)+"'></input>";
+			content+="<div class='bg_label'>"+EDITORSTRINGS.BG.label_width+":</div> <input data-dataid='width' class='param_value' value='"+(bg.width || 0)+"'></input>";
+			content+="<div class='bg_label'>"+EDITORSTRINGS.BG.label_height+": </div><input data-dataid='height' class='param_value' value='"+(bg.height || 0)+"'></input>";
 			content+="</div>";
 			content+="<div class='param_values'>";
-			content+="<div class='bg_label'>Y Offset: </div><input data-dataid='yoffset' class='param_value' value='"+(bg.yoffset || 0)+"'></input>";
-			content+="<div class='bg_label'>Z Offset: </div><input data-dataid='zoffset' class='param_value' value='"+(bg.zoffset || 0)+"'></input>";
+			content+="<div class='bg_label'>"+EDITORSTRINGS.BG.label_y_offset+": </div><input data-dataid='yoffset' class='param_value' value='"+(bg.yoffset || 0)+"'></input>";
+			content+="<div class='bg_label'>"+EDITORSTRINGS.BG.label_z_offset+": </div><input data-dataid='zoffset' class='param_value' value='"+(bg.zoffset || 0)+"'></input>";
 			content+="</div>";
 			content+="</div>";
 			content+="</div>";
@@ -2359,7 +2431,7 @@ SRWEditor.prototype.showEnvironmentEditorControls = function(){
 		});
 		
 		containerNode.querySelector("#new_def").addEventListener("click", function(){
-			var name = prompt("Please enter a name") || "New Animation";
+			var name = prompt(EDITORSTRINGS.BG.prompt_name) || "New Animation";
 			var newId = _this._environmentBuilder.newDef(name);
 			_this._currentEnvironmentDefinition = newId;
 			_this._modified = true;
@@ -2372,7 +2444,7 @@ SRWEditor.prototype.showEnvironmentEditorControls = function(){
 			_this.showEnvironmentEditorControls();
 		});
 		containerNode.querySelector("#delete_def").addEventListener("click", function(){
-			if(confirm("Delete the current definition?")){
+			if(confirm(EDITORSTRINGS.BG.confirm_delete)){
 				_this._environmentBuilder.deleteDef(_this._currentEnvironmentDefinition);
 				_this._currentEnvironmentDefinition = 0;
 				_this._modified = true;
@@ -2409,7 +2481,7 @@ SRWEditor.prototype.showEnvironmentEditorControls = function(){
 		inputs.forEach(function(tickInput){
 			tickInput.addEventListener("click", function(){
 				var bg = this.parentNode.getAttribute("data-bgid");
-				var c = confirm("Delete this layer?");
+				var c = confirm(EDITORSTRINGS.BG.confirm_delete_layer);
 				if(c){
 					_this._environmentBuilder.deleteBg(_this._currentEnvironmentDefinition, bg);
 					_this._modified = true;
@@ -2557,7 +2629,7 @@ SRWEditor.prototype.showAttackEditor = function(){
 	
 	content+="<div class='camera_info'>";
 	content+="<div class='title'>";
-	content+="Helper";
+	content+=EDITORSTRINGS.ATTACKS.label_helper;
 	content+="<input id='helper_target' value='Camera'></input>";
 	content+="<img id='refresh_camera' src='"+_this._svgPath+"clockwise-rotation.svg'>";
 	
@@ -2582,33 +2654,40 @@ SRWEditor.prototype.showAttackEditor = function(){
 	content+="<div class='preview_extra_controls_flex'>";
 	content+="<div class='preview_extra_controls'>";
 	
+	content+="<div class='extra_control playback'>";
+	content+="<div class='editor_label'>"+EDITORSTRINGS.ATTACKS.label_play_until+"</div>";
+	content+="<input id='inp_play_until'></input>";	
+	content+="<img id='advance' src='"+_this._svgPath+"play-mini-fill.svg'>";
+	content+="<img id='fast_forward' src='"+_this._svgPath+"speed-fill.svg'>";
+	content+="</div>";
+	
 	content+="<div class='extra_control'>";
-	content+="<div class='editor_label'>Play BGM</div>";
+	content+="<div class='editor_label'>"+EDITORSTRINGS.ATTACKS.label_play+"</div>";
 	content+="<input id='chk_play_bgm' checked type='checkbox'></input>";	
 	content+="</div>";
 	
 	
 	content+="<div class='extra_control'>";
-	content+="<div class='editor_label'>Enemy Side</div>";
+	content+="<div class='editor_label'>"+EDITORSTRINGS.ATTACKS.label_enemy_side+"</div>";
 	content+="<input id='chk_enemy_side' type='checkbox'></input>";	
 	content+="</div>";
 	
 	content+="<div class='extra_control'>";
-	content+="<div class='editor_label'>Attack hits</div>";
+	content+="<div class='editor_label'>"+EDITORSTRINGS.ATTACKS.label_hits+"</div>";
 	content+="<input id='chk_hits' checked type='checkbox'></input>";	
 	content+="</div>";
 	
 	content+="<div class='extra_control'>";
-	content+="<div class='editor_label'>Attack destroys</div>";
+	content+="<div class='editor_label'>"+EDITORSTRINGS.ATTACKS.label_destroys+"</div>";
 	content+="<input id='chk_destroys' type='checkbox'></input>";	
 	content+="</div>";	
 	
 	content+="<div class='extra_control'>";
-	content+="<div class='editor_label'>Show Barrier</div>";
+	content+="<div class='editor_label'>"+EDITORSTRINGS.ATTACKS.label_show_barrier+"</div>";
 	content+="<select id='barriers_select'>";
-	content+="<option  value='0'>No</option>";
-	content+="<option  value='1'>Yes</option>";
-	content+="<option  value='2'>Break</option>";
+	content+="<option  value='0'>"+EDITORSTRINGS.GENERAL.label_no+"</option>";
+	content+="<option  value='1'>"+EDITORSTRINGS.GENERAL.label_yes+"</option>";
+	content+="<option  value='2'>"+EDITORSTRINGS.ATTACKS.label_break+"</option>";
 	
 	content+="</select>";
 	//content+="<input id='chk_barriers' type='checkbox'></input>";	
@@ -2618,8 +2697,8 @@ SRWEditor.prototype.showAttackEditor = function(){
 	
 	content+="<div class='preview_extra_controls'>";
 	
-	content+="<div title='The attack for which to show quotes.' class='extra_control'>";
-	content+="<div class='editor_label'>Attack</div>";
+	content+="<div title='"+EDITORSTRINGS.ATTACKS.hint_attack+"' class='extra_control'>";
+	content+="<div class='editor_label'>"+EDITORSTRINGS.ATTACKS.label_attack+"</div>";
 	content+="<select class='has_preference' id='quote_set'>";
 	$dataWeapons.forEach(function(weapon){
 		if(weapon && weapon.name){
@@ -2632,16 +2711,16 @@ SRWEditor.prototype.showAttackEditor = function(){
 	
 	
 	
-	content+="<div title='The environment that will be used for the preview.' class='extra_control'>";
-	content+="<div class='editor_label'>Environment</div>";
+	content+="<div title='"+EDITORSTRINGS.ATTACKS.hint_environment+"' class='extra_control'>";
+	content+="<div class='editor_label'>"+EDITORSTRINGS.ATTACKS.label_environment+"</div>";
 	content+="<select class='has_preference' id='environment_select'>";
 	
 	content+="</select>"
 
 	content+="</div>";
 	
-	content+="<div class='extra_control'>";
-	content+="<div class='editor_label'>Actor</div>";
+	content+="<div title='"+EDITORSTRINGS.ATTACKS.hint_actor+"' class='extra_control'>";
+	content+="<div class='editor_label'>"+EDITORSTRINGS.ATTACKS.label_actor+"</div>";
 	content+="<select class='has_preference' id='actor_select'>";
 	for(var i = 1; i < $dataActors.length; i++){
 		if($dataActors[i].name){
@@ -2652,8 +2731,8 @@ SRWEditor.prototype.showAttackEditor = function(){
 	content+="</select>";
 	content+="</div>";
 	
-	content+="<div class='extra_control'>";
-	content+="<div class='editor_label'>Actor Mech</div>";
+	content+="<div title='"+EDITORSTRINGS.ATTACKS.hint_actor_mech+"' class='extra_control'>";
+	content+="<div class='editor_label'>"+EDITORSTRINGS.ATTACKS.label_actor_mech+"</div>";
 	content+="<select class='has_preference' id='actor_mech_select'>";
 	for(var i = 1; i < $dataClasses.length; i++){
 		if($dataClasses[i].name){
@@ -2664,8 +2743,8 @@ SRWEditor.prototype.showAttackEditor = function(){
 	content+="</select>";
 	content+="</div>";
 	
-	content+="<div class='extra_control'>";
-	content+="<div class='editor_label'>Actor Twin</div>";
+	content+="<div title='"+EDITORSTRINGS.ATTACKS.hint_actor_twin+"' class='extra_control'>";
+	content+="<div class='editor_label'>"+EDITORSTRINGS.ATTACKS.label_actor_twin+"</div>";
 	content+="<select class='has_preference' id='actor_twin_select'>";
 	content+="<option "+(_this._currentActorTwin == -1 ? "selected" : "")+" value='-1'>None</option>";
 	for(var i = 1; i < $dataActors.length; i++){
@@ -2677,8 +2756,8 @@ SRWEditor.prototype.showAttackEditor = function(){
 	content+="</select>";
 	content+="</div>";
 	
-	content+="<div class='extra_control'>";
-	content+="<div class='editor_label'>Actor Twin Mech</div>";
+	content+="<div title='"+EDITORSTRINGS.ATTACKS.hint_actor_twin_mech+"' class='extra_control'>";
+	content+="<div class='editor_label'>"+EDITORSTRINGS.ATTACKS.label_actor_twin_mech+"</div>";
 	content+="<select class='has_preference' id='actor_twin_mech_select'>";
 	content+="<option "+(_this._currentActorTwinMech == -1 ? "selected" : "")+" value='-1'>None</option>";
 	for(var i = 1; i < $dataClasses.length; i++){
@@ -2691,8 +2770,8 @@ SRWEditor.prototype.showAttackEditor = function(){
 	content+="</div>";
 	
 	
-	content+="<div class='extra_control'>";
-	content+="<div class='editor_label'>Enemy</div>";
+	content+="<div title='"+EDITORSTRINGS.ATTACKS.hint_enemy+"' class='extra_control'>";
+	content+="<div class='editor_label'>"+EDITORSTRINGS.ATTACKS.label_enemy+"</div>";
 	content+="<select class='has_preference' id='enemy_select'>";
 	for(var i = 1; i < $dataEnemies.length; i++){
 		if($dataEnemies[i].name){
@@ -2703,8 +2782,8 @@ SRWEditor.prototype.showAttackEditor = function(){
 	content+="</select>";
 	content+="</div>";
 	
-	content+="<div class='extra_control'>";
-	content+="<div class='editor_label'>Enemy Mech</div>";
+	content+="<div title='"+EDITORSTRINGS.ATTACKS.hint_enemy_mech+"' class='extra_control'>";
+	content+="<div class='editor_label'>"+EDITORSTRINGS.ATTACKS.label_enemy_mech+"</div>";
 	content+="<select class='has_preference' id='enemy_mech_select'>";
 	for(var i = 1; i < $dataClasses.length; i++){
 		if($dataClasses[i].name){
@@ -2715,8 +2794,8 @@ SRWEditor.prototype.showAttackEditor = function(){
 	content+="</select>";
 	content+="</div>";
 	
-	content+="<div class='extra_control'>";
-	content+="<div class='editor_label'>Enemy Twin</div>";
+	content+="<div title='"+EDITORSTRINGS.ATTACKS.hint_enemy_twin+"' class='extra_control'>";
+	content+="<div class='editor_label'>"+EDITORSTRINGS.ATTACKS.label_enemy_twin+"</div>";
 	content+="<select class='has_preference' id='enemy_twin_select'>";
 	content+="<option "+(_this._currentEnemyTwin == -1 ? "selected" : "")+" value='-1'>None</option>";
 	for(var i = 1; i < $dataEnemies.length; i++){
@@ -2728,8 +2807,8 @@ SRWEditor.prototype.showAttackEditor = function(){
 	content+="</select>";
 	content+="</div>";
 	
-	content+="<div class='extra_control'>";
-	content+="<div class='editor_label'>Enemy Twin Mech</div>";
+	content+="<div title='"+EDITORSTRINGS.ATTACKS.hint_enemy_twin_mech+"' class='extra_control'>";
+	content+="<div class='editor_label'>"+EDITORSTRINGS.ATTACKS.label_enemy_twin_mech+"</div>";
 	content+="<select class='has_preference' id='enemy_twin_mech_select'>";
 	content+="<option "+(_this._currentEnemyTwinMech == -1 ? "selected" : "")+" value='-1'>None</option>";
 	for(var i = 1; i < $dataClasses.length; i++){
@@ -2862,6 +2941,31 @@ SRWEditor.prototype.showAttackEditor = function(){
 		_this._playBGM = this.checked;
 	});
 	
+	document.querySelector("#inp_play_until").addEventListener("change", function(){
+		let value = this.value * 1;
+		if(!isNaN(value)){
+			_this._playUntil = value;
+		} else {
+			_this._playUntil = -1;
+		}
+		$battleSceneManager.setPlayUntil(_this._playUntil);
+	});
+	
+	document.querySelector("#advance").addEventListener("click", function(){
+		_this._fastForward = false;
+		document.querySelector("#fast_forward").classList.remove("active");
+		$battleSceneManager.advanceTick();
+	});
+	
+	document.querySelector("#fast_forward").addEventListener("click", function(){
+		_this._fastForward = !_this._fastForward;
+		if(_this._fastForward){
+			this.classList.add("active");
+		} else {
+			this.classList.remove("active");
+		}
+	});
+		
 	var preferenceEntries = document.querySelectorAll(".has_preference")
 	preferenceEntries.forEach(function(entry){
 		entry.addEventListener("change", function(){
@@ -2990,7 +3094,7 @@ SRWEditor.prototype.showCameraState = function(){
 				});
 			});
 		} else {
-			cameraInfoContainer.innerHTML = "Couldn't find an object named '"+name+"'";
+			cameraInfoContainer.innerHTML = EDITORSTRINGS.ATTACKS.label_missing_object.replace("[NAME]", name);
 		}
 	}
 }
@@ -3010,38 +3114,38 @@ SRWEditor.prototype.showAttackEditorControls = function(){
 		});
 		content+="</select>";
 		content+="<div class='selection_control_buttons'>";
-		content+="<button id='new_def'>New</button>";
-		content+="<button id='copy_def'>Copy</button>";
-		content+="<button id='delete_def'>Delete</button>";
-		content+="<button id='export_def'>Export</button>";
-		content+="<button id='import_def'>Import</button>";		
+		content+="<button id='new_def'>"+EDITORSTRINGS.GENERAL.label_new+"</button>";
+		content+="<button id='copy_def'>"+EDITORSTRINGS.GENERAL.label_copy+"</button>";
+		content+="<button id='delete_def'>"+EDITORSTRINGS.GENERAL.label_delete+"</button>";
+		content+="<button id='export_def'>"+EDITORSTRINGS.GENERAL.label_export+"</button>";
+		content+="<button id='import_def'>"+EDITORSTRINGS.GENERAL.label_import+"</button>";		
 
 		content+="</div>";
 		content+="</div>";
 		
 		content+="<div id='info_section' class='section'>";
-		content+="<button id='save_def'>Save</button>";
-		content+="<div class='section_label'>Info</div>";
+		content+="<button id='save_def'>"+EDITORSTRINGS.GENERAL.label_save+"</button>";
+		content+="<div class='section_label'>"+EDITORSTRINGS.GENERAL.label_info+"</div>";
 		content+="<div class='section_content'>";
-		content+="Name<input id='def_name' value='"+definitions[_this._currentDefinition].name+"'></input>";
+		content+=EDITORSTRINGS.GENERAL.label_name+"<input id='def_name' value='"+definitions[_this._currentDefinition].name+"'></input>";
 		content+="</div>";
 		content+="</div>";
 		
 		content+="<div class='section'>";
-		content+="<div class='section_label'>Commands</div>";
+		content+="<div class='section_label'>"+EDITORSTRINGS.GENERAL.label_commands+"</div>";
 		content+="<div id='timeline_section' class='section_content'>";
 		
 		content+="<div class='command_tools'>";
-		content+="Sequence<select id='sequence_select'>";
+		content+=EDITORSTRINGS.ATTACKS.label_sequence+"<select id='sequence_select'>";
 		_this._sequenceTypes.forEach(function(sequenceInfo){
 			content+="<option "+(_this._currentSequenceType == sequenceInfo.id ? "selected" : "")+" value='"+sequenceInfo.id+"'>"+sequenceInfo.name+"</option>";
 		});
 		content+="</select>";
 		
-		content+="<button id='new_tick'>New Tick</button>";
+		content+="<button id='new_tick'>"+EDITORSTRINGS.ATTACKS.label_new_tick+"</button>";
 		
 		if(_this._clipboardTick){
-			content+="<button class='tick_paste_button'>Paste</button>";
+			content+="<button class='tick_paste_button'>"+EDITORSTRINGS.GENERAL.label_paste+"</button>";
 		}
 		
 		content+="</div>";
@@ -3060,16 +3164,24 @@ SRWEditor.prototype.showAttackEditorControls = function(){
 			content+="<div data-tick='"+tick+"' class='tick_controls'>";
 			content+="<input class='tick_input' value='"+tick+"'></input>";
 			//content+="<button class='tick_button'>Update</button>";	
-			content+="<button class='tick_delete_button'>Delete</button>";	
-			content+="<button class='tick_shift_button'>Shift</button>";	
-			content+="<button class='tick_copy_button'>Copy</button>";			
+			content+="<button class='tick_delete_button'>"+EDITORSTRINGS.GENERAL.label_delete+"</button>";	
+			content+="<select class='tick_send_select'>";	
+			content+="<option value='-1'>"+EDITORSTRINGS.ATTACKS.label_send_to+"</option>";
+			_this._sequenceTypes.forEach(function(sequenceInfo){
+				if(sequenceInfo.id != _this._currentSequenceType){
+					content+="<option data-name='"+sequenceInfo.name+"' value='"+sequenceInfo.id+"'>"+sequenceInfo.name+"</option>";
+				}				
+			});
+			content+="</select>";	
+			content+="<button class='tick_shift_button'>"+EDITORSTRINGS.ATTACKS.label_shift+"</button>";	
+			content+="<button class='tick_copy_button'>"+EDITORSTRINGS.GENERAL.label_copy+"</button>";			
 			
 			content+="</div>"
 			//content+="<button class='tick_play_button'>Play</button>";				
 			content+="<div>"
-			content+="<button class='tick_add_command'>New</button>";		
+			content+="<button class='tick_add_command'>"+EDITORSTRINGS.GENERAL.label_new+"</button>";		
 			if(_this._clipboardCommand){
-				content+="<button class='tick_paste_command'>Paste</button>";
+				content+="<button class='tick_paste_command'>"+EDITORSTRINGS.GENERAL.label_paste+"</button>";
 			}		
 						
 			content+="</div>"	
@@ -3174,7 +3286,7 @@ SRWEditor.prototype.showAttackEditorControls = function(){
 					var isUsed = _this._animationBuilder.isUsedTick(_this._currentDefinition, _this._currentSequenceType, newTick);
 					var c = true;
 					if(isUsed){
-						var c = confirm("The new tick is already in use, merge the command lists?");
+						var c = confirm(EDITORSTRINGS.ATTACKS.confirm_merge_tick);
 					}
 					if(c){
 						_this._animationBuilder.updateTick(_this._currentDefinition, _this._currentSequenceType, originalTick, newTick);
@@ -3190,7 +3302,7 @@ SRWEditor.prototype.showAttackEditorControls = function(){
 		tickInputs.forEach(function(tickInput){
 			tickInput.addEventListener("click", function(){
 				var tick = this.parentNode.querySelector(".tick_input").value;
-				var c = confirm("Delete this entire tick?");
+				var c = confirm(EDITORSTRINGS.ATTACKS.confirm_delete);
 				if(c){
 					_this._animationBuilder.deleteTick(_this._currentDefinition, _this._currentSequenceType, tick);
 					_this._modified = true;
@@ -3198,11 +3310,30 @@ SRWEditor.prototype.showAttackEditorControls = function(){
 				}			
 			});
 		});	
+		var tickSelects = containerNode.querySelectorAll(".tick_send_select");
+		tickSelects.forEach(function(tickSelect){
+			tickSelect.addEventListener("change", function(){
+				const targetSequence = this.value;
+				if(targetSequence != -1 && targetSequence != _this._currentSequenceType){
+					var tick = this.parentNode.querySelector(".tick_input").value;
+					//var c = confirm("Send the selected tick to the "+this.options[this.selectedIndex ].getAttribute("data-name")+" sequence? (Will merge with existing ticks)");
+					//if(c){
+						const tickCopy = _this._animationBuilder.getTickCopy(_this._currentDefinition, _this._currentSequenceType, tick);	
+						_this._animationBuilder.mergeTickIntoSequence(_this._currentDefinition, targetSequence, tick, tickCopy);	
+						_this._animationBuilder.deleteTick(_this._currentDefinition, _this._currentSequenceType, tick);
+						_this.showAttackEditorControls();		
+					//} else {
+					//	this.value = -1;
+					//}
+				}							
+			});
+		});	
+		
 		
 		var tickInputs = containerNode.querySelectorAll(".tick_shift_button");
 		tickInputs.forEach(function(tickInput){
 			tickInput.addEventListener("click", function(){
-				var amount = (prompt("Shift by how many ticks?") || 0) * 1;
+				var amount = (prompt(EDITORSTRINGS.ATTACKS.prompt_ticks_count) || 0) * 1;
 				if(!isNaN(amount) && amount != 0){
 					var tick = this.parentNode.querySelector(".tick_input").value;					
 					try {
@@ -3235,7 +3366,7 @@ SRWEditor.prototype.showAttackEditorControls = function(){
 						_this._modified = true;
 						_this.showAttackEditorControls();
 					} else {
-						alert("Tick " + _this._clipboardTick + " is already in use!");
+						alert(EDITORSTRINGS.ATTACKS.alert_tick_in_use.replace("[TICK]", _this._clipboardTick));
 					}						
 				}												
 			});
@@ -3482,6 +3613,93 @@ SRWEditor.prototype.showAttackEditorControls = function(){
 			});
 		});
 		
+		var inputs = containerNode.querySelectorAll(".quote_selector_control")
+		inputs.forEach(function(input){
+			input.addEventListener("click", function(){	
+				let targetSelector = this.parentNode.querySelector(".quote_selector");
+				if(targetSelector.getAttribute("data-active") * 1){
+					targetSelector.style.display = "none";
+					targetSelector.setAttribute("data-active", 0);
+				} else {
+					targetSelector.setAttribute("data-active", 1);
+					targetSelector.style.display = "block";
+					let rect = this.getBoundingClientRect();
+					targetSelector.style.top = rect.bottom + "px";
+					targetSelector.style.left = rect.left + "px";
+				}		
+				let value = this.closest(".command_param").querySelector("input").value;	
+				let result = "";
+				
+				let quoteSet = [];
+				try {
+					quoteSet = _this._battleTextBuilder.getDefinitions().default;
+					if(_this._enemySideAttack){
+						quoteSet = quoteSet.enemy[_this._currentEnemy];
+					} else {
+						quoteSet = quoteSet.actor[_this._currentActor];
+					}
+					quoteSet = quoteSet.attacks[_this._currentQuoteSet].default;
+					
+				} catch(e){
+					
+				}	
+				
+				try {
+					if(quoteSet.length){
+						for(let quote of quoteSet){
+							let line = quote[0];
+							result+="<div  data-quoteid='"+line.quoteId+"' class='entry "+(value == line.quoteId ? "selected" : "")+"' >";
+							result+="<div class='display_name'>";
+							let displayName;
+							if(line.displayName){
+								displayName = line.displayName;
+							} else if(_this._enemySideAttack){
+								displayName = $dataEnemies[_this._currentEnemy].name;
+							} else {
+								displayName = $dataActors[_this._currentActor].name;
+							}
+							result+=displayName;
+							result+="</div>";
+							result+="<div>";
+							result+=line.text;
+							result+="</div>";
+							result+="</div>";
+						}
+					} else {
+						result+=EDITORSTRINGS.GENERAL.hint_no_quote;
+					}
+				} catch(e){
+					
+				}
+				targetSelector.innerHTML = result;
+				
+				var inputs = targetSelector.querySelectorAll(".quote_selector .entry")
+				inputs.forEach(function(input){
+					input.addEventListener("click", function(){		
+						let selector = this.parentNode;
+						selector.style.display = "none";
+						selector.setAttribute("data-active", 0);
+						
+						let targetInput = this.closest(".command_param").querySelector("input");				
+						targetInput.value = this.getAttribute("data-quoteid");
+						var event = new Event('change');
+						targetInput.dispatchEvent(event);	
+					});
+				});
+				
+			});
+		});
+		
+		
+		
+		containerNode.querySelector(".commands_scroll").addEventListener("scroll", function(){
+			var selectors = containerNode.querySelectorAll(".quote_selector")
+			selectors.forEach(function(selector){
+				selector.style.display = "none";
+				selector.setAttribute("data-active", 0);
+			});
+		});
+		
 		_this.registerUnloadListener();	
 		
 		
@@ -3573,10 +3791,10 @@ SRWEditor.prototype.getCommandContent = function(command, isInner){
 	var displayInfo = _this.getCommandDisplayInfo(command.type);
 	
 	result+="<div class='command_type command_row'>";
-	result+="<div class='command_label' title='"+displayInfo.desc+"'>Command:</div>";
+	result+="<div class='command_label' title='"+displayInfo.desc+"'>"+EDITORSTRINGS.ATTACKS.label_command+":</div>";
 	result+=_this.getCommandSelect(command.type, isInner);
-	result+="<button class='copy_command'>Copy</button>";
-	result+="<button class='delete_command'>Delete</button>";	
+	result+="<button class='copy_command'>"+EDITORSTRINGS.GENERAL.label_copy+"</button>";
+	result+="<button class='delete_command'>"+EDITORSTRINGS.GENERAL.label_delete+"</button>";	
 	
 	result+="<div class='move_command_buttons'>";
 	result+="<div data-direction='up' class='move_command_button up'>";
@@ -3589,19 +3807,20 @@ SRWEditor.prototype.getCommandContent = function(command, isInner){
 	
 	result+="</div>";
 	
-	if(displayInfo.hasTarget){
-		result+="<div class='command_target command_row'><div class='command_label'>Target: </div><input class='target_input' value='"+command.target+"'></input>"+_this.getTargetSelect(command.target)+"</div>";
+	if(displayInfo.hasTarget){	
+		result+="<div class='command_target command_row'><div class='command_label'>"+EDITORSTRINGS.ATTACKS.label_target+": </div><input class='target_input' value='"+command.target+"'></input>"+_this.getTargetSelect(command.target, displayInfo.isLightCommand)+"</div>";
+	
 	}
 	if(displayInfo.params.length){
 		const aliases = displayInfo.aliases || {};
 		result+="<div class='command_row'>";
-		result+="<div class='params_label'>Parameters</div>";
+		result+="<div class='params_label'>"+EDITORSTRINGS.ATTACKS.label_parameters+"</div>";
 		var params = command.params;
 		displayInfo.params.forEach(function(param){
 			var value = params[param];
 			result+="<div data-param='"+param+"' class='command_param "+(isInner ? "" : "command_param_outer")+"'>";
 			result+="<div title='"+(_this._paramTooltips[param] || "")+"' class='param_label'>"+(aliases[param] || param)+": </div>";
-			result+=_this.getParamContent(param, value);
+			result+=_this.getParamContent(param, value, displayInfo);
 			result+="</div>";
 		});
 		result+="</div>";
@@ -3622,21 +3841,30 @@ SRWEditor.prototype.getCommandSelect = function(command, isInner){
 	return result;
 }
 
-SRWEditor.prototype.getTargetSelect = function(target){
+SRWEditor.prototype.getTargetSelect = function(target, isLightCommand){
 	var _this = this;
 	var result = "";
 	result+="<select class='target_select'>";
 	result+="<option value=''></option>";
-	_this._specialTargets.forEach(function(type){
+	let targets;
+	if(isLightCommand){
+		targets = _this._specialLights;
+	} else {
+		targets = _this._specialTargets;
+	}
+	targets.forEach(function(type){
 		result+="<option "+(target == type.id ? "selected" : "")+" value='"+type.id+"'>"+type.name+"</option>";
 	});
 	result+="</select>";
 	return result;
 }
 
-SRWEditor.prototype.getParamContent = function(param, value){
+SRWEditor.prototype.getParamContent = function(param, value, displayInfo){
 	var _this = this;
 	var result = "";
+	if(displayInfo.paramAlias && displayInfo.paramAlias[param]){
+		param = displayInfo.paramAlias[param];
+	}
 	if(_this._paramDisplayHandlers[param]){
 		result = _this._paramDisplayHandlers[param](value);
 		if(!result){
@@ -3691,10 +3919,13 @@ SRWEditor.prototype.playBattleScene = function(){
 		if(_this._currentQuoteSet){
 			weapon.isAll = ($dataWeapons[_this._currentQuoteSet].meta.weaponIsAll || 0) * 1;
 		}
-		
+		let songId = "";
+		if(_this._playBGM){
+			songId = $songManager.getActorSongInfo(_this._currentActor) || "Battle1";			
+		}
 		var demoConfig = {
 			enemyFirst: _this._enemySideAttack, // if 0 the actor will move first, if 1 the enemy will move first. This also affects the supports. If 0, the actor support will be attacking otherwise defending. If 1, the enemy support will be attacking otherwise defending.
-			songId: _this._playBGM ? "Battle1" : "", // the id of the song that should be played during the battle scene
+			songId: songId, // the id of the song that should be played during the battle scene
 			actor: {
 				id: _this._currentActor, // the id of the actor pilot
 				mechId: _this._currentActorMech, // the id of the actor mech
@@ -3758,7 +3989,10 @@ SRWEditor.prototype.playBattleScene = function(){
 		}
 		
 		$battleSceneManager.setDebugBarriers(_this._previewShowsBarriers);
-		
+		if(this._playUntil){
+			$battleSceneManager.setPlayUntil(this._playUntil);
+		}
+		$battleSceneManager.setFastForward(this._fastForward);
 		$gameMap._interpreter.playBattleScene(demoConfig);
 		this.killAudioAfterScene();
 	}

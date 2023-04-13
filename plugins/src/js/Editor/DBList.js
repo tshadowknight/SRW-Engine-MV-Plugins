@@ -38,9 +38,9 @@ DBList.prototype.show = function(idx, isSearch){
 	
 	content+="<div class='db_list'>";
 	content+="<div class='list_controls'>";
-	content+="<div class='label'>Max. Entries</div><input id='max_entries' value='"+(this._data.length - 1)+"'></input>";
-	content+="<div class='label' id='list_search_label'>Search</div><input id='list_search' value='"+(this._search)+"'></input>";
-	content+="<img title='Clear' id='clear_search' src='"+_this._copyHandler._svgPath+"close-line.svg'>";	
+	content+="<div class='label'>"+EDITORSTRINGS.GENERAL.label_max_entries+"</div><input id='max_entries' value='"+(this._data.length - 1)+"'></input>";
+	content+="<div class='label' id='list_search_label'>"+EDITORSTRINGS.GENERAL.label_search+"</div><input id='list_search' value='"+(this._search)+"'></input>";
+	content+="<img title='"+EDITORSTRINGS.GENERAL.hint_clear+"' id='clear_search' src='"+_this._copyHandler._svgPath+"close-line.svg'>";	
 	content+="</div>";
 	
 	content+="<div class='scroll'>";
@@ -56,12 +56,12 @@ DBList.prototype.show = function(idx, isSearch){
 			content+="<div class='controls' >";
 			if(this._copyHandler.copyIsBuffered()){
 				//content+="<button data-idx='"+i+"' class='paste'>Paste</button>";
-				content+="<img title='Paste' data-idx='"+i+"' class='paste' src='"+_this._copyHandler._svgPath+"paste.svg'>";	
+				content+="<img title='"+EDITORSTRINGS.GENERAL.hint_paste+"' data-idx='"+i+"' class='paste' src='"+_this._copyHandler._svgPath+"paste.svg'>";	
 			}
 			//content+="<button data-idx='"+i+"' class='copy'>Copy</button>";	
-			content+="<img title='Copy' data-idx='"+i+"' class='copy' src='"+_this._copyHandler._svgPath+"copy.svg'>";	
+			content+="<img title='"+EDITORSTRINGS.GENERAL.hint_copy+"' data-idx='"+i+"' class='copy' src='"+_this._copyHandler._svgPath+"copy.svg'>";	
 			
-			content+="<img title='Erase' data-idx='"+i+"' class='delete' src='"+_this._copyHandler._svgPath+"close-line.svg'>";		
+			content+="<img title='"+EDITORSTRINGS.GENERAL.hint_erase+"' data-idx='"+i+"' class='delete' src='"+_this._copyHandler._svgPath+"close-line.svg'>";		
 			content+="</div>";
 			
 			content+="</div>";
@@ -86,7 +86,7 @@ DBList.prototype.hook = function(){
 		if(!isNaN(newCount) && newCount >= 1){
 			var c = true;
 			if(newCount < _this._data.length - 1){
-				c = confirm("Reducing the entry count to this number will discard existing entries. This cannot be undone! Continue?");				
+				c = confirm(EDITORSTRINGS.GENERAL.confirm_remove_entries);				
 			}
 			if(c){
 				_this._callbacks.countChanged(newCount);
