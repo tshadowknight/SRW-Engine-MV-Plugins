@@ -1219,19 +1219,19 @@ BattleSceneManager.prototype.prepareModel = function(root, name, position, flipX
 		if(ENGINE_SETTINGS.BATTLE_SCENE.USE_RENDER_GROUPS){
 			m.renderingGroupId = 2;
 		}
-		
+		/*
 		if(m.id.indexOf("att_") == 0){
 			m.isVisible = false;
 		} else {
-			/*if(m.material){
+			if(m.material){
 				let materialName = name + "__" + m.material.name;
 				if(!_this._materialCache[materialName]){
 					_this._materialCache[materialName] = m.material;
 				}
 				m.material = _this._materialCache[materialName];
-			}*/
+			}
 			
-		}		
+		}	*/	
 		
 		//m.material.backFaceCulling = true;
 		//m.material.transparencyMode = BABYLON.Material.MATERIAL_ALPHATEST;
@@ -1270,6 +1270,32 @@ BattleSceneManager.prototype.prepareModel = function(root, name, position, flipX
 		}
 	}
 	
+	let stack = [];
+	stack.push(body);
+	let attNodes = [];
+	while(stack.length){
+		let current = stack.shift();
+		if(current.id.indexOf("att_") == 0){
+			attNodes.push(current);
+		}
+		
+		let children = current.getChildren();
+		
+		let materialLeaves = {};
+		for(let child of children){		
+			stack.push(child);		
+		}
+	}
+	
+	stack = attNodes;
+	while(stack.length){
+		let current = stack.shift();
+		current.isVisible = false;
+		let children = current.getChildren();
+		for(let child of children){		
+			stack.push(child);		
+		}
+	}
 
 	root.name = name+"_model";
 	
@@ -1833,7 +1859,6 @@ BattleSceneManager.prototype.hookBeforeRender = function(){
 			}
 		}			
 		
-		
 		Object.keys(_this._matrixAnimations).forEach(function(animationId){			
 			var animation = _this._matrixAnimations[animationId];
 			var targetObj = animation.targetObj;
@@ -1888,11 +1913,14 @@ BattleSceneManager.prototype.hookBeforeRender = function(){
 				}	
 				if(targetObj.handle){ //support for effekseer handles
 					targetObj.handle.setLocation(targetObj.position.x, targetObj.position.y, targetObj.position.z);
-					//targetObj.context.update();
+					//do a 0 speed update to rerender the effect at the new location without progressing the animation
+					let oldSpeed = targetObj.handle.speed;
+					targetObj.handle.setSpeed(0);
+					targetObj.context.update();
+					targetObj.handle.setSpeed(oldSpeed);
 				}	
 			}
-		});
-		
+		});	
 		
 		Object.keys(_this._animationBlends).forEach(function(blendId){			
 			var blendInfo = _this._animationBlends[blendId];
@@ -2243,8 +2271,30 @@ BattleSceneManager.prototype.startScene = function(){
 	this._engine.stopRenderLoop();
 	this._scene.render();
 	this._frame = 0;
-
 	
+	
+	this._scene.onBeforeAnimationsObservable.add(() => {
+		var deltaTime = _this._engine.getDeltaTime();
+		var ratio = 1;
+		if(_this.isOKHeld){
+			ratio = 2;
+		}
+		ratio*=_this._animRatio;
+		deltaTime*=ratio;
+		if(_this._fastForward){
+			deltaTime*=5;
+		}
+		
+		
+
+		if(!_this._animsPaused){
+			_this._effksContext.update(60 / _this._engine.getFps() * ratio);
+			_this._effksContextMirror.update(60 / _this._engine.getFps() * ratio);
+			_this._effksContextBg.update(60 / _this._engine.getFps() * ratio);				
+			_this._effksContextBgMirror.update(60 / _this._engine.getFps() * ratio);	
+			_this._effksContextAttached.update();	
+		}	
+	});
 	this._scene.onBeforeRenderObservable.add(() => {
 		var ratio = 1;
 		if(_this.isOKHeld){
@@ -2276,13 +2326,7 @@ BattleSceneManager.prototype.startScene = function(){
 				);
 			}
 		});
-		if(!_this._animsPaused){
-			_this._effksContext.update(60 / _this._engine.getFps() * ratio);
-			_this._effksContextMirror.update(60 / _this._engine.getFps() * ratio);
-			_this._effksContextBg.update(60 / _this._engine.getFps() * ratio);				
-			_this._effksContextBgMirror.update(60 / _this._engine.getFps() * ratio);	
-			_this._effksContextAttached.update();	
-		}		
+			
 		//console.log("_effksContext.update");
 
 	})
@@ -3874,6 +3918,12 @@ BattleSceneManager.prototype.executeAnimation = function(animation, startTick){
 					this.position = new BABYLON.Vector3(x, y, z);
 				}
 				
+				const _setSpeed = handle.setSpeed;
+				handle.setSpeed = function(speed){
+					_setSpeed.call(this, speed);
+					this.speed = speed;
+				}
+				
 				
 				handle.setSpeed(speed);
 				
@@ -4213,20 +4263,72 @@ BattleSceneManager.prototype.executeAnimation = function(animation, startTick){
 		},
 		show_attachment: function(target, params){
 			const targetObj = getTargetObject(target);		
-			targetObj.getChildMeshes().forEach(m => {
+			/*targetObj.getChildMeshes().forEach(m => {
 				if(m.id.indexOf(params.attachId) == 0){
 					m.isVisible = true;
 				}
-			});			
+			});*/		
+			let stack = [];
+			stack.push(targetObj);
+			let attNodes = [];
+			while(stack.length){
+				let current = stack.shift();
+				if(current.id.indexOf(params.attachId) == 0){
+					attNodes.push(current);
+				}
+				
+				let children = current.getChildren();
+				
+				let materialLeaves = {};
+				for(let child of children){		
+					stack.push(child);		
+				}
+			}
+			
+			stack = attNodes;
+			while(stack.length){
+				let current = stack.shift();
+				current.isVisible = true;
+				let children = current.getChildren();
+				for(let child of children){		
+					stack.push(child);		
+				}
+			}
+				
 		},
 		hide_attachment: function(target, params){
 			const targetObj = getTargetObject(target);		
-			targetObj.getChildMeshes().forEach(m => {
+			/*targetObj.getChildMeshes().forEach(m => {
 				if(m.id.indexOf(params.attachId) == 0){
 					m.isVisible = false;
 				}
-			});
+			});*/
+			let stack = [];
+			stack.push(targetObj);
+			let attNodes = [];
+			while(stack.length){
+				let current = stack.shift();
+				if(current.id.indexOf(params.attachId) == 0){
+					attNodes.push(current);
+				}
+				
+				let children = current.getChildren();
+				
+				let materialLeaves = {};
+				for(let child of children){		
+					stack.push(child);		
+				}
+			}
 			
+			stack = attNodes;
+			while(stack.length){
+				let current = stack.shift();
+				current.isVisible = false;
+				let children = current.getChildren();
+				for(let child of children){		
+					stack.push(child);		
+				}
+			}
 		},
 		hide_sprite: function(target, params){
 			var targetObj = getTargetObject(target);
