@@ -1719,7 +1719,7 @@
 			}      
 		};
 		
-		Game_Player.prototype.locate = function(x, y, keepCameraPosition) {
+		Game_Player.prototype.locate = function(x, y, keepCameraPosition, center) {
 			var mapDispCoords = $gameMap.getDisplayPos();
 			var centerX = mapDispCoords.x + this.centerX();
 			var centerY = mapDispCoords.y + this.centerY();
@@ -1729,7 +1729,7 @@
 				
 				var deadZoneY;
 				var deadZoneX;
-				if(ENGINE_SETTINGS.LOCK_CAMERA_TO_CURSOR || $gameTemp.lockCameraToCursor){
+				if(ENGINE_SETTINGS.LOCK_CAMERA_TO_CURSOR || $gameTemp.lockCameraToCursor || center){
 					deadZoneY = 0;
 					deadZoneX = 0;
 				} else {

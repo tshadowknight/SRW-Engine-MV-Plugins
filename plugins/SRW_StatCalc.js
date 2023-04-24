@@ -755,7 +755,8 @@ StatCalc.prototype.resetStageTemp = function(actor){
 			isAI: false,
 			isEssential: false,
 			additionalActions: 0,
-			disabledTurn: -1
+			disabledTurn: -1,
+			popUpAnimsPlayed: {}
 		};
 		this.resetStatus(actor);
 	}
@@ -7242,5 +7243,28 @@ StatCalc.prototype.getTargetScoringFormula = function(actor){
 			return actor.SRWStats.pilot.targetingFormula;
 		}
 	}
+	return result;
+}
+
+StatCalc.prototype.setPopUpAnimPlayed = function(actor, id){
+	if(this.isActorSRWInitialized(actor)){
+		actor.SRWStats.stageTemp.popUpAnimsPlayed[id] = true;
+	}
+}
+
+StatCalc.prototype.getPopUpAnims = function(actor){
+	const _this = this;
+	let result = [];
+	_this.iterateAllActors(null, function(actor){			
+		let mods = _this.getModDefinitions(actor, ["activation_animation"]);
+		if(!actor.SRWStats.stageTemp.popUpAnimsPlayed){
+			actor.SRWStats.stageTemp.popUpAnimsPlayed = {};
+		}	
+		for(let animAbility of mods){
+			if(!actor.SRWStats.stageTemp.popUpAnimsPlayed[animAbility.stackId]){
+				result.push({actor: actor, animId: animAbility.animationId, trackingId: animAbility.stackId});
+			}
+		}
+	});
 	return result;
 }

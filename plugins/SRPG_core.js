@@ -1581,6 +1581,14 @@ SceneManager.isInSaveScene = function(){
 			}
 		}
 		
+		if(!$gameMap._interpreter.isRunning() && $SRWGameState.canShowPopUpAnim()){
+			let animDefs = $statCalc.getPopUpAnims();
+			if(animDefs.length){
+				$gameTemp.popUpAnimQueue = animDefs;
+				$gameTemp.contextState = $gameSystem.isSubBattlePhase();
+				$gameSystem.setSubBattlePhase("popup_anim");
+			}				
+		}
 		
 		if(!$SRWGameState.update(this)) {
 			return;
