@@ -755,7 +755,8 @@ StatCalc.prototype.resetStageTemp = function(actor){
 			isAI: false,
 			isEssential: false,
 			additionalActions: 0,
-			disabledTurn: -1
+			disabledTurn: -1,
+			popUpAnimsPlayed: {}
 		};
 		this.resetStatus(actor);
 	}
@@ -1363,6 +1364,7 @@ StatCalc.prototype.initSRWStats = function(actor, level, itemIds, preserveVolati
 	actor.SRWStats.pilot.name = actor.name();
 	actor.SRWStats.pilot.statsLabel = actorProperties.pilotStatsLabel || "";
 	actor.SRWStats.pilot.usesClassName = actorProperties.pilotUsesClassName * 1;
+	actor.SRWStats.pilot.cutinPath = actorProperties.pilotCutinPath;	
 	
 	actor.SRWStats.pilot.expYield = parseInt(actorProperties.pilotExpYield || 0);
 	actor.SRWStats.pilot.PPYield = parseInt(actorProperties.pilotPPYield || 0);
@@ -3088,8 +3090,14 @@ StatCalc.prototype.getBattleSceneInfo = function(actor){
 		result.deathAnimId = mechProperties.mechBattleSceneDeathAnim;
 		
 		result.yOffset = parseFloat(mechProperties.mechBattleYOffset) || 0;
+		result.xOffset = parseFloat(mechProperties.mechBattleXOffset) || 0;
+		
+		result.centerYOffset =  parseFloat(mechProperties.mechBattleCenterYOffset) || 0;
+		result.centerXOffset =  parseFloat(mechProperties.mechBattleCenterXOffset) || 0;
 		
 		result.scale = parseFloat(mechProperties.mechBattleSceneSpriteScale) || 0;
+		
+		result.BBHack = (mechProperties.mechBattleSceneBBHack || 0) * 1;
 		
 		result.rotation = parseInt(mechProperties.mechBattleSceneSpriteRotation) || 0;
 		
@@ -5722,11 +5730,24 @@ StatCalc.prototype.clearSpiritOnAll = function(type, spirit, factionId){
 	});
 }
 
+StatCalc.prototype.hasTempEffect = function(actor, type){
+	let result = false;
+	if(this.isActorSRWInitialized(actor)){	
+		var tmp = [];
+		actor.SRWStats.pilot.activeEffects.forEach(function(effect){
+			if(effect.type == type){
+				result = true;
+			}
+		});
+	}
+	return result;
+}
+
 StatCalc.prototype.getActiveTempEffects = function(actor){
 	if(this.isActorSRWInitialized(actor)){
 		return actor.SRWStats.pilot.activeEffects;
 	} else {
-		return {};
+		return [];
 	}	
 }	
 
@@ -7222,5 +7243,28 @@ StatCalc.prototype.getTargetScoringFormula = function(actor){
 			return actor.SRWStats.pilot.targetingFormula;
 		}
 	}
+	return result;
+}
+
+StatCalc.prototype.setPopUpAnimPlayed = function(actor, id){
+	if(this.isActorSRWInitialized(actor)){
+		actor.SRWStats.stageTemp.popUpAnimsPlayed[id] = true;
+	}
+}
+
+StatCalc.prototype.getPopUpAnims = function(actor){
+	const _this = this;
+	let result = [];
+	_this.iterateAllActors(null, function(actor){			
+		let mods = _this.getModDefinitions(actor, ["activation_animation"]);
+		if(!actor.SRWStats.stageTemp.popUpAnimsPlayed){
+			actor.SRWStats.stageTemp.popUpAnimsPlayed = {};
+		}	
+		for(let animAbility of mods){
+			if(!actor.SRWStats.stageTemp.popUpAnimsPlayed[animAbility.stackId]){
+				result.push({actor: actor, animId: animAbility.animationId, trackingId: animAbility.stackId});
+			}
+		}
+	});
 	return result;
 }

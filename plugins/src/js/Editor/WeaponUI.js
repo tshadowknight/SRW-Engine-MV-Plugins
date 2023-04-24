@@ -23,7 +23,7 @@ WeaponUI.prototype.initPropertyHandlers = function(){
 				var content = "";
 				content+="<div class='row'>";
 				content+="<div class='cell'>";
-				content+="Name";
+				content+=EDITORSTRINGS.GENERAL.label_name;
 				content+="</div>";
 				content+="<div class='cell'>";
 				content+="<input id='prop_name' value='"+entry.name+"'></input>";
@@ -32,7 +32,7 @@ WeaponUI.prototype.initPropertyHandlers = function(){
 				
 				content+="<div class='row'>";
 				content+="<div class='cell'>";
-				content+="Editor tag";
+				content+=EDITORSTRINGS.GENERAL.label_editor_tag;
 				content+="</div>";
 				content+="<div class='cell'>";
 				content+="<input id='editor_tag' value='"+_this.getMetaValue("editorTag")+"'></input>";
@@ -59,7 +59,7 @@ WeaponUI.prototype.initPropertyHandlers = function(){
 			createControls(){							
 				var content = "";
 				content+="<div title='' class='cell'>";
-				content+="Type";
+				content+=EDITORSTRINGS.WEAPON.label_type;
 				content+="</div>";
 				content+="<div class='cell'>";
 				var value = _this.getMetaValue("weaponType");
@@ -67,8 +67,8 @@ WeaponUI.prototype.initPropertyHandlers = function(){
 					value = "R";
 				}
 				var options = [
-					{name: "Melee", value: "M"},
-					{name: "Ranged", value: "R"},
+					{name: EDITORSTRINGS.WEAPON.label_melee, value: "M"},
+					{name: EDITORSTRINGS.WEAPON.label_ranged, value: "R"},
 				];
 				
 				content+="<select id='wep_type_select'>";
@@ -95,7 +95,7 @@ WeaponUI.prototype.initPropertyHandlers = function(){
 				var content = "";			
 
 				content+="<div class='cell'>";
-				content+="Post Move";
+				content+=EDITORSTRINGS.WEAPON.label_post_move;
 				content+="</div>";	
 				content+="<div class='cell'>";
 				content+="<input id='weapon_post_move' type=checkbox "+(_this.getMetaValue("weaponPostMoveEnabled") * 1 ? "checked" : "")+"></input>";
@@ -111,9 +111,9 @@ WeaponUI.prototype.initPropertyHandlers = function(){
 				});				
 			}
 		}, 	
-		power: handleDefaultProp("weaponPower", "Power"),		
-		min_range: handleDefaultProp("weaponMinRange", "Min Range"),
-		range: handleDefaultProp("weaponRange", "Range"),
+		power: handleDefaultProp("weaponPower", EDITORSTRINGS.WEAPON.label_power),		
+		min_range: handleDefaultProp("weaponMinRange", EDITORSTRINGS.WEAPON.label_min_range),
+		range: handleDefaultProp("weaponRange", EDITORSTRINGS.WEAPON.label_range),
 		terrain: {
 			createControls(){
 				var content = "";
@@ -135,21 +135,21 @@ WeaponUI.prototype.initPropertyHandlers = function(){
 				});
 			}
 		},
-		ammo: handleDefaultProp("weaponAmmo", "Ammo"),
-		EN: handleDefaultProp("weaponEN", "EN"),
-		will: handleDefaultProp("weaponWill", "Will"),
-		hit_mod: handleDefaultProp("weaponHitMod", "Hit Modifier"),
-		crit_mod: handleDefaultProp("weaponCritMod", "Crit Modifier"),
-		category: handleDefaultProp("weaponCategory", "Category"),
-		attr1: handleDefaultProp("weaponAttribute1", "Primary Attribute"),
-		attr2: handleDefaultProp("weaponAttribute2", "Secondary Attribute"),
+		ammo: handleDefaultProp("weaponAmmo", EDITORSTRINGS.WEAPON.label_ammo),
+		EN: handleDefaultProp("weaponEN", EDITORSTRINGS.WEAPON.label_EN),
+		will: handleDefaultProp("weaponWill", EDITORSTRINGS.WEAPON.label_will),
+		hit_mod: handleDefaultProp("weaponHitMod", EDITORSTRINGS.WEAPON.label_hit_mod),
+		crit_mod: handleDefaultProp("weaponCritMod", EDITORSTRINGS.WEAPON.label_crit_mod),
+		category: handleDefaultProp("weaponCategory", EDITORSTRINGS.WEAPON.label_category),
+		attr1: handleDefaultProp("weaponAttribute1", EDITORSTRINGS.WEAPON.label_primary_attr),
+		attr2: handleDefaultProp("weaponAttribute2", EDITORSTRINGS.WEAPON.label_secondary_attr),
 		upgrade_type: {
 			createControls(){
 				var content = "";
 				var idx = _this.getMetaValue("weaponUpgradeType");
 				var options = Object.keys(ENGINE_SETTINGS.WEAPON_UPGRADE_TYPES);
 				content+="<div class='cell'>";
-				content+="Upgrade Type";
+				content+=EDITORSTRINGS.WEAPON.label_upgrade_type;
 				content+="</div>";
 				content+="<div class='cell'>";
 				content+="<select id='weapon_upgrade_type'>";
@@ -186,7 +186,7 @@ WeaponUI.prototype.initPropertyHandlers = function(){
 				var content = "";			
 
 				content+="<div class='cell'>";
-				content+="Always Counter";
+				content+=EDITORSTRINGS.WEAPON.label_always_counter;
 				content+="</div>";	
 				content+="<div class='cell'>";
 				content+="<input id='weapon_is_counter' type=checkbox "+(_this.getMetaValue("weaponIsCounter") * 1 ? "checked" : "")+"></input>";
@@ -207,7 +207,7 @@ WeaponUI.prototype.initPropertyHandlers = function(){
 				var content = "";			
 
 				content+="<div class='cell'>";
-				content+="Only as Counter";
+				content+=EDITORSTRINGS.WEAPON.label_only_counter;
 				content+="</div>";	
 				content+="<div class='cell'>";
 				content+="<input id='weapon_only_counter' type=checkbox "+(_this.getMetaValue("weaponIsCounterOnly") * 1 ? "checked" : "")+"></input>";
@@ -223,13 +223,13 @@ WeaponUI.prototype.initPropertyHandlers = function(){
 				});				
 			}
 		}, 
-		hp_tresh: handleDefaultProp("weaponHPThreshold", "HP Treshold"),
+		hp_tresh: handleDefaultProp("weaponHPThreshold", EDITORSTRINGS.WEAPON.label_HP_treshold),
 		is_all: {
 			createControls(){		
 				var content = "";			
 
 				content+="<div class='cell'>";
-				content+="ALL Weapon";
+				content+=EDITORSTRINGS.WEAPON.label_ALL;
 				content+="</div>";	
 				content+="<div class='cell'>";
 				content+="<input id='weapon_is_ALL' type=checkbox "+(_this.getMetaValue("weaponIsAll") * 1 ? "checked" : "")+"></input>";
@@ -250,7 +250,7 @@ WeaponUI.prototype.initPropertyHandlers = function(){
 				var content = "";			
 
 				content+="<div class='cell'>";
-				content+="Animation";
+				content+=EDITORSTRINGS.WEAPON.label_animation;
 				content+="</div>";
 				content+="<div class='cell'>";
 				content+="<select id='anim_select'>";
@@ -281,7 +281,7 @@ WeaponUI.prototype.initPropertyHandlers = function(){
 				var content = "";
 				content+="<div class='row'>";	
 				content+="<div class='cell'>";
-				content+="Only the first two effects are shown in the UI";
+				content+=EDITORSTRINGS.WEAPON.hint_effects;
 				content+="</div>";
 				content+="</div>";
 				function createEffectControl(idx){					
@@ -343,9 +343,9 @@ WeaponUI.prototype.initPropertyHandlers = function(){
 				content+="<div class='row'>";	
 				content+="<div class='cell'>";
 				if(id != null){
-					content+="Is a Map Attack";
+					content+=EDITORSTRINGS.WEAPON.hint_is_map;
 				} else {
-					content+="Is a Regular Attack";
+					content+=EDITORSTRINGS.WEAPON.hint_is_regular;
 				}				
 				content+="</div>";
 				content+="</div>";
@@ -353,7 +353,7 @@ WeaponUI.prototype.initPropertyHandlers = function(){
 				
 				content+="<div class='row'>";	
 				content+="<div class='cell'>";
-				content+="Attack Id";
+				content+=EDITORSTRINGS.WEAPON.label_attack_id;
 				content+="</div>";
 				content+="<div class='cell'>";
 				content+="<select id='map_attack'>";
@@ -379,7 +379,7 @@ WeaponUI.prototype.initPropertyHandlers = function(){
 				
 				content+="<div class='row'>";	
 				content+="<div class='cell'>";
-				content+="Ignore Friendlies";
+				content+=EDITORSTRINGS.WEAPON.label_ignore_friendlies;
 				content+="</div>";	
 				content+="<div class='cell'>";
 				content+="<input id='map_ignore_friendlies' type=checkbox "+(_this.getMetaValue("weaponIgnoresFriendlies") * 1 ? "checked" : "")+"></input>";
@@ -450,13 +450,13 @@ WeaponUI.prototype.initPropertyHandlers = function(){
 				content+="<div class='row'>";	
 		
 				content+="<div title='' class='cell'>";
-				content+="Type";
+				content+=EDITORSTRINGS.WEAPON.label_combo_type;
 				content+="</div>";
 				content+="<div class='cell'>";
 				var value = _this.getMetaValue("weaponComboType");
 				var options = [
-					{name: "Adjacent", value: "0"},
-					{name: "On Map", value: "1"},
+					{name: EDITORSTRINGS.WEAPON.label_adjacent, value: "0"},
+					{name: EDITORSTRINGS.WEAPON.label_on_map, value: "1"},
 				];
 				content+="<select id='combo_type_select'>";
 				for(var i = 0; i < options.length; i++){				
@@ -471,7 +471,7 @@ WeaponUI.prototype.initPropertyHandlers = function(){
 				content+="<div class='row'>";	
 		
 				content+="<div title='' class='cell'>";
-				content+="Required Weapons";
+				content+=EDITORSTRINGS.WEAPON.label_required_weapons;
 				content+="</div>";
 				content+="</div>";
 				
@@ -605,8 +605,8 @@ WeaponUI.prototype.show = async function(){
 	content+="</div>";
 	content+="<div class='edit_pane'>";
 	content+="<div class='controls'>";
-	content+="<button class='cancel'>Cancel</button>";
-	content+="<button class='save'>Save</button>";	
+	content+="<button class='cancel'>"+EDITORSTRINGS.GENERAL.label_cancel+"</button>";
+	content+="<button class='save'>"+EDITORSTRINGS.GENERAL.label_save+"</button>";	
 	content+="</div>";
 	content+="<div class='main_info'>";
 	content+="<div class='row'>";
@@ -655,7 +655,7 @@ WeaponUI.prototype.show = async function(){
 	
 	content+="<div class='section'>";
 	content+="<div class='title abilities'>";
-	content+="Attributes";	
+	content+=EDITORSTRINGS.WEAPON.label_attributes;	
 	content+="</div>";
 	content+="<div class='content' style='display: block;'>";
 	
@@ -663,7 +663,7 @@ WeaponUI.prototype.show = async function(){
 	
 	content+="<div class='row numeric'>";
 	content+="<div class='cell'>";
-	content+="-1 means no cost or requirement";
+	content+=EDITORSTRINGS.WEAPON.hint_no_cost;	
 	content+="</div>";
 	content+="</div>";
 	content+="<div class='table' style='width: 100%;'>";
@@ -720,7 +720,7 @@ WeaponUI.prototype.show = async function(){
 	content+="<div class='row'>";
 	content+="<div class='section'>";
 	content+="<div class='title abilities'>";
-	content+="Effects";	
+	content+=EDITORSTRINGS.WEAPON.label_effects;	
 	content+="</div>";
 	content+="<div class='content' style='display: block;'>";
 	content+="<div class='table'>";		
@@ -733,7 +733,7 @@ WeaponUI.prototype.show = async function(){
 	
 	content+="<div class='section'>";
 	content+="<div class='title abilities'>";
-	content+="Map Attack";	
+	content+=EDITORSTRINGS.WEAPON.label_map_attack;	
 	content+="</div>";
 	content+="<div class='content' style='display: block;'>";
 	content+="<div class='table'>";		
@@ -753,7 +753,7 @@ WeaponUI.prototype.show = async function(){
 	content+="<div class='row'>";
 	content+="<div class='section'>";
 	content+="<div class='title abilities'>";
-	content+="Combo Attack";	
+	content+=EDITORSTRINGS.WEAPON.label_combo_attack;	
 	content+="</div>";
 	content+="<div class='content' style='display: block;'>";
 	
@@ -818,7 +818,7 @@ WeaponUI.prototype.hook = function(){
 	_this._container.querySelector(".edit_pane .controls .cancel").addEventListener("click", function(){
 		var c = true;
 		if(_this._mainUIHandler.isModified()){
-			c = confirm("Discard all unsaved changes?");
+			c = confirm(EDITORSTRINGS.GENERAL.confirm_discard_unchaged);
 		}
 		if(c){
 			_this._data = null;

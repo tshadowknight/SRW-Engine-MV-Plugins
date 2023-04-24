@@ -119,7 +119,7 @@ MapAttackUI.prototype.show = async function(){
 	if(_this._managedMapAttack == null){
 		content+=_this._currentEntry.name;
 	} else {
-		content+="Map Attack #"+String(_this._managedMapAttack).padStart(3,0)+" "+_this._currentEntry.name;
+		content+=EDITORSTRINGS.WEAPON.label_map_attack+" #"+String(_this._managedMapAttack).padStart(3,0)+" "+_this._currentEntry.name;
 	}
 	
 	content+="<img id='close_map_changes' class='remove_button' src='"+_this._svgPath+"/close-line.svg'>";
@@ -132,7 +132,7 @@ MapAttackUI.prototype.show = async function(){
 	
 	content+="<div class='target_control'>";
 	content+="<div class='label'>";
-	content+="Name";
+	content+=EDITORSTRINGS.GENERAL.label_name;
 	content+="</div>";
 	content+="<input value='"+_this._currentEntry.name+"' id='map_att_name'></input>"		
 	content+="</div>";
@@ -140,13 +140,13 @@ MapAttackUI.prototype.show = async function(){
 	content+="<div class='section animation'>";
 	content+="<div class='target_control title'>";
 	content+="<div class='label'>";
-	content+="Animation";
+	content+=EDITORSTRINGS.WEAPON.label_animation;
 	content+="</div>";
 	
 	content+="</div>";
 	content+="<div class='target_control'>";
 	content+="<div class='label'>";
-	content+="Id";
+	content+=EDITORSTRINGS.WEAPON.label_id;
 	content+="</div>";
 	
 	content+="<select id='map_att_anim'>";
@@ -160,7 +160,7 @@ MapAttackUI.prototype.show = async function(){
 	
 	content+="<div class='target_control'>";
 	content+="<div class='label'>";
-	content+="Scale";
+	content+=EDITORSTRINGS.WEAPON.label_scale;
 	content+="</div>";
 	
 	content+="<input value='"+_this._currentEntry.animInfo.scale+"' id='map_att_anim_scale'></input>"	
@@ -169,7 +169,7 @@ MapAttackUI.prototype.show = async function(){
 	
 	content+="<div class='target_control'>";
 	content+="<div class='label'>";
-	content+="Offsets";
+	content+=EDITORSTRINGS.WEAPON.label_offsets;
 	content+="</div>";
 	content+="</div>";
 	
@@ -199,10 +199,10 @@ MapAttackUI.prototype.show = async function(){
 		return content;
 	}
 	
-	content+=createOffsetRow("up", "Up");
-	content+=createOffsetRow("down", "Down");
-	content+=createOffsetRow("left", "Left");
-	content+=createOffsetRow("right", "Right");
+	content+=createOffsetRow("up", EDITORSTRINGS.WEAPON.label_up);
+	content+=createOffsetRow("down", EDITORSTRINGS.WEAPON.label_down);
+	content+=createOffsetRow("left", EDITORSTRINGS.WEAPON.label_left);
+	content+=createOffsetRow("right", EDITORSTRINGS.WEAPON.label_right);
 	
 	
 	content+="</div>";
@@ -211,7 +211,7 @@ MapAttackUI.prototype.show = async function(){
 	content+="<div class='section animation'>";
 	content+="<div class='target_control title'>";
 	content+="<div class='label'>";
-	content+="Text Box";
+	content+=EDITORSTRINGS.WEAPON.label_text_box;
 	content+="</div>";
 	content+="</div>";
 	content+="<div class='target_control'>";
@@ -226,20 +226,20 @@ MapAttackUI.prototype.show = async function(){
 	
 	content+="<div class='target_control'>";
 	content+="<div class='label secondary'>";
-	content+="Edit secondary pattern";
+	content+=EDITORSTRINGS.WEAPON.label_edit_secondary_pattern;
 	content+="</div>";
 	content+="<input type=checkbox "+(_this._editSecondary ? "checked" : "")+" id='edit_secondary'></input>"	
 	
-	content+="<button id='map_choose_retarget_center'>Choose Center</button>";
+	content+="<button id='map_choose_retarget_center'>"+EDITORSTRINGS.WEAPON.label_choose_center+"</button>";
 	if(_this._chooseCenter){		
-		content+="Select a center tile";	
+		content+=EDITORSTRINGS.WEAPON.hint_choose_center;	
 	}
 	
 	content+="</div>";
 	
 	content+="<div class='target_control'>";
 	content+="<div class='label'>";
-	content+="Lock Rotation";
+	content+=EDITORSTRINGS.WEAPON.label_lock_rotation;
 	content+="</div>";
 	content+="<input type=checkbox "+(_this._currentEntry.lockRotation ? "checked" : "")+" id='lock_att_rotation'></input>"	
 	content+="<div class='direction_control_container "+(_this._currentEntry.lockRotation ? "locked" : "")+"'>";	
@@ -344,9 +344,9 @@ MapAttackUI.prototype.show = async function(){
 	content+="</div>";
 	
 	content+="<div class='controls'>";
-	content+="<button id='apply_map_changes'>Save</button>";
+	content+="<button id='apply_map_changes'>"+EDITORSTRINGS.GENERAL.label_save+"</button>";
 	if(_this._managedMapAttack != null){
-		content+="<button id='delete_map_att'>Delete</button>";
+		content+="<button id='delete_map_att'>"+EDITORSTRINGS.GENERAL.label_delete+"</button>";
 	}
 	
 	content+="</div>";
@@ -449,7 +449,7 @@ MapAttackUI.prototype.hook = function(){
 	
 	if(_this._managedMapAttack != null){
 		this._container.querySelector("#delete_map_att").addEventListener("click", async function(){
-			var c = confirm("Remove this map attack?");
+			var c = confirm(EDITORSTRINGS.WEAPON.confirm_remove_MAP);
 			if(c){
 				_this._data.splice(_this._managedMapAttack, 1);
 				_this.save();

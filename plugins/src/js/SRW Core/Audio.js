@@ -31,10 +31,12 @@
 		AudioManager.playSe = function(se) {
 			if (se.name && !$gameTemp.isSkippingEvents) {
 				this._seBuffers = this._seBuffers.filter(function(audio) {
-					return audio.isPlaying();
+					return audio._isStarting || audio.isPlaying();
 				});
 				var buffer = this.createBuffer('se', se.name);
 				this.updateSeParameters(buffer, se);
+				buffer._seName = se.name;
+				buffer._isStarting = true;
 				AudioManager.seStates[se.name] = false;
 				buffer.play(false);
 				buffer._stopListeners.push(function(){
@@ -43,6 +45,8 @@
 				this._seBuffers.push(buffer);
 			}
 		};
+		
+		
 		
 		AudioManager.isPlayingSE = function(){
 			let result = false;
@@ -65,24 +69,26 @@
 			}
 		};
 		
-		AudioManager.playSe = function(se) {
-			if (se.name) {
-				this._seBuffers = this._seBuffers.filter(function(audio) {
-					return audio.isPlaying();
-				});
-				var buffer = this.createBuffer('se', se.name);
-				buffer._seName = se.name;
-				this.updateSeParameters(buffer, se);
-				buffer.play(false);
-				this._seBuffers.push(buffer);
-			}
-		};
-		
 		AudioManager.fadeOutSe = function(seName, duration) {
 			this._seBuffers.forEach(function(buffer) {
 				if(buffer._seName == seName){
 					buffer.fadeOut(duration);
 				}
 			});
+		};
+		
+		WebAudio.prototype.play = function(loop, offset) {
+			if (this.isReady()) {
+				offset = offset || 0;
+				this._isStarting = false;
+				this._startPlaying(loop, offset);
+			} else if (WebAudio._context) {
+				this._autoPlay = true;
+				this.addLoadListener(function() {
+					if (this._autoPlay) {
+						this.play(loop, offset);
+					}
+				}.bind(this));
+			}
 		};
 	}

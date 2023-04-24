@@ -1907,4 +1907,46 @@ $SRWConfig.pilotAbilties = function(){
 			return true;		
 		}
 	);	
+	
+	this.addDefinition(
+		94, 
+		"Test Activation Animation",
+		"This ability does nothing but play an animation when it becomes active.",
+		false,
+		false,
+		function(actor, level){
+			return [
+				{type: "activation_animation", animationId: 48},				
+			];
+		},
+		function(actor, level){
+			return $statCalc.getCurrentWill(actor) >= 130;
+		},
+		[0],
+		1,
+		function(actor, level){
+			return $statCalc.getCurrentWill(actor) >= 130 ? "on" : "off";
+		},
+	);
+	
+	this.addDefinition(
+		95, 
+		"Test Activation Animation 2",
+		"This ability does nothing but play an animation when it becomes active.",
+		false,
+		false,
+		function(actor, level){
+			return [
+				{type: "activation_animation", animationId: 51},				
+			];
+		},
+		function(actor, level){
+			return $statCalc.getCurrentWill(actor) >= 130;
+		},
+		[0],
+		1,
+		function(actor, level){
+			return $statCalc.getCurrentWill(actor) >= 130 ? "on" : "off";
+		},
+	);
 }

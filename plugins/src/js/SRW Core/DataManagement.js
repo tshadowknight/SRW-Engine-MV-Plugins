@@ -282,10 +282,10 @@
 				await loadConfigFile(base+'js/plugins/config/default/Appstrings.conf.js');
 				
 				var APPSTRINGS_DEFAULT = window.APPSTRINGS;
+				var EDITORSTRINGS_DEFAULT = window.EDITORSTRINGS;
 				
-				//if (fs.existsSync(base+'js/plugins/config/active/Appstrings.conf.js')) {
-					await loadConfigFile(base+'js/plugins/config/active/Appstrings.conf.js');						
-				//}		
+				await loadConfigFile(base+'js/plugins/config/active/Appstrings.conf.js');						
+					
 				
 				var errors = [];
 				Object.keys(configResults).forEach(function(type){
@@ -313,6 +313,7 @@
 							
 					updateFromDefault(ENGINE_SETTINGS_DEFAULT, window.ENGINE_SETTINGS);					
 					updateFromDefault(APPSTRINGS_DEFAULT, window.APPSTRINGS);
+					updateFromDefault(EDITORSTRINGS_DEFAULT, window.EDITORSTRINGS);
 				
 					$spiritManager.initDefinitions();
 					$pilotAbilityManager.initDefinitions();

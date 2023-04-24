@@ -143,7 +143,7 @@ EditorUI.prototype.createTerrainControls = function(key, name){
 	var content = "";
 	
 	content+="<div class='cell'>";
-	content+=name || "Terrain";
+	content+=EDITORSTRINGS.GENERAL.label_terrain || "Terrain";
 	content+="</div>";
 	content+="<div class='cell'>";
 	content+="<div class='terrain_container'>";

@@ -56,7 +56,7 @@ AllyPilotUI.prototype.initPropertyHandlers = function(){
 				var content = "";
 				content+="<div class='row'>";
 				content+="<div class='cell'>";
-				content+="Name";
+				content+=EDITORSTRINGS.PILOT.label_name;
 				content+="</div>";
 				content+="<div class='cell'>";
 				content+="<input id='prop_name' value='"+entry.name+"'></input>";
@@ -68,7 +68,7 @@ AllyPilotUI.prototype.initPropertyHandlers = function(){
 				
 				content+="<div class='row'>";
 				content+="<div class='cell'>";
-				content+="Use Mech Name";
+				content+=EDITORSTRINGS.PILOT.label_use_mech_name;
 				content+="</div>";
 				content+="<div class='cell'>";
 				content+="<input id='use_classname' type=checkbox "+(_this.getMetaValue("pilotUsesClassName")*1 ? "checked" : "")+"></input>";
@@ -77,7 +77,7 @@ AllyPilotUI.prototype.initPropertyHandlers = function(){
 				
 				content+="<div class='row'>";
 				content+="<div class='cell'>";
-				content+="Editor tag";
+				content+=EDITORSTRINGS.GENERAL.label_editor_tag;
 				content+="</div>";
 				content+="<div class='cell'>";
 				content+="<input id='editor_tag' value='"+_this.getMetaValue("editorTag")+"'></input>";
@@ -86,7 +86,7 @@ AllyPilotUI.prototype.initPropertyHandlers = function(){
 				
 				content+="<div class='row'>";
 				content+="<div class='cell'>";
-				content+="Stats Label";
+				content+=EDITORSTRINGS.PILOT.label_stats_label;
 				content+="</div>";
 				content+="<div class='cell'>";
 				content+="<input id='stats_name' value='"+_this.getMetaValue("pilotStatsLabel")+"'></input>";
@@ -125,7 +125,7 @@ AllyPilotUI.prototype.initPropertyHandlers = function(){
 				var content = "";
 				content+="<div class='row'>";
 				content+="<div class='cell'>";
-				content+="Default Mech";
+				content+=EDITORSTRINGS.PILOT.label_default_mech;
 				content+="</div>";
 				content+="<div class='cell'>";
 				content+="<select id='prop_default_mech'>";
@@ -163,7 +163,7 @@ AllyPilotUI.prototype.initPropertyHandlers = function(){
 					
 					if(type == "flat"){
 						content+="<div class='cell'>";
-						content+="Rate";
+						content+=EDITORSTRINGS.PILOT.label_rate;
 						content+="</div>";
 						content+="<div class='cell'>";
 						content+="<input id='prop_"+prop+"_flat_rate' value='"+parts[0]+"'></input>";
@@ -175,14 +175,14 @@ AllyPilotUI.prototype.initPropertyHandlers = function(){
 						content+="</div>";
 					} else {
 						content+="<div class='cell'>";
-						content+="Rate";
+						content+=EDITORSTRINGS.PILOT.label_rate;
 						content+="</div>";
 						content+="<div class='cell'>";
 						content+="<input id='prop_"+prop+"_curve_rate' value='"+parts[1]+"'></input>";
 						content+="</div>";
 						
 						content+="<div class='cell'>";
-						content+="Max";
+						content+=EDITORSTRINGS.PILOT.label_max;
 						content+="</div>";
 						content+="<div class='cell'>";
 						content+="<input id='prop_"+prop+"_curve_max' value='"+parts[0]+"'></input>";
@@ -192,37 +192,37 @@ AllyPilotUI.prototype.initPropertyHandlers = function(){
 				}
 				var content = "";
 				content+="<div class='row'>";	
-				content+=_this.createValueInput("pilotBaseSP", "SP");
+				content+=_this.createValueInput("pilotBaseSP", EDITORSTRINGS.PILOT.label_SP);
 				content+=createGrowthControls("pilotSPGrowth");
 				content+="</div>";
 				
 				content+="<div class='row'>";	
-				content+=_this.createValueInput("pilotBaseMelee", "Melee");
+				content+=_this.createValueInput("pilotBaseMelee", EDITORSTRINGS.PILOT.label_melee);
 				content+=createGrowthControls("pilotMeleeGrowth");
 				content+="</div>";
 				
 				content+="<div class='row'>";	
-				content+=_this.createValueInput("pilotBaseRanged", "Ranged");
+				content+=_this.createValueInput("pilotBaseRanged", EDITORSTRINGS.PILOT.label_ranged);
 				content+=createGrowthControls("pilotRangedGrowth");
 				content+="</div>";
 				
 				content+="<div class='row'>";	
-				content+=_this.createValueInput("pilotBaseSkill", "Skill");
+				content+=_this.createValueInput("pilotBaseSkill", EDITORSTRINGS.PILOT.label_skill);
 				content+=createGrowthControls("pilotSkillGrowth");
 				content+="</div>";
 				
 				content+="<div class='row'>";	
-				content+=_this.createValueInput("pilotBaseDefense", "Defense");
+				content+=_this.createValueInput("pilotBaseDefense", EDITORSTRINGS.PILOT.label_defense);
 				content+=createGrowthControls("pilotDefenseGrowth");
 				content+="</div>";
 				
 				content+="<div class='row'>";	
-				content+=_this.createValueInput("pilotBaseEvade", "Evade");
+				content+=_this.createValueInput("pilotBaseEvade", EDITORSTRINGS.PILOT.label_evade);
 				content+=createGrowthControls("pilotEvadeGrowth");
 				content+="</div>";
 				
 				content+="<div class='row'>";	
-				content+=_this.createValueInput("pilotBaseHit", "Hit");
+				content+=_this.createValueInput("pilotBaseHit", EDITORSTRINGS.PILOT.label_hit);
 				content+=createGrowthControls("pilotHitGrowth");
 				content+="</div>";
 				return content;
@@ -334,17 +334,17 @@ AllyPilotUI.prototype.initPropertyHandlers = function(){
 				});
 			}
 		},
-		exp_yield: handleDefaultProp("pilotExpYield", "Exp. Yield"),
-		pp_yield: handleDefaultProp("pilotPPYield", "PP Yield"),
-		tags: handleDefaultProp("pilotTags", "Tags"),
-		target_formula: handleDefaultProp("pilotTargetingFormula", "Targeting Formula"),
+		exp_yield: handleDefaultProp("pilotExpYield", EDITORSTRINGS.PILOT.label_exp_yield),
+		pp_yield: handleDefaultProp("pilotPPYield", EDITORSTRINGS.PILOT.label_pp_yield),
+		tags: handleDefaultProp("pilotTags", EDITORSTRINGS.PILOT.label_tags),
+		target_formula: handleDefaultProp("pilotTargetingFormula", EDITORSTRINGS.PILOT.label_target_formula),
 		text_alias:{
 			createControls(){
 	
 				var content = "";
 				content+="<div class='row'>";
 				content+="<div class='cell'>";
-				content+="Battle Text Alias";
+				content+=EDITORSTRINGS.PILOT.label_text_alias;
 				content+="</div>";
 				content+="<div class='cell'>";
 				content+="<select id='prop_text_alias'>";
@@ -394,13 +394,13 @@ AllyPilotUI.prototype.initPropertyHandlers = function(){
 					content+="</select>";
 					content+="</div>";
 					content+="<div class='cell'>";
-					content+="Level";
+					content+=EDITORSTRINGS.PILOT.label_level;
 					content+="</div>";
 					content+="<div class='cell'>";
 					content+="<input data-idx='"+idx+"' id='spirit_learned_"+idx+"' value='"+learnedAt+"'></input>";
 					content+="</div>";
 					content+="<div class='cell'>";
-					content+="Cost";
+					content+=EDITORSTRINGS.PILOT.label_cost;
 					content+="</div>";
 					content+="<div class='cell'>";
 					content+="<input data-idx='"+idx+"' id='spirit_cost_"+idx+"' value='"+cost+"'></input>";
@@ -462,7 +462,7 @@ AllyPilotUI.prototype.initPropertyHandlers = function(){
 				
 				content+="<div class='row'>";	
 				content+="<div class='cell'>";
-				content+="Twin";
+				content+=EDITORSTRINGS.PILOT.label_twin;
 				content+="</div>";
 				content+="<div class='cell'>";
 				content+="<select id='spirit_select_twin'>";
@@ -476,7 +476,7 @@ AllyPilotUI.prototype.initPropertyHandlers = function(){
 				content+="</select>";
 				content+="</div>";
 				content+="<div class='cell'>";
-				content+="Cost";
+				content+=EDITORSTRINGS.PILOT.label_cost;
 				content+="</div>";
 				content+="<div class='cell'>";
 				content+="<input id='spirit_cost_twin' value='"+cost+"'></input>";
@@ -541,7 +541,7 @@ AllyPilotUI.prototype.initPropertyHandlers = function(){
 					content+="</select>";
 					content+="</div>";
 					content+="<div class='cell'>";
-					content+="Ability Level";
+					content+=EDITORSTRINGS.PILOT.label_ability_level;
 					content+="</div>";
 					content+="<div class='cell'>";
 					//content+="<input data-idx='"+idx+"' id='ability_level_"+idx+"' value='"+abilityLevel+"'></input>";
@@ -559,7 +559,7 @@ AllyPilotUI.prototype.initPropertyHandlers = function(){
 					
 					content+="</div>";
 					content+="<div class='cell'>";
-					content+="Learned At";
+					content+=EDITORSTRINGS.PILOT.label_learned_at;
 					content+="</div>";
 					content+="<div class='cell'>";
 					content+="<input data-idx='"+idx+"' id='ability_learned_"+idx+"' value='"+requiredLevel+"'></input>";
@@ -629,7 +629,7 @@ AllyPilotUI.prototype.initPropertyHandlers = function(){
 				}				
 					
 				content+="<div class='cell'>";
-				content+="Ace Ability";
+				content+=EDITORSTRINGS.PILOT.label_ace_ability;
 				content+="</div>";
 				content+="<div class='cell'>";
 				content+="<select  id='ability_select_ace'>";
@@ -654,12 +654,38 @@ AllyPilotUI.prototype.initPropertyHandlers = function(){
 				});					
 			}
 		},
-		will_on_hit: handleDefaultProp("pilotOnHitWill", "On Hitting a Target"),
-		will_on_miss: handleDefaultProp("pilotOnMissWill", "On Missing a Target"),
-		will_on_damage: handleDefaultProp("pilotOnDamageWill", "On Taking Damage"),
-		will_on_evade: handleDefaultProp("pilotOnEvadeWill", "On Evading"),
-		will_on_destroy: handleDefaultProp("pilotOnDestroyWill", "On Destroying"),
-		will_on_ally_down: handleDefaultProp("pilotOnAllyDownWill", "On Ally Destroyed"),
+		will_on_hit: handleDefaultProp("pilotOnHitWill", EDITORSTRINGS.PILOT.label_will_on_hit),
+		will_on_miss: handleDefaultProp("pilotOnMissWill", EDITORSTRINGS.PILOT.label_will_on_miss),
+		will_on_damage: handleDefaultProp("pilotOnDamageWill", EDITORSTRINGS.PILOT.label_will_on_damage),
+		will_on_evade: handleDefaultProp("pilotOnEvadeWill", EDITORSTRINGS.PILOT.label_will_on_evade),
+		will_on_destroy: handleDefaultProp("pilotOnDestroyWill", EDITORSTRINGS.PILOT.label_will_on_destroy),
+		will_on_ally_down: handleDefaultProp("pilotOnAllyDownWill", EDITORSTRINGS.PILOT.label_will_on_ally_down),
+		assets: {
+			createControls(entry){
+				entry = _this.getCurrentEntry();
+				var content = "";			
+			
+				content+="<div class='cell'>";
+				content+=EDITORSTRINGS.PILOT.label_cutin_path;
+				content+="</div>";
+				content+="<div class='cell'>";
+				content+="img/SRWBattleScene/";
+				
+				content+="<input id='cutin_path' value='"+_this.getMetaValue("pilotCutinPath")+"'></input>";
+				content+=".png";
+				content+="</div>";
+				
+				return content;
+			},
+			hook(entry){
+				entry = _this.getCurrentEntry();
+				containerNode.querySelector("#cutin_path").addEventListener("change", function(){
+					_this.setMetaValue("pilotCutinPath", this.value);
+					_this.show();
+					_this._mainUIHandler.setModified();
+				});						
+			}
+		},
 		relationships: {
 			createControls(){		
 				var abilityDefs = $relationshipBonusManager.getDefinitions()
@@ -678,7 +704,7 @@ AllyPilotUI.prototype.initPropertyHandlers = function(){
 					content+="#"+String(idx).padStart(2,0);
 					content+="</div>";
 					content+="<div class='cell'>";
-					content+="Receiving Pilot";
+					content+=EDITORSTRINGS.PILOT.label_receiving;
 					content+="</div>";
 					content+="<div class='cell'>";
 					content+="<select data-idx='"+idx+"' id='rel_pilot_select_"+idx+"'>";
@@ -690,7 +716,7 @@ AllyPilotUI.prototype.initPropertyHandlers = function(){
 					content+="</select>";
 					content+="</div>";
 					content+="<div class='cell'>";
-					content+="Effect";
+					content+=EDITORSTRINGS.PILOT.label_effect;
 					content+="</div>";
 					content+="<div class='cell'>";
 					//content+="<input data-idx='"+idx+"' id='ability_level_"+idx+"' value='"+abilityLevel+"'></input>";
@@ -707,7 +733,7 @@ AllyPilotUI.prototype.initPropertyHandlers = function(){
 					
 					content+="</div>";
 					content+="<div class='cell'>";
-					content+="Level";
+					content+=EDITORSTRINGS.PILOT.label_rel_level;
 					content+="</div>";
 					content+="<div class='cell'>";
 					//content+="<input data-idx='"+idx+"' id='rel_abi_level_"+idx+"' value='"+(effectLevel + 1)+"'></input>";
@@ -803,15 +829,15 @@ AllyPilotUI.prototype.show = async function(){
 	content+="</div>";
 	content+="<div class='edit_pane'>";
 	content+="<div class='controls'>";
-	content+="<button class='cancel'>Cancel</button>";
-	content+="<button class='save'>Save</button>";	
+	content+="<button class='cancel'>"+EDITORSTRINGS.GENERAL.label_cancel+"</button>";
+	content+="<button class='save'>"+EDITORSTRINGS.GENERAL.label_save+"</button>";	
 	content+="</div>";
 	content+="<div class='main_info'>";
 	content+="<div class='row'>";
 	
 	content+="<div class='section'>";
 	content+="<div class='title'>";
-	content+="General Info";	
+	content+=EDITORSTRINGS.PILOT.label_general_info;	
 	content+="</div>";
 	content+="<div class='content'>";
 	content+=_this._propertyHandlers.face.createControls();
@@ -849,7 +875,7 @@ AllyPilotUI.prototype.show = async function(){
 	
 	content+="<div class='section'>";
 	content+="<div class='title'>";
-	content+="Stats";	
+	content+=EDITORSTRINGS.PILOT.label_stats;		
 	content+="</div>";
 	content+="<div class='content stats'>";
 	
@@ -863,7 +889,7 @@ AllyPilotUI.prototype.show = async function(){
 	
 	content+="<div class='section'>";
 	content+="<div class='title'>";
-	content+="Spirits";	
+	content+=EDITORSTRINGS.PILOT.label_spirits;	
 	content+="</div>";
 	content+="<div class='content stats'>";
 	
@@ -883,7 +909,7 @@ AllyPilotUI.prototype.show = async function(){
 	
 	content+="<div class='section'>";
 	content+="<div class='title abilities'>";
-	content+="Ability Learn List";	
+	content+=EDITORSTRINGS.PILOT.label_abilities;	
 	
 	content+="<div class='abi_page_control'>";
 	content+="<img title='Previous page' id='abi_page_left' src='svg/chevron_right.svg'/>"
@@ -905,7 +931,7 @@ AllyPilotUI.prototype.show = async function(){
 	
 	content+="<div class='section'>";
 	content+="<div class='title'>";
-	content+="Will Gain(Personality)";	
+	content+=EDITORSTRINGS.PILOT.label_personality;
 	content+="</div>";
 	content+="<div class='content stats'>";
 	content+="<div class='table'>";
@@ -933,11 +959,26 @@ AllyPilotUI.prototype.show = async function(){
 	
 	content+="</div>";
 	content+="</div>";
-	
+
 	
 	
 	content+=_this.createRelationshipSection();
+	content+="</div>";
+	content+="<div class='row'>";
+	content+="<div class='section'>";
+	content+="<div class='title'>";
+	content+=EDITORSTRINGS.PILOT.label_assets;
+	content+="</div>";
+	content+="<div class='content'>";
 	
+	content+="<div class='table'>";
+	
+	content+="<div class='row'>";
+	content+=_this._propertyHandlers.assets.createControls();
+	content+="</div>";
+	content+="</div>";
+	content+="</div>";
+	content+="</div>";	
 	
 	content+="</div>";	
 	content+="</div>";
@@ -984,7 +1025,7 @@ AllyPilotUI.prototype.createRelationshipSection = function(){
 	let content = "";
 	content+="<div class='section relationships'>";
 	content+="<div class='title abilities'>";
-	content+="Relationship Bonuses";	
+	content+=EDITORSTRINGS.PILOT.label_rel_bonus;
 	content+="<div class='abi_page_control'>";
 	content+="<img title='Previous page' id='rel_page_left' src='svg/chevron_right.svg'/>"
 	content+="<img title='Next page' id='rel_page_right' src='svg/chevron_right.svg'/>"

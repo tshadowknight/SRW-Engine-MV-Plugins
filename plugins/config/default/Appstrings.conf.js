@@ -416,3 +416,418 @@ APPSTRINGS.ZONE_STATUS = {
 	label_player: "Player",
 	label_enemy: "Enemy"
 }
+
+function EDITORSTRINGS(){
+	
+}
+
+EDITORSTRINGS.testAllSections = function(){
+	Object.keys(EDITORSTRINGS).forEach(function(section){
+		if(typeof EDITORSTRINGS[section] == "object"){
+			EDITORSTRINGS.testSection(section);
+		}
+	});
+}
+
+EDITORSTRINGS.testSection = function(section){
+	if(EDITORSTRINGS[section]){
+		var ctr = 0;
+		Object.keys(EDITORSTRINGS[section]).forEach(function(key){
+			EDITORSTRINGS[section][key] = ctr++;
+		});
+	}
+}
+
+EDITORSTRINGS.GENERAL = {
+	title: "SRW Engine MV Editor v2.0",
+	weapon_editor_label: "Weapon Editor Editor", 
+	mech_editor_label: "Mech Editor", 
+	enemy_pilot_editor_label: "Enemy Pilot Editor",
+	ally_pilot_editor_label: "Ally Pilot Editor", 
+	pattern_editor_label: "Pattern Editor", 
+	attack_editor_label: "Attack Editor",
+	environment_editor_label: "Environment Editor",
+	battle_text_editor_label: "Battle Text", 
+	label_no: "No",
+	label_yes: "Yes",
+	
+	label_new: "New",
+	label_copy: "Copy",
+	label_delete: "Delete",
+	label_export: "Export",
+	label_import: "Import",	
+	label_save: "Save",
+	label_cancel: "Cancel",
+	label_info: "Info",
+	label_commands: "Commands",
+	label_paste: "Paste",
+	label_name: "Name",
+	
+	label_max_entries: "Max. Entries",
+	label_search: "Search",
+	hint_clear: "Clear the search",
+	hint_paste: "Paste into this entry",
+	hint_copy: "Copy this entry",
+	hint_erase: "Erase this entry",
+	
+	confirm_remove_entries: "Reducing the entry count to this number will discard existing entries. This cannot be undone! Continue?",
+	
+	label_general: "General",
+	label_editor_tag: "Editor Tag",
+	label_terrain: "Terrain",
+	
+	hint_no_quote: "No quotes found for the current combination of Attack and Actor."
+}
+
+EDITORSTRINGS.ATTACKS = {
+	label_command: "Command",
+	label_target: "Target",
+	label_parameters: "Parameters",
+	
+	label_copy_helper: "Copy from Helper",
+	label_helper: "Helper",
+	label_play: "Play BGM",
+	label_play_until: "Play Until",
+	label_enemy_side: "Enemy Side",
+	label_hits: "Attack Hits",
+	label_destroys: "Attack Destroys",
+	label_show_barrier: "Show Barrier",
+	label_break: "Break",
+	label_environment: "Environment",
+	hint_environment: "The environment that will be used for the preview.",
+	
+	label_attack: "Attack",
+	hint_attack: "The attack for which to show quotes.",
+	label_actor: "Actor",
+	hint_actor: "The ally side pilot for the preview",
+	label_actor_mech: "Actor Mech",
+	hint_actor_mech: "The ally side mech for the preview",
+	label_actor_twin: "Actor Twin",
+	hint_actor_twin: "The ally side twin for the preview",
+	label_actor_twin_mech: "Actor Twin Mech",
+	hint_actor_twin_mech: "The ally side twin mech for the preview",
+	
+	label_enemy: "Enemy",
+	hint_enemy: "The enemy side pilot for the preview",
+	label_enemy_mech: "Enemy Mech",
+	hint_enemy_mech: "The enemy side mech for the preview",
+	label_enemy_twin: "Enemy Twin",
+	hint_enemy_twin: "The enemy side twin for the preview",
+	label_enemy_twin_mech: "Enemy Twin Mech",
+	hint_enemy_twin_mech: "The enemy side twin mech for the preview",
+	
+	label_missing_object:" Couldn't find an object named '[NAME]'",
+	
+	label_new_tick: "New Tick",
+	label_send_to: "Send to...",
+	label_sequence: "Sequence",
+	label_shift: "Shift",
+	
+	confirm_merge_tick: "The new tick is already in use, merge the command lists?",
+	confirm_delete: "Delete this entire tick?",
+	prompt_ticks_count: "Shift by how many ticks?",
+	alert_tick_in_use: "Tick [TICK] is already in use!",
+	
+	confirm_discard_unchaged: "Discard all unsaved changes?",
+	
+
+}
+
+EDITORSTRINGS.TEXT = {
+	label_text_type: "Text Type",
+	label_event: "Event",
+	label_unit_type: "Unit Type",
+	label_unit: "Unit",
+	label_text_type: "Text Type",
+	label_reference_id: "Reference ID",
+	
+	label_default: "Default",
+	label_new: "New",
+	label_target_mech: "Target Mech",
+	label_mech: "Mech",
+	label_actors: "Actors",
+	label_enemies: "Enemies",
+	label_target_pilots_tags: "Target Pilot Tags",
+	label_target_mech_tags: "Target Mech Tags",
+	label_add: "Add",
+	label_name: "Name",
+	label_duration: "Duration",
+	label_copy_face: "Copy Face",
+	label_paste_face: "Paste Face",
+	label_face_name: "Face Name",
+	label_face_index: "Face Index",
+	label_quote_id: "Quote ID",
+	label_other_unit: "Other Unit",
+	label_tag: "Other Tag",
+	label_quote: "Quote",
+	label_line: "Line",
+	
+	hint_preview: "Preview this quote",
+	hint_delete: "Delete this quote",
+	
+	confirm_delete_text: "Delete this line?",
+	confirm_delete_entry: "Delete this weapon entry and all its quotes?",
+	confirm_delete_event_entry: "Delete this event entry and all its quotes?",
+}
+
+EDITORSTRINGS.BG = {
+	label_layers: "Layers",
+	label_visible: "Visible",
+	
+	label_path: "Path",
+	label_fixed: "Fixed",
+	label_width: "Width",
+	label_height: "Height",
+	label_y_offset: "Y Offset",
+	label_z_offset: "Z Offset",
+	
+	prompt_name: "Please enter a name",
+	confirm_delete: "Delete the current definition?",
+	confirm_delete_layer: "Delete this layer?",
+}
+
+EDITORSTRINGS.WEAPON = {
+	label_attributes: "Attributes",
+	hint_no_cost: "-1 means no cost or requirement",
+	label_effects: "Effects",
+	label_map_attack: "Map Attack",
+	label_combo_attack: "Combo Attack",
+	
+	label_type: "Type",
+	
+	label_melee: "Melee",
+	label_ranged: "Ranged",
+	label_post_move: "Post Move",
+	
+	label_power: "Power",
+	label_min_range: "Min Range",	
+	label_range: "Range",
+	
+	label_ammo: "Ammo",
+	label_EN: "EN",
+	label_will: "Will",
+	label_hit_mod: "Hit Modifier",
+	label_crit_mod: "Crit Modifier",
+	label_category: "Category",
+	label_primary_attr: "Primary Attribute",
+	label_secondary_attr: "Secondary Attribute",	
+	label_upgrade_type: "Upgrade Type",
+	label_always_counter: "Always Counter",
+	label_only_counter: "Only as Counter",
+	label_ALL: "ALL Weapon",
+	label_animation: "Animation",
+	
+	hint_effects: "Only the first two effects are shown in the UI",
+	
+	hint_is_map: "Is a Map Attack",
+	hint_is_regular: "Is a Regular Attack",
+	label_attack_id: "Attack ID",
+	label_ignore_friendlies: "Ignore Friendlies",
+	
+	label_combo_type: "Type",
+	label_adjacent: "Adjacent",
+	label_on_map: "On Map",
+	label_required_weapons: "Required Weapons",
+	label_HP_treshold: "HP Treshold",
+	
+	label_map_attack: "Map Attack",
+	label_animation: "Animation",
+	label_id: "ID",
+	label_scale: "Scale",
+	label_offsets: "Offsets",
+	label_up: "Up",
+	label_down: "Down",
+	label_left: "Left",
+	label_right: "Right",
+	label_text_box: "Text Box",
+	label_edit_secondary_pattern: "Edit secondary pattern",
+	label_lock_rotation: "Lock Rotation",
+	label_choose_center: "Choose Center",
+	hint_choose_center: "Select a center tile",
+	
+	confirm_remove_MAP: "Remove this map attack?",
+}
+
+EDITORSTRINGS.MECH = {
+	label_general_info: "General Info",
+	label_stats: "Stats",
+	label_terrain: "Terrain",
+	label_abilities: "Abilities",
+	label_weapons: "Weapons",
+	label_transformation: "Transformation",
+	label_auto_transformation: "Auto Transformation",
+	label_auto_combination: "Combination",
+	label_deployment: "Deployment",
+	label_sprites: "Sprites",
+	label_animations: "Animations",
+	
+	
+	hint_fallback: "Falling back to Battle Scene sprite because no Menu Sprite is defined!",
+	label_warn_fallback: "Using fallback!",
+	label_stats_label: "Stats Label",
+	label_is_ship: "Is Ship",
+	label_sync_parts: "Sync Parts With",
+	label_sync_upgrades: "Sync Upgrades With",
+	label_enabled: "Enabled",
+	label_move_penalty: "With Movement Penalty",
+	label_terrain_rank: "Rank",
+	
+	label_exp_yield: "Exp. Yield",
+	label_pp_yield: "PP Yield",
+	label_fund_yield:"Fund Yield",
+	label_tags: "Tags",
+	label_attribute1: "Attribute 1",
+	label_attribute2: "Attribute 2",
+	
+	title_FUB: "Full Upgrade Bonus",
+	label_FUB: "FUB",
+	
+	label_item_slots: "Item Slots",
+	label_cost_type: "Cost Type",
+	label_upgrade_amount: "Upgrade Amount",
+	
+	label_HP: "HP",
+	label_EN: "EN",
+	label_armor: "Armor",
+	label_mobility: "Mobility",
+	label_accuracy: "Accuracy",
+	
+	label_weapons: "Weapons",
+	
+	label_locked: "Locked",
+	
+	label_command_name: "Command Name",
+	label_available: "Available",
+	label_required_will: "Required Will",
+	label_restores: "Restores",
+	
+	label_on_destruction: "On Destruction",
+	label_mech: "Mech",
+	label_pilot: "Pilot",
+	label_if_other_unit_present: "If Other Unit Present",
+	label_other_unit: "Other Unit",
+	label_transform_into: "Tranform Into",
+	label_if_other_unit_missing: "If Other Unit Missing",
+	
+	label_from: "From",
+	label_into: "Into",
+	
+	label_can_deploy: "Can Deploy",
+	hint_can_deploy: "If enabled the mech can be deployed directly",
+	label_edit: "Edit",
+	label_deploy_actions: "Deploy Actions",
+	label_force_pilots: "Force Pilots",
+	hint_force_pilots: "If enabled setting a pilot for this mech will immediately reconfigure other pilots if needed according to the deploy actions",
+	label_quick_swap: "Quick Swap",
+	hint_quick_swap: "If enabled a menu option to swap between the available pilots will be enabled on the unit's map menu",
+	label_allowed_pilots: "Allowed Pilots",
+	label_sub_pilots: "Sub Pilot Slots",
+	label_slot: "Slot",
+	label_default_pilot: "Default Pilot",
+	label_allowed: "Allowed",
+	
+	label_basic_battle: "Basic Battle",
+	label_overworld: "Overworld",
+	label_battle_scene: "Battle Scene",
+	label_folder: "Folder",
+	label_sprite_type: "Sprite Type",
+	label_blockbench_hack: "Blockbench Hack",
+	hint_blockbench_hack: "If 1 the model will have its leaf geometry merged on load by the engine to reduce draw calls. Do not enable for models that use Armatures as they will break!",
+	hint_dragonbones_width: "Determines the width for the canvas on which the DragonBones sprite is rendered",
+	hint_dragonbones_height: "Determines the height for the canvas on which the DragonBones sprite is rendered",
+	hint_default_size: "The width and height of the texture files for this sprite in pixels",
+	hint_3D_scale: "A scaling factor for the 3D model",
+	hint_3D_rotation: "The default rotation of the 3D model",
+	hint_shadow: "Scale for the shadow of the unit",
+	hint_world_size: "The size at which the sprite is displayed in World units(default 3)",
+	
+	label_armature_name: "Armature Name",
+	label_dragonbones_world_size: "DragonBones World Size",
+	label_canvas_width: "Internal Canvas Width",
+	label_canvas_height: "Internal Canvas Height",
+	label_source_size: "Source Size",
+	label_scale: "Scale",
+	label_rotation: "Rotation",
+	label_y_offset: "Y Offset",
+	label_x_offset: "X Offset",
+	label_root_y_offset: "Root Y Offset",
+	label_shadow_scale: "Shadow Scale",
+	label_shadow_z_offset: "Shadow Z Offset",
+	label_shadow_x_offset: "Shadow X Offset",
+	label_world_size: "World Size",
+	
+	label_world_units: "world units",
+				
+	label_death_anim: "Death Animation",
+	label_system_default: "System Default",
+	
+	label_spawn: "Spawn",
+	label_animation: "Animation",
+	label_frame_size: "Frame Size",
+	label_frames: "Frames",
+	label_sheet_width: "Sheet Width",
+	label_anim_speed: "Animation Speed",
+	label_change_on_frame: "Change on Frame",
+	label_SE: "Sound Effect",	
+	label_destroy: "Destroy",
+	
+	label_animation: "Animation",
+	label_deploy_actions: "Deploy Actions",
+	
+	
+}
+
+EDITORSTRINGS.PILOT = {
+	label_general_info: "General Info",
+	label_stats: "Stats",
+	label_spirits: "Spirits",
+	label_abilities: "Ability Learn List",
+	label_personality: "Will Gain(Personality)",
+	label_rel_bonus: "Relationship Bonuses",
+	label_assets: "Assets",
+	
+	label_name: "Name",
+	label_use_mech_name: "Use Mech Name",
+	label_stats_label: "Stats Label",
+
+	label_default_mech: "Default Mech",
+	
+	label_rate: "Rate",
+	label_max: "Max",
+	
+	label_SP: "SP",	
+	label_melee: "Melee",	
+	label_ranged: "Ranged",		
+	label_skill: "Skill",	
+	label_defense: "Defense",
+	label_evade: "Evade",
+	label_hit: "Hit",
+	
+	label_exp_yield:"Exp. Yield",
+	label_pp_yield: "PP Yield",
+	label_tags: "Tags",
+	label_target_formula: "Targeting Formula",	
+	label_text_alias: "Battle Text Alias",
+	
+	label_level: "Level",
+	label_cost: "Cost",
+	label_twin: "Twin",
+	
+	label_ability_level: "Ability Level",
+	label_learned_at: "Learned At",
+	
+	label_ace_ability: "Ace Ability",
+	
+	label_will_on_hit: "On Hitting a Target",
+	label_will_on_miss: "On Missing a Target",
+	label_will_on_damage: "On Taking Damage",
+	label_will_on_evade: "On Evading",
+	label_will_on_destroy: "On Destroying",
+	label_will_on_ally_down: "On Ally Destroyed",
+	
+	label_cutin_path: "Cutin Path",
+	
+	label_receiving: "Receiving Pilot",
+	label_effect: "Effect",
+	label_rel_level: "Level"
+}

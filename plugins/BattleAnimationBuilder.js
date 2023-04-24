@@ -321,6 +321,18 @@ BattleAnimationBuilder.prototype.updateTick = function(id, sequence, originalTic
 	//this.save();
 }
 
+BattleAnimationBuilder.prototype.mergeTickIntoSequence = function(id, sequence, tick, tickData){
+	tick = tick*1;
+	var def = this._animLookup[id].data[sequence];
+	if(def){
+		if(!def[tick]){
+			def[tick] = [];
+		}
+		def[tick] = def[tick].concat(tickData);
+	}
+	//this.save();
+}
+
 BattleAnimationBuilder.prototype.processDefinitions = function(data){
 	var _this = this;
 	
