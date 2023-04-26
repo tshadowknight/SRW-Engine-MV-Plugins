@@ -3271,18 +3271,19 @@ BattleSceneManager.prototype.executeAnimation = function(animation, startTick){
 			_this.setBgMode($statCalc.isFlying(action.ref) || $statCalc.getTileType(action.ref) == "space" ? "sky" : "land");			
 		},	
 		next_phase: function(target, params){
+			let insertStartTick = _this._currentAnimationTick;
 			
-			_this._animationList[startTick + 1] = [{type: "fade_swipe", target: "", params: {time: 18}}];	
+			_this._animationList[insertStartTick + 1] = [{type: "fade_swipe", target: "", params: {time: 18}}];	
 			
-			_this._animationList[startTick + 25] = [{type: "create_target_environment"}, {type: "updateBgMode", target: "active_target"}];
+			_this._animationList[insertStartTick + 25] = [{type: "create_target_environment"}, {type: "updateBgMode", target: "active_target"}];
 			if(params.cleanUpCommands){				
-				_this._animationList[startTick + 26] = params.cleanUpCommands;						
+				_this._animationList[insertStartTick + 26] = params.cleanUpCommands;						
 			}				
 			
 			//support defend animation
 			if(_this._currentAnimatedAction.attacked && _this._currentAnimatedAction.attacked.type == "support defend"){
-				_this.delayAnimationList(startTick + 27, 170);
-				_this._animationList[startTick + 30] = [
+				_this.delayAnimationList(insertStartTick + 27, 170);
+				_this._animationList[insertStartTick + 30] = [
 					{type: "teleport", target: "Camera", params: {position: _this._defaultPositions.camera_main_idle}},
 					{type: "teleport", target: "active_target", params: {position: _this._defaultPositions.enemy_main_idle}},
 					{type: "rotate_to", target: "Camera", params: {rotation: _this._defaultRotations.camera_main_idle}},
@@ -3291,48 +3292,48 @@ BattleSceneManager.prototype.executeAnimation = function(animation, startTick){
 					{type: "hide_sprite", target: "active_main", params: {}},					
 				];	
 				
-				_this._animationList[startTick + 50] = [
+				_this._animationList[insertStartTick + 50] = [
 					{type: "set_sprite_frame", target: "active_target", params: {name: "out"}},
 					{type: "translate", target: "active_target", params: {startPosition: _this._defaultPositions.enemy_main_idle, position: new BABYLON.Vector3(-10, 0, 1), duration: 30, easingFunction: new BABYLON.SineEase(), easingMode: BABYLON.EasingFunction.EASINGMODE_EASEIN}},
 				];
 				
-				_this._animationList[startTick + 80] = [
+				_this._animationList[insertStartTick + 80] = [
 					{type: "show_sprite", target: "active_support_defender", params: {}},
 					{type: "set_sprite_frame", target: "active_support_defender", params: {name: "in"}},
 					{type: "translate", target: "active_support_defender", params: {startPosition: new BABYLON.Vector3(-10, 0, 1), position: _this._defaultPositions.enemy_main_idle, duration: 30, easingFunction: new BABYLON.SineEase(), easingMode: BABYLON.EasingFunction.EASINGMODE_EASEIN}},
 					{type: "show_support_defender_text"},					
 				];
 				
-				_this._animationList[startTick + 110] = [
+				_this._animationList[insertStartTick + 110] = [
 					{type: "set_sprite_frame", target: "active_support_defender", params: {name: "block", spriterOnly: true}},
 					{type: "set_sprite_frame", target: "active_support_defender", params: {name: "block", defaultOnly: true}},
 					{type: "set_sprite_frame", target: "active_target", params: {name: "block"}},
 					{type: "show_barrier", target: "active_support_defender", params: {}}
 				];
 				
-				_this._animationList[startTick + 150] = [
+				_this._animationList[insertStartTick + 150] = [
 					{type: "fade_swipe", target: "", params: {time: 54}},
 				];
 				
-				_this._animationList[startTick + 160] = [
+				_this._animationList[insertStartTick + 160] = [
 					{type: "show_sprite", target: "active_main", params: {}},	
 					{type: "enable_support_defender"},
 				];				
 				
 				if(params.commands){
-					_this._animationList[startTick + 161] = params.commands;						
+					_this._animationList[insertStartTick + 161] = params.commands;						
 				}
-				_this._animationList[startTick + 162] = [{type: "updateBgMode", target: "active_target"}];
+				_this._animationList[insertStartTick + 162] = [{type: "updateBgMode", target: "active_target"}];
 			} else {
 				if(params.commands){
-					_this._animationList[startTick + 27] = params.commands;	
-					_this._animationList[startTick + 28] = [{type: "updateBgMode", target: "active_target"}];
+					_this._animationList[insertStartTick + 27] = params.commands;	
+					_this._animationList[insertStartTick + 28] = [{type: "updateBgMode", target: "active_target"}];
 					
 					if(_this._currentAnimatedAction.hits){
 						var additions = [];
-						additions[startTick + 50] = [{type: "show_barrier", target: "active_target", params: {}}];	
+						additions[insertStartTick + 50] = [{type: "show_barrier", target: "active_target", params: {}}];	
 						//if(_this._currentAnimatedAction.attacked.action.type == "defend"){
-						additions[startTick + 50].push({type: "set_sprite_frame", target: "active_target", params: {name: "block"}});
+						additions[insertStartTick + 50].push({type: "set_sprite_frame", target: "active_target", params: {name: "block"}});
 						//}
 						_this.mergeAnimList(additions);	
 					}								
@@ -3340,6 +3341,7 @@ BattleSceneManager.prototype.executeAnimation = function(animation, startTick){
 			}
 		},
 		dodge_pattern: function(target, params){
+			let insertStartTick = _this._currentAnimationTick;
 			var action = _this.getTargetAction(target);
 			
 			var entityType = action.isActor ? "actor" : "enemy";
@@ -3363,7 +3365,7 @@ BattleSceneManager.prototype.executeAnimation = function(animation, startTick){
 					var animData = _this._animationBuilder.buildAnimation(animDef.full_anim, _this).mainAnimation;
 					var additions = [];
 					Object.keys(animData).forEach(function(tick){
-						additions[startTick * 1 + tick * 1 + 1] = animData[tick];
+						additions[insertStartTick * 1 + tick * 1 + 1] = animData[tick];
 					});
 					_this.mergeAnimList(additions);		
 					
@@ -3374,7 +3376,7 @@ BattleSceneManager.prototype.executeAnimation = function(animation, startTick){
 				if(params.commands){
 					var additions = [];
 					Object.keys(params.commands).forEach(function(tick){
-						additions[startTick * 1 + tick * 1 + 1] = params.commands[tick];
+						additions[insertStartTick * 1 + tick * 1 + 1] = params.commands[tick];
 					});
 					_this.mergeAnimList(additions);
 				}
@@ -4436,6 +4438,11 @@ BattleSceneManager.prototype.executeAnimation = function(animation, startTick){
 			_this._bgs.forEach(function(bg){	
 				bg.position.x+=targetOffset;	
 			});
+			_this._bgInstances.forEach(function(bg){	
+				bg.position.x+=targetOffset;	
+			});
+			
+			
 			if(targetObj){
 				//targetObj.playAnimation(1, 1, false, 100)			
 				if(!params.duration){
@@ -5493,6 +5500,7 @@ BattleSceneManager.prototype.resetScene = function() {
 		bg.dispose();
 	});	
 	_this._bgs = [];
+	_this._bgInstances = [];
 	
 	_this._fixedBgs.forEach(function(bg){
 		bg.dispose();
@@ -5650,6 +5658,7 @@ BattleSceneManager.prototype.createScrollingBg = function(id, bgId, path, size, 
 				width: size.width, 
 				height: size.height
 			};			
+			_this._bgInstances.push(bg);
 		}			
 	}
 }
@@ -6805,6 +6814,7 @@ BattleSceneManager.prototype.showEnvironmentScene = function() {
 		bg.dispose();
 	});	
 	_this._bgs = [];
+	_this._bgInstances = [];
 	
 	_this._fixedBgs.forEach(function(bg){
 		bg.dispose();
