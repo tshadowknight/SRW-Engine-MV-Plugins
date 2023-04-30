@@ -1914,10 +1914,18 @@ BattleSceneManager.prototype.hookBeforeRender = function(){
 				if(targetObj.handle){ //support for effekseer handles
 					targetObj.handle.setLocation(targetObj.position.x, targetObj.position.y, targetObj.position.z);
 					//do a 0 speed update to rerender the effect at the new location without progressing the animation
-					let oldSpeed = targetObj.handle.speed;
-					targetObj.handle.setSpeed(0);
+					for(let info of _this._effekseerInfo){
+						info.savedSpeed = info.handle.speed;
+						info.handle.setSpeed(0);
+					}
+					//let oldSpeed = targetObj.handle.speed;
+					//targetObj.handle.setSpeed(0);
 					targetObj.context.update();
-					targetObj.handle.setSpeed(oldSpeed);
+					//targetObj.handle.setSpeed(oldSpeed);
+					for(let info of _this._effekseerInfo){
+						info.handle.setSpeed(info.savedSpeed);
+						delete info.savedSpeed;
+					}
 				}	
 			}
 		});	
