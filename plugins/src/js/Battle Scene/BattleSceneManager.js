@@ -2341,14 +2341,17 @@ BattleSceneManager.prototype.startScene = function(){
 	
 	//foreground layer
 	this._scene.onAfterDrawPhaseObservable.add(() => {//onAfterRenderObservable 
-		_this._effksContext.setProjectionMatrix(_this._camera.getProjectionMatrix().m);
-		_this._effksContext.setCameraMatrix(BABYLON.Matrix.Invert(_this._camera.getWorldMatrix()).m);
+		let projectionMatrix = new BABYLON.Matrix().copyFrom(_this._camera.getProjectionMatrix()).m;
+		_this._effksContext.setProjectionMatrix(projectionMatrix);
+		let worldMatrix = new BABYLON.Matrix().copyFrom(BABYLON.Matrix.Invert(_this._camera.getWorldMatrix())).m;		
+		_this._effksContext.setCameraMatrix(worldMatrix);
 		_this._effksContext.draw();
 		
-		let projectionMatrix = new BABYLON.Matrix().copyFrom(_this._camera.getProjectionMatrix()).m;
+		projectionMatrix = new BABYLON.Matrix().copyFrom(_this._camera.getProjectionMatrix()).m;
 		//projectionMatrix[0]*=-1;
 		_this._effksContextMirror.setProjectionMatrix(projectionMatrix);
-		let worldMatrix = new BABYLON.Matrix().copyFrom(BABYLON.Matrix.Invert(_this._camera.getWorldMatrix())).m;
+		
+		worldMatrix = new BABYLON.Matrix().copyFrom(BABYLON.Matrix.Invert(_this._camera.getWorldMatrix())).m;
 		worldMatrix[0]*=-1;
 		worldMatrix[1]*=-1;
 		worldMatrix[2]*=-1;
@@ -3939,6 +3942,8 @@ BattleSceneManager.prototype.executeAnimation = function(animation, startTick){
 				
 				handle.setRotation(rotation.x, rotation.y, rotation.z);
 				handle.setLocation(position.x, position.y, position.z);
+				
+				handle.setScale(scale, scale, scale * (params.flipZ ? -1 : 1));
 			
 				info = {name: target, effect: effect, context: targetContext, offset: {x: position.x, y: position.y, z: position.z}, offsetRotation: {x: rotation.x, y: rotation.y, z: rotation.z}};
 				info.handle = handle;
@@ -3961,7 +3966,7 @@ BattleSceneManager.prototype.executeAnimation = function(animation, startTick){
 				_this._isLoading--;
 				
 			});
-			effect.scale = scale;
+			//effect.scale = scale;
 		},		
 		play_rmmv_anim: function(target, params){
 			var position = _this.applyAnimationDirection(params.position || new BABYLON.Vector3(0,0,0));	
@@ -4084,6 +4089,19 @@ BattleSceneManager.prototype.executeAnimation = function(animation, startTick){
 				targetObj.sendTrigger(params.id * 1);
 			}
 		}, 
+		set_effekseer_attract_point: function(target, params){
+			var targetObj;
+			var ctr = 0;
+			while(!targetObj && ctr < _this._effekseerInfo.length){
+				if(_this._effekseerInfo[ctr].name == target){
+					targetObj = _this._effekseerInfo[ctr].handle;
+				}
+				ctr++;
+			}
+			if(targetObj){
+				targetObj.setTargetLocation(params.position.x * _this._animationDirection, params.position.y * 1, params.position.z * 1);
+			}
+		}, 	
 		stop_effekseer_root: function(target, params){
 			var targetObj;
 			var ctr = 0;
