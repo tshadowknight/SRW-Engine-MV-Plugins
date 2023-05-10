@@ -410,7 +410,7 @@ SRWEditor.prototype.init = function(){
 		},	
 		play_effekseer: {
 			hasTarget: true,
-			params: ["path", "position", "scale", "speed", "rotation", "parent", "isBackground", "autoRotate"],
+			params: ["path", "position", "scale", "speed", "rotation", "parent", "isBackground", "autoRotate", "flipZ"],
 			desc: "Play a predefined effekseer effect."
 		},
 		show_barrier: {
@@ -433,6 +433,11 @@ SRWEditor.prototype.init = function(){
 			params: ["id"],
 			desc: "Send the trigger with the specified id to the target effekseer effect."
 		},
+		set_effekseer_attract_point: {
+			hasTarget: true,
+			params: ["position"],
+			desc: "Set the location of the attraction point for the effekseer context of the target handle."
+		},		
 		play_rmmv_anim: {
 			hasTarget: true,
 			params: ["animId", "position", "scaleX", "scaleY", "loop", "noFlash", "noSfx", "delay"],
@@ -689,6 +694,7 @@ SRWEditor.prototype.init = function(){
 		columnCount: "The number of columns in the spritesheet.",
 		isBackground: "If 1 the layer will be a background layer.",
 		autoRotate: "If 1 the effect will be automatically rotated for enemies.",
+		flipZ: "If 1 the effect will have its z scale inverted.",
 		color: "The blend color for the skybox.",
 		scale: "A scaling factor for the effect.",
 		scaleX: "A scaling factor for the width of the effect.",
@@ -1065,6 +1071,9 @@ SRWEditor.prototype.init = function(){
 		
 		},
 		autoRotate: function(value){
+		
+		},
+		flipZ: function(value){
 		
 		},
 		color: function(value){
