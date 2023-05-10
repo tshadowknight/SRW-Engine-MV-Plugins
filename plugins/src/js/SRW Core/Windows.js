@@ -8,6 +8,7 @@
 		Window_SRWPilotSelection: Window_SRWPilotSelection,
 		Window_StageInfo: Window_StageInfo,
 		Window_ConditionsInfo: Window_ConditionsInfo,
+		Window_LocationHeader: Window_LocationHeader
 	} 
 	
 	function patches(){};
@@ -155,6 +156,160 @@
 			this.startWait(waitCount);
 			this.pause = true;
 		};		
+		
+		Window_Message.prototype.processEscapeCharacter = function(code, textState) {
+			switch (code) {
+			/*case 'R':
+				this._isRemote = !!this.obtainEscapeParam(textState);
+				this.updateFaceDisplay();
+				break;*/
+			case '$':
+				this._goldWindow.open();
+				break;
+			case '.':
+				this.startWait(15);
+				break;
+			case '|':
+				this.startWait(60);
+				break;
+			case '!':
+				this.startPause();
+				break;
+			case '>':
+				this._lineShowFast = true;
+				break;
+			case '<':
+				this._lineShowFast = false;
+				break;
+			case '^':
+				this._pauseSkip = true;
+				break;
+			default:
+				Window_Base.prototype.processEscapeCharacter.call(this, code, textState);
+				break;
+			}
+		};
+		
+		Window_Message.prototype.update = function() {
+			this.checkToNotClose();
+			Window_Base.prototype.update.call(this);
+			while (!this.isOpening() && !this.isClosing()) {
+				this._remoteOverlayCounter+=0.2;
+				if($gameMessage.faceName()){
+					this.updateFaceDisplay();
+				}
+				if($gameTemp.locationHeader){
+					this._locationHeaderWindow.open();
+				} else {
+					this._locationHeaderWindow.close();
+				}
+				if (this.updateWait()) {
+					return;
+				} else if (this.updateLoading()) {
+					return;
+				} else if (this.updateInput()) {
+					return;
+				} else if (this.updateMessage()) {
+					return;
+				} else if (this.canStart()) {
+					this.startMessage();
+				} else {
+					this.startInput();
+					return;
+				}
+			}
+		};
+		
+		Window_Message.prototype.updateLoading = function() {
+			if (this._faceBitmap) {
+				if (this._faceBitmap.isReady()) {
+					this.updateFaceDisplay();
+					this._faceBitmap = null;
+					return false;
+				} else {
+					return true;
+				}
+			} else {
+				return false;
+			}
+		};
+		
+		Window_Message.prototype.updateFaceDisplay = function() {
+			let width = Window_Base._faceWidth;
+			let height = Window_Base._faceHeight;
+			this.contents.clearRect(0, 0, width, height);
+		
+			this.drawMessageFace();
+			if($gameMessage.faceName()){
+				this.drawPortraitOverlay();
+			}
+			
+		}
+		
+		Window_Message.prototype.initMembers = function() {
+			this._imageReservationId = Utils.generateRuntimeId();
+			this._background = 0;
+			this._positionType = 2;
+			this._waitCount = 0;
+			this._faceBitmap = null;
+			this._remoteBGBitmaps = [];
+			this._textState = null;
+			this._remoteOverlayCounter = 0;
+			this.clearFlags();
+		};
+		
+		Window_Message.prototype.drawPortraitOverlay = function() {
+			if($gameTemp.portraitOverlays){
+				for(let overlayId of $gameTemp.portraitOverlays){					
+					if(!this._remoteBGBitmaps[overlayId]){
+						this._remoteBGBitmaps[overlayId] = ImageManager.loadSystem("PortraitOverlay_"+overlayId)
+					}
+					const x = 0;
+					const y = 0;
+					let width = Window_Base._faceWidth;
+					let height = Window_Base._faceHeight;
+					var pw = Window_Base._faceWidth;
+					var ph = Window_Base._faceHeight;
+					var sw = Math.min(width, pw);
+					var sh = Math.min(height, ph);
+					var dx = Math.floor(x + Math.max(width - pw, 0) / 2);
+					var dy = Math.floor(y + Math.max(height - ph, 0) / 2);
+					let frame = Math.floor(this._remoteOverlayCounter % 16);
+					//this._remoteOverlayCounter = frame;
+					var sx = frame % 8 * pw + (pw - sw) / 2;
+					var sy = Math.floor(frame / 8) * ph + (ph - sh) / 2;
+					this.contents.blt(this._remoteBGBitmaps[overlayId], sx, sy, sw, sh, dx, dy);					
+				}				
+			}			
+		};
+		
+		Window_Message.prototype.loadMessageFace = function() {
+			this._faceBitmap = ImageManager.reserveFace($gameMessage.faceName(), 0, this._imageReservationId);			
+		};
+		
+		Window_Message.prototype.subWindows = function() {
+			return [this._goldWindow, this._choiceWindow,
+					this._numberWindow, this._itemWindow,
+					this._locationHeaderWindow];
+		};
+		
+		Window_Message.prototype.createSubWindows = function() {
+			this._goldWindow = new Window_Gold(0, 0);
+			this._goldWindow.x = Graphics.boxWidth - this._goldWindow.width;
+			this._goldWindow.openness = 0;
+			this._choiceWindow = new Window_ChoiceList(this);
+			this._numberWindow = new Window_NumberInput(this);
+			this._itemWindow = new Window_EventItem(this);
+			
+			this._locationHeaderWindow = new Window_LocationHeader(0, 20);
+			this._locationHeaderWindow.openness = 0;
+		};
+		
+		Window_Message.prototype.terminateMessage = function() {
+			this.close();
+			this._goldWindow.close();
+			$gameMessage.clear();
+		};
 
 	//====================================================================
 	// ●Window_ActorCommand
@@ -1001,6 +1156,42 @@
 	};
 
 	Window_SRWAbilityDescription.prototype.open = function() {
+		this.refresh();
+		Window_Base.prototype.open.call(this);
+	};
+	
+	
+	function Window_LocationHeader(x,y) {
+		this.initialize.apply(this, arguments);		
+	}
+
+	Window_LocationHeader.prototype = Object.create(Window_Base.prototype);
+	Window_LocationHeader.prototype.constructor = Window_LocationHeader;
+
+	Window_LocationHeader.prototype.initialize = function(x, y) {
+		var width = this.windowWidth();
+		var height = this.windowHeight();
+		Window_Base.prototype.initialize.call(this, x, y, width, height);
+		this.setBackgroundType(1);
+		this.refresh();
+	};
+
+	Window_LocationHeader.prototype.windowWidth = function() {
+		return 1110;
+	};
+
+	Window_LocationHeader.prototype.windowHeight = function() {
+		return this.fittingHeight(1);
+	};
+	
+	Window_LocationHeader.prototype.refresh = function() {
+		this.contents.clear();		
+		
+		this.drawText($gameTemp.locationHeader, 0, 0, 1110 - 38);
+			
+	};
+
+	Window_LocationHeader.prototype.open = function() {
 		this.refresh();
 		Window_Base.prototype.open.call(this);
 	};

@@ -717,4 +717,32 @@ $SRWConfig.mechAbilties = function(){
 			return true;
 		}
 	);
+	
+	this.addDefinition(
+		48, 
+		"Regen in reach", 
+		"Provides 100% EN regen when in reach of the mech with the specified id", 
+		false,
+		false,
+		function(actor, level){
+			return [{type: "EN_regen", modType: "addFlat", value: 100}];
+		},
+		function(actor, level){
+			const providerMechId = 3;//this is the mech id of the unit providing the regen field
+			const activationDistance = 4;
+			var targetActor = $statCalc.getCurrentPilot(providerMechId);
+			if(targetActor){
+				let providerEvent = $statCalc.getReferenceEvent(targetActor);
+				let receptorEvent = $statCalc.getReferenceEvent(actor);
+				if(providerEvent && receptorEvent){
+					let deltaX = Math.abs(providerEvent.posX() - receptorEvent.posX());
+					let deltaY = Math.abs(providerEvent.posY() - receptorEvent.posY());
+					if(deltaX + deltaY <= activationDistance){
+						return true;
+					}
+				}
+			}
+			return false;
+		}
+	);
 };

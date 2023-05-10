@@ -38,7 +38,7 @@ BattleTextBuilder.prototype.getAvailableTextHooks = function(){
 
 BattleTextBuilder.prototype.loadDefinitions = function(type, onload, onerror){
 	var xhr = new XMLHttpRequest();
-    var url = 'js/plugins/config/'+type+'/'+this._dataFileName;
+    var url = 'data/'+this._dataFileName;
     xhr.open('GET', url);
     xhr.overrideMimeType('application/json');
     xhr.onload = function() {
@@ -68,20 +68,14 @@ BattleTextBuilder.prototype.processDefinitions = function(data){
 
 BattleTextBuilder.prototype.save = function(id){
 	var fs = require('fs');
-	var dirPath = 'js/plugins/config/active';
-	if (!fs.existsSync(dirPath)) {
-        fs.mkdirSync(dirPath);
-    }
-	fs.writeFileSync('js/plugins/config/active/'+this._dataFileName, JSON.stringify(this._data));
+	fs.writeFileSync('data/'+this._dataFileName, JSON.stringify(this._data));
 }
 
 BattleTextBuilder.prototype.saveBackup = function(id){
 	var fs = require('fs');
-	var dirPath = 'js/plugins/config/active';
-	if (!fs.existsSync(dirPath)) {
-        fs.mkdirSync(dirPath);
-    }
-	fs.writeFileSync('js/plugins/config/active/'+this._dataFileName+'.bak', JSON.stringify(this._data));
+	if(this._data && Object.keys(this._data).length){
+		fs.writeFileSync('data/'+this._dataFileName+'.bak', JSON.stringify(this._data));
+	}
 }
 
 BattleTextBuilder.prototype.updateText = function(params, updateValues){

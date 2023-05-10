@@ -5655,6 +5655,24 @@ StatCalc.prototype.canRecoverAmmo = function(actor, percent){
 	} 	
 }
 
+StatCalc.prototype.getRemainingAmmoRatio = function(actor){		
+	if(this.isActorSRWInitialized(actor)){			
+		var weapons = this.getActorMechWeapons(actor);
+		var ctr = 0;
+		let totalAmmo = 0;
+		let currentAmmo = 0;
+		while(!hasUsedAmmo && ctr < weapons.length){
+			var weapon = weapons[ctr++];
+			if(weapon.totalAmmo != -1){
+				totalAmmo+=weapon.totalAmmo;
+				currentAmmo+=weapon.currentAmmo;
+			}			
+		}
+		return currentAmmo / totalAmmo;
+	} 	
+	return 0;
+}
+
 StatCalc.prototype.hasHealTargets = function(actor, percent){
 	var referenceEvent = this.getReferenceEvent(actor);
 	var candidates = this.getAdjacentActors(null, {x: referenceEvent.posX(), y: referenceEvent.posY()});
@@ -5938,6 +5956,48 @@ StatCalc.prototype.getConsumables = function(actor){
 			if(items[i]){			
 				if($itemEffectManager.getAbilityDef(items[i].idx).isUnique && !actor.SRWStats.stageTemp.inventoryConsumed[i]){
 					result.push({itemIdx: items[i].idx, listIdx: i});
+				}
+			}
+		}
+	}	
+	return result;
+}
+
+StatCalc.prototype.getAIConsumables = function(actor){
+	var _this = this;
+	var result = [];
+	const recoverPriority = {
+		HP_recover: 3,
+		EN_recover: 2,
+		ammo_recover: 1
+	};
+	const recoverValidators = {
+		HP_recover: (actor) => {
+			return actor.SRWStats.mech.stats.calculated.currentHP / actor.SRWStats.mech.stats.calculated.maxHP <= 0.5;
+		},
+		EN_recover: (actor) => {
+			return actor.SRWStats.mech.stats.calculated.currentEN / actor.SRWStats.mech.stats.calculated.maxEN <= 0.5;
+		},
+		ammo_recover: (actor) => {
+			return _this.getRemainingAmmoRatio(actor) <= 0.5;
+		}
+	};
+	if(_this.isActorSRWInitialized(actor)){	
+		var items = actor.SRWStats.mech.items;		
+		for(var i = 0; i < items.length; i++){
+			if(items[i]){			
+				if($itemEffectManager.getAbilityDef(items[i].idx).isUnique && !actor.SRWStats.stageTemp.inventoryConsumed[i]){
+					let recoveredStat;
+					let mods = $itemEffectManager.getStatmod(actor, items[i].idx);
+					for(let mod of mods){
+						if(recoverPriority[mod.type] && (!recoveredStat || recoverPriority[mod.type] > recoverPriority[recoveredStat])){
+							recoveredStat = mod.type;
+						}
+					}
+					if(recoverValidators[recoveredStat] && recoverValidators[recoveredStat](actor)){
+						result.push({itemIdx: items[i].idx, listIdx: i});
+					}
+					//
 				}
 			}
 		}

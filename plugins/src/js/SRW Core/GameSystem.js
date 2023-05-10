@@ -2636,16 +2636,32 @@
 		
 		Game_System.prototype.registerColorCycle = function(id, colors, delay) {
 			this.checkcolorSubstitutionKit();
-			if(id >= 0 && id < 3 && colors.length < 5){
+			if(id >= 0 && id < 3 ){
 				let tmp = [];
+				let isComplexCycle = false;
 				for(let color of colors){
-					tmp.push(color.replace("#", ""));
+					if(typeof color == "object"){
+						let lookup = {};
+						for(let searchColor in color.colors){
+							lookup[searchColor.replace("#", "")] = color.colors[searchColor].replace("#", "");
+						}
+						color.colors = lookup;
+						tmp.push(color);
+						isComplexCycle = true;
+					} else {
+						tmp.push(color.replace("#", ""));
+					}
+					
+				}
+				if(isComplexCycle && tmp[0]){
+					delay = tmp[0].delay;
 				}
 				this._colorCycles[id] = {
 					running: true,
 					lastUpdate: Date.now(),
 					colors: tmp,
 					delay: delay || 250,
+					isComplexCycle: isComplexCycle,
 					cycle: 0
 				}
 			}			
@@ -2660,6 +2676,26 @@
 		
 		Game_System.prototype.updateColorCycles = function() {
 			const _this = this;
+			
+			function registerColorTranslation(baseOffset, entryOffset, currentColor, targetColor){
+				let currentR = Number("0x"+currentColor.substring(0, 2), 10);
+				let currentG = Number("0x"+currentColor.substring(2, 4), 10);
+				let currentB = Number("0x"+currentColor.substring(4), 10);
+				
+				let targetR = Number("0x"+targetColor.substring(0, 2), 10);
+				let targetG = Number("0x"+targetColor.substring(2, 4), 10);
+				let targetB = Number("0x"+targetColor.substring(4), 10);
+				
+				
+				_this._currentColorSubstitutions[baseOffset + entryOffset + 0] = currentR;
+				_this._currentColorSubstitutions[baseOffset + entryOffset + 1] = currentG;
+				_this._currentColorSubstitutions[baseOffset + entryOffset + 2] = currentB;
+				
+				_this._currentColorSubstitutions[baseOffset + entryOffset + 3] = targetR;
+				_this._currentColorSubstitutions[baseOffset + entryOffset + 4] = targetG;
+				_this._currentColorSubstitutions[baseOffset + entryOffset + 5] = targetB;
+			}
+			
 			this.checkcolorSubstitutionKit();
 			for(let cycleId in _this._colorCycles){
 				let cycleInfo = _this._colorCycles[cycleId];
@@ -2670,33 +2706,30 @@
 					if(cycleInfo.cycle >= cycleInfo.colors.length){
 						cycleInfo.cycle = 0;
 					}
-				}					
-				for(var i = 0; i < 5; i++){
-					let currentColor = "000000";
-					let targetColor = "000000";
-					if(cycleInfo.running && i < cycleInfo.colors.length){
-						currentColor = String(cycleInfo.colors[i]);
-						let targetColorIdx = (i + cycleInfo.cycle) % cycleInfo.colors.length;
-						targetColor = String(cycleInfo.colors[targetColorIdx]);
+				}		
+				const baseOffset = cycleId * 24;	
+				if(cycleInfo.isComplexCycle) {
+					let frameInfo = cycleInfo.colors[cycleInfo.cycle];
+					cycleInfo.delay = frameInfo.delay;
+					let ctr = 0;					
+					for(let searchColor in frameInfo.colors){
+						let targetColor = frameInfo.colors[searchColor];						
+						const entryOffset = (ctr++) * 6;
+						registerColorTranslation(baseOffset, entryOffset, searchColor, targetColor);
 					}
-					let currentR = Number("0x"+currentColor.substring(0, 2), 10);
-					let currentG = Number("0x"+currentColor.substring(2, 4), 10);
-					let currentB = Number("0x"+currentColor.substring(4), 10);
-					
-					let targetR = Number("0x"+targetColor.substring(0, 2), 10);
-					let targetG = Number("0x"+targetColor.substring(2, 4), 10);
-					let targetB = Number("0x"+targetColor.substring(4), 10);
-					
-					const baseOffset = cycleId * 24;
-					const entryOffset = i * 6;
-					this._currentColorSubstitutions[baseOffset + entryOffset + 0] = currentR;
-					this._currentColorSubstitutions[baseOffset + entryOffset + 1] = currentG;
-					this._currentColorSubstitutions[baseOffset + entryOffset + 2] = currentB;
-					
-					this._currentColorSubstitutions[baseOffset + entryOffset + 3] = targetR;
-					this._currentColorSubstitutions[baseOffset + entryOffset + 4] = targetG;
-					this._currentColorSubstitutions[baseOffset + entryOffset + 5] = targetB;
-				}	
+				} else {
+					for(var i = 0; i < 4; i++){
+						let currentColor = "000000";
+						let targetColor = "000000";
+						if(cycleInfo.running && i < cycleInfo.colors.length){
+							currentColor = String(cycleInfo.colors[i]);
+							let targetColorIdx = (i + cycleInfo.cycle) % cycleInfo.colors.length;
+							targetColor = String(cycleInfo.colors[targetColorIdx]);
+						}
+						const entryOffset = i * 6;
+						registerColorTranslation(baseOffset, entryOffset, currentColor, targetColor);
+					}
+				}					
 			}		
 		}
 	}

@@ -262,7 +262,7 @@ ItemEffectManager.prototype.getIdPrefix = function(idx){
 	return "item";
 }
 
-ItemEffectManager.prototype.applyConsumable = function(actor, itemIdx){
+ItemEffectManager.prototype.applyConsumable = function(actor, itemIdx, handler){
 	
 	
 	var effectHandlers = {
@@ -343,7 +343,7 @@ ItemEffectManager.prototype.applyConsumable = function(actor, itemIdx){
 		$gameTemp.spiritTargetActor	= actor;
 		$gameSystem.setSubBattlePhase('spirit_activation');	
 		$gameTemp.pushMenu = "spirit_activation";	
-		$gameTemp.spiritWindowDoneHandler = function(){
+		$gameTemp.spiritWindowDoneHandler = handler || function(){
 			$gameTemp.spiritWindowDoneHandler = null;
 			$gameTemp.popMenu = true;
 			$gameSystem.setSubBattlePhase('normal');	

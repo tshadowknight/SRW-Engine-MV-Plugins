@@ -57,8 +57,23 @@ SRWEditor.prototype.init = function(){
 	_this._contentDiv.id = "srw_editor";
 	document.body.appendChild(_this._contentDiv);
 	
-	this._battleTextBuilder = $battleSceneManager.getBattleTextBuilder();
+	$battleSceneManager.init(true);	
 	
+	this._battleTextBuilder = $battleSceneManager.getBattleTextBuilder();
+	this._animationBuilder = $battleSceneManager.getAnimationBuilder();
+	this._environmentBuilder = $battleSceneManager.getEnvironmentBuilder();
+	
+	_this._battleTextBuilder.isLoaded().then(function(){
+		_this._battleTextBuilder.saveBackup();	
+	});
+	_this._animationBuilder.isLoaded().then(function(){
+		_this._animationBuilder.saveBackup();	
+	});
+	_this._environmentBuilder.isLoaded().then(function(){
+		_this._environmentBuilder.saveBackup();	
+	});
+
+		
 	$gameSystem.skyBattleOffset = 0;
 	
 	$gameSystem.battleBg = "mountains2";
@@ -1335,7 +1350,7 @@ SRWEditor.prototype.prepareBattleScenePreview = function(){
 	$battleSceneManager._swipeContainer.style.width = "";
 	$battleSceneManager._swipeContainer.style.height = "";
 	
-	$battleSceneManager.init(true);	
+	//$battleSceneManager.init(true);	
 	
 	$battleSceneManager.setExternalFPSCounter(document.querySelector("#attack_editor .fps_counter"));
 	$battleSceneManager.setExternalTickCounter(document.querySelector("#attack_editor .tick_counter"));
@@ -2844,8 +2859,8 @@ SRWEditor.prototype.showAttackEditor = function(){
 	
 	this.prepareBattleScenePreview();
 	
-	this._animationBuilder = $battleSceneManager.getAnimationBuilder();
-	this._environmentBuilder = $battleSceneManager.getEnvironmentBuilder()
+	//this._animationBuilder = $battleSceneManager.getAnimationBuilder();
+	//this._environmentBuilder = $battleSceneManager.getEnvironmentBuilder()
 	
 	if(_this._currentEnvironmentDefinition == null){
 		_this._currentEnvironmentDefinition = id;
@@ -2861,9 +2876,7 @@ SRWEditor.prototype.showAttackEditor = function(){
 		_this.applyPreferences();
 	});
 	
-	_this._animationBuilder.isLoaded().then(function(){
-		_this._animationBuilder.saveBackup();	
-	});
+	
 	
 	this.showAttackEditorControls();
 	

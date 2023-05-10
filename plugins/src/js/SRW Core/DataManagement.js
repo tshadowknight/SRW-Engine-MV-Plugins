@@ -79,7 +79,7 @@
 				const fs = require('fs');
 				var path = require('path');
 				var base = path.dirname(process.mainModule.filename);
-				let filesToCheck = ["AllyPilots", "Mechs", "MechWeapons", "EnemyPilots", "DeployActions", "MapAttacks", "ScriptCharacters", "Patterns"];
+				let filesToCheck = ["AllyPilots", "Mechs", "MechWeapons", "EnemyPilots", "DeployActions", "MapAttacks", "ScriptCharacters", "Patterns", "BattleAnimations", "BattleEnvironments", "BattleText"];
 				let missingFiles = [];	
 				filesToCheck.forEach(function(file){
 					if (!fs.existsSync(base+"/data/"+file+".json")) {
@@ -141,6 +141,27 @@
 						sourceFile = base+"/js/plugins/config/default/ScriptCharacters.json";
 					}
 					fs.copyFileSync(sourceFile, base+"/data/ScriptCharacters.json", fs.constants.COPYFILE_EXCL);	
+				}
+				if(file == "BattleAnimations"){
+					var sourceFile = base+"/js/plugins/config/active/BattleAnimations.json";
+					if(!fs.existsSync(sourceFile)){
+						sourceFile = base+"/js/plugins/config/default/BattleAnimations.json";
+					}
+					fs.copyFileSync(sourceFile, base+"/data/BattleAnimations.json", fs.constants.COPYFILE_EXCL);	
+				}
+				if(file == "BattleEnvironments"){
+					var sourceFile = base+"/js/plugins/config/active/BattleEnvironments.json";
+					if(!fs.existsSync(sourceFile)){
+						sourceFile = base+"/js/plugins/config/default/BattleEnvironments.json";
+					}
+					fs.copyFileSync(sourceFile, base+"/data/BattleEnvironments.json", fs.constants.COPYFILE_EXCL);	
+				}
+				if(file == "BattleText"){
+					var sourceFile = base+"/js/plugins/config/active/BattleText.json";
+					if(!fs.existsSync(sourceFile)){
+						sourceFile = base+"/js/plugins/config/default/BattleText.json";
+					}
+					fs.copyFileSync(sourceFile, base+"/data/BattleText.json", fs.constants.COPYFILE_EXCL);	
 				}
 			});
 		}
@@ -650,7 +671,13 @@
 				refundPilotPP: true,
 				addFunds: true,
 				setEventHP: true,
-				addSubPilot: true
+				addSubPilot: true,
+				setPortraitOverlay: true,
+				hidePortraitOverlay: true,
+				hideAllPortraitOverlays: true,
+				setLocationHeader: true,
+				clearLocationHeader: true,
+				deployMech: true
 			}
 			var scriptCommands = {
 				fadeIn: function(eventList, indent, params){

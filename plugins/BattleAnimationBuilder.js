@@ -21,7 +21,7 @@ function BattleAnimationBuilder(){
 
 BattleAnimationBuilder.prototype.loadDefinitions = function(type, onload, onerror){
 	var xhr = new XMLHttpRequest();
-    var url = 'js/plugins/config/'+type+'/BattleAnimations.json';
+    var url = 'data/BattleAnimations.json';
     xhr.open('GET', url);
     xhr.overrideMimeType('application/json');
     xhr.onload = function() {
@@ -60,20 +60,14 @@ BattleAnimationBuilder.prototype.isLoaded = function(){
 
 BattleAnimationBuilder.prototype.save = function(id){
 	var fs = require('fs');
-	var dirPath = 'js/plugins/config/active';
-	if (!fs.existsSync(dirPath)) {
-        fs.mkdirSync(dirPath);
-    }
-	fs.writeFileSync('js/plugins/config/active/BattleAnimations.json', JSON.stringify(this._animLookup));
+	fs.writeFileSync('data/BattleAnimations.json', JSON.stringify(this._animLookup));
 }
 
 BattleAnimationBuilder.prototype.saveBackup = function(id){
 	var fs = require('fs');
-	var dirPath = 'js/plugins/config/active';
-	if (!fs.existsSync(dirPath)) {
-        fs.mkdirSync(dirPath);
-    }
-	fs.writeFileSync('js/plugins/config/active/BattleAnimations.json.bak', JSON.stringify(this._animLookup));
+	if(this._animLookup && Object.keys(this._animLookup).length){
+		fs.writeFileSync('data/BattleAnimations.json.bak', JSON.stringify(this._animLookup));
+	}
 }
 
 BattleAnimationBuilder.prototype.newDef = function(name){
