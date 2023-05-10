@@ -25,6 +25,7 @@ var ENGINE_SETTINGS = {
 		reposition: 0, //if 1 the unit will move closer to hit enemies with stronger attacks even if they already can hit a target with a longer range attack
 		preferTarget: 0,//if 1 the unit will prefer to move closer to its target unit or region even if they have other targets to attack. Target units take priority over target regions.  
 	},
+	AI_USES_ITEMS: true,
 	DISABLE_FULL_BATTLE_SCENE: false,// if true the option to show the battle DEMO will not be available
 	BATTLE_SCENE: {
 		FXAA_ON: false,

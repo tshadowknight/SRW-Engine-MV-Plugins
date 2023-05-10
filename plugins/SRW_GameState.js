@@ -60,9 +60,11 @@ function GameStateManager(){
 		confirm_end_turn: "GameState_confirm_end_turn", //OK
 		end_actor_turn: "GameState_end_actor_turn", //OK
 		enemy_action: "GameState_enemy_action",
+		enemy_item_usage: "GameState_enemy_item_usage",
 		enemy_attack: "GameState_enemy_attack", //OK
 		enemy_command: "GameState_enemy_command", //OK
 		enemy_move: "GameState_enemy_move", //OK
+		enemy_hit_and_away: "GameState_enemy_hit_and_away", //OK
 		enemy_range_display: "GameState_enemy_range_display", //OK
 		enemy_targeting_display: "GameState_enemy_targeting_display", //OK
 		enemy_unit_summary: "GameState_enemy_unit_summary", //OK
@@ -1822,6 +1824,7 @@ GameState_enemy_command.prototype.constructor = GameState_enemy_command;
 
 GameState_enemy_command.prototype.update = function(scene){
 	if (!$gameMap.isEventRunning()) {
+		
 		$gameTemp.AIWaitTimer--;
 		if($gameTemp.AIWaitTimer < 0){		
 			$gameTemp.unitHitInfo = {};
@@ -1865,6 +1868,37 @@ GameState_enemy_action.prototype.update = function(scene){
 			$gameTemp.AIWaitTimer = 0;				
 		}
 	}
+	return true;
+}
+
+
+function GameState_enemy_item_usage(){
+	GameState.call(this);
+}
+
+GameState_enemy_item_usage.prototype = Object.create(GameState.prototype);
+GameState_enemy_item_usage.prototype.constructor = GameState_enemy_item_usage;
+
+GameState_enemy_item_usage.prototype.update = function(scene){
+	if(!$gameTemp.handlingItemAnim){
+		if(ENGINE_SETTINGS.AI_USES_ITEMS){
+			const actor = $gameSystem.getActiveUnit();
+			let validConsumables = $statCalc.getAIConsumables(actor);
+			if(validConsumables.length){
+				let current = validConsumables.pop();
+				$gameTemp.handlingItemAnim = true;	
+				$statCalc.setConsumableUsed(actor, current.listIdx);
+				$itemEffectManager.applyConsumable(actor, current.itemIdx, function(){
+					$gameTemp.handlingItemAnim = false;
+					$gameTemp.spiritWindowDoneHandler = null;
+					$gameTemp.popMenu = true;
+					$gameSystem.setSubBattlePhase('enemy_item_usage');	
+				});					
+				return true;
+			}	
+		}			
+		scene.srpgContinueAICommand();
+	}	
 	return true;
 }
 
@@ -1916,6 +1950,43 @@ GameState_enemy_targeting_display.prototype.update = function(scene){
 		$gameSystem.setSubBattlePhase("enemy_attack");
 	} else {
 		$gameTemp.targetingDisplayCounter--;
+	}
+	return true;
+}
+
+
+function GameState_enemy_hit_and_away(){
+	GameState.call(this);
+}
+
+GameState_enemy_hit_and_away.prototype = Object.create(GameState.prototype);
+GameState_enemy_hit_and_away.prototype.constructor = GameState_enemy_hit_and_away;
+
+GameState_enemy_hit_and_away.prototype.update = function(scene){
+	if($gameSystem.srpgWaitMoving()){
+		return;
+	}
+	if($gameTemp.hitAndAwayTimer > 0){
+		$gameTemp.hitAndAwayTimer--;
+		return;
+	}
+	const actor = $gameSystem.getActiveUnit();
+	if(!$gameTemp.isPostMove && $statCalc.applyStatModsToValue(actor, 0, ["hit_and_away"])){
+		let optimalPos = scene.srpgGetAITargetPosition();	
+		if(optimalPos){
+			let event = $gameTemp.activeEvent();
+			if(optimalPos[0] != event.posX() || optimalPos[1] != event.posY()){
+				$gameSystem.srpgMakeMoveTable(event);
+				$gameTemp.isPostMove = true;
+				$gameTemp.hitAndAwayTimer = $gameSystem.getScaledTime(30);
+				var route = $gameTemp.MoveTable(optimalPos[0], optimalPos[1])[1];
+				$gameSystem.setSrpgWaitMoving(true);
+				event.srpgMoveToPoint({x: optimalPos[0], y: optimalPos[1]});
+				$gamePlayer.setTransparent(true);
+			}					
+		}	
+	} else {
+		scene.srpgAfterAction();
 	}
 	return true;
 }

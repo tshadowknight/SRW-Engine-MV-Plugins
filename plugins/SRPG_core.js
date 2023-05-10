@@ -1780,7 +1780,8 @@ SceneManager.isInSaveScene = function(){
 			$gameSystem.setSubBattlePhase("process_death_queue");
 			this.eventBeforeDestruction();
 		} else {
-			this.srpgAfterAction();
+			$gameSystem.setSubBattlePhase("enemy_hit_and_away");
+			//this.srpgAfterAction();
 		}
     };
 
@@ -3074,21 +3075,24 @@ SceneManager.isInSaveScene = function(){
 		}
 		
 		
-		
+		$gameTemp.setActiveEvent(event);
 		
 		$gameTemp.isPostMove = false;
 		if(enemy.battleMode() === 'disabled'){
-			$gameTemp.setActiveEvent(event);
 			enemy.onAllActionsEnd();
 			$gameTemp.AIWaitTimer = $gameSystem.getScaledTime(10);
 			$gamePlayer.locate(event.posX(), event.posY());		
 			this.srpgAfterAction();
 			return;
 		}
-		
-    
+		$gamePlayer.locate(event.posX(), event.posY());		
+		$gameSystem.setSubBattlePhase('enemy_item_usage');
+	}
+	Scene_Map.prototype.srpgContinueAICommand = function() {
+		const event = $gameTemp.activeEvent();
+		const enemy = $gameSystem.EventToUnit(event.eventId())[1];
         if (_srpgStandUnitSkip === 'true' && enemy.battleMode() === 'stand' || enemy.battleMode() === 'fixed') {
-            $gameTemp.setActiveEvent(event);
+           
             $gameSystem.srpgMakeMoveTable(event);
             var canAttackTargets = this.srpgMakeCanAttackTargets(enemy, null, true); //行動対象としうるユニットのリストを作成
             $gameTemp.clearMoveTable();
@@ -3099,7 +3103,6 @@ SceneManager.isInSaveScene = function(){
 					this.doEnemyMapAttack(event, false);	
 					return;
 				} else {
-					$gameTemp.setActiveEvent(event);
 					enemy.onAllActionsEnd();
 					$gameTemp.AIWaitTimer = $gameSystem.getScaledTime(10);
 					$gamePlayer.locate(event.posX(), event.posY());		
@@ -3123,7 +3126,6 @@ SceneManager.isInSaveScene = function(){
 		}
 		
         		
-		$gameTemp.setActiveEvent(event);
 		$statCalc.invalidateAbilityCache($gameSystem.getActiveUnit());
 		$gameSystem.setSubBattlePhase('enemy_move');
 		$gameTemp.AIWaitTimer = $gameSystem.getScaledTime(1);
@@ -3212,15 +3214,10 @@ SceneManager.isInSaveScene = function(){
 		}
 	}
 	
-    //エネミーの移動先決定と移動実行
-    Scene_Map.prototype.srpgInvokeAIMove = function() {
-		var _this = this;
-		$gameTemp.AIWaitTimer = $gameSystem.getScaledTime(20);
-		$gameVariables.setValue(_currentActorId, -1); //ensure no active actor id lingers
-		$gameTemp.enemyWeaponSelection = null;
-        var event = $gameTemp.activeEvent();
+	Scene_Map.prototype.srpgGetAITargetPosition = function() {
+		var event = $gameTemp.activeEvent();
         var type = $gameSystem.EventToUnit(event.eventId())[0];
-        var enemy = $gameSystem.EventToUnit(event.eventId())[1];
+        var enemy = $gameSystem.EventToUnit(event.eventId())[1];		
 		
 		function checkPriorityTarget(candidates){
 			var priorityTargetInRange = false;
@@ -3256,6 +3253,151 @@ SceneManager.isInSaveScene = function(){
 			return priorityTargetInRange;
 		}
 		
+		let optimalPos;
+		
+		var AIFlags = $statCalc.getAIFlags(enemy);
+		var canAttackTargets = this.srpgMakeCanAttackTargets(enemy, null, enemy.battleMode() === 'stand' || enemy.battleMode() === 'fixed'); //行動対象としうるユニットのリストを作成
+		var priorityTargetInRange = checkPriorityTarget(canAttackTargets);
+		var optimalPosStanding;
+		if(!AIFlags.reposition && canAttackTargets && canAttackTargets.length){
+			var targetInfo = this.srpgDecideTarget(canAttackTargets, event, !AIFlags.reposition); //ターゲットの設定
+			$gameTemp.enemyWeaponSelection = targetInfo.weapon;
+			$gameTemp.setTargetEvent(targetInfo.target);
+			enemy._currentTarget = targetInfo.target;
+			var alreadyInRange = $battleCalc.isTargetInRange({x: event.posX(), y: event.posY()}, {x: targetInfo.target.posX(), y: targetInfo.target.posY()}, $statCalc.getRealWeaponRange(enemy, targetInfo.weapon), $statCalc.getRealWeaponMinRange(enemy, targetInfo.weapon));
+			if(alreadyInRange){
+				optimalPosStanding =  this.srpgSearchOptimalPos({x: targetInfo.target.posX(), y: targetInfo.target.posY()}, enemy, type, $statCalc.getRealWeaponRange(enemy, targetInfo.weapon), $statCalc.getRealWeaponMinRange(enemy, targetInfo.weapon));
+			}
+		}	
+		
+		var fullRange = $statCalc.getFullWeaponRange(enemy, true);
+		$gameSystem.srpgMakeMoveTable(event, false, true);
+		var targetInfo;
+		
+		var optimalPosWithMove;
+		var canAttackTargets = this.srpgMakeCanAttackTargetsWithMove(enemy);
+		var withMoveHasPrio = checkPriorityTarget(canAttackTargets);
+		if(canAttackTargets && canAttackTargets.length){
+			targetInfo = this.srpgDecideTarget(canAttackTargets, event); //ターゲットの設定
+			if(targetInfo.target){
+				var alreadyInRange = $battleCalc.isTargetInRange({x: event.posX(), y: event.posY()}, {x: targetInfo.target.posX(), y: targetInfo.target.posY()}, $statCalc.getRealWeaponRange(enemy, targetInfo.weapon), $statCalc.getRealWeaponMinRange(enemy, targetInfo.weapon));
+				if(!alreadyInRange){						
+					enemy._currentTarget = targetInfo.target;						
+					optimalPosWithMove = this.srpgSearchOptimalPos({x: targetInfo.target.posX(), y: targetInfo.target.posY()}, enemy, type, fullRange.range, fullRange.minRange);
+				} else {
+					optimalPosWithMove = [event.posX(), event.posY()];
+				}
+			}
+		}
+		
+		var optimalPosMap;
+		var mapPositionHasPrio = checkPriorityTarget($statCalc.getAllActorEvents("", $gameSystem.getUnitFactionInfo(enemy)));
+		targetInfo = this.srpgDecideTarget($statCalc.getAllActorEvents("", $gameSystem.getUnitFactionInfo(enemy)), event); //ターゲットの設定
+		if(targetInfo.target){
+			enemy._currentTarget = targetInfo.target;
+			var minRange = fullRange.minRange;
+			if(minRange == -1){
+				minRange = 0;
+			}
+			optimalPosMap = this.srpgSearchOptimalPos({x: targetInfo.target.posX(), y: targetInfo.target.posY()}, enemy, type, fullRange.range || -1, minRange, true);
+		}
+		
+		/*if(enemy._currentTarget && !enemy._currentTarget.isErased()){
+			targetInfo = {target: enemy._currentTarget};
+			optimalPos = this.srpgSearchOptimalPos({x: targetInfo.target.posX(), y: targetInfo.target.posY()}, enemy, type, fullRange.range, fullRange.minRange);
+		} else */
+		var regionOptimalPos;
+		if(enemy.targetRegion != -1 && enemy.targetRegion != null){
+			var candidatePositions = $gameMap.getRegionTiles(enemy.targetRegion);
+			var currentBestDist = -1;
+			var xRef = event.posX();
+			var yRef = event.posY();
+			for(var i = 0; i < candidatePositions.length; i++){
+				
+				var dist = Math.hypot(xRef-candidatePositions[i].x, yRef-candidatePositions[i].y);
+				if((currentBestDist == -1 || dist < currentBestDist) && ($statCalc.isFreeSpace(candidatePositions[i]) || (xRef == candidatePositions[i].x && yRef == candidatePositions[i].y))){
+					regionOptimalPos = candidatePositions[i];
+					currentBestDist = dist;
+				}
+			}
+			if(!regionOptimalPos){
+				currentBestDist = -1;
+				for(var i = 0; i < candidatePositions.length; i++){						
+					var dist = Math.hypot(xRef-candidatePositions[i].x, yRef-candidatePositions[i].y);
+					if((currentBestDist == -1 || dist < currentBestDist)){
+						regionOptimalPos = candidatePositions[i];
+						currentBestDist = dist;
+					}
+				}
+			}
+			if(regionOptimalPos){
+				regionOptimalPos = this.srpgSearchOptimalPos(regionOptimalPos, enemy, type, -1, 0);
+			}					
+		} 
+		
+		//if the priority target is in range, target it
+		if(priorityTargetInRange || (!AIFlags.preferTarget && optimalPosStanding)){
+			optimalPos = optimalPosStanding;
+		}
+		
+		//if the priority target is among the possible targets with move or somewhere on the map, prefer moving towards it
+		if(!optimalPos && withMoveHasPrio){
+			optimalPos = optimalPosWithMove;
+		}
+		
+		if(!optimalPos && mapPositionHasPrio){
+			optimalPos = optimalPosMap;
+		}
+		
+		//if no priority target is present and the enemy has no target region or doesn't prefer its target
+		if(!optimalPos && (enemy.targetRegion == -1 || AIFlags.preferTarget < 2)){
+			if(optimalPosStanding){
+				optimalPos = optimalPosStanding;
+			}
+		}		
+				
+		//if no priority target is present first check if a target region is reachable
+		if(!optimalPos){
+			if(regionOptimalPos){
+				optimalPos = regionOptimalPos;
+			}
+		}
+		
+		//if no priority target or target region, take any target reachable
+		if(!optimalPos){
+			if(optimalPosStanding){
+				optimalPos = optimalPosStanding;
+			}
+		}
+		
+		//if no priority target or region target is present, take any target in move range
+		if(!optimalPos){
+			if(optimalPosWithMove){
+				optimalPos = optimalPosWithMove;
+			}
+		}
+		
+		//if still no target is found, pick one from targets on the entire map
+		if(!optimalPos){
+			if(optimalPosMap){
+				optimalPos = optimalPosMap;
+			}
+		}
+		return optimalPos;
+	}
+	
+    //エネミーの移動先決定と移動実行
+    Scene_Map.prototype.srpgInvokeAIMove = function() {
+		var _this = this;
+		$gameTemp.AIWaitTimer = $gameSystem.getScaledTime(20);
+		$gameVariables.setValue(_currentActorId, -1); //ensure no active actor id lingers
+		$gameTemp.enemyWeaponSelection = null;
+        var event = $gameTemp.activeEvent();
+        var type = $gameSystem.EventToUnit(event.eventId())[0];
+        var enemy = $gameSystem.EventToUnit(event.eventId())[1];
+		
+		
+		
 		var mapAttackInfo = this.getEnemyMapAttackInfo(event, false);		
 		
 		if(mapAttackInfo && mapAttackInfo.targets.length > 1){//if the map attack has at least two or more targets use it, else check for regular attacks	
@@ -3263,135 +3405,7 @@ SceneManager.isInSaveScene = function(){
 			this.doEnemyMapAttack(event, false);	
 		} else {      
 					
-			var AIFlags = $statCalc.getAIFlags(enemy);
-			var canAttackTargets = this.srpgMakeCanAttackTargets(enemy, null, enemy.battleMode() === 'stand' || enemy.battleMode() === 'fixed'); //行動対象としうるユニットのリストを作成
-			var priorityTargetInRange = checkPriorityTarget(canAttackTargets);
-			var optimalPosStanding;
-			if(!AIFlags.reposition && canAttackTargets && canAttackTargets.length){
-				var targetInfo = this.srpgDecideTarget(canAttackTargets, event, !AIFlags.reposition); //ターゲットの設定
-				$gameTemp.enemyWeaponSelection = targetInfo.weapon;
-				$gameTemp.setTargetEvent(targetInfo.target);
-				enemy._currentTarget = targetInfo.target;
-				var alreadyInRange = $battleCalc.isTargetInRange({x: event.posX(), y: event.posY()}, {x: targetInfo.target.posX(), y: targetInfo.target.posY()}, $statCalc.getRealWeaponRange(enemy, targetInfo.weapon), $statCalc.getRealWeaponMinRange(enemy, targetInfo.weapon));
-				if(alreadyInRange){
-					optimalPosStanding =  this.srpgSearchOptimalPos({x: targetInfo.target.posX(), y: targetInfo.target.posY()}, enemy, type, $statCalc.getRealWeaponRange(enemy, targetInfo.weapon), $statCalc.getRealWeaponMinRange(enemy, targetInfo.weapon));
-				}
-			}	
-			
-			var fullRange = $statCalc.getFullWeaponRange(enemy, true);
-			$gameSystem.srpgMakeMoveTable(event, false, true);
-			var targetInfo;
-			var optimalPos;
-			
-			var optimalPosWithMove;
-			var canAttackTargets = this.srpgMakeCanAttackTargetsWithMove(enemy);
-			var withMoveHasPrio = checkPriorityTarget(canAttackTargets);
-			if(canAttackTargets && canAttackTargets.length){
-				targetInfo = this.srpgDecideTarget(canAttackTargets, event); //ターゲットの設定
-				if(targetInfo.target){
-					var alreadyInRange = $battleCalc.isTargetInRange({x: event.posX(), y: event.posY()}, {x: targetInfo.target.posX(), y: targetInfo.target.posY()}, $statCalc.getRealWeaponRange(enemy, targetInfo.weapon), $statCalc.getRealWeaponMinRange(enemy, targetInfo.weapon));
-					if(!alreadyInRange){						
-						enemy._currentTarget = targetInfo.target;						
-						optimalPosWithMove = this.srpgSearchOptimalPos({x: targetInfo.target.posX(), y: targetInfo.target.posY()}, enemy, type, fullRange.range, fullRange.minRange);
-					} else {
-						optimalPosWithMove = [event.posX(), event.posY()];
-					}
-				}
-			}
-			
-			var optimalPosMap;
-			var mapPositionHasPrio = checkPriorityTarget($statCalc.getAllActorEvents("", $gameSystem.getUnitFactionInfo(enemy)));
-			targetInfo = this.srpgDecideTarget($statCalc.getAllActorEvents("", $gameSystem.getUnitFactionInfo(enemy)), event); //ターゲットの設定
-			if(targetInfo.target){
-				enemy._currentTarget = targetInfo.target;
-				var minRange = fullRange.minRange;
-				if(minRange == -1){
-					minRange = 0;
-				}
-				optimalPosMap = this.srpgSearchOptimalPos({x: targetInfo.target.posX(), y: targetInfo.target.posY()}, enemy, type, fullRange.range || -1, minRange, true);
-			}
-			
-			/*if(enemy._currentTarget && !enemy._currentTarget.isErased()){
-				targetInfo = {target: enemy._currentTarget};
-				optimalPos = this.srpgSearchOptimalPos({x: targetInfo.target.posX(), y: targetInfo.target.posY()}, enemy, type, fullRange.range, fullRange.minRange);
-			} else */
-			var regionOptimalPos;
-			if(enemy.targetRegion != -1 && enemy.targetRegion != null){
-				var candidatePositions = $gameMap.getRegionTiles(enemy.targetRegion);
-				var currentBestDist = -1;
-				var xRef = event.posX();
-				var yRef = event.posY();
-				for(var i = 0; i < candidatePositions.length; i++){
-					
-					var dist = Math.hypot(xRef-candidatePositions[i].x, yRef-candidatePositions[i].y);
-					if((currentBestDist == -1 || dist < currentBestDist) && ($statCalc.isFreeSpace(candidatePositions[i]) || (xRef == candidatePositions[i].x && yRef == candidatePositions[i].y))){
-						regionOptimalPos = candidatePositions[i];
-						currentBestDist = dist;
-					}
-				}
-				if(!regionOptimalPos){
-					currentBestDist = -1;
-					for(var i = 0; i < candidatePositions.length; i++){						
-						var dist = Math.hypot(xRef-candidatePositions[i].x, yRef-candidatePositions[i].y);
-						if((currentBestDist == -1 || dist < currentBestDist)){
-							regionOptimalPos = candidatePositions[i];
-							currentBestDist = dist;
-						}
-					}
-				}
-				if(regionOptimalPos){
-					regionOptimalPos = this.srpgSearchOptimalPos(regionOptimalPos, enemy, type, -1, 0);
-				}					
-			} 
-			
-			//if the priority target is in range, target it
-			if(priorityTargetInRange || (!AIFlags.preferTarget && optimalPosStanding)){
-				optimalPos = optimalPosStanding;
-			}
-			
-			//if the priority target is among the possible targets with move or somewhere on the map, prefer moving towards it
-			if(!optimalPos && withMoveHasPrio){
-				optimalPos = optimalPosWithMove;
-			}
-			
-			if(!optimalPos && mapPositionHasPrio){
-				optimalPos = optimalPosMap;
-			}
-			
-			//if no priority target is present and the enemy has no target region or doesn't prefer its target
-			if(!optimalPos && (enemy.targetRegion == -1 || AIFlags.preferTarget < 2)){
-				if(optimalPosStanding){
-					optimalPos = optimalPosStanding;
-				}
-			}		
-					
-			//if no priority target is present first check if a target region is reachable
-			if(!optimalPos){
-				if(regionOptimalPos){
-					optimalPos = regionOptimalPos;
-				}
-			}
-			
-			//if no priority target or target region, take any target reachable
-			if(!optimalPos){
-				if(optimalPosStanding){
-					optimalPos = optimalPosStanding;
-				}
-			}
-			
-			//if no priority target or region target is present, take any target in move range
-			if(!optimalPos){
-				if(optimalPosWithMove){
-					optimalPos = optimalPosWithMove;
-				}
-			}
-			
-			//if still no target is found, pick one from targets on the entire map
-			if(!optimalPos){
-				if(optimalPosMap){
-					optimalPos = optimalPosMap;
-				}
-			}
+			let optimalPos = this.srpgGetAITargetPosition();
 	
 			
 			if(optimalPos){

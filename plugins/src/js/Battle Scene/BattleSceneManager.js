@@ -2427,7 +2427,9 @@ BattleSceneManager.prototype.startScene = function(){
 		var tmp = [];
 		_this._spriterMainSpritesInfo.forEach(function(spriterBg){
 			if(!spriterBg.sprite.isDisposed()){
-				spriterBg.renderer.update(_this._engine.getDeltaTime());	
+				if(!_this._animsPaused){
+					spriterBg.renderer.update(_this._engine.getDeltaTime());	
+				}
 				tmp.push(spriterBg);
 			}			
 		});
@@ -2436,7 +2438,9 @@ BattleSceneManager.prototype.startScene = function(){
 		var tmp = [];
 		_this._spineMainSpritesInfo.forEach(function(spriterBg){
 			if(!spriterBg.sprite.isDisposed()){
-				spriterBg.renderer.update(_this._engine.getDeltaTime() / 1000 * ratio);	
+				if(!_this._animsPaused){
+					spriterBg.renderer.update(_this._engine.getDeltaTime() / 1000 * ratio);	
+				}
 				tmp.push(spriterBg);
 			}			
 		});
@@ -2446,7 +2450,9 @@ BattleSceneManager.prototype.startScene = function(){
 		var tmp = [];
 		_this._RMMVSpriteInfo.forEach(function(RMMVBg){
 			if(!RMMVBg.sprite.isDisposed()){
-				RMMVBg.RMMVSprite.update(_this._engine.getDeltaTime() * ratio);
+				if(!_this._animsPaused){
+					RMMVBg.RMMVSprite.update(_this._engine.getDeltaTime() * ratio);
+				}
 				RMMVBg.renderer.render(RMMVBg.stage);	
 				RMMVBg.texture.update();
 				tmp.push(RMMVBg);

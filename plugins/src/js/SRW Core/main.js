@@ -18,6 +18,9 @@ GameTemp.patches.apply();
 import GameSystem from './GameSystem.js';
 GameSystem.patches.apply();
 
+import GameMessage from './GameMessage.js';
+GameMessage.patches.apply();
+
 import DataManagement from './DataManagement.js';
 DataManagement.patches.apply();
 importGlobal(DataManagement);
@@ -31,6 +34,9 @@ Sprites.patches.apply();
 
 import Map from './Map.js';
 Map.patches.apply();
+
+import Scenes from './Scenes.js';
+Scenes.patches.apply();
 
 import Entities from './Entities.js';
 Entities.patches.apply();

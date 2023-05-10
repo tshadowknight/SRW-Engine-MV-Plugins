@@ -523,6 +523,22 @@
 					}			
 				}
 				
+				if (command === 'deployMech') {
+					var mechId = args[0];
+					var actor_unit = $statCalc.getCurrentPilot(mechId);
+					var event = $gameMap.event(args[1]);
+					if(actor_unit && event){
+						var type;
+						if(event.event().meta.type){
+							type = event.event().meta.type;
+						} else {
+							type = "actor";
+						}
+						event.setType(type);
+						$gameSystem.deployActor(actor_unit, event, args[2] * 1, args[3], true);
+					}
+				}
+				
 				if (command === 'deploySlot') {
 					var slot = args[0];
 					var deployInfo = $gameSystem.getDeployInfo();
@@ -1195,6 +1211,35 @@
 					targetMech.subPilots[args[1] * 1] = args[2] * 1;
 					$statCalc.storeMechData(targetMech);
 				}	
+				
+				if (command === 'setPortraitOverlay') {		
+					if(!$gameTemp.portraitOverlays){
+						$gameTemp.portraitOverlays = [];
+					}
+					$gameTemp.portraitOverlays.push((args[0] || 0) * 1);
+				}	
+				if (command === 'hidePortraitOverlay') {
+					if(!$gameTemp.portraitOverlays){
+						$gameTemp.portraitOverlays = [];
+					}	
+					let tmp = [];
+					for(let id of $gameTemp.portraitOverlays){
+						if(id != args[0]){
+							tmp.push(id);
+						}
+					}
+					$gameTemp.portraitOverlays = tmp;
+				}
+				if (command === 'hideAllPortraitOverlays') {					
+					$gameTemp.portraitOverlays = [];
+				}
+				if (command === 'setLocationHeader') {					
+					$gameTemp.locationHeader = (args[0] || "").replace(/\_/ig, " ");
+				}	
+				if (command === 'clearLocationHeader') {					
+					$gameTemp.locationHeader = null;
+				}
+							
 			} catch(e){
 				var msg = "";
 				msg+="Error while executing a plugin command: "+getLogContext();
