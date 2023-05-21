@@ -1229,14 +1229,14 @@
 			if(route.length > 1){//no movecost for the start tile
 				var taggedCost = $gameMap.SRPGTerrainTag(x, y);
 				if(taggedCost > 1){
-					if(currentRegion == 4 || (!$statCalc.isFlying(actor) && !$statCalc.applyStatModsToValue(actor, 0, ["is_hover"]))){
+					if(currentRegion == 4 || (!$statCalc.isFlying(actor) && !$statCalc.hoversOnWater(actor))){
 						moveCost = taggedCost;
 					}					
 					
 				}
 			}		
 
-			if(currentRegion == 3 && !$statCalc.isFlying(actor) && !$statCalc.applyStatModsToValue(actor, 0, ["is_hover"])){
+			if(currentRegion == 3 && !$statCalc.isFlying(actor) && !$statCalc.hoversOnWater(actor)){
 				if($statCalc.canBeOnWater(actor, "water") < 2){
 					moveCost*=2;
 				}

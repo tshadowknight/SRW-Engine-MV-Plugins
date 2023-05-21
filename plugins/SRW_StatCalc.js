@@ -398,6 +398,7 @@ StatCalc.prototype.getPilotStatInfo = function(actorProperties){
 	return {
 		base: {
 			SP: parseInt(actorProperties.pilotBaseSP),
+			MP: parseInt(actorProperties.pilotBaseMP || 0),
 			melee: parseInt(actorProperties.pilotBaseMelee),
 			ranged: parseInt(actorProperties.pilotBaseRanged),
 			skill: parseInt(actorProperties.pilotBaseSkill),
@@ -408,6 +409,7 @@ StatCalc.prototype.getPilotStatInfo = function(actorProperties){
 		},
 		growthRates: {
 			SP: parseGrowthRate(actorProperties.pilotSPGrowth),
+			MP: parseGrowthRate(actorProperties.pilotMPGrowth),
 			melee: parseGrowthRate(actorProperties.pilotMeleeGrowth),
 			ranged: parseGrowthRate(actorProperties.pilotRangedGrowth),
 			skill: parseGrowthRate(actorProperties.pilotSkillGrowth),
@@ -489,6 +491,7 @@ StatCalc.prototype.getMechWeapons = function(actor, mechProperties, previousWeap
 					totalAmmo: totalAmmo,
 					currentAmmo: currentAmmo,
 					ENCost: parseInt(weaponProperties.weaponEN),
+					MPCost: parseInt(weaponProperties.weaponMP || 0),
 					willRequired: parseInt(weaponProperties.weaponWill),
 					terrain: this.parseTerrainString(weaponProperties.weaponTerrain),
 					effects: effects,
@@ -756,7 +759,8 @@ StatCalc.prototype.resetStageTemp = function(actor){
 			isEssential: false,
 			additionalActions: 0,
 			disabledTurn: -1,
-			popUpAnimsPlayed: {}
+			popUpAnimsPlayed: {},
+			isHovering: !!this.canHover(actor)
 		};
 		this.resetStatus(actor);
 	}
@@ -1306,12 +1310,14 @@ StatCalc.prototype.reloadSRWStats = function(actor, lockAbilityCache, reloadMech
 	}
 	if(actor.SRWInitialized){
 		var currentSP = actor.SRWStats.pilot.stats.calculated.currentSP;
+		var currentMP = actor.SRWStats.pilot.stats.calculated.currentMP;
 		var currentHP = actor.SRWStats.mech.stats.calculated.currentHP;
 		var currentEN = actor.SRWStats.mech.stats.calculated.currentEN;
 		var activeSpirits = this.getActiveSpirits(actor);
 		var mech = actor.SRWStats.mech;
 		this.initSRWStats(actor, null, null, false, true);
 		actor.SRWStats.pilot.stats.calculated.currentSP = currentSP;
+		actor.SRWStats.pilot.stats.calculated.currentMP = currentMP;
 		actor.SRWStats.pilot.activeSpirits = activeSpirits;
 		
 		if(!reloadMech){
@@ -1636,6 +1642,7 @@ StatCalc.prototype.getMechData = function(mech, forActor, items, previousWeapons
 		result.canLand = mechProperties.mechLandEnabled || 1;
 		result.canWater = mechProperties.mechWaterEnabled || 1;
 		result.canSpace = mechProperties.mechSpaceEnabled || 1;
+		result.canHover =  mechProperties.mechHoverEnabled || 0;
 		result.isFlying = false;
 		result.id = mech.id;
 		result.expYield = parseInt(mechProperties.mechExpYield || 0);
@@ -2923,6 +2930,10 @@ StatCalc.prototype.calculateSRWActorStats = function(actor, preserveVolatile){
 				}				
 			}
 		}
+		
+		if(!preserveVolatile || calculatedStats.currentMP == null){
+			calculatedStats.currentMP = calculatedStats.MP || 0;		
+		}
 	}
 }
 
@@ -3677,6 +3688,14 @@ StatCalc.prototype.getCurrentSP = function(actor){
 	}	
 }
 
+StatCalc.prototype.getCurrentMP = function(actor){
+	if(this.isActorSRWInitialized(actor)){
+		return actor.SRWStats.pilot.stats.calculated.currentMP;
+	} else {
+		return 0;
+	}	
+}
+
 StatCalc.prototype.getCurrentPP = function(actor){
 	if(this.isActorSRWInitialized(actor)){
 		return actor.SRWStats.pilot.PP;
@@ -3952,7 +3971,23 @@ StatCalc.prototype.canBeOnLand = function(actor){
 
 StatCalc.prototype.canBeOnWater = function(actor){
 	if(this.isActorSRWInitialized(actor)){
-		return actor.SRWStats.mech.canWater * 1 || this.applyStatModsToValue(actor, 0, ["water_enabled"]) || this.applyStatModsToValue(actor, 0, ["is_hover"]);
+		return actor.SRWStats.mech.canWater * 1 || this.applyStatModsToValue(actor, 0, ["water_enabled"]) || this.canHover(actor);
+	} else {
+		return false;
+	}		
+}
+
+StatCalc.prototype.canHover = function(actor){
+	if(this.isActorSRWInitialized(actor)){
+		return this.applyStatModsToValue(actor, 0, ["is_hover"]) || actor.SRWStats.mech.canHover;
+	} else {
+		return false;
+	}		
+}
+
+StatCalc.prototype.hoversOnWater = function(actor){
+	if(this.isActorSRWInitialized(actor)){
+		return actor.SRWStats.stageTemp.isHovering;
 	} else {
 		return false;
 	}		
@@ -4217,6 +4252,10 @@ StatCalc.prototype.canUseWeaponDetail = function(actor, weapon, postMoveEnabledO
 			canUse = false;
 			detail.EN = true;
 		}
+		if(weapon.MPCost > actor.SRWStats.pilot.stats.calculated.currentMP){
+			canUse = false;
+			detail.MP = true;
+		}
 		if(weapon.willRequired > actor.SRWStats.pilot.will){
 			canUse = false;
 			detail.will = true;
@@ -4325,6 +4364,9 @@ StatCalc.prototype.canUseWeapon = function(actor, weapon, postMoveEnabledOnly, d
 			return false;
 		}
 		if(weapon.ENCost > actor.SRWStats.mech.stats.calculated.currentEN){
+			return false;
+		}
+		if(weapon.MPCost > actor.SRWStats.pilot.stats.calculated.currentMP){
 			return false;
 		}
 		if(weapon.willRequired > actor.SRWStats.pilot.will){
@@ -5354,6 +5396,7 @@ StatCalc.prototype.addExp = function(actor, amount){
 		}
 		this.calculateSRWActorStats(actor);
 		this.getCalculatedPilotStats(actor).currentSP = oldStats.currentSP;
+		this.getCalculatedPilotStats(actor).currentMP = oldStats.currentMP;
 		var newLevel = this.getCurrentLevel(actor);		
 		var newStats;
 		var currentAbilities;
@@ -5476,6 +5519,12 @@ StatCalc.prototype.canRecoverSP = function(actor){
 	}
 }
 
+StatCalc.prototype.canRecoverMP = function(actor){
+	if(this.isActorSRWInitialized(actor)){			
+		var pilotStats = this.getCalculatedPilotStats(actor);
+		return pilotStats.currentMP < pilotStats.MP;			
+	}
+}
 
 StatCalc.prototype.addPP = function(actor, amount){		
 	if(this.isActorSRWInitialized(actor)){	
@@ -5563,6 +5612,37 @@ StatCalc.prototype.recoverSP = function(actor, amount){
 		pilotStats.currentSP+=amount;
 		if(pilotStats.currentSP > pilotStats.SP){
 			pilotStats.currentSP = pilotStats.SP;
+		}
+	} 	
+}
+
+StatCalc.prototype.applyMPCost = function(actor, amount){		
+	if(this.isActorSRWInitialized(actor)){			
+		var pilotStats = this.getCalculatedPilotStats(actor);
+		pilotStats.currentMP-=amount;
+		if(pilotStats.currentMP < 0){
+			console.log("MP Cost applied while actor had insufficient MP!");
+			pilotStats.currentMP = 0;
+		}
+	} 	
+}
+
+StatCalc.prototype.setAllMPPercent = function(type, percent){
+	var _this = this;
+	var result = [];
+	this.iterateAllActors(type, function(actor){			
+		var pilotStats = _this.getCalculatedPilotStats(actor);
+		pilotStats.currentMP = pilotStats.MP * percent / 100;	
+	});
+	return result;
+}
+
+StatCalc.prototype.recoverMP = function(actor, amount){		
+	if(this.isActorSRWInitialized(actor)){			
+		var pilotStats = this.getCalculatedPilotStats(actor);
+		pilotStats.currentMP+=amount;
+		if(pilotStats.currentMP > pilotStats.MP){
+			pilotStats.currentMP = pilotStats.MP;
 		}
 	} 	
 }
@@ -5838,6 +5918,15 @@ StatCalc.prototype.getRealENCost = function(actor, cost){
 	if(this.isActorSRWInitialized(actor)){	
 		if(cost != -1){
 			cost = this.applyStatModsToValue(actor, cost, ["EN_cost"]);
+		}		
+	} 
+	return cost;
+}
+
+StatCalc.prototype.getRealMPCost = function(actor, cost){
+	if(this.isActorSRWInitialized(actor)){	
+		if(cost != -1){
+			cost = this.applyStatModsToValue(actor, cost, ["MP_cost"]);
 		}		
 	} 
 	return cost;

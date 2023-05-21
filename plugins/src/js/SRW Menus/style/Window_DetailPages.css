@@ -127,6 +127,12 @@
 
 #detail_pages .pilot_stat_container {
 	border: 0px;
+	max-width: 50%;
+}
+
+#label_MP_cost {
+	width: 20%;
+    margin-left: 3%;
 }
 
 #detail_pages .pilot_stat_container.on {
@@ -282,6 +288,10 @@
 	left: 45%;
     top: 23%;
 	position: absolute;
+}
+
+#detail_pages #pilot_summary_card #MP_block{
+	width: 50%;
 }
 
 #pilot_summary_card .stat_label {

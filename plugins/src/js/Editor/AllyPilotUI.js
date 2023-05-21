@@ -197,6 +197,11 @@ AllyPilotUI.prototype.initPropertyHandlers = function(){
 				content+="</div>";
 				
 				content+="<div class='row'>";	
+				content+=_this.createValueInput("pilotBaseMP", EDITORSTRINGS.PILOT.label_MP);
+				content+=createGrowthControls("pilotMPGrowth");
+				content+="</div>";
+				
+				content+="<div class='row'>";	
 				content+=_this.createValueInput("pilotBaseMelee", EDITORSTRINGS.PILOT.label_melee);
 				content+=createGrowthControls("pilotMeleeGrowth");
 				content+="</div>";
@@ -230,6 +235,7 @@ AllyPilotUI.prototype.initPropertyHandlers = function(){
 			hook(entry){
 				let hookedProperties = [
 					"pilotBaseSP",
+					"pilotBaseMP",
 					"pilotBaseMelee",
 					"pilotBaseRanged",
 					"pilotBaseSkill",
@@ -251,6 +257,7 @@ AllyPilotUI.prototype.initPropertyHandlers = function(){
 				
 				hookedProperties = [
 					"pilotSPGrowth",
+					"pilotMPGrowth",
 					"pilotMeleeGrowth",
 					"pilotRangedGrowth",
 					"pilotSkillGrowth",

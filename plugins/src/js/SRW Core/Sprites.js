@@ -695,7 +695,7 @@
 							this._upperBodyOverlay.opacity = 255;
 							this._lowerBodyOverlay.opacity = 255;
 						}
-						if(battlerArray && battlerArray[1] && $statCalc.getCurrentTerrain(battlerArray[1]) == "water" && !$statCalc.applyStatModsToValue(battlerArray[1], 0, ["is_hover"])){
+						if(battlerArray && battlerArray[1] && $statCalc.getCurrentTerrain(battlerArray[1]) == "water" && !$statCalc.hoversOnWater(battlerArray[1])){
 							this._upperBody.opacity-=120;
 							this._upperBodyOverlay.opacity-=120;
 							this._upperBodyTop.opacity-=120;
@@ -842,7 +842,7 @@
 					if(($gameSystem.isSubBattlePhase() !== 'actor_map_target_confirm' || $gameTemp.isMapTarget(this._character.eventId())) &&
 						($gameSystem.isSubBattlePhase() !== 'actor_target_spirit' || $gameTemp.isSpiritTarget(this._character.eventId()))
 					){				
-						if(battlerArray && battlerArray[1] && $statCalc.getCurrentTerrain(battlerArray[1]) == "water" && !$statCalc.applyStatModsToValue(battlerArray[1], 0, ["is_hover"])){
+						if(battlerArray && battlerArray[1] && $statCalc.getCurrentTerrain(battlerArray[1]) == "water" && !$statCalc.hoversOnWater(battlerArray[1])){
 							this.setBlendColor([21, 87, 255, 64]);								
 							
 						} else {
@@ -946,7 +946,7 @@
 					if(($gameSystem.isSubBattlePhase() !== 'actor_map_target_confirm' || $gameTemp.isMapTarget(this._character.eventId())) &&
 						($gameSystem.isSubBattlePhase() !== 'actor_target_spirit' || $gameTemp.isSpiritTarget(this._character.eventId()))
 					){				
-						if(battlerArray && battlerArray[1] && $statCalc.getCurrentTerrain(battlerArray[1]) == "water" && !$statCalc.applyStatModsToValue(battlerArray[1], 0, ["is_hover"])){
+						if(battlerArray && battlerArray[1] && $statCalc.getCurrentTerrain(battlerArray[1]) == "water" && !$statCalc.hoversOnWater(battlerArray[1])){
 							this._upperBody.setBlendColor([21, 87, 255, 64]);	
 							this._upperBodyOverlay.setBlendColor([21, 87, 255, 64]);	
 							this._upperBodyTop.setBlendColor([21, 87, 255, 64]);	

@@ -1135,6 +1135,10 @@ BattleCalc.prototype.generateBattleResult = function(isPrediction){
 		if(weaponref.totalAmmo != -1){
 			aCache.ammoUsed = 1;
 		}
+		var MPCost = weaponref.MPCost;
+		if(MPCost != -1){
+			aCache.MPCost = MPCost;
+		}
 				
 		if(!isPrediction && aCache.type != "support attack"){
 			if(activeAttackerSpirits.soul){
@@ -1488,6 +1492,11 @@ BattleCalc.prototype.generateMapBattleResult = function(){
 	}
 	if(weaponref.totalAmmo != -1){
 		aCache.ammoUsed = 1;
+	}
+	
+	var MPCost = weaponref.MPCost;
+	if(MPCost != -1){
+		aCache.MPCost = MPCost;
 	}
 	
 	aCache.hasActed = true;

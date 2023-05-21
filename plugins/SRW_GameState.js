@@ -1865,7 +1865,7 @@ GameState_enemy_action.prototype.update = function(scene){
 		if($gameTemp.AIWaitTimer < 0){	
 			$gamePlayer.setTransparent(false);
 			scene.srpgInvokeAIAction();		
-			$gameTemp.AIWaitTimer = 0;				
+			$gameTemp.AIWaitTimer = $gameSystem.getScaledTime(20);;				
 		}
 	}
 	return true;

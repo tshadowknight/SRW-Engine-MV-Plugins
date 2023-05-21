@@ -209,6 +209,13 @@ APPSTRINGS.DETAILPAGES = {
 	label_cost: "Ability",
 	label_attribute_1: "Attribute 1",
 	label_attribute_2: "Attribute 2",
+	label_pilot_level: "Lv",
+	label_pilot_next_level: "Next-Lv",
+	label_pilot_will: "Will",
+	label_pilot_PP: "PP",
+	label_pilot_exp: "Exp",
+	label_pilot_SP: "SP",
+	label_pilot_MP: "MP",
 }	
 
 APPSTRINGS.MECHUPGRADES = {
@@ -284,6 +291,7 @@ APPSTRINGS.ATTACKLIST = {
 	
 	label_ammo: "Ammo",
 	label_EN_cost: "EN Cost",
+	label_MP_cost: "MP Cost",
 	label_required_will: "Required Will",
 	label_terrain_rating: "Terrain Rating",
 	label_special_effect: "Special Effect",
@@ -305,6 +313,7 @@ APPSTRINGS.ATTACKLIST = {
 	label_sub_twin_combo: "A sub twin cannot initiate a combo attack!",
 	label_no_combo_support: "Combo attack unavailable!",
 	label_counter_only: "Can only be used to counter attack!",
+	label_no_MP: "Out of MP!",
 }
 
 APPSTRINGS.REWARDS = {
@@ -605,6 +614,7 @@ EDITORSTRINGS.WEAPON = {
 	
 	label_ammo: "Ammo",
 	label_EN: "EN",
+	label_MP: "MP",
 	label_will: "Will",
 	label_hit_mod: "Hit Modifier",
 	label_crit_mod: "Crit Modifier",
@@ -666,6 +676,7 @@ EDITORSTRINGS.MECH = {
 	label_warn_fallback: "Using fallback!",
 	label_stats_label: "Stats Label",
 	label_is_ship: "Is Ship",
+	label_can_hover: "Can Hover",
 	label_sync_parts: "Sync Parts With",
 	label_sync_upgrades: "Sync Upgrades With",
 	label_enabled: "Enabled",
@@ -688,6 +699,7 @@ EDITORSTRINGS.MECH = {
 	
 	label_HP: "HP",
 	label_EN: "EN",
+
 	label_armor: "Armor",
 	label_mobility: "Mobility",
 	label_accuracy: "Accuracy",
@@ -796,6 +808,7 @@ EDITORSTRINGS.PILOT = {
 	label_max: "Max",
 	
 	label_SP: "SP",	
+	label_MP: "MP",	
 	label_melee: "Melee",	
 	label_ranged: "Ranged",		
 	label_skill: "Skill",	

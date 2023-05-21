@@ -137,6 +137,7 @@ WeaponUI.prototype.initPropertyHandlers = function(){
 		},
 		ammo: handleDefaultProp("weaponAmmo", EDITORSTRINGS.WEAPON.label_ammo),
 		EN: handleDefaultProp("weaponEN", EDITORSTRINGS.WEAPON.label_EN),
+		MP: handleDefaultProp("weaponMP", EDITORSTRINGS.WEAPON.label_MP),
 		will: handleDefaultProp("weaponWill", EDITORSTRINGS.WEAPON.label_will),
 		hit_mod: handleDefaultProp("weaponHitMod", EDITORSTRINGS.WEAPON.label_hit_mod),
 		crit_mod: handleDefaultProp("weaponCritMod", EDITORSTRINGS.WEAPON.label_crit_mod),
@@ -670,6 +671,9 @@ WeaponUI.prototype.show = async function(){
 	
 	content+="<div class='row numeric'>";
 	content+=_this._propertyHandlers.EN.createControls();	
+	content+="</div>";
+	content+="<div class='row numeric'>";
+	content+=_this._propertyHandlers.MP.createControls();
 	content+="</div>";
 	content+="<div class='row numeric'>";
 	content+=_this._propertyHandlers.ammo.createControls();
