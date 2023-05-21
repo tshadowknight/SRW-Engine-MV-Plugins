@@ -51,6 +51,8 @@ APPSTRINGS.GENERAL = {
 	label_LND: "LND",
 	label_SEA: "SEA",
 	label_SPC: "SPC",
+	label_MP: "MP",
+	label_EN: "EN",
 }
 
 APPSTRINGS.MAINMENU = {

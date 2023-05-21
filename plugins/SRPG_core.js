@@ -2689,7 +2689,15 @@ SceneManager.isInSaveScene = function(){
 		var itemDef = $abilityCommandManger.getAbilityDef(item);
 		var actor = $gameSystem.EventToUnit($gameTemp.activeEvent().eventId())[1];
 		if(itemDef && itemDef.isActiveHandler(actor)){			
-			$statCalc.setAbilityUsed(actor, item);
+			var useInfo = $abilityCommandManger.getUseInfo(actor, item);
+			if(useInfo.type == "ammo"){
+				$statCalc.setAbilityUsed(actor, item);
+			} else if(useInfo.type == "EN"){
+				var ENCost = useInfo.cost;										
+				actor.setMp(actor.mp - Math.floor(ENCost));
+			} else if(useInfo.type == "MP"){
+				$statCalc.applyMPCost(actor, useInfo.cost);
+			}				
 			itemDef.statmodHandler(actor);
        
 			this._abilityWindow.hide();
