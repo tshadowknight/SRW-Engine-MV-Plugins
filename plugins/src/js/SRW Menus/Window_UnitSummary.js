@@ -112,11 +112,28 @@ Window_UnitSummary.prototype.redraw = function() {
 					content+=Math.floor(hitRate * 100)+"%";	
 				}
 				content+="</div>";				
-			} else if($statCalc.getStatusSummary(actor).length){
-				content+="<div class='status_display'>";
-				content+="<img class='scaled_width' src='svg/hazard-sign.svg'></img>";
+			} else {
+				let statusScore = 0;
+				let statusCount = 0;
+				const statusList = $statCalc.getStatusSummary(actor);
+				for(let status of statusList){
+					statusCount++;
+					let amount = (status.amount || 0) * -1;
+					statusScore+=Math.sign(amount);
+				}
 				
-				content+="</div>";
+				if(statusCount){
+					let statusClass = "mix";
+					if(statusScore > 0){
+						statusClass = "buff";
+					} else if(statusScore < 0){
+						statusClass = "debuff";
+					}
+					content+="<div class='status_display "+statusClass+"'>";
+					content+="<img class='scaled_width' src='svg/hazard-sign.svg'></img>";
+					
+					content+="</div>";
+				}
 			}	
 			
 			

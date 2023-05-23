@@ -60,21 +60,20 @@ Window_BeforebattleTwin.prototype.show = function(){
 	this.redraw();
 }
 
-Window_BeforebattleTwin.prototype.getMaxMainSelection = function(){
-	var addSpiritMenu = ENGINE_SETTINGS.BEFORE_BATTLE_SPIRITS ? 1 : 0;
-	if(!$gameTemp.currentBattleActor.isActor()){
-		return 3;
-	} else if($statCalc.isAI($gameTemp.currentBattleActor)){
-		return 3;
-	} else if($gameTemp.isEnemyAttack){
-		return 4 + addSpiritMenu;
-	} else {
-		if($statCalc.isMainTwin($gameTemp.currentBattleActor)){
-			return 4 + addSpiritMenu;
-		} else {
-			return 3 + addSpiritMenu;
-		}		
+Window_BeforebattleTwin.prototype.isBuffingAttack = function(){
+	const interactionInfo = $gameSystem.getCombatInteractionInfo($gameTemp.actorAction.attack);
+	return interactionInfo.isBetweenFriendlies && interactionInfo.interactionType == Game_System.INTERACTION_STATUS;
+}
+
+Window_BeforebattleTwin.prototype.assistIsValid = function(){
+	return !$gameTemp.currentBattleActor.isActor() && (!this.isBuffingAttack());
+}
+
+Window_BeforebattleTwin.prototype.counterValid = function(){
+	if(!$gameTemp.enemyAction.attack){
+		return true;
 	}
+	return $gameTemp.enemyAction.attack.enemiesCounter;
 }
 
 Window_BeforebattleTwin.prototype.updateButtonPermissions = function(){
@@ -85,7 +84,7 @@ Window_BeforebattleTwin.prototype.updateButtonPermissions = function(){
 	this._btnInfo.forEach(function(btnDef){
 		if(btnDef.type == "action"){
 			btnDef.enabled = false;
-			if(!$statCalc.isAI($gameTemp.currentBattleActor)){
+			if(!$statCalc.isAI($gameTemp.currentBattleActor) && _this.counterValid()){
 				if($gameTemp.isEnemyAttack){
 					btnDef.enabled = true;
 				}
@@ -99,6 +98,10 @@ Window_BeforebattleTwin.prototype.updateButtonPermissions = function(){
 			if(ENGINE_SETTINGS.BEFORE_BATTLE_SPIRITS && !$statCalc.isAI($gameTemp.currentBattleActor)){
 				btnDef.enabled = true;
 			}			
+		}
+		
+		if(btnDef.type == "assist"){
+			btnDef.enabled = _this.assistIsValid();
 		}
 	});
 }
@@ -546,7 +549,7 @@ Window_BeforebattleTwin.prototype.update = function() {
 			if(Input.isTriggered('pageup') || Input.isRepeated('pageup')){
 				this.requestRedraw();
 				if(this._currentUIState == "main_selection"){
-					if($gameTemp.currentBattleActor.isActor() && $gameTemp.isEnemyAttack){
+					if(_this.counterValid() && $gameTemp.currentBattleActor.isActor() && $gameTemp.isEnemyAttack){
 						_this._currentActionSelection--;
 						if(_this._currentActionSelection < 0){
 							_this._currentActionSelection = 2;
@@ -559,7 +562,7 @@ Window_BeforebattleTwin.prototype.update = function() {
 			} else if (Input.isTriggered('pagedown') || Input.isRepeated('pagedown')) {
 				this.requestRedraw();
 				if(this._currentUIState == "main_selection"){
-					if($gameTemp.currentBattleActor.isActor() && $gameTemp.isEnemyAttack){
+					if(_this.counterValid() && $gameTemp.currentBattleActor.isActor() && $gameTemp.isEnemyAttack){
 						_this._currentActionSelection++;
 						if(_this._currentActionSelection > 2){
 							_this._currentActionSelection = 0;
@@ -1204,33 +1207,42 @@ Window_BeforebattleTwin.prototype.createParticipantBlock = function(ref, action,
 	}
 	
 	content+="<div class='scaled_text action_row'>";
-	if(!isSupport){
-		if(action.type == "attack"){
-			content+="Attack";
-		}
-		if(action.type == "evade"){
-			content+="Evade";
-		}
-		if(action.type == "defend"){
-			content+="Defend";
-		}
-		if(action.type == "none"){
-			content+="---";
+	if(this.isBuffingAttack()){
+		if(allyOrEnemy == "ally"){
+			content+="Buffing";
+		} else {
+			content+="Receiving";
 		}
 	} else {
-		if(action.type == "attack"){
-			content+="Attack";
-		}
-		if(action.type == "evade"){
-			content+="---";
-		}
-		if(action.type == "defend"){
-			content+="Defend";
-		}
-		if(action.type == "none"){
-			content+="---";
+		if(!isSupport){
+			if(action.type == "attack"){
+				content+="Attack";
+			}
+			if(action.type == "evade"){
+				content+="Evade";
+			}
+			if(action.type == "defend"){
+				content+="Defend";
+			}
+			if(action.type == "none"){
+				content+="---";
+			}
+		} else {
+			if(action.type == "attack"){
+				content+="Attack";
+			}
+			if(action.type == "evade"){
+				content+="---";
+			}
+			if(action.type == "defend"){
+				content+="Defend";
+			}
+			if(action.type == "none"){
+				content+="---";
+			}
 		}
 	}
+	
 	content+="</div>";
 	content+="<div class='main_row'>";
 	if(allyOrEnemy == "ally"){
@@ -1703,14 +1715,20 @@ Window_BeforebattleTwin.prototype.redraw = function() {
 		this._enemy_twin.style.display = "none";
 	}
 	
-	
-	if(!$gameTemp.isEnemyAttack){
-		this._enemy_label.innerHTML = "Defending";
-		this._ally_label.innerHTML = "Attacking";
+	if(this.isBuffingAttack()){
+		this._enemy_label.innerHTML = "Support";
+		this._ally_label.innerHTML = "Support";
 	} else {
-		this._enemy_label.innerHTML = "Attacking";
-		this._ally_label.innerHTML = "Defending";
+		if(!$gameTemp.isEnemyAttack){
+			this._enemy_label.innerHTML = "Defending";
+			this._ally_label.innerHTML = "Attacking";
+		} else {
+			this._enemy_label.innerHTML = "Attacking";
+			this._ally_label.innerHTML = "Defending";
+		}
 	}
+	
+	
 	
 	
 	
@@ -1882,6 +1900,32 @@ Window_BeforebattleTwin.prototype.redraw = function() {
 		var pilotId = pilotIcon.getAttribute("data-pilot");
 		_this.loadEnemyFace(pilotId, pilotIcon);
 	});*/
+	
+	if(this.isBuffingAttack()){
+		if($gameTemp.isEnemyAttack){
+			let elem = windowNode.querySelector(".percent_indicator_containers.enemy .percent_indicator_container");
+			if(elem){
+				elem.style.visibility = "hidden";	
+			}			
+		} else {
+			let elem = windowNode.querySelector(".percent_indicator_containers.actor .percent_indicator_container")
+			if(elem){
+				elem.style.visibility = "hidden";	
+			}
+		}	
+	} else {
+		if($gameTemp.isEnemyAttack){
+			let elem = windowNode.querySelector(".percent_indicator_containers.enemy .percent_indicator_container")
+			if(elem){
+				elem.style.visibility = "visible";
+			}			
+		} else {
+			let elem = windowNode.querySelector(".percent_indicator_containers.actor .percent_indicator_container")
+			if(elem){
+				elem.style.visibility = "visible";
+			}				
+		}			
+	}
 	
 	var arrowsOffset = 0;
 	var noTwinOffet = 2;

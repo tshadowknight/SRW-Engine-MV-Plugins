@@ -516,7 +516,8 @@
 			 return {
 				attacksPlayers:false,
 				attacksFactions: aggressiveFactions,
-				active: true 
+				active: true,
+				ownFaction: "player"
 			 };
 		}
 		
@@ -529,7 +530,13 @@
 		}
 		
 		Game_System.prototype.getEnemyFactionInfo = function(enemy) {
-			 return this.factionConfig[enemy.factionId] || {};
+			 let result = this.factionConfig[enemy.factionId] || {};
+			 result.ownFaction = enemy.factionId;
+			 return result;
+		}
+		
+		Game_System.prototype.areUnitsFriendly = function(actor, other) {
+			return this.isFriendly(actor, this.getFactionId(other))
 		}
 		
 		Game_System.prototype.isFriendly = function(actor, factionId) {
@@ -2731,5 +2738,26 @@
 					}
 				}					
 			}		
+		}
+		
+		Game_System.INTERACTION_STATUS = "status";
+		Game_System.INTERACTION_DAMAGE = "damage";
+		Game_System.INTERACTION_DAMAGE_AND_STATUS = "damage_and_status";
+		
+		Game_System.prototype.getCombatInteractionInfo = function(weapon) {
+			const isBetweenFriendlies = this.areUnitsFriendly($gameTemp.currentBattleActor, $gameTemp.currentBattleEnemy);
+			let interactionType;
+			if(weapon){
+				if(!isBetweenFriendlies){
+					interactionType = weapon.enemiesInteraction;
+				} else {  
+					interactionType = weapon.alliesInteraction;
+				}
+			}
+			
+			return {
+				isBetweenFriendlies: isBetweenFriendlies,
+				interactionType: interactionType
+			};
 		}
 	}

@@ -203,35 +203,35 @@ DetailBarAttackSummary.prototype.redraw = function(){
 	detailContent+="</div>";
 	detailContent+="</div>";
 	
-	detailContent+="<div class='summary_row'>";
-	detailContent+="<div class='summary_row_label scaled_text required_will_label'>";
-	detailContent+=APPSTRINGS.ATTACKLIST.label_special_effect;
-	detailContent+="</div>";
-	if(typeof attackData.effects[0] == "undefined"){
-		detailContent+="<div class='summary_row_value scaled_text disabled'>";
-		detailContent+="------";
+	function createEffectRow(idx){
+		let detailContent = "";
+		detailContent+="<div class='summary_row'>";
+		detailContent+="<div class='summary_row_label scaled_text required_will_label'>";
+		detailContent+=APPSTRINGS.ATTACKLIST.label_special_effect;
 		detailContent+="</div>";
-	} else { //TODO Add display once weapon effects are actually implemented
-		detailContent+="<div class='summary_row_value scaled_text'>";
-		detailContent+=$weaponEffectManager.getAbilityDisplayInfo(attackData.effects[0]).name;
+		if(typeof attackData.effects[idx] == "undefined"){
+			detailContent+="<div class='summary_row_value scaled_text disabled'>";
+			detailContent+="------";
+			detailContent+="</div>";
+		} else {
+			detailContent+="<div class='summary_row_value scaled_text'>";
+			detailContent+=$weaponEffectManager.getAbilityDisplayInfo(attackData.effects[idx].idx).name;
+			if(attackData.effects[idx].targeting != "all"){
+				if(attackData.effects[idx].targeting == "enemy"){
+					detailContent+="["+APPSTRINGS.ATTACKLIST.label_target_enemies+"]";
+				}
+				if(attackData.effects[idx].targeting == "ally"){
+					detailContent+="["+APPSTRINGS.ATTACKLIST.label_target_allies+"]";
+				}
+			}
+			detailContent+="</div>";
+		}		
 		detailContent+="</div>";
-	}		
-	detailContent+="</div>";	
+		return detailContent;		
+	}
+	detailContent+=createEffectRow(0);
+	detailContent+=createEffectRow(1);
 	
-	detailContent+="<div class='summary_row'>";
-	detailContent+="<div class='summary_row_label scaled_text required_will_label'>";
-	detailContent+=APPSTRINGS.ATTACKLIST.label_special_effect;
-	detailContent+="</div>";
-	if(typeof attackData.effects[1] == "undefined"){
-		detailContent+="<div class='summary_row_value scaled_text disabled'>";
-		detailContent+="------";
-		detailContent+="</div>";
-	} else { //TODO Add display once weapon effects are actually implemented
-		detailContent+="<div class='summary_row_value scaled_text'>";
-		detailContent+=$weaponEffectManager.getAbilityDisplayInfo(attackData.effects[1]).name;
-		detailContent+="</div>";
-	}		
-	detailContent+="</div>";
 
 	detailContent+="<div class='summary_row'>";
 	detailContent+="<div class='summary_row_label scaled_text required_will_label'>";

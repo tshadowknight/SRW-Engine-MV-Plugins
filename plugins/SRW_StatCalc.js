@@ -442,17 +442,40 @@ StatCalc.prototype.getMechWeapons = function(actor, mechProperties, previousWeap
 				var effects = [];
 				for(var j = 0; j < 10; j++){
 					if(weaponProperties["weaponEffect"+j]){
-						effects[j] = String(weaponProperties["weaponEffect"+j]).trim() * 1;
+						effects[j] = {idx: String(weaponProperties["weaponEffect"+j]).trim() * 1, targeting: "all"};
+						if(weaponProperties["weaponEffectTargeting"+j]){
+							effects[j].targeting = weaponProperties["weaponEffectTargeting"+j];
+						}
 					}
+					
 				}
 				var isMap = false;
 				var mapId;
-				var ignoresFriendlies = false;
+				
 				if(weaponProperties.weaponMapId){
 					isMap = true;
 					mapId = JSON.parse(weaponProperties.weaponMapId);
-					ignoresFriendlies = weaponProperties.weaponIgnoresFriendlies*1 || 0;
 				}
+				var ignoresFriendlies = weaponProperties.weaponIgnoresFriendlies;
+				if(ignoresFriendlies == null || ignoresFriendlies == ""){//hack to ensure backwards compatibility for old weapon definitions
+					ignoresFriendlies = true;
+				} else {
+					ignoresFriendlies = ignoresFriendlies * 1;
+				}	
+
+				var enemiesCounter = weaponProperties.weaponEnemiesCounter;
+				if(enemiesCounter == null || enemiesCounter == ""){//hack to ensure backwards compatibility for old weapon definitions
+					enemiesCounter = true;
+				} else {
+					enemiesCounter = enemiesCounter * 1;
+				}	
+
+				var alliesCounter = weaponProperties.weaponAlliesCounter;
+				if(alliesCounter == null || alliesCounter == ""){//hack to ensure backwards compatibility for old weapon definitions
+					alliesCounter = true;
+				} else {
+					alliesCounter = alliesCounter * 1;
+				}	
 				
 				var isCombination = false;
 				var combinationWeapons = [];
@@ -476,6 +499,14 @@ StatCalc.prototype.getMechWeapons = function(actor, mechProperties, previousWeap
 				if(weaponProperties.weaponHPThreshold){
 					HPThreshold = weaponProperties.weaponHPThreshold * 1;
 				}
+				let animId = parseInt(weaponProperties.weaponAnimId);
+				if(isNaN(animId)){
+					animId = -1;
+				}
+				let vsAllyAnimId = parseInt(weaponProperties.weaponVSAllyAnimId);
+				if(isNaN(vsAllyAnimId)){
+					vsAllyAnimId = -1;
+				}
 				result.push({
 					id: parseInt(weaponDefinition.id),
 					name: weaponDefinition.name,
@@ -496,10 +527,12 @@ StatCalc.prototype.getMechWeapons = function(actor, mechProperties, previousWeap
 					terrain: this.parseTerrainString(weaponProperties.weaponTerrain),
 					effects: effects,
 					particleType: (weaponProperties.weaponCategory || "").trim(), //missile, funnel, beam, gravity, physical or "".
-					animId: parseInt(weaponProperties.weaponAnimId) || -1,
+					animId: animId,
+					vsAllyAnimId: vsAllyAnimId,
 					isMap: isMap, 
 					mapId: mapId,
 					ignoresFriendlies: ignoresFriendlies,
+					ignoresEnemies: weaponProperties.weaponIgnoresEnemies*1 || 0,
 					isCombination: isCombination,
 					combinationWeapons: combinationWeapons,
 					combinationType: combinationType,
@@ -510,7 +543,10 @@ StatCalc.prototype.getMechWeapons = function(actor, mechProperties, previousWeap
 					isSelfDestruct: parseInt(weaponProperties.weaponIsSelfDestruct),
 					isAll: parseInt(weaponProperties.weaponIsAll),
 					HPThreshold: HPThreshold,
-
+					enemiesCounter: enemiesCounter,
+					alliesCounter: alliesCounter,
+					enemiesInteraction: weaponProperties.weaponEnemyInteraction || "damage_and_status",
+					alliesInteraction: weaponProperties.weaponAllyInteraction || "damage_and_status",
 				});
 			}
 		}
@@ -862,10 +898,8 @@ StatCalc.prototype.isAccuracyDown = function(actor){
 }
 
 StatCalc.prototype.setAccuracyDown = function(actor, amount){
-	if(this.isActorSRWInitialized(actor)){
-		if(amount > actor.SRWStats.stageTemp.status.accuracyDown){
-			actor.SRWStats.stageTemp.status.accuracyDown = amount;
-		}		
+	if(this.isActorSRWInitialized(actor)){		
+		actor.SRWStats.stageTemp.status.accuracyDown = amount;				
 	} 
 }
 
@@ -878,10 +912,8 @@ StatCalc.prototype.isMobilityDown = function(actor){
 }
 
 StatCalc.prototype.setMobilityDown = function(actor, amount){
-	if(this.isActorSRWInitialized(actor)){
-		if(amount > actor.SRWStats.stageTemp.status.mobilityDown){
-			actor.SRWStats.stageTemp.status.mobilityDown = amount;
-		}
+	if(this.isActorSRWInitialized(actor)){		
+		actor.SRWStats.stageTemp.status.mobilityDown = amount;		
 	} 
 }
 
@@ -894,10 +926,8 @@ StatCalc.prototype.isArmorDown = function(actor){
 }
 
 StatCalc.prototype.setArmorDown = function(actor, amount){
-	if(this.isActorSRWInitialized(actor)){
-		if(amount > actor.SRWStats.stageTemp.status.armorDown){
-			actor.SRWStats.stageTemp.status.armorDown = amount;
-		}
+	if(this.isActorSRWInitialized(actor)){		
+		actor.SRWStats.stageTemp.status.armorDown = amount;		
 	} 
 }
 
@@ -910,10 +940,8 @@ StatCalc.prototype.isMovementDown = function(actor){
 }
 
 StatCalc.prototype.setMovementDown = function(actor, amount){
-	if(this.isActorSRWInitialized(actor)){
-		if(amount > actor.SRWStats.stageTemp.status.movementDown){
-			actor.SRWStats.stageTemp.status.movementDown = amount;
-		}
+	if(this.isActorSRWInitialized(actor)){		
+		actor.SRWStats.stageTemp.status.movementDown = amount;		
 	} 
 }
 
@@ -926,10 +954,8 @@ StatCalc.prototype.isRangeDown = function(actor){
 }
 
 StatCalc.prototype.setRangeDown = function(actor, amount){
-	if(this.isActorSRWInitialized(actor)){
-		if(amount > actor.SRWStats.stageTemp.status.rangeDown){
-			actor.SRWStats.stageTemp.status.rangeDown = amount;
-		}
+	if(this.isActorSRWInitialized(actor)){		
+		actor.SRWStats.stageTemp.status.rangeDown = amount;		
 	} 
 }
 
@@ -942,10 +968,8 @@ StatCalc.prototype.isAttackDown = function(actor){
 }
 
 StatCalc.prototype.setAttackDown = function(actor, amount){
-	if(this.isActorSRWInitialized(actor)){
-		if(amount > actor.SRWStats.stageTemp.status.attackDown){
-			actor.SRWStats.stageTemp.status.attackDown = amount;
-		}
+	if(this.isActorSRWInitialized(actor)){		
+		actor.SRWStats.stageTemp.status.attackDown = amount;		
 	} 
 }
 
@@ -4296,7 +4320,7 @@ StatCalc.prototype.canUseWeaponDetail = function(actor, weapon, postMoveEnabledO
 				var rangeResult;
 				var type = actor.isActor() ? "enemy" : "actor";
 				
-				if(!this.getAllInRange($gameSystem.getUnitFactionInfo(actor), pos, $statCalc.getRealWeaponRange(actor, weapon), $statCalc.getRealWeaponMinRange(actor, weapon)).length){
+				if(!this.getAllInRange(actor).length){
 					canUse = false;
 					detail.target = true;
 				}
@@ -4597,21 +4621,46 @@ StatCalc.prototype.isReachable = function(target, user, range, minRange){
 	return hasEmptyTiles || userIsInRange;
 }
 
-StatCalc.prototype.getAllInRange = function(factionConfig, pos, range, minRange){
+StatCalc.prototype.isValidWeaponTarget = function(actor, target, weapon, includeMoveRange){
+	const _this = this;
+	let additionalRange = 0;
+	if(includeMoveRange){
+		additionalRange = _this.getCurrentMoveRange(actor);		
+	}	
+	
+	const factionConfig = $gameSystem.getUnitFactionInfo(actor);
+	var range = _this.getRealWeaponRange(actor, weapon) + additionalRange;
+	var minRange = _this.getRealWeaponMinRange(actor, weapon);
+	
+	let actorRefEvent = _this.getReferenceEvent(actor);
+	let targetRefEvent = _this.getReferenceEvent(target);
+	var isInRange = $battleCalc.isTargetInRange({x: actorRefEvent.posX(), y: actorRefEvent.posY()}, {x: targetRefEvent.posX(), y: targetRefEvent.posY()}, range, minRange);
+	var isValidTarget = false;
+	if(!weapon.ignoresEnemies){		
+		if(!$gameSystem.isFriendly(target, factionConfig.ownFaction)){
+			isValidTarget = true;
+		}
+	}
+	if(!weapon.ignoresFriendlies){
+		if($gameSystem.isFriendly(target, factionConfig.ownFaction)){
+			isValidTarget = true;
+		}
+	}
+	return isValidTarget && isInRange;
+}
+
+StatCalc.prototype.getAllInRange = function(initiator, includeMoveRange){
 	var _this = this;
-	var result = [];
-	this.iterateAllActors(null, function(actor, event){			
-		var isInRange = $battleCalc.isTargetInRange({x: pos.x, y: pos.y}, {x: event.posX(), y: event.posY()}, range, minRange);
-		var isValidTarget = false;
-		if(factionConfig.attacksPlayers && actor.isActor()){
-			isValidTarget = true;
-		}
-		if(actor.isEnemy() && factionConfig.attacksFactions.indexOf(actor.factionId) != -1){
-			isValidTarget = true;
-		}
-		if(isValidTarget && isInRange && !event._erased){
-			result.push(event);
-		}			
+	var result = [];	
+	var allWeapons = _this.getActorMechWeapons(initiator);
+	allWeapons.forEach(function(weapon){
+		if(_this.canUseWeapon(initiator, weapon, false)){			
+			_this.iterateAllActors(null, function(target, event){			
+				if(_this.isValidWeaponTarget(initiator, target, weapon, includeMoveRange) && !event._erased){
+					result.push(event);
+				}			
+			});
+		}		
 	});
 	return result;
 }
@@ -6256,12 +6305,12 @@ StatCalc.prototype.getActiveStatMods = function(actor, excludedSkills){
 
 			if(actor.SRWStats.battleTemp && actor.SRWStats.battleTemp.currentAttack){
 				var effects = actor.SRWStats.battleTemp.currentAttack.effects;
-				if(effects){
-					var tmp = [];
-					for(var i = 0; i < effects.length; i++){
-						tmp.push({idx: effects[i]});
-					}
-					accumulateFromAbilityList(tmp, $weaponEffectManager);		
+				if(effects){					
+					if($gameTemp.currentBattleTarget){
+						const isFriendly = $gameSystem.isFriendly(actor, $gameTemp.currentBattleTarget.factionId);
+						const tmp = effects.filter(effect => effect.targeting == "all" || (isFriendly && effect.targeting == "ally") || (!isFriendly && effect.targeting == "enemy"));
+						accumulateFromAbilityList(tmp, $weaponEffectManager);
+					}							
 				}
 			}	
 			

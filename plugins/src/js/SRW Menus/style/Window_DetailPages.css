@@ -433,6 +433,10 @@
 	white-space: nowrap;
 }
 
+#status_info .ability_block_row.buff {
+	color: #2dc589;
+}
+
 #status_info .ability_block_row .value{	
 	--fontsize: 1.8px;
 }

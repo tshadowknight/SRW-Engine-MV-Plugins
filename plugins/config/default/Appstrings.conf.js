@@ -316,6 +316,10 @@ APPSTRINGS.ATTACKLIST = {
 	label_no_combo_support: "Combo attack unavailable!",
 	label_counter_only: "Can only be used to counter attack!",
 	label_no_MP: "Out of MP!",
+	
+	label_target_both: "All",
+	label_target_enemies: "Enemy",
+	label_target_allies: "Ally",
 }
 
 APPSTRINGS.REWARDS = {
@@ -601,7 +605,6 @@ EDITORSTRINGS.WEAPON = {
 	label_attributes: "Attributes",
 	hint_no_cost: "-1 means no cost or requirement",
 	label_effects: "Effects",
-	label_map_attack: "Map Attack",
 	label_combo_attack: "Combo Attack",
 	
 	label_type: "Type",
@@ -628,13 +631,27 @@ EDITORSTRINGS.WEAPON = {
 	label_only_counter: "Only as Counter",
 	label_ALL: "ALL Weapon",
 	label_animation: "Animation",
+	label_animation_ally: "Animation(Ally)",
 	
 	hint_effects: "Only the first two effects are shown in the UI",
 	
 	hint_is_map: "Is a Map Attack",
 	hint_is_regular: "Is a Regular Attack",
 	label_attack_id: "Attack ID",
-	label_ignore_friendlies: "Ignore Friendlies",
+	label_ignore_friendlies: "Hits Allies",
+	label_allies_counter: "Allies Counter",
+	label_allies_interaction: "Effects on Allies",
+	label_hit_enemies: "Hits Enemies",
+	label_enemies_counter: "Enemies Counter",
+	label_enemies_interaction: "Effects on Enemies",
+	
+	label_damage_and_status: "Damage & Status",
+	label_status_only: "Status",
+	label_damage_only: "Damage",
+	
+	label_target_both: "Both",
+	label_target_enemies: "Enemies",
+	label_target_allies: "Allies",
 	
 	label_combo_type: "Type",
 	label_adjacent: "Adjacent",
@@ -642,7 +659,7 @@ EDITORSTRINGS.WEAPON = {
 	label_required_weapons: "Required Weapons",
 	label_HP_treshold: "HP Treshold",
 	
-	label_map_attack: "Map Attack",
+	label_map_attack: "Targeting",
 	label_animation: "Animation",
 	label_id: "ID",
 	label_scale: "Scale",
@@ -658,6 +675,7 @@ EDITORSTRINGS.WEAPON = {
 	hint_choose_center: "Select a center tile",
 	
 	confirm_remove_MAP: "Remove this map attack?",
+	label_affects: "Affects",
 }
 
 EDITORSTRINGS.MECH = {

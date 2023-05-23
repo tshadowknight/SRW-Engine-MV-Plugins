@@ -645,12 +645,24 @@ Window_DetailPages.prototype.drawPilotStats1 = function() {
 		detailContent+="</div>";
 	}*/
 	for(var i = 0 ; i < 5; i++){
-		detailContent+="<div class='ability_block_row terrain scaled_height status'>";		
+		let hasContent = false;
+		let amount = 0;
 		if(statusList[i]){
+			hasContent = true;
+			if(statusList[i].amount){
+				amount = statusList[i].amount * -1;
+			}
+		}
+		detailContent+="<div class='ability_block_row terrain scaled_height status "+(amount < 0 ? "" : "buff")+"'>";		
+		if(hasContent){
 			detailContent+="<div style='opacity: "+this.getGlowOpacity()+"' class='value scaled_text fitted_text described_element glowing_elem' data-type='status' data-ref='"+statusList[i].id+"'>";
 			detailContent+=APPSTRINGS.STATUS[statusList[i].id].name;
-			if(statusList[i].amount){
-				detailContent+=" "+(statusList[i].amount * -1);
+			if(amount){
+				if(amount > 0){
+					detailContent+=" +"+amount;
+				} else {
+					detailContent+=" "+amount;
+				}				
 			}
 			detailContent+="</div>";
 		}		

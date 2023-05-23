@@ -6526,10 +6526,17 @@ BattleSceneManager.prototype.processActionQueue = function() {
 						_this._UILayerManager.setNotification(nextAction.side, "Main Attack");					
 					}
 					
+					const isBetweenFriendlies = $gameSystem.areUnitsFriendly(nextAction.ref, nextAction.attacked.ref);
+					
 					var attack = nextAction.action.attack;
 					var animId;
 					if(typeof attack.animId != "undefined" && attack.animId != -1){
-						animId = attack.animId;
+						if(isBetweenFriendlies){
+							animId = attack.vsAllyAnimId;
+						} else {
+							animId = attack.animId;
+						}
+						
 					} else {
 						/*_this.playDefaultAttackAnimation(nextAction).then(function(){
 							_this.processActionQueue();

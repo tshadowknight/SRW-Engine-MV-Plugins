@@ -278,13 +278,25 @@
 	color: #FF0000;
 	border-radius: 999999px;
 	padding: 1.5%;
-	background-color: #EE2222;
+	
 	
 	animation-name: blink_elem;
 	animation-duration: 2s;
 	animation-fill-mode: forwards;
 	animation-iteration-count: infinite;
 	display: flex;
+}
+
+#unit_summary .status_display.debuff {
+	background-color: #EE2222;
+}
+
+#unit_summary .status_display.buff {
+	background-color: #2dc589;
+}
+
+#unit_summary .status_display.mix {
+	background-color: #e17526;
 }
 
 #unit_summary .status_display img{

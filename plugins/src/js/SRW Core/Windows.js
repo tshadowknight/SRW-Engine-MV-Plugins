@@ -348,8 +348,8 @@
 						x: $gameTemp.activeEvent().posX(),
 						y: $gameTemp.activeEvent().posY()
 					};
-					var fullRange = $statCalc.getFullWeaponRange(battler, $gameTemp.isPostMove);
-					var hasTarget = $statCalc.getAllInRange($gameSystem.getPlayerFactionInfo(), pos, fullRange.range, fullRange.minRange).length > 0;
+			
+					var hasTarget = $statCalc.getAllInRange(this._actor).length > 0;
 					var hasMapWeapon = $statCalc.hasMapWeapon(battler);
 					
 					function boardingMenu(){

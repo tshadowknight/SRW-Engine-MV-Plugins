@@ -859,6 +859,22 @@ BattleCalc.prototype.generateBattleResult = function(isPrediction){
 		var mainAttackerCache = $gameTemp.battleEffectCache[attacker.actor._cacheReference];
 		var aCache = $gameTemp.battleEffectCache[this._attacker.actor._cacheReference];
 		
+		//temp variable used to resolve weapon effects per target in StatCalc.prototype.getActiveStatMods
+		$gameTemp.currentBattleTarget = this._defender.actor;
+		
+		const isBetweenFriendlies = $gameSystem.areUnitsFriendly(this._attacker.actor, this._defender.actor);
+		let interactionType;
+		if(this._attacker.action.attack){
+			if(!isBetweenFriendlies){
+				interactionType = this._attacker.action.attack.enemiesInteraction;
+			} else {  
+				interactionType = this._attacker.action.attack.alliesInteraction;
+			}
+		}
+		
+		const isBuffingAttack = isBetweenFriendlies && interactionType == Game_System.INTERACTION_STATUS;
+		aCache.isBuffingAttack = isBuffingAttack;
+		
 		var storedCacheRef = this._attacker.actor._cacheReference;
 		if(this._isSupportAttack){
 			this._attacker.actor._cacheReference = null; //remove the main attacker cache ref while calculating support results for this actor 
@@ -924,7 +940,7 @@ BattleCalc.prototype.generateBattleResult = function(isPrediction){
 			}
 			var dCache = $gameTemp.battleEffectCache[defenders[i].actor._cacheReference];
 			var sCache;
-			if(this._supportDefender) {
+			if(this._supportDefender && !(isBetweenFriendlies && interactionType == Game_System.INTERACTION_STATUS)) {
 				sCache = $gameTemp.battleEffectCache[this._supportDefender.actor._supportCacheReference];
 			}
 			//when making a prediction also resolve attacks from units that were previously predicted to be destroyed to account for potential misses
@@ -974,7 +990,7 @@ BattleCalc.prototype.generateBattleResult = function(isPrediction){
 							isHit = 0;
 						}*/
 						var specialEvasion = this.getSpecialEvasion(this._attacker, activeDefender);
-						if(specialEvasion){
+						if(specialEvasion && !isBuffingAttack){
 							sCache.specialEvasion = specialEvasion;
 							isHit = false;
 						}
@@ -985,15 +1001,19 @@ BattleCalc.prototype.generateBattleResult = function(isPrediction){
 					}
 					
 					if(isHit){
-						damageResult = _this.performDamageCalculation(
-							this._attacker,
-							activeDefender,
-							noCrit,
-							false,
-							isSupportDefender,
-							aCache.type == "support attack",
-							hitInfo.isMismatchedTwin
-						);	
+						if(interactionType == Game_System.INTERACTION_STATUS){
+							damageResult.isStatusInteraction = true;
+						} else {
+							damageResult = _this.performDamageCalculation(
+								this._attacker,
+								activeDefender,
+								noCrit,
+								false,
+								isSupportDefender,
+								aCache.type == "support attack",
+								hitInfo.isMismatchedTwin
+							);	
+						}						
 					} 					
 				} 
 				
@@ -1009,6 +1029,9 @@ BattleCalc.prototype.generateBattleResult = function(isPrediction){
 					}
 				}
 				
+				
+				
+				
 				aCache["hits"+attackedRef] = isHit;
 				activeDefenderCache.isHit = isHit;
 				activeDefenderCache.isAttacked = true;
@@ -1020,6 +1043,10 @@ BattleCalc.prototype.generateBattleResult = function(isPrediction){
 				activeDefenderCache.barrierBroken = damageResult.thresholdBarrierBroken;
 				
 				dCache.barrierNames = damageResult.barrierNames;
+				
+				if(isBetweenFriendlies && interactionType == "status"){
+					dCache.receivedBuff = true;
+				}
 				
 				if(this._side == "actor"){
 					if(dCache){
@@ -1054,7 +1081,7 @@ BattleCalc.prototype.generateBattleResult = function(isPrediction){
 				
 				if(activeDefenderCache.damageTaken >= activeDefenderCache.currentAnimHP + (activeDefenderCache.HPRestored || 0)){
 					if($statCalc.applyMaxStatModsToValue(defenders[i].actor, 0, ["one_time_miracle"])){
-						if(!isPrediction){
+						if(!isPrediction && !isBuffingAttack){
 							$statCalc.setAbilityUsed(defenders[i].actor, "one_time_miracle");
 						}						
 						activeDefenderCache.damageTaken = activeDefenderCache.currentAnimHP + (activeDefenderCache.HPRestored || 0) - 1;
@@ -1080,28 +1107,32 @@ BattleCalc.prototype.generateBattleResult = function(isPrediction){
 					$statCalc.addAdditionalAction(defenders[i].actor);
 				}
 				
-				var statusEffects = {
-					inflict_accuracy_down: $statCalc.applyStatModsToValue(aCache.ref, 0, ["inflict_accuracy_down"]),
-					inflict_mobility_down: $statCalc.applyStatModsToValue(aCache.ref, 0, ["inflict_mobility_down"]),
-					inflict_armor_down: $statCalc.applyStatModsToValue(aCache.ref, 0, ["inflict_armor_down"]),
-					inflict_move_down: $statCalc.applyStatModsToValue(aCache.ref, 0, ["inflict_move_down"]),
-					inflict_attack_down: $statCalc.applyStatModsToValue(aCache.ref, 0, ["inflict_attack_down"]),
-					inflict_range_down: $statCalc.applyStatModsToValue(aCache.ref, 0, ["inflict_range_down"]),
-					inflict_disable: $statCalc.applyStatModsToValue(aCache.ref, 0, ["inflict_disable"]),
-					inflict_SP_down: $statCalc.applyStatModsToValue(aCache.ref, 0, ["inflict_SP_down"]),
-					inflict_will_down: $statCalc.applyStatModsToValue(aCache.ref, 0, ["inflict_will_down"]),		
-					inflict_spirit_seal: $statCalc.applyStatModsToValue(aCache.ref, 0, ["inflict_spirit_seal"]),	
-				};		
-				aCache.statusEffects = statusEffects;
+				if(interactionType == Game_System.INTERACTION_DAMAGE){
+					aCache.statusEffects = {};
+				} else {
+					var statusEffects = {
+						inflict_accuracy_down: $statCalc.applyStatModsToValue(aCache.ref, 0, ["inflict_accuracy_down"]),
+						inflict_mobility_down: $statCalc.applyStatModsToValue(aCache.ref, 0, ["inflict_mobility_down"]),
+						inflict_armor_down: $statCalc.applyStatModsToValue(aCache.ref, 0, ["inflict_armor_down"]),
+						inflict_move_down: $statCalc.applyStatModsToValue(aCache.ref, 0, ["inflict_move_down"]),
+						inflict_attack_down: $statCalc.applyStatModsToValue(aCache.ref, 0, ["inflict_attack_down"]),
+						inflict_range_down: $statCalc.applyStatModsToValue(aCache.ref, 0, ["inflict_range_down"]),
+						inflict_disable: $statCalc.applyStatModsToValue(aCache.ref, 0, ["inflict_disable"]),
+						inflict_SP_down: $statCalc.applyStatModsToValue(aCache.ref, 0, ["inflict_SP_down"]),
+						inflict_will_down: $statCalc.applyStatModsToValue(aCache.ref, 0, ["inflict_will_down"]),		
+						inflict_spirit_seal: $statCalc.applyStatModsToValue(aCache.ref, 0, ["inflict_spirit_seal"]),	
+					};		
+					aCache.statusEffects = statusEffects;				
 				
-				if(aCache.statusEffects && aCache.statusEffects.inflict_disable && isHit && damageResult.damage > 0){
-					var resistance = $statCalc.applyMaxStatModsToValue(activeDefenderCache.ref, 0, ["status_resistance"]);
-					if(resistance < 1 || (aCache.hasFury && resistance == 1)){
-						activeDefenderCache.isDisabled = true;
-					}	
+					if(aCache.statusEffects && aCache.statusEffects.inflict_disable && isHit && damageResult.damage > 0){
+						var resistance = $statCalc.applyMaxStatModsToValue(activeDefenderCache.ref, 0, ["status_resistance"]);
+						if(resistance < 1 || (aCache.hasFury && resistance == 1)){
+							activeDefenderCache.isDisabled = true;
+						}	
+					}
 				}
 				
-				if(!isPrediction){
+				if(!isPrediction && !isBuffingAttack){
 					if(ENGINE_SETTINGS.ALERT_CLEARS_ON_ATTACK){
 						if(activeDefenderCache.isAttacked){
 							$statCalc.clearSpirit(activeDefenderCache.ref, "alert");
@@ -1140,7 +1171,7 @@ BattleCalc.prototype.generateBattleResult = function(isPrediction){
 			aCache.MPCost = MPCost;
 		}
 				
-		if(!isPrediction && aCache.type != "support attack"){
+		if(!isPrediction && aCache.type != "support attack" && !isBuffingAttack){
 			if(activeAttackerSpirits.soul){
 				$statCalc.clearSpirit(this._attacker.actor, "soul");
 			} else {
@@ -1194,7 +1225,17 @@ BattleCalc.prototype.generateBattleResult = function(isPrediction){
 	}
 	
 	BattleAction.prototype.determineTargetInfo = function(){		
-		function getTargetInfo(attacker, defender){			
+		function getTargetInfo(attacker, defender){	
+			const isBetweenFriendlies = $gameSystem.areUnitsFriendly(this._attacker.actor, this._defender.actor);
+			let interactionType;
+			if(this._attacker.action.attack){
+				if(!isBetweenFriendlies){
+					interactionType = this._attacker.action.attack.enemiesInteraction;
+				} else {  
+					interactionType = this._attacker.action.attack.alliesInteraction;
+				}
+			}
+			const isBuffingAttack = isBetweenFriendlies && interactionType == Game_System.INTERACTION_STATUS; 
 			var finalTarget = defender;
 			var isMismatchedTwin = false;
 			
@@ -1209,11 +1250,15 @@ BattleCalc.prototype.generateBattleResult = function(isPrediction){
 				hitRate = 1;
 			}	
 			
+			if(isBuffingAttack){//you can't dodge status effects by allies(assumed to be beneficial ones)
+				hitRate = 1;
+			}
+			
 			var isHit = Math.random() <= hitRate;
 			var specialEvasion = null;
 			if(isHit){		
 				specialEvasion = this.getSpecialEvasion(attacker, defender);
-				if(specialEvasion){
+				if(!isBuffingAttack && specialEvasion){
 					isHit = false;
 				}
 			}
@@ -1394,7 +1439,7 @@ BattleCalc.prototype.generateBattleResult = function(isPrediction){
 		
 			var expGain = _this.performExpCalculation(gainRecipient, gainDonor);
 			expGain = $statCalc.applyStatModsToValue(gainRecipient, expGain, ["exp"]);
-			if($statCalc.getActiveSpirits(gainRecipient).gain){
+			if($statCalc.getActiveSpirits(gainRecipient).gain && !aCache.isBuffingAttack){
 				expGain*=2;
 			}
 			
@@ -1404,7 +1449,11 @@ BattleCalc.prototype.generateBattleResult = function(isPrediction){
 				fundGain*=2;
 			}
 			if(!dCache.isDestroyed){
-				expGain = Math.floor(expGain / 10);
+				if(aCache.isBuffingAttack){
+					expGain = Math.floor(expGain / 4);
+				} else {
+					expGain = Math.floor(expGain / 10);
+				}				
 				ppGain = 0;
 				fundGain = 0;
 			} else {
@@ -1418,7 +1467,7 @@ BattleCalc.prototype.generateBattleResult = function(isPrediction){
 			
 		}
 	});
-	if(!isPrediction){
+	if(!isPrediction && !aCache.isBuffingAttack){
 		if($statCalc.getActiveSpirits(gainRecipient).gain){
 			$statCalc.clearSpirit(gainRecipient, "gain");
 		}
@@ -1470,7 +1519,7 @@ BattleCalc.prototype.generateBattleResult = function(isPrediction){
 
 BattleCalc.prototype.generateMapBattleResult = function(){
 	var _this = this;
-	$statCalc.invalidateAbilityCache();
+	
 	
 	$gameTemp.battleEffectCache = {};
 	$gameTemp.sortedBattleActorCaches = [];
@@ -1505,35 +1554,57 @@ BattleCalc.prototype.generateMapBattleResult = function(){
 	aCache.ppGain = 0;
 	aCache.fundGain = 0;	
 	aCache.gainDonors = [];
-	
-	var statusEffects = {
-		inflict_accuracy_down: $statCalc.applyStatModsToValue(aCache.ref, 0, ["inflict_accuracy_down"]),
-		inflict_mobility_down: $statCalc.applyStatModsToValue(aCache.ref, 0, ["inflict_mobility_down"]),
-		inflict_armor_down: $statCalc.applyStatModsToValue(aCache.ref, 0, ["inflict_armor_down"]),
-		inflict_move_down: $statCalc.applyStatModsToValue(aCache.ref, 0, ["inflict_move_down"]),
-		inflict_attack_down: $statCalc.applyStatModsToValue(aCache.ref, 0, ["inflict_attack_down"]),
-		inflict_range_down: $statCalc.applyStatModsToValue(aCache.ref, 0, ["inflict_range_down"]),
-		inflict_disable: $statCalc.applyStatModsToValue(aCache.ref, 0, ["inflict_disable"]),
-		inflict_SP_down: $statCalc.applyStatModsToValue(aCache.ref, 0, ["inflict_SP_down"]),
-		inflict_will_down: $statCalc.applyStatModsToValue(aCache.ref, 0, ["inflict_will_down"]),		
-		inflict_spirit_seal: $statCalc.applyStatModsToValue(aCache.ref, 0, ["inflict_spirit_seal"]),	
-	};
-	aCache.statusEffects = statusEffects;
+
+	let inflictedDamge = false;
 	
 	var targets = $gameTemp.currentMapTargets;
 	targets.forEach(function(target){
+		$statCalc.invalidateAbilityCache();
+		//temp variable used to resolve weapon effects per target in StatCalc.prototype.getActiveStatMods
+		$gameTemp.currentBattleTarget = target;
+		
 		var defender = {actor: target, action: {type: "none"}};
 		if(target != attacker.actor){
-				
+			const isBetweenFriendlies = $gameSystem.areUnitsFriendly(attacker.actor, defender.actor);
+			let interactionType;
+			if(!isBetweenFriendlies){
+				interactionType = attacker.action.attack.enemiesInteraction;
+			} else {  
+				interactionType = attacker.action.attack.alliesInteraction;
+			}	
+			const isBuffingAttack = isBetweenFriendlies && interactionType == Game_System.INTERACTION_STATUS;
+			if(!isBuffingAttack){
+				inflictedDamge = true;
+			}
 			
 			_this.prepareBattleCache(defender, "defender");
 			var dCache = $gameTemp.battleEffectCache[defender.actor._cacheReference];
+			if(interactionType != Game_System.INTERACTION_DAMAGE){
+				var statusEffects = {
+					inflict_accuracy_down: $statCalc.applyStatModsToValue(aCache.ref, 0, ["inflict_accuracy_down"]),
+					inflict_mobility_down: $statCalc.applyStatModsToValue(aCache.ref, 0, ["inflict_mobility_down"]),
+					inflict_armor_down: $statCalc.applyStatModsToValue(aCache.ref, 0, ["inflict_armor_down"]),
+					inflict_move_down: $statCalc.applyStatModsToValue(aCache.ref, 0, ["inflict_move_down"]),
+					inflict_attack_down: $statCalc.applyStatModsToValue(aCache.ref, 0, ["inflict_attack_down"]),
+					inflict_range_down: $statCalc.applyStatModsToValue(aCache.ref, 0, ["inflict_range_down"]),
+					inflict_disable: $statCalc.applyStatModsToValue(aCache.ref, 0, ["inflict_disable"]),
+					inflict_SP_down: $statCalc.applyStatModsToValue(aCache.ref, 0, ["inflict_SP_down"]),
+					inflict_will_down: $statCalc.applyStatModsToValue(aCache.ref, 0, ["inflict_will_down"]),		
+					inflict_spirit_seal: $statCalc.applyStatModsToValue(aCache.ref, 0, ["inflict_spirit_seal"]),	
+				};				
+				dCache.statusReceived = statusEffects;
+			}
+			
 			dCache.isAttacked = true;
 			dCache.attackedBy = aCache;
 			var isHit = Math.random() < _this.performHitCalculation(
 				attacker,
 				defender		
 			);
+			if(isBetweenFriendlies && interactionType == Game_System.INTERACTION_STATUS){//you can't dodge status effects by allies(assumed to be beneficial ones)
+				isHit = 1;
+				dCache.receivedBuff = true;
+			}
 			if(isHit){
 				if(Math.random() < $statCalc.applyStatModsToValue(defender.actor, 0, ["double_image_rate"])){
 					dCache.isDoubleImage = true;
@@ -1550,13 +1621,17 @@ BattleCalc.prototype.generateMapBattleResult = function(){
 				hasPercentBarrier: false
 			};
 			if(isHit){
-				damageResult = _this.performDamageCalculation(
-					attacker,
-					defender,
-					false,
-					false,
-					false	
-				);	
+				if(interactionType == Game_System.INTERACTION_STATUS){
+					damageResult.isStatusInteraction = true;
+				} else {
+					damageResult = _this.performDamageCalculation(
+						attacker,
+						defender,
+						false,
+						false,
+						false	
+					);
+				}				
 			} 
 			dCache.isHit = isHit;
 			dCache.type = "defender";
@@ -1601,21 +1676,23 @@ BattleCalc.prototype.generateMapBattleResult = function(){
 		}
 	});
 	
-	if($statCalc.getActiveSpirits(aCache).fortune){
-		$statCalc.clearSpirit(attacker.actor, "fortune");
-	}	
-	
-	if($statCalc.getActiveSpirits(gainRecipient).gain){
-		$statCalc.clearSpirit(gainRecipient, "gain");
+	if(inflictedDamge){
+		if($statCalc.getActiveSpirits(aCache).fortune){
+			$statCalc.clearSpirit(attacker.actor, "fortune");
+		}	
+		
+		if($statCalc.getActiveSpirits(gainRecipient).gain){
+			$statCalc.clearSpirit(gainRecipient, "gain");
+		}		
+		
+		var activeAttackerSpirits = $statCalc.getActiveSpirits(attacker.actor);
+		if(activeAttackerSpirits.soul){
+			$statCalc.clearSpirit(attacker.actor, "soul");
+		} else {
+			$statCalc.clearSpirit(attacker.actor, "valor");
+		}
 	}
 	
-	
-	var activeAttackerSpirits = $statCalc.getActiveSpirits(attacker.actor);
-	if(activeAttackerSpirits.soul){
-		$statCalc.clearSpirit(attacker.actor, "soul");
-	} else {
-		$statCalc.clearSpirit(attacker.actor, "valor");
-	}
 	
 	var mapRewardsScaling = 1 / (targets.length / 2);
 	aCache.expGain = Math.floor(aCache.expGain * mapRewardsScaling);
