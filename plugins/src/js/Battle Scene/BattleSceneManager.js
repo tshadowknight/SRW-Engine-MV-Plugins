@@ -6526,7 +6526,14 @@ BattleSceneManager.prototype.processActionQueue = function() {
 						_this._UILayerManager.setNotification(nextAction.side, "Main Attack");					
 					}
 					
-					const isBetweenFriendlies = $gameSystem.areUnitsFriendly(nextAction.ref, nextAction.attacked.ref);
+					let isBetweenFriendlies;
+
+					if($gameTemp.editMode){
+						isBetweenFriendlies = false;
+					} else {
+						isBetweenFriendlies = $gameSystem.areUnitsFriendly(nextAction.ref, nextAction.attacked.ref);
+					}
+					
 					
 					var attack = nextAction.action.attack;
 					var animId;
