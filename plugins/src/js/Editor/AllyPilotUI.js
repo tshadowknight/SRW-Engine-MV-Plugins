@@ -1,6 +1,7 @@
 import EditorUI from "./EditorUI.js";
 import DBList from "./DBList.js";
 import FaceManager from "./FaceManager.js";
+import OverworldSpriteManager from "./OverworldSpriteManager";
 
 export default function AllyPilotUI(container, mainUIHandler){
 	EditorUI.call(this, container, mainUIHandler);
@@ -671,7 +672,7 @@ AllyPilotUI.prototype.initPropertyHandlers = function(){
 			createControls(entry){
 				entry = _this.getCurrentEntry();
 				var content = "";			
-			
+				content+="<div class='row'>";	
 				content+="<div class='cell'>";
 				content+=EDITORSTRINGS.PILOT.label_cutin_path;
 				content+="</div>";
@@ -680,6 +681,22 @@ AllyPilotUI.prototype.initPropertyHandlers = function(){
 				
 				content+="<input id='cutin_path' value='"+_this.getMetaValue("pilotCutinPath")+"'></input>";
 				content+=".png";
+				content+="</div>";
+				content+="</div>";
+				
+				content+="<div title='' class='table sub_section'>";
+				content+="<div title='' class='row'>";
+				content+="<div class='cell'>";
+				content+=EDITORSTRINGS.PILOT.label_overworld;
+				content+="</div>";
+				content+="</div>";
+				content+="<div title='' class='row'>";
+				
+				content+="<div class='cell'>";
+				content+= "<div class='overworld_preview unit_img_preview'></div>";
+				content+="</div>";
+				
+				content+="</div>";
 				content+="</div>";
 				
 				return content;
@@ -690,7 +707,31 @@ AllyPilotUI.prototype.initPropertyHandlers = function(){
 					_this.setMetaValue("pilotCutinPath", this.value);
 					_this.show();
 					_this._mainUIHandler.setModified();
-				});						
+				});	
+
+				var overworldInfo = [
+					_this.getProperty("characterName"),
+					_this.getProperty("characterIndex")
+				];//_this.getMetaValue("srpgOverworld").split(",");
+				var divs = containerNode.querySelectorAll(".overworld_preview");
+				divs.forEach(function(div){
+					OverworldSpriteManager.loadOverworldByParams(overworldInfo[0], overworldInfo[1], div);
+				});		
+
+
+				divs.forEach(function(div){
+					div.addEventListener("click", async function(e){
+						var elem = this;
+						let result = await OverworldSpriteManager.showOverworldSelector(e, overworldInfo[0], overworldInfo[1], this);
+						if(result.status == "updated"){
+							//_this.setMetaValue("srpgOverworld", result.faceName+","+result.faceIndex);
+							_this.setProperty("characterName", result.faceName);	
+							_this.setProperty("characterIndex", result.faceIndex);	
+							_this.show();
+							_this._mainUIHandler.isModified();
+						}
+					});			
+				});		
 			}
 		},
 		relationships: {
@@ -980,9 +1021,9 @@ AllyPilotUI.prototype.show = async function(){
 	
 	content+="<div class='table'>";
 	
-	content+="<div class='row'>";
+	
 	content+=_this._propertyHandlers.assets.createControls();
-	content+="</div>";
+
 	content+="</div>";
 	content+="</div>";
 	content+="</div>";	

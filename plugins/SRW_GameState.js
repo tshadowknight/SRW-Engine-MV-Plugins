@@ -1563,6 +1563,15 @@ GameState_normal.prototype.update = function(scene){
 		scene._mapButtonsWindow.show();
 	}
 	
+	if (!$gameSystem.isSRPGMode()){
+		if(Input.isTriggered('menu')){
+			scene.showPauseMenu();
+			$gameSystem.setSubBattlePhase('pause_menu');		
+			scene._mapButtonsWindow.requestRedraw();	
+		}
+		return;
+	}
+	
 	
 	
 	if($gameTemp.supportAttackCandidates && $gameTemp.supportAttackCandidates.length){

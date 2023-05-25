@@ -818,6 +818,8 @@ EDITORSTRINGS.PILOT = {
 	label_rel_bonus: "Relationship Bonuses",
 	label_assets: "Assets",
 	
+	label_overworld: "Overworld(Regular map only)",
+	
 	label_name: "Name",
 	label_use_mech_name: "Use Mech Name",
 	label_stats_label: "Stats Label",

@@ -558,13 +558,16 @@
 				   this.addCommand(APPSTRINGS.MAPMENU.cmd_list, 'unitList', true);
 				   this.addCommand(APPSTRINGS.MAPMENU.cmd_conditions, 'conditions', true);
 				   				   	
+			   
+				   if(ENGINE_SETTINGS.ENABLE_TRANSFORM_ALL){
+						this.addCommand(APPSTRINGS.MAPMENU.cmd_transform_all, 'transform_all');
+					}
 			   }
-			   if(ENGINE_SETTINGS.ENABLE_TRANSFORM_ALL){
-					this.addCommand(APPSTRINGS.MAPMENU.cmd_transform_all, 'transform_all');
-				}
 			   
 			   this.addCommand(APPSTRINGS.MAPMENU.cmd_options, 'options');
-			   this.addCommand(APPSTRINGS.MAPMENU.cmd_log, 'log');
+			   if($gameSystem.isSRPGMode()){
+				this.addCommand(APPSTRINGS.MAPMENU.cmd_log, 'log');
+			   }
 			   this.addCommand(APPSTRINGS.MAPMENU.cmd_save, 'save');
 			   this.addCommand(APPSTRINGS.MAPMENU.cmd_game_end, 'gameEnd');
 			};

@@ -400,6 +400,15 @@
 		Game_Battler.prototype.srpgMaxFloorDamage = function() {
 			return $dataSystem.optFloorDeath ? this.hp : Math.max(this.hp - 1, 0);
 		};
+		
+		Game_Battler.prototype.refresh = function() {
+			Game_BattlerBase.prototype.refresh.call(this);
+			/*if (this.hp === 0) {
+				this.addState(this.deathStateId());
+			} else {
+				this.removeState(this.deathStateId());
+			}*/
+		};
 
 	//====================================================================
 	// ●Game_Actor
@@ -1791,16 +1800,8 @@
 
 		//戦闘中、サブフェーズの状況に応じてプレイヤーの移動を制限する
 		var _SRPG_Game_Player_canMove = Game_Player.prototype.canMove;
-		Game_Player.prototype.canMove = function() {
-			if ($gameSystem.isSRPGMode() == true) {				
-				if(!$SRWGameState.canCursorMove()){
-					return false;
-				}
-			}
-			if($gameSystem.isSubBattlePhase() === 'rearrange_deploys'){
-				return true;
-			}
-			return _SRPG_Game_Player_canMove.call(this);
+		Game_Player.prototype.canMove = function() {					
+			return $SRWGameState.canCursorMove() && _SRPG_Game_Player_canMove.call(this);
 		};
 
 		//戦闘中、サブフェーズの状況に応じて決定キー・タッチの処理を変える

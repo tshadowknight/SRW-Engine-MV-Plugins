@@ -339,9 +339,9 @@ SceneManager.isInSaveScene = function(){
     //SRPG戦闘中は無効化する
     var _SRPG_Scene_Base_checkGameover = Scene_Base.prototype.checkGameover;
     Scene_Base.prototype.checkGameover = function() {
-        if ($gameSystem.isSRPGMode() == false) {
-            _SRPG_Scene_Base_checkGameover.call(this);
-        }
+        //if ($gameSystem.isSRPGMode() == false) {
+        //    _SRPG_Scene_Base_checkGameover.call(this);
+        //}
     };
 
 //====================================================================
@@ -4563,6 +4563,16 @@ SceneManager.isInSaveScene = function(){
 		$gameMap._interpreter.clear();//make sure no events run after the game over before loading into the intermission
 		$gamePlayer.reserveTransfer(2, 0, 0);//send player to intermission after losing
 		SceneManager.goto(Scene_Map);
+	};
+	
+	Scene_Map.prototype.callMenu = function() {
+		//SoundManager.playOk();
+		//SceneManager.push(Scene_Menu);
+		//Window_MenuCommand.initCommandPosition();
+		//$gameTemp.clearDestination();
+		//this._mapNameWindow.hide();
+		//this._waitCount = 2;
+		//this.showPauseMenu()
 	};
 
 //====================================================================

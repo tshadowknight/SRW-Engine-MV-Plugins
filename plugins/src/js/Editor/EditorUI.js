@@ -90,6 +90,17 @@ EditorUI.prototype.setMetaValue = function(key, value){
 	return this.getCurrentEntry().meta[key] = String(value);
 }
 
+EditorUI.prototype.getProperty = function(key){
+	if(this.getCurrentEntry()[key] == null){
+		return "";
+	}
+	return this.getCurrentEntry()[key];
+}
+
+EditorUI.prototype.setProperty = function(key, value){
+	return this.getCurrentEntry()[key] = value;
+}
+
 EditorUI.prototype.createValueInput = function(key, name, preHint, postHint){
 	let _this = this;
 	var content = "";

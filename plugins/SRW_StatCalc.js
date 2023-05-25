@@ -6395,7 +6395,7 @@ StatCalc.prototype.createActiveAbilityLookup = function(excludedSkills){
 	}
 	function processActor(actor, eventId, isEnemy, sourceX, sourceY, type, slot){
 		//hack to prevent nested ability checks from causing abilities to be registered multiple times
-		if(!actor.SRWStats || _this._currentActorBeingProcessed[actor.SRWStats.pilot.id] || actor.SRWStats.stageTemp.isBoarded){
+		if(!actor.SRWStats || _this._currentActorBeingProcessed[actor.SRWStats.pilot.id] || (actor.SRWStats.stageTemp && actor.SRWStats.stageTemp.isBoarded)){
 			return;
 		}
 		_this._currentActorBeingProcessed[actor.SRWStats.pilot.id] = true;
