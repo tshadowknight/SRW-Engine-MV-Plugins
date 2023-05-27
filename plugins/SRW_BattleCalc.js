@@ -872,8 +872,6 @@ BattleCalc.prototype.generateBattleResult = function(isPrediction){
 			}
 		}
 		
-		const isBuffingAttack = isBetweenFriendlies && interactionType == Game_System.INTERACTION_STATUS;
-		aCache.isBuffingAttack = isBuffingAttack;
 		
 		var storedCacheRef = this._attacker.actor._cacheReference;
 		if(this._isSupportAttack){
@@ -881,6 +879,10 @@ BattleCalc.prototype.generateBattleResult = function(isPrediction){
 			//this is a hack to circumvent issues with determining ability activation when a unit has self supporting capabilites
 			aCache = $gameTemp.battleEffectCache[this._attacker.actor._supportCacheReference];
 		}
+		
+		const isBuffingAttack = isBetweenFriendlies && interactionType == Game_System.INTERACTION_STATUS;
+		aCache.isBuffingAttack = isBuffingAttack;
+		
 		aCache.side = this._side;
 		if(aCache.action.type != "attack"){
 			return;
