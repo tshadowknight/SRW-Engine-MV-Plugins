@@ -2151,9 +2151,41 @@ BattleSceneManager.prototype.hookBeforeRender = function(){
 			}
 		});	
 		
-		Object.keys(_this._bgScrolls).forEach(function(animationId){
-			var animation = _this._bgScrolls[animationId];
-			var targetObj = animation.targetObj;
+		Object.keys(_this._bgScrolls).forEach(function(targetName){
+			var animInfo = _this._bgScrolls[targetName];
+			let speed = 0;
+			if(!animInfo.next){
+				speed = animInfo.current.speed;
+			} else {
+				let currentSpeed = animInfo.current.speed;
+				let targetSpeed = animInfo.next.speed;
+				
+				var duration = animInfo.next.duration * _this.getTickDuration();
+				if(animInfo.next.accumulator == null){
+					animInfo.next.accumulator = 0;
+				}
+				animInfo.next.accumulator+=deltaTime;
+				var t = animInfo.next.accumulator / duration;
+				
+				if(t < 1){
+					if(animInfo.easingFunction){
+						t = animInfo.easingFunction.ease(t);
+					}
+					var startVector = new BABYLON.Vector3(currentSpeed * 1, 0, 0);
+					var endVector = new BABYLON.Vector3(targetSpeed * 1, 0, 0);
+					var interpVector = BABYLON.Vector3.Lerp(startVector, endVector, t);
+					//console.log(interpVector);					
+					
+					speed = interpVector.x;
+					
+				} else {					
+					animInfo.current = animInfo.next;
+					delete animInfo.next;
+					speed = animInfo.current.speed;
+				}
+				
+			}
+			var targetObj = animInfo.targetObj;
 			if(targetObj){
 				var texture;	
 				if(targetObj.material){
@@ -2162,7 +2194,7 @@ BattleSceneManager.prototype.hookBeforeRender = function(){
 					texture = targetObj.texture;
 				}
 				if(texture){
-					texture.uOffset+=(animation.speed / 1000);
+					texture.uOffset+=(speed / 1000);
 					if(texture.uOffset > 1){
 						texture.uOffset-=1;
 					} else if(texture.uOffset < 0){
@@ -2622,11 +2654,30 @@ BattleSceneManager.prototype.registerBgAnimation = function(targetObj, startTick
 	};
 }
 
-BattleSceneManager.prototype.registerBgScroll = function(targetObj, speed){	
-	this._bgScrolls[this._bgScrollCounter++] = {		
-		targetObj: targetObj,
-		speed: speed
-	};
+BattleSceneManager.prototype.registerBgScroll = function(targetName, targetObj, speed, duration, easingFunction, easingMode){	
+	if(easingFunction && easingMode){
+		easingFunction.setEasingMode(easingMode);
+	}
+
+	if(!this._bgScrolls[targetName]){
+		this._bgScrolls[targetName] = {
+			targetObj: targetObj,
+			current: {				
+				speed: speed,
+				easingFunction: easingFunction,
+				easingMode: easingFunction,
+				duration: duration,
+			},
+			next: null
+		};
+	} else {
+		this._bgScrolls[targetName].next = {
+			speed: speed,
+			easingFunction: easingFunction,
+			easingMode: easingFunction,
+			duration: duration,
+		};
+	}
 }
 
 BattleSceneManager.prototype.registerLightAnimation = function(targetObj, startColor, endColor, startTick, duration, easingFunction, easingMode){
@@ -3501,7 +3552,7 @@ BattleSceneManager.prototype.executeAnimation = function(animation, startTick){
 			}
 			if(params.scrollSpeed){
 				//var speed = params.scrollSpeed * _this._animationDirection;				
-				_this.registerBgScroll(bg, params.scrollSpeed * 1);
+				_this.registerBgScroll(target, bg, params.scrollSpeed * 1);
 			}
 			if(params.parent){
 				var parentObj = getTargetObject(params.parent);
@@ -3510,6 +3561,14 @@ BattleSceneManager.prototype.executeAnimation = function(animation, startTick){
 				}
 			}
 			_this._animationBackgroundsInfo.push(bg);
+		},
+		
+		set_bg_scroll_speed: function(target, params){
+			var targetObj = getTargetObject(target);
+			if(params.scrollSpeed){
+				//var speed = params.scrollSpeed * _this._animationDirection;				
+				_this.registerBgScroll(target, targetObj, params.scrollSpeed * 1, params.duration * 1, params.easingFunction, params.easingMode);
+			}
 		},
 		create_movie_bg: function(target, params){
 			var position;
@@ -4080,6 +4139,7 @@ BattleSceneManager.prototype.executeAnimation = function(animation, startTick){
 			if(targetObj){
 				targetObj.setShown(false);
 				targetObj.context.update();
+				targetObj.stop();
 			}
 		},
 		send_effekseer_trigger: function(target, params){

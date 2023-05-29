@@ -331,6 +331,11 @@ SRWEditor.prototype.init = function(){
 			aliases: {"animationLoop": "loopFromFrame", "animationFrames": "loopToFrame"},
 			desc: "Create a new background."
 		},
+		set_bg_scroll_speed: {
+			hasTarget: true,
+			params: ["scrollSpeed", "duration", "easingFunction", "easingMode"],
+			desc: "Set the scrolling speed of a spawned background."
+		},
 		create_movie_bg: {
 			hasTarget: true,
 			params: ["path", "parent", "position", "size", "alpha", "billboardMode", "rotation"],
