@@ -1249,7 +1249,7 @@ BattleSceneManager.prototype.prepareModel = function(root, name, position, flipX
 			for(let child of children){
 				if(child.getChildren().length){
 					stack.push(child);
-				} else if(child instanceof BABYLON.Mesh && child.id.indexOf("att_") == -1){
+				} else if(child instanceof BABYLON.Mesh && child.id.indexOf("att_") == -1 && child.id.indexOf("point_") == -1){
 					let materialName = child.material.name;
 					if(!materialLeaves[materialName]){
 						materialLeaves[materialName] = [];
@@ -2299,6 +2299,48 @@ BattleSceneManager.prototype.disposeSpriterBackgrounds = function(){
 	//this._spriterMainSpritesInfo = [];	
 }
 
+BattleSceneManager.prototype.updateParentedEffekseerEffect = function(effekInfo){
+	if(effekInfo.parent && effekInfo.handle){
+				
+		var scale = new BABYLON.Vector3(0, 0, 0);
+		var rotation = new BABYLON.Quaternion();
+		var position = new BABYLON.Vector3(0,0,0);
+		
+		var tempWorldMatrix = effekInfo.parent.getWorldMatrix();
+		tempWorldMatrix.decompose(scale, rotation, position);
+		
+		rotation = rotation.toEulerAngles();
+		
+		//console.log("sys rotation: " + effekInfo.parent.rotation.x + ", " + effekInfo.parent.rotation.y + ", " + effekInfo.parent.rotation.z + " VS " + "calc rotation: " + rotation.x + ", " + rotation.y + ", " + rotation.z);
+		
+		/*var position; 
+		if(effekInfo.parent.getAbsolutePosition){
+			position = effekInfo.parent.getAbsolutePosition();
+		} else {
+			position = effekInfo.parent.position;
+		}
+		
+		var rotation = effekInfo.parent.absoluteRotationQuaternion().toEulerAngles();*/
+		
+		
+		
+		let mirrorFactor = 1;
+		if(effekInfo.isMirrored){
+			mirrorFactor = -1;
+		}	
+		effekInfo.handle.setLocation(
+			position.x * mirrorFactor + effekInfo.offset.x, 
+			position.y + effekInfo.offset.y, 
+			position.z + effekInfo.offset.z
+		);
+		effekInfo.handle.setRotation(
+			(rotation.x + effekInfo.offsetRotation.x), 
+			(rotation.y + effekInfo.offsetRotation.y), 
+			(rotation.z + effekInfo.offsetRotation.z) * mirrorFactor
+		);
+	}
+}
+
 BattleSceneManager.prototype.startScene = function(){
 	var _this = this;
 	//_this.initScene();
@@ -2324,7 +2366,10 @@ BattleSceneManager.prototype.startScene = function(){
 		if(_this._fastForward){
 			deltaTime*=5;
 		}
-		
+		this._effekseerInfo.forEach(function(effekInfo){
+			_this.updateParentedEffekseerEffect(effekInfo);
+		});
+			
 		
 
 		if(!_this._animsPaused){
@@ -2341,32 +2386,7 @@ BattleSceneManager.prototype.startScene = function(){
 			ratio = 2;
 		}
 		ratio*=_this._animRatio;
-		this._effekseerInfo.forEach(function(effekInfo){
-			if(effekInfo.parent && effekInfo.handle){
-				var position; 
-				if(effekInfo.parent.getAbsolutePosition){
-					position = effekInfo.parent.getAbsolutePosition();
-				} else {
-					position = effekInfo.parent.position;
-				}
-				
-				let mirrorFactor = 1;
-				if(effekInfo.isMirrored){
-					mirrorFactor = -1;
-				}	
-				effekInfo.handle.setLocation(
-					position.x * mirrorFactor + effekInfo.offset.x, 
-					position.y + effekInfo.offset.y, 
-					position.z + effekInfo.offset.z
-				);
-				effekInfo.handle.setRotation(
-					(effekInfo.parent.rotation.x + effekInfo.offsetRotation.x), 
-					(effekInfo.parent.rotation.y + effekInfo.offsetRotation.y), 
-					(effekInfo.parent.rotation.z + effekInfo.offsetRotation.z) * -1 * mirrorFactor
-				);
-			}
-		});
-			
+		
 		//console.log("_effksContext.update");
 
 	})
@@ -4012,21 +4032,25 @@ BattleSceneManager.prototype.executeAnimation = function(animation, startTick){
 			
 				info = {name: target, effect: effect, context: targetContext, offset: {x: position.x, y: position.y, z: position.z}, offsetRotation: {x: rotation.x, y: rotation.y, z: rotation.z}};
 				info.handle = handle;
-				if(params.parent){
-					var parentObj = getTargetObject(params.parent)
-					if(parentObj.pivothelper){
-						parentObj = parentObj.pivothelper;
-					}
-					if(parentObj.parent_handle){
-						parentObj = parentObj.parent_handle;
-					}
-					if(parentObj){
-						info.parent = parentObj;
-					}				 
-				}
 				if(params.autoRotate && _this._animationDirection == -1){
 					info.isMirrored = true;
 				}
+				if(params.parent){
+					var parentObj = getTargetObject(params.parent)
+					if(parentObj.parent_handle){
+						parentObj = parentObj.parent_handle;
+					}
+					if(parentObj.pivothelper){
+						parentObj = parentObj.pivothelper;
+					}
+					
+					if(parentObj){
+						info.parent = parentObj;
+					}		
+					
+					//_this.updateParentedEffekseerEffect(info);	
+				}
+				
 				_this._effekseerInfo.push(info);			
 				_this._isLoading--;
 				
