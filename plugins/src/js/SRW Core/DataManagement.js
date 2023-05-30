@@ -297,7 +297,10 @@
 				
 				//if (fs.existsSync(base+'/js/plugins/config/active/Engine.conf.js')) {
 					await loadConfigFile(base+'js/plugins/config/active/Engine.conf.js');						
-				//}				
+				//}			
+				if(configResults[base+'js/plugins/config/default/Engine.conf.js'].status == "OK") {
+					delete configResults[base+'js/plugins/config/active/Engine.conf.js'];
+				}		
 				
 				//Appstrings
 				await loadConfigFile(base+'js/plugins/config/default/Appstrings.conf.js');
@@ -306,6 +309,10 @@
 				var EDITORSTRINGS_DEFAULT = window.EDITORSTRINGS;
 				
 				await loadConfigFile(base+'js/plugins/config/active/Appstrings.conf.js');						
+					
+				if(configResults[base+'js/plugins/config/default/Appstrings.conf.js'].status == "OK") {
+					delete configResults[base+'js/plugins/config/active/Appstrings.conf.js'];
+				}		
 					
 				
 				var errors = [];
