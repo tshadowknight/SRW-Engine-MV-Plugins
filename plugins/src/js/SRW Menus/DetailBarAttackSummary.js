@@ -22,9 +22,13 @@ DetailBarAttackSummary.prototype.createComponents = function(){
 		
 }
 
+DetailBarAttackSummary.prototype.padCostValue = function(value){
+	return String(value).padStart(3, "0");
+}
+
 DetailBarAttackSummary.prototype.redraw = function(){
 	var detailContent = "";
-	var attackData = this.getCurrentSelection() || {totalAmmo: -1, ENCost: -1, willRequired: -1, effects: []};
+	var attackData = this.getCurrentSelection() || {totalAmmo: -1, ENCost: -1, willRequired: -1, effects: [], MPCost: -1};
 	var mechData = $gameTemp.currentMenuUnit.mech;
 	var actor = $statCalc.getCurrentPilot($gameTemp.currentMenuUnit.mech.id);
 	if(!actor){
@@ -72,13 +76,30 @@ DetailBarAttackSummary.prototype.redraw = function(){
 		detailContent+="</div>";
 	} else if(calculatedStats.currentEN < realEnCost) {
 		detailContent+="<div class='summary_row_value scaled_text insufficient'>";
-		detailContent+=String(realEnCost).padStart(3, "0")+" ("+calculatedStats.currentEN+")";
+		detailContent+=this.padCostValue(realEnCost)+" ("+calculatedStats.currentEN+")";
 		detailContent+="</div>";
 	} else {
 		detailContent+="<div class='summary_row_value scaled_text'>";
-		detailContent+=String(realEnCost).padStart(3, "0")+" ("+calculatedStats.currentEN+")";
+		detailContent+=this.padCostValue(realEnCost)+" ("+calculatedStats.currentEN+")";
 		detailContent+="</div>";
 	}		
+	var realMPCost = $statCalc.getRealMPCost($gameTemp.currentMenuUnit.actor, attackData.MPCost);
+	if(attackData.MPCost > 0){
+		let currentMP = actor.SRWStats.pilot.stats.calculated.currentMP;
+		detailContent+="<div class='summary_row_label scaled_text' id='label_MP_cost'>";
+		detailContent+=APPSTRINGS.ATTACKLIST.label_MP_cost;
+		detailContent+="</div>";
+		if(currentMP < realMPCost) {
+			detailContent+="<div class='summary_row_value scaled_text insufficient'>";
+			detailContent+=this.padCostValue(realMPCost)+" ("+currentMP+")";
+			detailContent+="</div>";
+		} else {
+			detailContent+="<div class='summary_row_value scaled_text'>";
+			detailContent+=this.padCostValue(realMPCost)+" ("+currentMP+")";
+			detailContent+="</div>";
+		}
+	}
+	
 	detailContent+="</div>";
 	
 	detailContent+="<div class='summary_row'>";
@@ -91,11 +112,11 @@ DetailBarAttackSummary.prototype.redraw = function(){
 		detailContent+="</div>";
 	} else if($statCalc.getCurrentWill($gameTemp.currentMenuUnit.actor) < attackData.willRequired) {
 		detailContent+="<div class='summary_row_value scaled_text insufficient'>";
-		detailContent+=String(attackData.willRequired).padStart(3, "0")+" ("+$statCalc.getCurrentWill($gameTemp.currentMenuUnit.actor)+")";
+		detailContent+=this.padCostValue(attackData.willRequired)+" ("+$statCalc.getCurrentWill($gameTemp.currentMenuUnit.actor)+")";
 		detailContent+="</div>";
 	} else {
 		detailContent+="<div class='summary_row_value scaled_text'>";
-		detailContent+=String(attackData.willRequired).padStart(3, "0")+" ("+$statCalc.getCurrentWill($gameTemp.currentMenuUnit.actor)+")";
+		detailContent+=this.padCostValue(attackData.willRequired)+" ("+$statCalc.getCurrentWill($gameTemp.currentMenuUnit.actor)+")";
 		detailContent+="</div>";
 	}		
 	detailContent+="</div>";
@@ -119,6 +140,8 @@ DetailBarAttackSummary.prototype.redraw = function(){
 				detailContent+=APPSTRINGS.ATTACKLIST.label_no_ammo;
 			} else if(detail.EN){
 				detailContent+=APPSTRINGS.ATTACKLIST.label_no_EN;
+			} else if(detail.MP){
+				detailContent+=APPSTRINGS.ATTACKLIST.label_no_MP;
 			} else if(detail.will){
 				detailContent+=APPSTRINGS.ATTACKLIST.label_no_will;
 			} else if(detail.postMove){
@@ -129,7 +152,7 @@ DetailBarAttackSummary.prototype.redraw = function(){
 				detailContent+=APPSTRINGS.ATTACKLIST.label_no_map_counter;
 			} else if(detail.isMap2){
 				detailContent+=APPSTRINGS.ATTACKLIST.label_no_map_support;
-			}else if(detail.noParticipants){
+			} else if(detail.noParticipants){
 				detailContent+=APPSTRINGS.ATTACKLIST.label_no_participants;
 			} else if(detail.terrain){
 				detailContent+=APPSTRINGS.ATTACKLIST.label_no_terrain;
@@ -180,35 +203,35 @@ DetailBarAttackSummary.prototype.redraw = function(){
 	detailContent+="</div>";
 	detailContent+="</div>";
 	
-	detailContent+="<div class='summary_row'>";
-	detailContent+="<div class='summary_row_label scaled_text required_will_label'>";
-	detailContent+=APPSTRINGS.ATTACKLIST.label_special_effect;
-	detailContent+="</div>";
-	if(typeof attackData.effects[0] == "undefined"){
-		detailContent+="<div class='summary_row_value scaled_text disabled'>";
-		detailContent+="------";
+	function createEffectRow(idx){
+		let detailContent = "";
+		detailContent+="<div class='summary_row'>";
+		detailContent+="<div class='summary_row_label scaled_text required_will_label'>";
+		detailContent+=APPSTRINGS.ATTACKLIST.label_special_effect;
 		detailContent+="</div>";
-	} else { //TODO Add display once weapon effects are actually implemented
-		detailContent+="<div class='summary_row_value scaled_text'>";
-		detailContent+=$weaponEffectManager.getAbilityDisplayInfo(attackData.effects[0]).name;
+		if(typeof attackData.effects[idx] == "undefined"){
+			detailContent+="<div class='summary_row_value scaled_text disabled'>";
+			detailContent+="------";
+			detailContent+="</div>";
+		} else {
+			detailContent+="<div class='summary_row_value scaled_text'>";
+			detailContent+=$weaponEffectManager.getAbilityDisplayInfo(attackData.effects[idx].idx).name;
+			if(attackData.effects[idx].targeting != "all"){
+				if(attackData.effects[idx].targeting == "enemy"){
+					detailContent+="["+APPSTRINGS.ATTACKLIST.label_target_enemies+"]";
+				}
+				if(attackData.effects[idx].targeting == "ally"){
+					detailContent+="["+APPSTRINGS.ATTACKLIST.label_target_allies+"]";
+				}
+			}
+			detailContent+="</div>";
+		}		
 		detailContent+="</div>";
-	}		
-	detailContent+="</div>";	
+		return detailContent;		
+	}
+	detailContent+=createEffectRow(0);
+	detailContent+=createEffectRow(1);
 	
-	detailContent+="<div class='summary_row'>";
-	detailContent+="<div class='summary_row_label scaled_text required_will_label'>";
-	detailContent+=APPSTRINGS.ATTACKLIST.label_special_effect;
-	detailContent+="</div>";
-	if(typeof attackData.effects[1] == "undefined"){
-		detailContent+="<div class='summary_row_value scaled_text disabled'>";
-		detailContent+="------";
-		detailContent+="</div>";
-	} else { //TODO Add display once weapon effects are actually implemented
-		detailContent+="<div class='summary_row_value scaled_text'>";
-		detailContent+=$weaponEffectManager.getAbilityDisplayInfo(attackData.effects[1]).name;
-		detailContent+="</div>";
-	}		
-	detailContent+="</div>";
 
 	detailContent+="<div class='summary_row'>";
 	detailContent+="<div class='summary_row_label scaled_text required_will_label'>";

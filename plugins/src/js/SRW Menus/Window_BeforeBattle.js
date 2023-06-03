@@ -38,8 +38,13 @@ Window_BeforeBattle.prototype.show = function(){
 	this._longPressTimer = 20;
 }
 
+Window_BeforeBattle.prototype.assistIsValid = function(){
+	const interactionInfo = $gameSystem.getCombatInteractionInfo($gameTemp.actorAction.attack);
+	return !$gameTemp.currentBattleActor.isActor() && (!interactionInfo.isBetweenFriendlies || interactionInfo.interactionType != Game_System.INTERACTION_STATUS);
+}
+
 Window_BeforeBattle.prototype.getMaxMainSelection = function(){
-	if(!$gameTemp.currentBattleActor.isActor()){
+	if(!this.assistIsValid()){
 		return 2;
 	} else if($gameTemp.isEnemyAttack){
 		return 4;
@@ -713,7 +718,7 @@ Window_BeforeBattle.prototype.redraw = function() {
 		_this._btn_demo.innerHTML = "DEMO: OFF";
 	}
 	
-	if(!$gameTemp.currentBattleActor.isActor()){
+	if(!this.assistIsValid()){
 		_this._btn_action.style.display = "none";
 		_this._btn_assist.style.display = "none";
 	} else {

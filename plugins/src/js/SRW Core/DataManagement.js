@@ -297,7 +297,10 @@
 				
 				//if (fs.existsSync(base+'/js/plugins/config/active/Engine.conf.js')) {
 					await loadConfigFile(base+'js/plugins/config/active/Engine.conf.js');						
-				//}				
+				//}			
+				if(configResults[base+'js/plugins/config/default/Engine.conf.js'].status == "OK") {
+					delete configResults[base+'js/plugins/config/active/Engine.conf.js'];
+				}		
 				
 				//Appstrings
 				await loadConfigFile(base+'js/plugins/config/default/Appstrings.conf.js');
@@ -306,6 +309,10 @@
 				var EDITORSTRINGS_DEFAULT = window.EDITORSTRINGS;
 				
 				await loadConfigFile(base+'js/plugins/config/active/Appstrings.conf.js');						
+					
+				if(configResults[base+'js/plugins/config/default/Appstrings.conf.js'].status == "OK") {
+					delete configResults[base+'js/plugins/config/active/Appstrings.conf.js'];
+				}		
 					
 				
 				var errors = [];
@@ -708,11 +715,93 @@
 						parameters: [params[0], params[1], 0, 0, 0, 0, 100, 100, 255, 0]
 					});
 				},
+				showPicture: function(eventList, indent, params){
+					let blendMode = {
+						"Normal": 0,
+						"Additive": 1,
+						"Multiply": 2,
+						"Screen": 3
+					}[params[9]] || 0;
+					eventList.push({
+						code: 231,
+						indent: indent,
+						parameters: [
+							params[0] * 1,//pictureID
+							params[1],//name
+							params[2] == "Center" ? 1 : 0,//0, origin
+							params[3] == "Direct" ? 0 : 1,//0, direct designation
+							params[4] * 1,//0, x
+							params[5] * 1,//0, y
+							params[6] * 1,//scaleX
+							params[7] * 1,//scaleY
+							params[8] * 1,//opacity
+							blendMode,//blend mode
+						]
+					});
+				},
 				hideBackground: function(eventList, indent, params){
 					eventList.push({
 						code: 235,
 						indent: indent,
 						parameters: [params[0]]
+					});
+				},
+				erasePicture: function(eventList, indent, params){
+					eventList.push({
+						code: 235,
+						indent: indent,
+						parameters: [params[0]]
+					});
+				},
+				movePicture: function(eventList, indent, params){
+					let blendMode = {
+						"Normal": 0,
+						"Additive": 1,
+						"Multiply": 2,
+						"Screen": 3
+					}[params[8]] || 0;
+					eventList.push({
+						code: 232,
+						indent: indent,
+						parameters: [
+							params[0] * 1,//pictureID
+							null,//name
+							params[1] == "Center" ? 1 : 0,//0, origin
+							params[2] == "Direct" ? 0 : 1,//0, direct designation
+							params[3] * 1,//0, x
+							params[4] * 1,//0, y
+							params[5] * 1,//scaleX
+							params[6] * 1,//scaleY
+							params[7] * 1,//opacity
+							blendMode,//blend mode,
+							params[9] * 1,//duration
+							params[10] == "wait" ? 1 : 0,//wait
+						]
+					});
+				},
+				rotatePicture: function(eventList, indent, params){
+					eventList.push({
+						code: 233,
+						indent: indent,
+						parameters: [params[0] * 1, params[1] * 1]
+					});
+				},
+				tintPicture: function(eventList, indent, params){
+					let colorArray = params[1].split(",");
+					let tmp = [];
+					colorArray.forEach(function(val){
+						tmp.push(val * 1);
+					});
+					colorArray = tmp;
+					eventList.push({
+						code: 234,
+						indent: indent,
+						parameters: [
+							params[0] * 1, //picture id
+							colorArray, //tone
+							params[2] * 1, //duration
+							params[3] == "wait" ? 1 : 0,//wait
+						]
 					});
 				},
 				playSE: function(eventList, indent, params){
@@ -732,6 +821,20 @@
 				fadeOutBGM: function(eventList, indent, params){
 					eventList.push({
 						code: 242,
+						indent: indent,
+						parameters: [params[0]*1]
+					});
+				}, 
+				playBGS: function(eventList, indent, params){
+					eventList.push({
+						code: 245,
+						indent: indent,
+						parameters: [{name: params[0], volume: params[1] || 90, pitch: params[2] || 100, pan: params[3] || 0}]
+					});
+				},
+				fadeOutBGS: function(eventList, indent, params){
+					eventList.push({
+						code: 246,
 						indent: indent,
 						parameters: [params[0]*1]
 					});

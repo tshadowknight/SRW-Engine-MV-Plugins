@@ -331,6 +331,11 @@ SRWEditor.prototype.init = function(){
 			aliases: {"animationLoop": "loopFromFrame", "animationFrames": "loopToFrame"},
 			desc: "Create a new background."
 		},
+		set_bg_scroll_speed: {
+			hasTarget: true,
+			params: ["scrollSpeed", "duration", "easingFunction", "easingMode"],
+			desc: "Set the scrolling speed of a spawned background."
+		},
 		create_movie_bg: {
 			hasTarget: true,
 			params: ["path", "parent", "position", "size", "alpha", "billboardMode", "rotation"],
@@ -3038,8 +3043,12 @@ SRWEditor.prototype.showCameraState = function(){
 			}
 			var content = "";
 			var position = targetObj.position;
-			if(targetObj.handle){
-				position = targetObj.handle.position;
+			if(targetObj.handle){				
+				if(targetObj.parent){
+					position = targetObj.offset;
+				} else {
+					position = targetObj.handle.position;
+				}
 			}
 			content+="<div>"
 			content+="<b>Position</b>"
@@ -3056,7 +3065,12 @@ SRWEditor.prototype.showCameraState = function(){
 			
 			var rotation = targetObj.rotation;
 			if(targetObj.handle){
-				rotation = targetObj.handle.rotation;
+				if(targetObj.parent){
+					rotation = targetObj.offsetRotation;
+				} else {
+					rotation = targetObj.handle.rotation;	
+				}
+				
 			}
 			content+="<div>"
 			content+="<b>Rotation</b>"
@@ -3078,16 +3092,61 @@ SRWEditor.prototype.showCameraState = function(){
 				var prop = input.getAttribute("data-prop");
 				var value = input.value;
 				if(!isNaN(value)){					
-					if(targetObj.handle){
-						var newVector = new BABYLON.Vector3().copyFrom(targetObj.handle[type]);
-						newVector[prop] = value * 1;
+					if(targetObj.handle){					
 						if(type == "rotation"){
+							var newVector;
+							if(targetObj.parent){
+								var scale = new BABYLON.Vector3(0, 0, 0);
+								var rotation = new BABYLON.Quaternion();
+								var position = new BABYLON.Vector3(0,0,0);
+								
+								var tempWorldMatrix = targetObj.parent.getWorldMatrix();
+								tempWorldMatrix.decompose(scale, rotation, position);
+								
+								rotation = rotation.toEulerAngles();
+								
+								targetObj.offsetRotation[prop] = value * 1;
+								let offsetVector = new BABYLON.Vector3(targetObj.offsetRotation.x * 1, targetObj.offsetRotation.y * 1, targetObj.offsetRotation.z * 1);
+								
+								newVector = new BABYLON.Vector3(
+									rotation.x + offsetVector.x,
+									rotation.y + offsetVector.y,
+									rotation.z + offsetVector.z,
+								);
+							} else {
+								newVector = new BABYLON.Vector3().copyFrom(targetObj.handle[type]);
+								newVector[prop] = value * 1;
+							}
+							
 							targetObj.handle.setRotation(
 								newVector.x, 
 								newVector.y, 
 								newVector.z
 							);
 						} else {
+							if(targetObj.parent){
+								var scale = new BABYLON.Vector3(0, 0, 0);
+								var rotation = new BABYLON.Quaternion();
+								var position = new BABYLON.Vector3(0,0,0);
+								
+								var tempWorldMatrix = targetObj.parent.getWorldMatrix();
+								tempWorldMatrix.decompose(scale, rotation, position);
+								
+								rotation = rotation.toEulerAngles();
+								
+								targetObj.offset[prop] = value * 1;
+								let offsetVector = new BABYLON.Vector3(targetObj.offset.x * 1, targetObj.offset.y * 1, targetObj.offset.z * 1);
+								
+								newVector = new BABYLON.Vector3(
+									position.x + offsetVector.x,
+									position.y + offsetVector.y,
+									position.z + offsetVector.z,
+								);
+							} else {
+								newVector = new BABYLON.Vector3().copyFrom(targetObj.handle[type]);
+								newVector[prop] = value * 1;
+							}
+							
 							targetObj.handle.setLocation(
 								newVector.x, 
 								newVector.y, 
@@ -3534,11 +3593,19 @@ SRWEditor.prototype.showAttackEditorControls = function(){
 					var data = targetObj[prop]; 
 				
 					if(targetObj.handle){
-						if(prop == "position"){
-							data = targetObj.handle.position;
-						} else if(prop == "rotation"){
-							data = targetObj.handle.rotation;
-						}						
+						if(targetObj.parent){
+							if(prop == "position"){
+								data = targetObj.offset;
+							} else if(prop == "rotation"){
+								data = targetObj.offsetRotation;
+							}	
+						} else {
+							if(prop == "position"){
+								data = targetObj.handle.position;
+							} else if(prop == "rotation"){
+								data = targetObj.handle.rotation;
+							}	
+						}												
 					}
 					
 			

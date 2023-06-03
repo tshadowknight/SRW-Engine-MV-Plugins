@@ -388,7 +388,7 @@ AbilityCommandManger.prototype.getIdPrefix = function(idx){
 }
 
 
-AbilityCommandManger.prototype.getUseCount = function(actor, idx){
+AbilityCommandManger.prototype.getUseInfo = function(actor, idx){
 	var def = this._abilityDefinitions[this.getUpgradeIdx(idx)];
 	if(typeof def.useCount == "function"){
 		return def.useCount(actor);

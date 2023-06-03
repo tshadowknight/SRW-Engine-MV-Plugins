@@ -184,4 +184,110 @@ $SRWConfig.weaponEffects = function(){
 			return true;
 		}
 	);
+	
+	this.addDefinition(
+		14, 
+		"Accuracy Up", 
+		"Accuracy increased by 30 for 1 turn.", 
+		false,
+		false,
+		function(actor, level){
+			return [{type: "inflict_accuracy_down", modType: "addFlat", value: -30}];
+		},
+		function(actor, level){
+			return true;
+		}
+	);
+	this.addDefinition(
+		15, 
+		"Mobility Up", 
+		"Mobility increased by 30 for 1 turn.", 
+		false,
+		false,
+		function(actor, level){
+			return [{type: "inflict_mobility_down", modType: "addFlat", value: -30}];
+		},
+		function(actor, level){
+			return true;
+		}
+	);
+	this.addDefinition(
+		16, 
+		"Armor Up", 
+		"Armor increased by 500 for 1 turn.", 
+		false,
+		false,
+		function(actor, level){
+			return [{type: "inflict_armor_down", modType: "addFlat", value: -500}];
+		},
+		function(actor, level){
+			return true;
+		}
+	);
+	this.addDefinition(
+		17, 
+		"Movement Up", 
+		"Movement increased by 3 for 1 turn.", 
+		false,
+		false,
+		function(actor, level){
+			return [{type: "inflict_move_down", modType: "addFlat", value: -3}];
+		},
+		function(actor, level){
+			return true;
+		}
+	);
+	this.addDefinition(
+		18, 
+		"Attack Power Up", 
+		"Attack Power increased by 500 for 1 turn.", 
+		false,
+		false,
+		function(actor, level){
+			return [{type: "inflict_attack_down", modType: "addFlat", value: -500}];
+		},
+		function(actor, level){
+			return true;
+		}
+	);
+
+	this.addDefinition(
+		19, 
+		"Range Up", 
+		"Attack Range up by 3 for 1 turn.", 
+		false,
+		false,
+		function(actor, level){
+			return [{type: "inflict_range_down", modType: "addFlat", value: -3}];
+		},
+		function(actor, level){
+			return true;
+		}
+	);
+	this.addDefinition(
+		20, 
+		"SP Up", 
+		"SP increased by 10.", 
+		false,
+		false,
+		function(actor, level){
+			return [{type: "inflict_SP_down", modType: "addFlat", value: -10}];
+		},
+		function(actor, level){
+			return true;
+		}
+	);
+	this.addDefinition(
+		21, 
+		"Will Up", 
+		"Will increased by 10.", 
+		false,
+		false,
+		function(actor, level){
+			return [{type: "inflict_will_down", modType: "addFlat", value: -10}];
+		},
+		function(actor, level){
+			return true;
+		}
+	);
 }

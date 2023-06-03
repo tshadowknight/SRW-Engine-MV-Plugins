@@ -510,18 +510,26 @@ Window_DetailPages.prototype.drawPilotStats1 = function() {
 	
 	detailContent+="<div class='ability_block_row scaled_height'>";
 	detailContent+="<div class='pilot_stat_container scaled_text scaled_width'>";
-	detailContent+="<div class='stat_label'>Lv</div>";
+	detailContent+="<div class='stat_label'>"+APPSTRINGS.DETAILPAGES.label_pilot_level+"</div>";
 	detailContent+="<div class='stat_value'>"+currentLevel+"</div>";
 	detailContent+="</div>";
+	
+	if(actor.SRWStats.pilot.stats.base.MP){
+		detailContent+="<div class='pilot_stat_container scaled_text scaled_width'>";		
+		detailContent+="<div class='stat_label'>"+APPSTRINGS.DETAILPAGES.label_pilot_MP+"</div>";
+		detailContent+="<div class='stat_value'>"+calculatedStats.currentMP+"/"+calculatedStats.MP+"</div>";
+		detailContent+="</div>";
+	}
+	
 	detailContent+="</div>";
 	
 	detailContent+="<div class='ability_block_row scaled_height'>";
 	detailContent+="<div class='pilot_stat_container scaled_text scaled_width'>";
-	detailContent+="<div class='stat_label'>Will</div>";
+	detailContent+="<div class='stat_label'>"+APPSTRINGS.DETAILPAGES.label_pilot_will+"</div>";
 	detailContent+="<div class='stat_value'>"+$statCalc.getCurrentWill(actor)+"</div>";
 	detailContent+="</div>";
 	detailContent+="<div class='pilot_stat_container scaled_text scaled_width'>";
-	detailContent+="<div class='stat_label'>Next-Lv</div>";
+	detailContent+="<div class='stat_label'>"+APPSTRINGS.DETAILPAGES.label_pilot_next_level+"</div>";
 	var currentExp = $statCalc.getExp(actor);
 	
 	detailContent+="<div class='stat_value'>"+(500 - (currentExp - (currentLevel * 500)))+"</div>";
@@ -530,11 +538,11 @@ Window_DetailPages.prototype.drawPilotStats1 = function() {
 	
 	detailContent+="<div class='ability_block_row scaled_height'>";
 	detailContent+="<div class='pilot_stat_container scaled_text scaled_width'>";
-	detailContent+="<div class='stat_label'>PP</div>";
+	detailContent+="<div class='stat_label'>"+APPSTRINGS.DETAILPAGES.label_pilot_PP+"</div>";
 	detailContent+="<div class='stat_value'>"+$statCalc.getCurrentPP(actor)+"</div>";
 	detailContent+="</div>";
 	detailContent+="<div class='pilot_stat_container scaled_text scaled_width'>";
-	detailContent+="<div class='stat_label'>Exp</div>";
+	detailContent+="<div class='stat_label'>"+APPSTRINGS.DETAILPAGES.label_pilot_exp+"</div>";
 	var currentExp = $statCalc.getExp(actor);
 	
 	detailContent+="<div class='stat_value'>"+currentExp+"</div>";
@@ -544,7 +552,7 @@ Window_DetailPages.prototype.drawPilotStats1 = function() {
 	
 	detailContent+="<div class='ability_block_row scaled_height'>";
 	detailContent+="<div class='pilot_stat_container scaled_text scaled_width'>";
-	detailContent+="<div class='stat_label'>SP</div>";
+	detailContent+="<div class='stat_label'>"+APPSTRINGS.DETAILPAGES.label_pilot_SP+"</div>";
 	detailContent+="<div class='stat_value'>"+calculatedStats.currentSP+"/"+calculatedStats.SP+"</div>";
 	detailContent+="</div>";
 	detailContent+="<div class='pilot_stat_container scaled_text scaled_width'>";
@@ -554,6 +562,9 @@ Window_DetailPages.prototype.drawPilotStats1 = function() {
 
 	detailContent+="</div>";
 	detailContent+="</div>";
+	
+	
+	
 	detailContent+="</div>";
 	
 	
@@ -634,12 +645,24 @@ Window_DetailPages.prototype.drawPilotStats1 = function() {
 		detailContent+="</div>";
 	}*/
 	for(var i = 0 ; i < 5; i++){
-		detailContent+="<div class='ability_block_row terrain scaled_height status'>";		
+		let hasContent = false;
+		let amount = 0;
 		if(statusList[i]){
+			hasContent = true;
+			if(statusList[i].amount){
+				amount = statusList[i].amount * -1;
+			}
+		}
+		detailContent+="<div class='ability_block_row terrain scaled_height status "+(amount < 0 ? "" : "buff")+"'>";		
+		if(hasContent){
 			detailContent+="<div style='opacity: "+this.getGlowOpacity()+"' class='value scaled_text fitted_text described_element glowing_elem' data-type='status' data-ref='"+statusList[i].id+"'>";
 			detailContent+=APPSTRINGS.STATUS[statusList[i].id].name;
-			if(statusList[i].amount){
-				detailContent+=" "+(statusList[i].amount * -1);
+			if(amount){
+				if(amount > 0){
+					detailContent+=" +"+amount;
+				} else {
+					detailContent+=" "+amount;
+				}				
 			}
 			detailContent+="</div>";
 		}		

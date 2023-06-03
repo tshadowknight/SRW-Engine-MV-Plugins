@@ -137,6 +137,7 @@ WeaponUI.prototype.initPropertyHandlers = function(){
 		},
 		ammo: handleDefaultProp("weaponAmmo", EDITORSTRINGS.WEAPON.label_ammo),
 		EN: handleDefaultProp("weaponEN", EDITORSTRINGS.WEAPON.label_EN),
+		MP: handleDefaultProp("weaponMP", EDITORSTRINGS.WEAPON.label_MP),
 		will: handleDefaultProp("weaponWill", EDITORSTRINGS.WEAPON.label_will),
 		hit_mod: handleDefaultProp("weaponHitMod", EDITORSTRINGS.WEAPON.label_hit_mod),
 		crit_mod: handleDefaultProp("weaponCritMod", EDITORSTRINGS.WEAPON.label_crit_mod),
@@ -248,7 +249,7 @@ WeaponUI.prototype.initPropertyHandlers = function(){
 		animation: {
 			createControls(){		
 				var content = "";			
-
+				content+="<div class='row '>";
 				content+="<div class='cell'>";
 				content+=EDITORSTRINGS.WEAPON.label_animation;
 				content+="</div>";
@@ -264,6 +265,26 @@ WeaponUI.prototype.initPropertyHandlers = function(){
 				
 				content+="</select>";
 				content+="</div>";
+				content+="</div>";
+				
+				
+				content+="<div class='row '>";
+				content+="<div class='cell'>";
+				content+=EDITORSTRINGS.WEAPON.label_animation_ally;
+				content+="</div>";
+				content+="<div class='cell'>";
+				content+="<select id='anim_ally_select'>";
+				var animData = _this._mainUIHandler.getAnimationDefs();
+				var value = _this.getMetaValue("weaponVSAllyAnimId");
+				content+="<option title='' value=''>System Default</option>";
+				var options = Object.keys(animData);
+				for(var j = 0; j < options.length; j++){					
+					content+="<option "+(options[j] == value ? "selected" : "")+" value='"+options[j]+"'>"+animData[options[j]].name+"</option>";										
+				}
+				
+				content+="</select>";
+				content+="</div>";
+				content+="</div>";
 				return content;				
 			},
 			hook(){
@@ -272,7 +293,12 @@ WeaponUI.prototype.initPropertyHandlers = function(){
 					_this.setMetaValue("weaponAnimId", this.value);
 					//_this.show();
 					_this._mainUIHandler.setModified();
-				});				
+				});	
+				containerNode.querySelector("#anim_ally_select").addEventListener("change", function(){
+					_this.setMetaValue("weaponVSAllyAnimId", this.value);
+					//_this.show();
+					_this._mainUIHandler.setModified();
+				});					
 			}
 		},
 		effects: {
@@ -307,6 +333,26 @@ WeaponUI.prototype.initPropertyHandlers = function(){
 					content+="</select>";
 					content+="</div>";
 					
+					content+="<div class='cell'>";
+					content+=EDITORSTRINGS.WEAPON.label_affects;
+					content+="</div>";
+						
+					content+="<div class='cell'>";
+					var targetSetting = _this.getMetaValue("weaponEffectTargeting"+idx);
+					var options = [
+						{name: EDITORSTRINGS.WEAPON.label_target_both, value: "all"},
+						{name: EDITORSTRINGS.WEAPON.label_target_enemies, value: "enemy"},
+						{name: EDITORSTRINGS.WEAPON.label_target_allies, value: "ally"},
+					];
+					
+					content+="<select data-idx='"+idx+"' id='weapon_effect_target_"+idx+"'>";
+					for(var i = 0; i < options.length; i++){						
+						content+="<option "+(options[i].value == targetSetting ? "selected" : "")+" value='"+options[i].value+"'>"+options[i].name+"</option>";								
+					}
+					
+					content+="</select>";
+					content+="</div>";
+					
 					content+="</div>";				
 					return content;
 				}
@@ -325,7 +371,12 @@ WeaponUI.prototype.initPropertyHandlers = function(){
 						//_this.show();
 						_this._mainUIHandler.setModified();
 					});
-					
+					containerNode.querySelector("#weapon_effect_target_"+i).addEventListener("change", function(){
+						var idx = this.getAttribute("data-idx");
+						_this.setMetaValue("weaponEffectTargeting"+idx, this.value);
+						//_this.show();
+						_this._mainUIHandler.setModified();
+					});
 				}
 			}
 		},
@@ -382,13 +433,119 @@ WeaponUI.prototype.initPropertyHandlers = function(){
 				content+=EDITORSTRINGS.WEAPON.label_ignore_friendlies;
 				content+="</div>";	
 				content+="<div class='cell'>";
-				content+="<input id='map_ignore_friendlies' type=checkbox "+(_this.getMetaValue("weaponIgnoresFriendlies") * 1 ? "checked" : "")+"></input>";
+				let ignoresFriendlies = _this.getMetaValue("weaponIgnoresFriendlies");
+				if(ignoresFriendlies == null || ignoresFriendlies == ""){
+					ignoresFriendlies = 1;
+				}
+				content+="<input id='map_ignore_friendlies' type=checkbox "+(!(ignoresFriendlies * 1) ? "checked" : "")+"></input>";
+				content+="</div>";	
+				
+				content+="<div class='cell'>";
+				content+="</div>";
+				
+				content+="</div>";
+				
+				content+="<div class='row'>";	
+				content+="<div class='cell'>";
+				content+=EDITORSTRINGS.WEAPON.label_allies_interaction;
+				content+="</div>";	
+				content+="<div class='cell'>";
+				var interactionType = _this.getMetaValue("weaponAllyInteraction");
+				
+				var options = [
+					{name: EDITORSTRINGS.WEAPON.label_damage_and_status, value: "damage_and_status"},
+					{name: EDITORSTRINGS.WEAPON.label_status_only, value: "status"},
+					{name: EDITORSTRINGS.WEAPON.label_damage_only, value: "damage"},
+				];
+				
+				content+="<select id='wep_ally_interaction'>";
+				for(var i = 0; i < options.length; i++){				
+					content+="<option "+(options[i].value == interactionType ? "selected" : "")+"  value='"+options[i].value+"'>"+options[i].name+"</option>";										
+				}
+				
+				content+="</select>";
+				
+				content+="</div>";	
+				
+				content+="<div class='cell'>";
+				content+="</div>";
+				
+				content+="</div>";
+				
+				content+="<div class='row'>";	
+				content+="<div class='cell'>";
+				content+=EDITORSTRINGS.WEAPON.label_allies_counter;
+				content+="</div>";	
+				content+="<div class='cell'>";
+				let alliesCounter = _this.getMetaValue("weaponAlliesCounter");
+				if(alliesCounter == null || alliesCounter == ""){
+					alliesCounter = true;
+				}
+	
+				content+="<input id='wep_allies_counter' type=checkbox "+((alliesCounter * 1) ? "checked" : "")+"></input>";
+				content+="</div>";	
+				
+				content+="<div class='cell'>";
+				content+="</div>";
+				
+				content+="</div>";
+				
+				content+="<div class='row'>";	
+				content+="<div class='cell'>";
+				content+=EDITORSTRINGS.WEAPON.label_hit_enemies;
+				content+="</div>";	
+				content+="<div class='cell'>";
+				content+="<input id='map_ignore_enemies' type=checkbox "+(!(_this.getMetaValue("weaponIgnoresEnemies") * 1) ? "checked" : "")+"></input>";
 				content+="</div>";	
 				
 				content+="<div class='cell'>";
 				content+="</div>";
 					
-				content+="</div>";		
+				content+="</div>";	
+
+				content+="<div class='row'>";	
+				content+="<div class='cell'>";
+				content+=EDITORSTRINGS.WEAPON.label_enemies_interaction;
+				content+="</div>";	
+				content+="<div class='cell'>";
+				var interactionType = _this.getMetaValue("weaponEnemyInteraction");
+				
+				var options = [
+					{name: EDITORSTRINGS.WEAPON.label_damage_and_status, value: "damage_and_status"},
+					{name: EDITORSTRINGS.WEAPON.label_status_only, value: "status"},
+					{name: EDITORSTRINGS.WEAPON.label_damage_only, value: "damage"},
+				];
+				
+				content+="<select id='wep_enemy_interaction'>";
+				for(var i = 0; i < options.length; i++){				
+					content+="<option "+(options[i].value == interactionType ? "selected" : "")+"  value='"+options[i].value+"'>"+options[i].name+"</option>";										
+				}
+				
+				content+="</select>";
+				
+				content+="</div>";	
+				content+="<div class='cell'>";
+				content+="</div>";
+				
+				content+="</div>";
+				
+				content+="<div class='row'>";
+				content+="<div class='cell'>";
+				content+=EDITORSTRINGS.WEAPON.label_enemies_counter;
+				content+="</div>";
+				content+="<div class='cell'>";
+				let enemiesCounter = _this.getMetaValue("weaponEnemiesCounter");
+				if(enemiesCounter == null || enemiesCounter == ""){
+					enemiesCounter = true;
+				}
+	
+				content+="<input id='wep_enemies_counter' type=checkbox "+((enemiesCounter * 1) ? "checked" : "")+"></input>";
+				content+="</div>";	
+				
+				content+="<div class='cell'>";
+				content+="</div>";
+				
+				content+="</div>";
 				
 				return content;
 			},
@@ -436,10 +593,40 @@ WeaponUI.prototype.initPropertyHandlers = function(){
 			hook(){
 				
 				containerNode.querySelector("#map_ignore_friendlies").addEventListener("change", function(){
-					_this.setMetaValue("weaponIgnoresFriendlies", this.checked ? 1 : 0);
+					_this.setMetaValue("weaponIgnoresFriendlies", this.checked ? 0 : 1);
 					//_this.show();
 					_this._mainUIHandler.setModified();
-				});				
+				});	
+
+				containerNode.querySelector("#map_ignore_enemies").addEventListener("change", function(){
+					_this.setMetaValue("weaponIgnoresEnemies", this.checked ? 0 : 1);
+					//_this.show();
+					_this._mainUIHandler.setModified();
+				});	
+
+				containerNode.querySelector("#wep_ally_interaction").addEventListener("change", function(){
+					_this.setMetaValue("weaponAllyInteraction", this.value);
+					//_this.show();
+					_this._mainUIHandler.setModified();
+				});	
+
+				containerNode.querySelector("#wep_enemy_interaction").addEventListener("change", function(){
+					_this.setMetaValue("weaponEnemyInteraction", this.value);
+					//_this.show();
+					_this._mainUIHandler.setModified();
+				});	
+
+				containerNode.querySelector("#wep_allies_counter").addEventListener("change", function(){
+					_this.setMetaValue("weaponAlliesCounter", this.checked ? 1 : 0);
+					//_this.show();
+					_this._mainUIHandler.setModified();
+				});	
+
+				containerNode.querySelector("#wep_enemies_counter").addEventListener("change", function(){
+					_this.setMetaValue("weaponEnemiesCounter", this.checked ? 1 : 0);
+					//_this.show();
+					_this._mainUIHandler.setModified();
+				});		
 			}
 		}, 	
 		combo_properties: {
@@ -622,9 +809,9 @@ WeaponUI.prototype.show = async function(){
 	
 	content+="<div class='table'>";
 	content+=_this._propertyHandlers.name.createControls();
-	content+="<div class='row '>";
+
 	content+=_this._propertyHandlers.animation.createControls();
-	content+="</div>";
+
 	content+="<div class='row'>";
 	content+=_this._propertyHandlers.type.createControls();
 	content+="</div>";
@@ -670,6 +857,9 @@ WeaponUI.prototype.show = async function(){
 	
 	content+="<div class='row numeric'>";
 	content+=_this._propertyHandlers.EN.createControls();	
+	content+="</div>";
+	content+="<div class='row numeric'>";
+	content+=_this._propertyHandlers.MP.createControls();
 	content+="</div>";
 	content+="<div class='row numeric'>";
 	content+=_this._propertyHandlers.ammo.createControls();

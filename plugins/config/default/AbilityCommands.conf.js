@@ -3,7 +3,7 @@ $SRWConfig.abilityCommands = function(){
 		0, //the id of the command
 		"Chalice", //the display name of the command
 		"Recover HP and EN to full up to twice per stage.", //the display description of the command
-		2, //the number of times the ability can be used per stage
+		{type: "ammo", cost: 2}, //the cost for use
 		function(actor){ //the function that applies the effect of the command to the user
 			$statCalc.recoverHPPercent(actor, 100);
 			$statCalc.recoverENPercent(actor, 100);
@@ -17,7 +17,7 @@ $SRWConfig.abilityCommands = function(){
 		1, //the id of the command
 		"Summon Illusion", //the display name of the command
 		"Summon a ghostly copy of an enemy to fight on your side.", //the display description of the command
-		1, //the number of times the ability can be used per stage
+		{type: "MP", cost: 70}, //the cost for use
 		function(actor){ //the function that applies the effect of the command to the user
 			var event = $gameMap.requestDynamicEvent();			
 			var space = $statCalc.getAdjacentFreeSpace({x: actor.event.posX(), y: actor.event.posY()});			

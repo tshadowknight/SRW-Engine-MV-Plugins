@@ -183,6 +183,17 @@ Window_BattleBasic.prototype.createParticipantComponents = function(componentId,
 	damageContainer.appendChild(damage);
 	component.damage = damage;
 	
+	var buffContainer = document.createElement("div");
+	buffContainer.classList.add("buff_container");
+	container.appendChild(buffContainer);
+	component.buffContainer = buffContainer;
+	
+	var buff = document.createElement("img");
+	buff.classList.add("buff_anim");
+	buff.setAttribute("src", this.makeImageURL("buff"));
+	buffContainer.appendChild(buff);
+	component.buff = buff;
+	
 	this._participantComponents[componentId] = component;
 }
 
@@ -434,6 +445,36 @@ Window_BattleBasic.prototype.animateHP = function(type, startPercent, endPercent
 	}, stepDuration);
 }
 
+
+
+Window_BattleBasic.prototype.animateBuff = function(type) {
+	var _this = this;
+	var containerInfo = this._participantComponents[type];
+	if(containerInfo){
+		
+		var parentNode = containerInfo.buff.parentNode;
+		parentNode.removeChild(containerInfo.buff);		
+		parentNode.appendChild(containerInfo.buff);
+			
+		containerInfo.buff.className = "";	
+		containerInfo.buff.className = "buff_anim active";	
+		//delete containerInfo.damage.style["animation-duration"];
+		containerInfo.buff.style["animation-duration"] = "";
+		this.applyDoubleTime(containerInfo.buff);
+		
+		containerInfo.buff.style.visibility = "visible";
+
+		setTimeout(function(){ containerInfo.buff.style.visibility = "hidden" }, 400 * this.getAnimTimeRatio());
+		
+		var se = {};
+		se.name = "SRW_Recovery";
+		se.pan = 0;
+		se.pitch = 100;
+		se.volume = 80;
+		AudioManager.playSe(se);
+	}
+}
+
 Window_BattleBasic.prototype.animateDamage = function(type, special) {
 	var _this = this;
 	var containerInfo = this._participantComponents[type];
@@ -628,43 +669,53 @@ Window_BattleBasic.prototype.setUpAnimations = function(nextAction) {
 			var damageAnimation;
 			if(nextAction["damageInflicted"+attackRef] > 0){
 				damageAnimation = {target: target, type: "damage"};
+			} else if(nextAction.isBuffingAttack){
+				damageAnimation = {target: target, type: "no_damage"};
 			} else {
 				damageAnimation = {target: target, type: "no_damage"};
 			}
 			
 			damageAnimation.special =  {};
-			var barrierState = 0;
-			if(nextAction["attacked"+attackRef].hasBarrier){
-				if(nextAction["attacked"+attackRef].barrierBroken){
-					barrierState = 2;
-				} else {
-					barrierState = 1;
+			if(nextAction.isBuffingAttack){
+				damageAnimation.special["buff"] = {target: target};
+				attackAnimationSubQueue.damageAnimation.push(damageAnimation);
+			} else {	
+				var barrierState = 0;
+				if(nextAction["attacked"+attackRef].hasBarrier){
+					if(nextAction["attacked"+attackRef].barrierBroken){
+						barrierState = 2;
+					} else {
+						barrierState = 1;
+					}
 				}
+				var inflictsStatus = false;
+				if(nextAction.damageInflicted > 0){
+					var resistance = $statCalc.applyMaxStatModsToValue(nextAction.attacked.ref, 0, ["status_resistance"]);
+					if(resistance < 1 || (nextAction.hasFury && resistance == 1)){
+						Object.keys(nextAction.statusEffects).forEach(function(inflictionId){
+							if(nextAction.statusEffects[inflictionId]){
+								inflictsStatus = true;					
+							}
+						});
+					}	
+				}
+				
+				damageAnimation.special["damage"] = {target: target, damage: nextAction["damageInflicted"+attackRef], crit: nextAction.inflictedCritical, barrierState: barrierState, inflictsStatus: inflictsStatus};
+				if(nextAction["attacked"+attackRef].hasBarrier && !nextAction["attacked"+attackRef].barrierBroken){
+					damageAnimation.special["barrier"] = {target: target};
+				}
+			
+			
+			
+				attackAnimationSubQueue.damageAnimation.push(damageAnimation);
+				
+				var hpBarAnimation = {target: target, type: "hp_bar"}
+				hpBarAnimation.special =  {};
+				hpBarAnimation.special["hp_bar"] =  {target: target, startPercent: animInfo.startPercent, endPercent: animInfo.endPercent};
+				attackAnimationSubQueue.hpBarAnimation.push(hpBarAnimation);
 			}
-			var inflictsStatus = false;
-			if(nextAction.damageInflicted > 0){
-				var resistance = $statCalc.applyMaxStatModsToValue(nextAction.attacked.ref, 0, ["status_resistance"]);
-				if(resistance < 1 || (nextAction.hasFury && resistance == 1)){
-					Object.keys(nextAction.statusEffects).forEach(function(inflictionId){
-						if(nextAction.statusEffects[inflictionId]){
-							inflictsStatus = true;					
-						}
-					});
-				}	
-			}
-			
-			damageAnimation.special["damage"] = {target: target, damage: nextAction["damageInflicted"+attackRef], crit: nextAction.inflictedCritical, barrierState: barrierState, inflictsStatus: inflictsStatus};
-			if(nextAction["attacked"+attackRef].hasBarrier && !nextAction["attacked"+attackRef].barrierBroken){
-				damageAnimation.special["barrier"] = {target: target};
-			}
-			attackAnimationSubQueue.damageAnimation.push(damageAnimation);
-			
-			var hpBarAnimation = {target: target, type: "hp_bar"}
-			hpBarAnimation.special =  {};
-			hpBarAnimation.special["hp_bar"] =  {target: target, startPercent: animInfo.startPercent, endPercent: animInfo.endPercent};
 			
 			
-			attackAnimationSubQueue.hpBarAnimation.push(hpBarAnimation);
 					
 			if(nextAction["attacked"+attackRef].currentAnimHP <= 0){
 				var destroyAnimation = {target: target, type: "destroyed_participant"};
@@ -813,6 +864,10 @@ Window_BattleBasic.prototype.update = function() {
 						if(nextAnimation.special){
 							if(nextAnimation.special.damage){
 								_this.animateDamage(nextAnimation.special.damage.target, nextAnimation.special.damage);		
+							}
+							
+							if(nextAnimation.special.buff){
+								_this.animateBuff(nextAnimation.special.buff.target);		
 							}
 							
 							if(nextAnimation.special.hp_bar){								
@@ -972,6 +1027,8 @@ Window_BattleBasic.prototype.redraw = function() {
 			_this.updateScaledImage(containerInfo.destroyed);
 			_this.updateScaledDiv(containerInfo.damageContainer);
 			_this.updateScaledImage(containerInfo.damage);
+			_this.updateScaledDiv(containerInfo.buffContainer);
+			_this.updateScaledImage(containerInfo.buff);
 			_this.updateScaledImage(containerInfo.barrier);
 		}			
 	});	

@@ -348,8 +348,8 @@
 						x: $gameTemp.activeEvent().posX(),
 						y: $gameTemp.activeEvent().posY()
 					};
-					var fullRange = $statCalc.getFullWeaponRange(battler, $gameTemp.isPostMove);
-					var hasTarget = $statCalc.getAllInRange($gameSystem.getPlayerFactionInfo(), pos, fullRange.range, fullRange.minRange).length > 0;
+			
+					var hasTarget = $statCalc.getAllInRange(this._actor).length > 0;
 					var hasMapWeapon = $statCalc.hasMapWeapon(battler);
 					
 					function boardingMenu(){
@@ -558,13 +558,16 @@
 				   this.addCommand(APPSTRINGS.MAPMENU.cmd_list, 'unitList', true);
 				   this.addCommand(APPSTRINGS.MAPMENU.cmd_conditions, 'conditions', true);
 				   				   	
+			   
+				   if(ENGINE_SETTINGS.ENABLE_TRANSFORM_ALL){
+						this.addCommand(APPSTRINGS.MAPMENU.cmd_transform_all, 'transform_all');
+					}
 			   }
-			   if(ENGINE_SETTINGS.ENABLE_TRANSFORM_ALL){
-					this.addCommand(APPSTRINGS.MAPMENU.cmd_transform_all, 'transform_all');
-				}
 			   
 			   this.addCommand(APPSTRINGS.MAPMENU.cmd_options, 'options');
-			   this.addCommand(APPSTRINGS.MAPMENU.cmd_log, 'log');
+			   if($gameSystem.isSRPGMode()){
+				this.addCommand(APPSTRINGS.MAPMENU.cmd_log, 'log');
+			   }
 			   this.addCommand(APPSTRINGS.MAPMENU.cmd_save, 'save');
 			   this.addCommand(APPSTRINGS.MAPMENU.cmd_game_end, 'gameEnd');
 			};
@@ -796,14 +799,35 @@
 			}
 			
 			this.drawItemName(item, rect.x, rect.y, this.windowWidth() - numberWidth);
-			var maxCount = $abilityCommandManger.getUseCount(actor, cmdAbilityIdx);
-			var timesUsed = actor.SRWStats.stageTemp.abilityUsed[cmdAbilityIdx] || 0;
-			var remaining = maxCount - timesUsed;
 			
-			if(remaining <= 0) {
-				this.changeTextColor("#FF0000");
-			} 
-			this.drawText(remaining+"/"+maxCount, this.windowWidth() - numberWidth + 5, rect.y, numberWidth);
+			var useInfo = $abilityCommandManger.getUseInfo(actor, cmdAbilityIdx);
+			if(typeof useInfo != "object"){
+				useInfo = {
+					type: "ammo",
+					cost: useInfo
+				};
+			}
+			if(useInfo.type == "ammo"){
+				var timesUsed = actor.SRWStats.stageTemp.abilityUsed[cmdAbilityIdx] || 0;
+				var maxCount = useInfo.cost;
+				var remaining = maxCount - timesUsed;			
+				
+				if(remaining <= 0) {
+					this.changeTextColor("#FF0000");
+				} 
+				this.drawText(remaining+"/"+maxCount, this.windowWidth() - numberWidth + 5, rect.y, numberWidth);
+			} else if(useInfo.type == "EN"){
+				if(actor.SRWStats.mech.stats.calculated.currentEN < useInfo.cost){
+					this.changeTextColor("#FF0000");
+				}
+				this.drawText(useInfo.cost+" "+APPSTRINGS.GENERAL.label_EN, this.windowWidth() - numberWidth - 15, rect.y, numberWidth);
+			} else if(useInfo.type == "MP"){
+				if(actor.SRWStats.pilot.stats.calculated.currentMP < useInfo.cost){
+					this.changeTextColor("#FF0000");
+				}
+				this.drawText(useInfo.cost+" "+APPSTRINGS.GENERAL.label_MP, this.windowWidth() - numberWidth - 15, rect.y, numberWidth);
+			}
+			
 		}
 	};
 	
@@ -823,11 +847,25 @@
 		var actor = $gameSystem.EventToUnit($gameTemp.activeEvent().eventId())[1];
 		var itemDef = $abilityCommandManger.getAbilityDef(item);
 		
-		var maxCount = $abilityCommandManger.getUseCount(actor, item);
-		var timesUsed = actor.SRWStats.stageTemp.abilityUsed[item] || 0;
-		var remaining = maxCount - timesUsed;
-		
-		return itemDef.isActiveHandler(actor) && remaining > 0;
+		var useInfo = $abilityCommandManger.getUseInfo(actor, item);
+		let canPayCost = true;		
+		if(useInfo.type == "ammo"){
+			var timesUsed = actor.SRWStats.stageTemp.abilityUsed[item] || 0;
+			var maxCount = useInfo.cost;
+			var remaining = maxCount - timesUsed;			
+			if(remaining <= 0) {
+				canPayCost = false;
+			} 
+		} else if(useInfo.type == "EN"){
+			if(actor.SRWStats.mech.stats.calculated.currentEN < useInfo.cost){
+				canPayCost = false;
+			}
+		} else if(useInfo.type == "MP"){
+			if(actor.SRWStats.pilot.stats.calculated.currentMP < useInfo.cost){
+				canPayCost = false;
+			}
+		}		
+		return itemDef.isActiveHandler(actor) && canPayCost;
 	};	
 	
 	function Window_SRWTransformSelection() {

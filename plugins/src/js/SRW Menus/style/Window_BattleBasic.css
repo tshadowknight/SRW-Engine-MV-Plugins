@@ -455,6 +455,14 @@
 	animation: playXDamage 0.3s steps(5) infinite,  playYDamage 0.6s steps(2) infinite;
 }
 
+.buff_anim {
+	position: absolute;
+	top: 0px;
+	left: 0px;
+	animation: playXDamage 0.3s steps(5) infinite,  playYDamage 0.6s steps(2) infinite;
+}
+
+
 @keyframes playXDamage {
   from {left: 0px;}
   to {left: -500%;}
@@ -895,6 +903,21 @@
 }
 
 .participant_container .damage_anim.active {
+	display: block;
+}
+
+.participant_container .buff_container {
+	--widthpixels: 192;
+    --heightpixels: 192;
+	overflow: hidden;
+	position: absolute;
+}
+
+.participant_container .buff_anim {
+	display: none;
+}
+
+.participant_container .buff_anim.active {
 	display: block;
 }
 

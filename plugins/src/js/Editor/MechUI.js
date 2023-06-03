@@ -227,6 +227,14 @@ MechUI.prototype.initPropertyHandlers = function(){
 				content+="<div class='row'>";	
 				content+=_this.createTerrainControls("mechTerrain", EDITORSTRINGS.MECH.label_terrain_rank);
 				content+="</div>";
+				content+="<div class='row'>";
+				content+="<div class='cell'>";
+				content+=EDITORSTRINGS.MECH.label_can_hover;
+				content+="</div>";
+				content+="<div class='cell'>";
+				content+="<input id='can_hover' type=checkbox "+(_this.getMetaValue("mechHoverEnabled")*1 ? "checked" : "")+"></input>";
+				content+="</div>";
+				content+="</div>";
 				return content;
 			},
 			hook(){
@@ -254,6 +262,12 @@ MechUI.prototype.initPropertyHandlers = function(){
 				
 				containerNode.querySelector("#terrain_enabled_select").addEventListener("change", function(){
 					_this.setMetaValue(terrains[2].prop, this.value);
+					_this.show();
+					_this._mainUIHandler.setModified();
+				});
+				
+				containerNode.querySelector("#can_hover").addEventListener("change", function(){
+					_this.setMetaValue("mechHoverEnabled", this.checked ? 1 : 0);
 					_this.show();
 					_this._mainUIHandler.setModified();
 				});

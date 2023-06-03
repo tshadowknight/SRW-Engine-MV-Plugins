@@ -1249,7 +1249,7 @@ BattleSceneManager.prototype.prepareModel = function(root, name, position, flipX
 			for(let child of children){
 				if(child.getChildren().length){
 					stack.push(child);
-				} else if(child instanceof BABYLON.Mesh && child.id.indexOf("att_") == -1){
+				} else if(child instanceof BABYLON.Mesh && child.id.indexOf("att_") == -1 && child.id.indexOf("point_") == -1){
 					let materialName = child.material.name;
 					if(!materialLeaves[materialName]){
 						materialLeaves[materialName] = [];
@@ -2151,9 +2151,41 @@ BattleSceneManager.prototype.hookBeforeRender = function(){
 			}
 		});	
 		
-		Object.keys(_this._bgScrolls).forEach(function(animationId){
-			var animation = _this._bgScrolls[animationId];
-			var targetObj = animation.targetObj;
+		Object.keys(_this._bgScrolls).forEach(function(targetName){
+			var animInfo = _this._bgScrolls[targetName];
+			let speed = 0;
+			if(!animInfo.next){
+				speed = animInfo.current.speed;
+			} else {
+				let currentSpeed = animInfo.current.speed;
+				let targetSpeed = animInfo.next.speed;
+				
+				var duration = animInfo.next.duration * _this.getTickDuration();
+				if(animInfo.next.accumulator == null){
+					animInfo.next.accumulator = 0;
+				}
+				animInfo.next.accumulator+=deltaTime;
+				var t = animInfo.next.accumulator / duration;
+				
+				if(t < 1){
+					if(animInfo.easingFunction){
+						t = animInfo.easingFunction.ease(t);
+					}
+					var startVector = new BABYLON.Vector3(currentSpeed * 1, 0, 0);
+					var endVector = new BABYLON.Vector3(targetSpeed * 1, 0, 0);
+					var interpVector = BABYLON.Vector3.Lerp(startVector, endVector, t);
+					//console.log(interpVector);					
+					
+					speed = interpVector.x;
+					
+				} else {					
+					animInfo.current = animInfo.next;
+					delete animInfo.next;
+					speed = animInfo.current.speed;
+				}
+				
+			}
+			var targetObj = animInfo.targetObj;
 			if(targetObj){
 				var texture;	
 				if(targetObj.material){
@@ -2162,7 +2194,7 @@ BattleSceneManager.prototype.hookBeforeRender = function(){
 					texture = targetObj.texture;
 				}
 				if(texture){
-					texture.uOffset+=(animation.speed / 1000);
+					texture.uOffset+=(speed / 1000);
 					if(texture.uOffset > 1){
 						texture.uOffset-=1;
 					} else if(texture.uOffset < 0){
@@ -2267,6 +2299,48 @@ BattleSceneManager.prototype.disposeSpriterBackgrounds = function(){
 	//this._spriterMainSpritesInfo = [];	
 }
 
+BattleSceneManager.prototype.updateParentedEffekseerEffect = function(effekInfo){
+	if(effekInfo.parent && effekInfo.handle){
+				
+		var scale = new BABYLON.Vector3(0, 0, 0);
+		var rotation = new BABYLON.Quaternion();
+		var position = new BABYLON.Vector3(0,0,0);
+		
+		var tempWorldMatrix = effekInfo.parent.getWorldMatrix();
+		tempWorldMatrix.decompose(scale, rotation, position);
+		
+		rotation = rotation.toEulerAngles();
+		
+		//console.log("sys rotation: " + effekInfo.parent.rotation.x + ", " + effekInfo.parent.rotation.y + ", " + effekInfo.parent.rotation.z + " VS " + "calc rotation: " + rotation.x + ", " + rotation.y + ", " + rotation.z);
+		
+		/*var position; 
+		if(effekInfo.parent.getAbsolutePosition){
+			position = effekInfo.parent.getAbsolutePosition();
+		} else {
+			position = effekInfo.parent.position;
+		}
+		
+		var rotation = effekInfo.parent.absoluteRotationQuaternion().toEulerAngles();*/
+		
+		
+		
+		let mirrorFactor = 1;
+		if(effekInfo.isMirrored){
+			mirrorFactor = -1;
+		}	
+		effekInfo.handle.setLocation(
+			position.x * mirrorFactor + effekInfo.offset.x, 
+			position.y + effekInfo.offset.y, 
+			position.z + effekInfo.offset.z
+		);
+		effekInfo.handle.setRotation(
+			(rotation.x + effekInfo.offsetRotation.x), 
+			(rotation.y + effekInfo.offsetRotation.y), 
+			(rotation.z + effekInfo.offsetRotation.z) * mirrorFactor
+		);
+	}
+}
+
 BattleSceneManager.prototype.startScene = function(){
 	var _this = this;
 	//_this.initScene();
@@ -2292,7 +2366,10 @@ BattleSceneManager.prototype.startScene = function(){
 		if(_this._fastForward){
 			deltaTime*=5;
 		}
-		
+		this._effekseerInfo.forEach(function(effekInfo){
+			_this.updateParentedEffekseerEffect(effekInfo);
+		});
+			
 		
 
 		if(!_this._animsPaused){
@@ -2309,32 +2386,7 @@ BattleSceneManager.prototype.startScene = function(){
 			ratio = 2;
 		}
 		ratio*=_this._animRatio;
-		this._effekseerInfo.forEach(function(effekInfo){
-			if(effekInfo.parent && effekInfo.handle){
-				var position; 
-				if(effekInfo.parent.getAbsolutePosition){
-					position = effekInfo.parent.getAbsolutePosition();
-				} else {
-					position = effekInfo.parent.position;
-				}
-				
-				let mirrorFactor = 1;
-				if(effekInfo.isMirrored){
-					mirrorFactor = -1;
-				}	
-				effekInfo.handle.setLocation(
-					position.x * mirrorFactor + effekInfo.offset.x, 
-					position.y + effekInfo.offset.y, 
-					position.z + effekInfo.offset.z
-				);
-				effekInfo.handle.setRotation(
-					(effekInfo.parent.rotation.x + effekInfo.offsetRotation.x), 
-					(effekInfo.parent.rotation.y + effekInfo.offsetRotation.y), 
-					(effekInfo.parent.rotation.z + effekInfo.offsetRotation.z) * -1 * mirrorFactor
-				);
-			}
-		});
-			
+		
 		//console.log("_effksContext.update");
 
 	})
@@ -2622,11 +2674,30 @@ BattleSceneManager.prototype.registerBgAnimation = function(targetObj, startTick
 	};
 }
 
-BattleSceneManager.prototype.registerBgScroll = function(targetObj, speed){	
-	this._bgScrolls[this._bgScrollCounter++] = {		
-		targetObj: targetObj,
-		speed: speed
-	};
+BattleSceneManager.prototype.registerBgScroll = function(targetName, targetObj, speed, duration, easingFunction, easingMode){	
+	if(easingFunction && easingMode){
+		easingFunction.setEasingMode(easingMode);
+	}
+
+	if(!this._bgScrolls[targetName]){
+		this._bgScrolls[targetName] = {
+			targetObj: targetObj,
+			current: {				
+				speed: speed,
+				easingFunction: easingFunction,
+				easingMode: easingFunction,
+				duration: duration,
+			},
+			next: null
+		};
+	} else {
+		this._bgScrolls[targetName].next = {
+			speed: speed,
+			easingFunction: easingFunction,
+			easingMode: easingFunction,
+			duration: duration,
+		};
+	}
 }
 
 BattleSceneManager.prototype.registerLightAnimation = function(targetObj, startColor, endColor, startTick, duration, easingFunction, easingMode){
@@ -3501,7 +3572,7 @@ BattleSceneManager.prototype.executeAnimation = function(animation, startTick){
 			}
 			if(params.scrollSpeed){
 				//var speed = params.scrollSpeed * _this._animationDirection;				
-				_this.registerBgScroll(bg, params.scrollSpeed * 1);
+				_this.registerBgScroll(target, bg, params.scrollSpeed * 1);
 			}
 			if(params.parent){
 				var parentObj = getTargetObject(params.parent);
@@ -3510,6 +3581,14 @@ BattleSceneManager.prototype.executeAnimation = function(animation, startTick){
 				}
 			}
 			_this._animationBackgroundsInfo.push(bg);
+		},
+		
+		set_bg_scroll_speed: function(target, params){
+			var targetObj = getTargetObject(target);
+			if(params.scrollSpeed){
+				//var speed = params.scrollSpeed * _this._animationDirection;				
+				_this.registerBgScroll(target, targetObj, params.scrollSpeed * 1, params.duration * 1, params.easingFunction, params.easingMode);
+			}
 		},
 		create_movie_bg: function(target, params){
 			var position;
@@ -3953,21 +4032,25 @@ BattleSceneManager.prototype.executeAnimation = function(animation, startTick){
 			
 				info = {name: target, effect: effect, context: targetContext, offset: {x: position.x, y: position.y, z: position.z}, offsetRotation: {x: rotation.x, y: rotation.y, z: rotation.z}};
 				info.handle = handle;
-				if(params.parent){
-					var parentObj = getTargetObject(params.parent)
-					if(parentObj.pivothelper){
-						parentObj = parentObj.pivothelper;
-					}
-					if(parentObj.parent_handle){
-						parentObj = parentObj.parent_handle;
-					}
-					if(parentObj){
-						info.parent = parentObj;
-					}				 
-				}
 				if(params.autoRotate && _this._animationDirection == -1){
 					info.isMirrored = true;
 				}
+				if(params.parent){
+					var parentObj = getTargetObject(params.parent)
+					if(parentObj.parent_handle){
+						parentObj = parentObj.parent_handle;
+					}
+					if(parentObj.pivothelper){
+						parentObj = parentObj.pivothelper;
+					}
+					
+					if(parentObj){
+						info.parent = parentObj;
+					}		
+					
+					//_this.updateParentedEffekseerEffect(info);	
+				}
+				
 				_this._effekseerInfo.push(info);			
 				_this._isLoading--;
 				
@@ -4080,6 +4163,7 @@ BattleSceneManager.prototype.executeAnimation = function(animation, startTick){
 			if(targetObj){
 				targetObj.setShown(false);
 				targetObj.context.update();
+				targetObj.stop();
 			}
 		},
 		send_effekseer_trigger: function(target, params){
@@ -6526,10 +6610,24 @@ BattleSceneManager.prototype.processActionQueue = function() {
 						_this._UILayerManager.setNotification(nextAction.side, "Main Attack");					
 					}
 					
+					let isBetweenFriendlies;
+
+					if($gameTemp.editMode){
+						isBetweenFriendlies = false;
+					} else {
+						isBetweenFriendlies = $gameSystem.areUnitsFriendly(nextAction.ref, nextAction.attacked.ref);
+					}
+					
+					
 					var attack = nextAction.action.attack;
 					var animId;
 					if(typeof attack.animId != "undefined" && attack.animId != -1){
-						animId = attack.animId;
+						if(isBetweenFriendlies){
+							animId = attack.vsAllyAnimId;
+						} else {
+							animId = attack.animId;
+						}
+						
 					} else {
 						/*_this.playDefaultAttackAnimation(nextAction).then(function(){
 							_this.processActionQueue();

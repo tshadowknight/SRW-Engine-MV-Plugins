@@ -135,6 +135,12 @@
 
 #detail_pages .pilot_stat_container {
 	border: 0px;
+	max-width: 50%;
+}
+
+#label_MP_cost {
+	width: 20%;
+    margin-left: 3%;
 }
 
 #detail_pages .pilot_stat_container.on {
@@ -300,6 +306,10 @@
 	position: absolute;
 }
 
+#detail_pages #pilot_summary_card #MP_block{
+	width: 50%;
+}
+
 #pilot_summary_card .stat_label {
 	color: var(--text-color-highlight);
 }
@@ -437,6 +447,10 @@
 	display: flex;
 	color: #FF2222;	
 	white-space: nowrap;
+}
+
+#status_info .ability_block_row.buff {
+	color: #2dc589;
 }
 
 #status_info .ability_block_row .value{	

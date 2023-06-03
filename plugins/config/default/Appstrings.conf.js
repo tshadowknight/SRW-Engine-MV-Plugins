@@ -51,6 +51,8 @@ APPSTRINGS.GENERAL = {
 	label_LND: "LND",
 	label_SEA: "SEA",
 	label_SPC: "SPC",
+	label_MP: "MP",
+	label_EN: "EN",
 }
 
 APPSTRINGS.MAINMENU = {
@@ -209,6 +211,13 @@ APPSTRINGS.DETAILPAGES = {
 	label_cost: "Ability",
 	label_attribute_1: "Attribute 1",
 	label_attribute_2: "Attribute 2",
+	label_pilot_level: "Lv",
+	label_pilot_next_level: "Next-Lv",
+	label_pilot_will: "Will",
+	label_pilot_PP: "PP",
+	label_pilot_exp: "Exp",
+	label_pilot_SP: "SP",
+	label_pilot_MP: "MP",
 }	
 
 APPSTRINGS.MECHUPGRADES = {
@@ -284,6 +293,7 @@ APPSTRINGS.ATTACKLIST = {
 	
 	label_ammo: "Ammo",
 	label_EN_cost: "EN Cost",
+	label_MP_cost: "MP Cost",
 	label_required_will: "Required Will",
 	label_terrain_rating: "Terrain Rating",
 	label_special_effect: "Special Effect",
@@ -305,6 +315,11 @@ APPSTRINGS.ATTACKLIST = {
 	label_sub_twin_combo: "A sub twin cannot initiate a combo attack!",
 	label_no_combo_support: "Combo attack unavailable!",
 	label_counter_only: "Can only be used to counter attack!",
+	label_no_MP: "Out of MP!",
+	
+	label_target_both: "All",
+	label_target_enemies: "Enemy",
+	label_target_allies: "Ally",
 }
 
 APPSTRINGS.REWARDS = {
@@ -590,7 +605,6 @@ EDITORSTRINGS.WEAPON = {
 	label_attributes: "Attributes",
 	hint_no_cost: "-1 means no cost or requirement",
 	label_effects: "Effects",
-	label_map_attack: "Map Attack",
 	label_combo_attack: "Combo Attack",
 	
 	label_type: "Type",
@@ -605,6 +619,7 @@ EDITORSTRINGS.WEAPON = {
 	
 	label_ammo: "Ammo",
 	label_EN: "EN",
+	label_MP: "MP",
 	label_will: "Will",
 	label_hit_mod: "Hit Modifier",
 	label_crit_mod: "Crit Modifier",
@@ -616,13 +631,27 @@ EDITORSTRINGS.WEAPON = {
 	label_only_counter: "Only as Counter",
 	label_ALL: "ALL Weapon",
 	label_animation: "Animation",
+	label_animation_ally: "Animation(Ally)",
 	
 	hint_effects: "Only the first two effects are shown in the UI",
 	
 	hint_is_map: "Is a Map Attack",
 	hint_is_regular: "Is a Regular Attack",
 	label_attack_id: "Attack ID",
-	label_ignore_friendlies: "Ignore Friendlies",
+	label_ignore_friendlies: "Hits Allies",
+	label_allies_counter: "Allies Counter",
+	label_allies_interaction: "Effects on Allies",
+	label_hit_enemies: "Hits Enemies",
+	label_enemies_counter: "Enemies Counter",
+	label_enemies_interaction: "Effects on Enemies",
+	
+	label_damage_and_status: "Damage & Status",
+	label_status_only: "Status",
+	label_damage_only: "Damage",
+	
+	label_target_both: "Both",
+	label_target_enemies: "Enemies",
+	label_target_allies: "Allies",
 	
 	label_combo_type: "Type",
 	label_adjacent: "Adjacent",
@@ -630,7 +659,7 @@ EDITORSTRINGS.WEAPON = {
 	label_required_weapons: "Required Weapons",
 	label_HP_treshold: "HP Treshold",
 	
-	label_map_attack: "Map Attack",
+	label_map_attack: "Targeting",
 	label_animation: "Animation",
 	label_id: "ID",
 	label_scale: "Scale",
@@ -646,6 +675,7 @@ EDITORSTRINGS.WEAPON = {
 	hint_choose_center: "Select a center tile",
 	
 	confirm_remove_MAP: "Remove this map attack?",
+	label_affects: "Affects",
 }
 
 EDITORSTRINGS.MECH = {
@@ -666,6 +696,7 @@ EDITORSTRINGS.MECH = {
 	label_warn_fallback: "Using fallback!",
 	label_stats_label: "Stats Label",
 	label_is_ship: "Is Ship",
+	label_can_hover: "Can Hover",
 	label_sync_parts: "Sync Parts With",
 	label_sync_upgrades: "Sync Upgrades With",
 	label_enabled: "Enabled",
@@ -688,6 +719,7 @@ EDITORSTRINGS.MECH = {
 	
 	label_HP: "HP",
 	label_EN: "EN",
+
 	label_armor: "Armor",
 	label_mobility: "Mobility",
 	label_accuracy: "Accuracy",
@@ -786,6 +818,8 @@ EDITORSTRINGS.PILOT = {
 	label_rel_bonus: "Relationship Bonuses",
 	label_assets: "Assets",
 	
+	label_overworld: "Overworld(Regular map only)",
+	
 	label_name: "Name",
 	label_use_mech_name: "Use Mech Name",
 	label_stats_label: "Stats Label",
@@ -796,6 +830,7 @@ EDITORSTRINGS.PILOT = {
 	label_max: "Max",
 	
 	label_SP: "SP",	
+	label_MP: "MP",	
 	label_melee: "Melee",	
 	label_ranged: "Ranged",		
 	label_skill: "Skill",	
