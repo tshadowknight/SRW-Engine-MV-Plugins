@@ -373,19 +373,19 @@
 .participant_block .active_spirits {
 	width: 100%;
 	height: 10%;
-	--fontsize: 1px;
+	--fontsize: 1.4px;
 	display: flex;
 	align-items: center;
 	justify-content: center;
 	position: absolute;
-    top: 91%;
+    top: 93%;
     left: 0%;
 	margin-top: 0%;
 }
 
 .participant_block .active_spirits .spirit_entry {
 	--widthpixels: 28;
-	--heightpixels: 20;
+	--heightpixels: 16;
 	display: flex;
 	align-items: flex-end;
 	justify-content: center;
@@ -393,6 +393,22 @@
 	border-right: 0.2vw solid #FFFFFF;
 	border-bottom: 0.2vw solid #FFFFFF;
 	color: rgba(222,222,222,0.6);
+	/*padding-top: -5%;*/
+	padding-bottom: 2%;
+	/*line-height: 13pt;*/
+	min-width: 0;
+}
+
+.spirit_entry {
+	/*transform: scale(1.2, 1.5);*/
+	/* Safari and Chrome */
+	/*-webkit-transform: scale(1.2, 1.5);*/
+	/* Firefox */
+	/*-moz-transform: scale(1.2, 1.5);*/
+	/* IE 9+ */
+	/*-ms-transform: scale(1.2, 1.5);*/
+	/* Opera */
+	/*-o-transform: scale(1.2, 1.5);*/
 }
 
 .participant_block .active_spirits .spirit_entry.active {
