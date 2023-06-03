@@ -1499,6 +1499,14 @@
 			
 			return true;
 		};
+		
+		// Play BGS
+		Game_Interpreter.prototype.command245 = function() {
+			if(!this.isTextSkipMode){
+				AudioManager.playBgs(this._params[0]);
+			}
+			return true;
+		};
 
 
 		/**************************************
