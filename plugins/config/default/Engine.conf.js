@@ -14,6 +14,16 @@ var ENGINE_SETTINGS = {
 	ALERT_CLEARS_ON_ATTACK: false,//if true alert clears after dodging one attack, otherwise it affects all attacks in one battle phase(support attacks, etc.)
 	PERSIST_CLEARS_ON_HIT: false,//if true persist clears after taking one attack, otherwise it affects all attacks in one battle phase(support attacks, etc.)
 	DISABLE_EVASION_DECAY: false,
+	CURSOR_TINT_INFO: {//a blend color set for the cursor when hovering units of a certain faction
+		enabled: false,
+		colors: {
+			"player": [38, 110, 172, 128],//players
+			0: [172, 38, 38, 128],//enemy
+			1: [38, 172, 83, 128],//green
+			2: [172, 172, 38, 128],//yellow
+		}
+	},	
+	TINT_CURSOR_PER_FACTION: true,
 	USE_TILE_PASSAGE: true,
 	ENABLE_QUICK_MOVE: true,
 	LEVEL_CAP: 99,

@@ -4738,6 +4738,26 @@ Scene_Disclaimer.prototype.createForeground = function() {
 	}	
 };
 
+SceneManager.onKeyDown = function(event) {
+	if (!event.ctrlKey && !event.altKey) {
+		switch (event.keyCode) {
+		case 116:   // F5
+			if (Utils.isNwjs()) {
+				if($battleSceneManager){
+					$battleSceneManager.dispose();
+				}
+				location.reload();
+			}
+			break;
+		case 119:   // F8
+			if (Utils.isNwjs() && Utils.isOptionValid('test')) {
+				require('nw.gui').Window.get().showDevTools();
+			}
+			break;
+		}
+	}
+};
+
 let lastLogTime = {};
 function logSafe(type, msg){
 	if(!lastLogTime[type]){

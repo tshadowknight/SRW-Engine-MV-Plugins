@@ -1089,6 +1089,30 @@
     Sprite_Player.prototype = Object.create(Sprite_Character.prototype);
     Sprite_Player.prototype.constructor = Sprite_Player;
 	
+	const UltraMode7_Sprite_Player_prototype_update = Sprite_Player.prototype.update;
+	Sprite_Player.prototype.update = function(){
+		if((!$gameMap || !$gameMap._interpreter || !$gameMap._interpreter.isRunning()) && ENGINE_SETTINGS.CURSOR_TINT_INFO && ENGINE_SETTINGS.CURSOR_TINT_INFO.enabled && $gameTemp.summaryUnit){
+			this.setBlendColor(ENGINE_SETTINGS.CURSOR_TINT_INFO.colors[$gameSystem.getFactionId($gameTemp.summaryUnit)]);
+		} else {
+			this.setBlendColor([0, 0, 0, 0]);
+		}	
+		if (!UltraMode7.isActive())
+		{
+			UltraMode7_Sprite_Player_prototype_update.call(this);
+			return;
+		}
+		if (!!this._character)
+		{
+			this._ultraMode7PreUpdate();
+		}
+		UltraMode7_Sprite_Player_prototype_update.call(this);
+		if (!!this._character)
+		{
+			this._ultraMode7Update();
+		}
+			
+	};
+	
 	Sprite_Player.prototype.updatePosition = function() {
 		this.x = this._character.screenX();
 		this.y = this._character.screenY();

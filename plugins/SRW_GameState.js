@@ -1632,6 +1632,7 @@ GameState_normal.prototype.update = function(scene){
 		}
 		
 	} else {
+		$gameTemp.summaryUnit = null;
 		scene._summaryWindow.hide();
 		if($gameTemp.commanderAuraVisible){
 			$gameTemp.commanderAuraVisible = false;

@@ -345,9 +345,42 @@ BattleSceneManager.prototype.init = async function(attachControl){
 	}
 }
 
+BattleSceneManager.prototype.dispose = function(){
+	function destroyCanvas(canvas){
+		if(canvas){
+			canvas.parentNode.removeChild(canvas);
+		}		
+	}
+	
+	function stopEffekContext(ctx){
+		if(ctx){
+			ctx.stopAll();
+		}
+	}
+	
+	destroyCanvas(this._canvas);
+	destroyCanvas(this._pixiCanvas);
+	destroyCanvas(this._movieCanvas);
+	if(this._scene){
+		this._scene.dispose();
+	}	
+	
+	this.disposeAnimationSprites();
+	this.disposeAnimationBackgrounds();
+	this.disposeSpriterBackgrounds();
+	this.disposeEffekseerInstances();
+	stopEffekContext(this._effksContext);
+	stopEffekContext(this._effksContextMirror);
+	stopEffekContext(this._effksContextBg);
+	stopEffekContext(this._effksContextBgMirror);
+	stopEffekContext(this._effksContextAttached);
+	
+	
+	this.disposeMovieBackgrounds();
+	this.disposeRMMVBackgrounds();
+	this._animationList = [];
+}
 
-//workaround for a bug where spawning effekseer effects would have them render all their texture upside down
-//preloading them before the animation starts prevents this
 BattleSceneManager.prototype.initEffekseerParticles = async function(){
 	var _this = this;	
 	var promises = [];
@@ -605,6 +638,7 @@ BattleSceneManager.prototype.initScene = function(){
 	//canvas.setAttribute("height", 624);
 	canvas.style.width = "100%";
 	canvas.style.height = "100%";
+	this._pixiCanvas = canvas;
 	this._PIXIContainer.innerHTML = "";
 	this._PIXIContainer.appendChild(canvas);
 	
