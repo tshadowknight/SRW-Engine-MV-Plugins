@@ -217,12 +217,14 @@ Window_BeforebattleTwin.prototype.createComponents = function() {
 	this._ally_main.id = this.createId("ally_main");
 	this._ally_main.classList.add("faction_color");
 	this._ally_main.addEventListener("click", function(){
-		if(_this._currentUIState == "main_selection"){
-			_this._currentUIState = "actor_twin_target_selection";
-			_this._currentTwinTargetSelection = 0;
-			_this.requestRedraw();
-			_this._touchOK = true;
-		}		
+		if(!$statCalc.isAI($gameTemp.currentBattleActor)){		
+			if(_this._currentUIState == "main_selection"){
+				_this._currentUIState = "actor_twin_target_selection";
+				_this._currentTwinTargetSelection = 0;
+				_this.requestRedraw();
+				_this._touchOK = true;
+			}		
+		}
 	});
 	windowNode.appendChild(this._ally_main);	
 	
@@ -546,33 +548,35 @@ Window_BeforebattleTwin.prototype.update = function() {
 		}		
 		
 		if(!Input.isTriggered('ok') && !Input.isLongPressed('ok') && !Input.isPressed('ok')){
-			if(Input.isTriggered('pageup') || Input.isRepeated('pageup')){
-				this.requestRedraw();
-				if(this._currentUIState == "main_selection"){
-					if(_this.counterValid() && $gameTemp.currentBattleActor.isActor() && $gameTemp.isEnemyAttack){
-						_this._currentActionSelection--;
-						if(_this._currentActionSelection < 0){
-							_this._currentActionSelection = 2;
+			if(!$statCalc.isAI($gameTemp.currentBattleActor)){			
+				if(Input.isTriggered('pageup') || Input.isRepeated('pageup')){
+					this.requestRedraw();
+					if(this._currentUIState == "main_selection"){
+						if(_this.counterValid() && $gameTemp.currentBattleActor.isActor() && $gameTemp.isEnemyAttack){
+							_this._currentActionSelection--;
+							if(_this._currentActionSelection < 0){
+								_this._currentActionSelection = 2;
+							}
+							quickUpdateActorAction();
 						}
-						quickUpdateActorAction();
 					}
-				}
-				this.refresh();
-				return;
-			} else if (Input.isTriggered('pagedown') || Input.isRepeated('pagedown')) {
-				this.requestRedraw();
-				if(this._currentUIState == "main_selection"){
-					if(_this.counterValid() && $gameTemp.currentBattleActor.isActor() && $gameTemp.isEnemyAttack){
-						_this._currentActionSelection++;
-						if(_this._currentActionSelection > 2){
-							_this._currentActionSelection = 0;
+					this.refresh();
+					return;
+				} else if (Input.isTriggered('pagedown') || Input.isRepeated('pagedown')) {
+					this.requestRedraw();
+					if(this._currentUIState == "main_selection"){
+						if(_this.counterValid() && $gameTemp.currentBattleActor.isActor() && $gameTemp.isEnemyAttack){
+							_this._currentActionSelection++;
+							if(_this._currentActionSelection > 2){
+								_this._currentActionSelection = 0;
+							}
+							quickUpdateActorAction();
 						}
-						quickUpdateActorAction();
-					}
-				}		
-				this.refresh();
-				return;				
-			}			
+					}		
+					this.refresh();
+					return;				
+				}	
+			}	
 		}		
 		
 		if(Input.isTriggered('L3')){
