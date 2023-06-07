@@ -4090,7 +4090,20 @@ BattleSceneManager.prototype.executeAnimation = function(animation, startTick){
 				
 			});
 			//effect.scale = scale;
-		},		
+		},	
+		remove_effekseer_parent: function(target, params){	
+			var targetObj;
+			var ctr = 0;
+			while(!targetObj && ctr < _this._effekseerInfo.length){
+				if(_this._effekseerInfo[ctr].name == target){
+					targetObj = _this._effekseerInfo[ctr];
+				}
+				ctr++;
+			}
+			if(targetObj){
+				delete targetObj.parent;
+			}
+		}			,
 		play_rmmv_anim: function(target, params){
 			var position = _this.applyAnimationDirection(params.position || new BABYLON.Vector3(0,0,0));	
 			var width = params.scaleX || 5;

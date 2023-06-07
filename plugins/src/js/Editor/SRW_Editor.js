@@ -433,6 +433,11 @@ SRWEditor.prototype.init = function(){
 			params: ["path", "position", "scale", "speed", "rotation", "parent", "isBackground", "autoRotate", "flipZ"],
 			desc: "Play a predefined effekseer effect."
 		},
+		remove_effekseer_parent: {
+			hasTarget: true,
+			params: [],
+			desc: "Remove the parent of an effekseer effect if it has one."
+		},
 		show_barrier: {
 			hasTarget: true,
 			params: [],
