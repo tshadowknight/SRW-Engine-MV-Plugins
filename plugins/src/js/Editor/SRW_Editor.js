@@ -438,6 +438,11 @@ SRWEditor.prototype.init = function(){
 			params: [],
 			desc: "Remove the parent of an effekseer effect if it has one."
 		},
+		stop_matrix_animations: {
+			hasTarget: true,
+			params: [],
+			desc: "Remove all matrix animation(rotate, translate) applied to the target."
+		},
 		show_barrier: {
 			hasTarget: true,
 			params: [],

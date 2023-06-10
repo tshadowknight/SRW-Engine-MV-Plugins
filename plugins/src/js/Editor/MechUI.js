@@ -679,8 +679,30 @@ MechUI.prototype.initPropertyHandlers = function(){
 				content+="<div class='transformation_scroll'>";
 				content+="<div class='table'>";
 				
-				var value = JSON.parse(_this.getMetaValue("mechTransformsInto") || "[]");
-				var willReqs = JSON.parse(_this.getMetaValue("mechTransformWill") || "[]");
+				function compatParse(value){
+					//this method avoids immediately using a try to see if the input is valid json because the debugger needs to run with pause on caught execeptions on
+					var result;
+					result = value * 1 || -1;	
+					if(result == -1 && value != null){
+						try {
+							result = JSON.parse(value);
+						} catch(e){
+											
+						}
+					}
+					
+					if(result && result != -1){
+						if(!Array.isArray(result)){
+							result = [result];
+						}			
+					} else {
+						result = [];
+					}
+					return result;
+				}
+				
+				var value = compatParse(_this.getMetaValue("mechTransformsInto") || "[]");
+				var willReqs = compatParse(_this.getMetaValue("mechTransformWill") || "[]");
 				for(var i = 0; i < value.length; i++){
 					
 				
@@ -780,9 +802,31 @@ MechUI.prototype.initPropertyHandlers = function(){
 					_this._mainUIHandler.setModified();
 				});
 				
+				function compatParse(value){
+					//this method avoids immediately using a try to see if the input is valid json because the debugger needs to run with pause on caught execeptions on
+					var result;
+					result = value * 1 || -1;	
+					if(result == -1 && value != null){
+						try {
+							result = JSON.parse(value);
+						} catch(e){
+											
+						}
+					}
+					
+					if(result && result != -1){
+						if(!Array.isArray(result)){
+							result = [result];
+						}			
+					} else {
+						result = [];
+					}
+					return result;
+				}
+				
 				containerNode.querySelector("#add_transformation").addEventListener("click", function(){
-					var value = JSON.parse(_this.getMetaValue("mechTransformsInto") || "[]");
-					var willReqs = JSON.parse(_this.getMetaValue("mechTransformWill") || "[]");
+					var value = compatParse(_this.getMetaValue("mechTransformsInto") || "[]");
+					var willReqs = compatParse(_this.getMetaValue("mechTransformWill") || "[]");
 					value.push("");
 					willReqs.push(0);
 					_this.setMetaValue("mechTransformsInto", JSON.stringify(value));
@@ -795,8 +839,8 @@ MechUI.prototype.initPropertyHandlers = function(){
 				entries.forEach(function(entry){
 					entry.addEventListener("click", function(){
 						var idx = this.getAttribute("data-idx");
-						var value = JSON.parse(_this.getMetaValue("mechTransformsInto") || "[]");
-						var willReqs = JSON.parse(_this.getMetaValue("mechTransformWill") || "[]");
+						var value = compatParse(_this.getMetaValue("mechTransformsInto") || "[]");
+						var willReqs = compatParse(_this.getMetaValue("mechTransformWill") || "[]");
 						value.splice(idx, 1);
 						willReqs.splice(idx, 1);
 						
@@ -811,7 +855,7 @@ MechUI.prototype.initPropertyHandlers = function(){
 				entries.forEach(function(entry){
 					entry.addEventListener("change", function(){
 						var idx = this.getAttribute("data-idx");
-						var value = JSON.parse(_this.getMetaValue("mechTransformsInto") || "[]");
+						var value = compatParse(_this.getMetaValue("mechTransformsInto") || "[]");
 						value[idx] = this.value;
 			
 						_this.setMetaValue("mechTransformsInto", JSON.stringify(value));
@@ -824,7 +868,7 @@ MechUI.prototype.initPropertyHandlers = function(){
 				entries.forEach(function(entry){
 					entry.addEventListener("change", function(){
 						var idx = this.getAttribute("data-idx");
-						var willReqs = JSON.parse(_this.getMetaValue("mechTransformWill") || "[]");
+						var willReqs = compatParse(_this.getMetaValue("mechTransformWill") || "[]");
 						willReqs[idx] = this.value;
 			
 						_this.setMetaValue("mechTransformWill", JSON.stringify(willReqs));

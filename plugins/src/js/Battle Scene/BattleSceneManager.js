@@ -345,17 +345,17 @@ BattleSceneManager.prototype.init = async function(attachControl){
 	}
 }
 
+BattleSceneManager.prototype.stopEffekContext = function(ctx){
+	if(ctx){
+		ctx.stopAll();
+	}
+}
+
 BattleSceneManager.prototype.dispose = function(){
 	function destroyCanvas(canvas){
 		if(canvas){
 			canvas.parentNode.removeChild(canvas);
 		}		
-	}
-	
-	function stopEffekContext(ctx){
-		if(ctx){
-			ctx.stopAll();
-		}
 	}
 	
 	destroyCanvas(this._canvas);
@@ -369,11 +369,11 @@ BattleSceneManager.prototype.dispose = function(){
 	this.disposeAnimationBackgrounds();
 	this.disposeSpriterBackgrounds();
 	this.disposeEffekseerInstances();
-	stopEffekContext(this._effksContext);
-	stopEffekContext(this._effksContextMirror);
-	stopEffekContext(this._effksContextBg);
-	stopEffekContext(this._effksContextBgMirror);
-	stopEffekContext(this._effksContextAttached);
+	/*this.stopEffekContext(this._effksContext);
+	this.stopEffekContext(this._effksContextMirror);
+	this.stopEffekContext(this._effksContextBg);
+	this.stopEffekContext(this._effksContextBgMirror);
+	this.stopEffekContext(this._effksContextAttached);*/
 	
 	
 	this.disposeMovieBackgrounds();
@@ -2276,6 +2276,12 @@ BattleSceneManager.prototype.disposeEffekseerInstances = function(){
 		}		
 	});
 	this._effekseerInfo = [];
+	
+	this.stopEffekContext(this._effksContext);
+	this.stopEffekContext(this._effksContextMirror);
+	this.stopEffekContext(this._effksContextBg);
+	this.stopEffekContext(this._effksContextBgMirror);
+	this.stopEffekContext(this._effksContextAttached);
 }
 
 BattleSceneManager.prototype.disposeBarrierEffects = function(){
@@ -2919,6 +2925,23 @@ BattleSceneManager.prototype.getTargetObject = function(name){
 	return obj;	
 }
 
+
+BattleSceneManager.prototype.stopShakeAnimations = function(target){
+	const _this = this;
+	const targetObj = _this.getTargetObject(target);
+	if(targetObj){
+		let tmp = [];
+		if(_this._shakeAnimations){
+			for(let animCtr in _this._shakeAnimations){
+				if(_this._shakeAnimations[animCtr].targetObj != targetObj){
+					tmp.push(_this._shakeAnimations[animCtr]);
+				}
+			}
+			_this._shakeAnimations = tmp;
+		}
+	}	
+}			
+
 BattleSceneManager.prototype.executeAnimation = function(animation, startTick){
 	var _this = this;
 	//debug
@@ -3043,6 +3066,7 @@ BattleSceneManager.prototype.executeAnimation = function(animation, startTick){
 			}
 			if(targetObj){
 				targetObj.wasMoved = true;
+				_this.stopShakeAnimations(target);
 				targetObj.position = _this.applyAnimationDirection(params.position || new BABYLON.Vector3(0,0,0));
 				targetObj.realPosition = new BABYLON.Vector3().copyFrom(targetObj.position);
 				if(targetObj.handle){
@@ -3087,8 +3111,22 @@ BattleSceneManager.prototype.executeAnimation = function(animation, startTick){
 				}
 			}
 		},
+		stop_matrix_animations: function(target, params){
+			const targetObj = getTargetObject(target);
+			let tmp = [];
+			if(_this._matrixAnimations){
+				for(let animCtr in _this._matrixAnimations){
+					if(_this._matrixAnimations[animCtr].targetObj != targetObj){
+						tmp.push(_this._matrixAnimations[animCtr]);
+					}
+				}
+				_this._matrixAnimations = tmp;
+			}
+			
+		},
 		translate: function(target, params){
 			var targetObj = getTargetObject(target);
+			_this.stopShakeAnimations(target);
 			if(targetObj.parent_handle){
 				targetObj = targetObj.parent_handle;
 			}
@@ -3188,6 +3226,7 @@ BattleSceneManager.prototype.executeAnimation = function(animation, startTick){
 		shake: function(target, params){
 			var targetObj = getTargetObject(target);
 			if(targetObj){				
+				_this.stopShakeAnimations(target);
 				targetObj.realPosition = new BABYLON.Vector3().copyFrom(targetObj.position);
 				_this.registerShakeAnimation(targetObj, params.magnitude_x || 0, params.speed_x || 1, params.magnitude_y || 0, params.speed_y || 1, startTick, params.duration, params.fadeInTicks || 0, params.fadeOutTicks || 0);
 			}			

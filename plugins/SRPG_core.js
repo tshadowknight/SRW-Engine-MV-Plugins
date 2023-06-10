@@ -2370,9 +2370,9 @@ SceneManager.isInSaveScene = function(){
 		this._deploySelectionWindow.setAvailableUnits($statCalc.getBoardedUnits(actionBattlerArray[1]));
 		this._deploySelectionWindow.setCurrentSelection(0);
       	$gameTemp.pushMenu = "boarded_deploy_selection";
-		//this._mapSrpgActorCommandWindow.hide();
+		this._mapSrpgActorCommandWindow.hide();
 		//this._mapSrpgActorCommandWindow.close();
-		$gameSystem.clearSrpgActorCommandWindowNeedRefresh(actionBattlerArray[1]);
+		//$gameSystem.clearSrpgActorCommandWindowNeedRefresh(actionBattlerArray[1]);
 		
 		$gameTemp.deployWindowCallback = function(deployed){
 			var shipEvent = $gameTemp.activeEvent();
@@ -2391,12 +2391,14 @@ SceneManager.isInSaveScene = function(){
 			//$gameSystem.srpgMakeMoveTable(event);
 			var battlerArray = actor;		
 			$gameSystem.setSrpgActorCommandWindowNeedRefresh($gameSystem.EventToUnit($gameTemp.activeEvent().eventId()));
-			
+			_this._mapSrpgActorCommandWindow.close();
 			//$gameSystem.setSubBattlePhase('actor_move');
 		}
 		
 		$gameTemp.deployCancelWindowCallback = function(){
-			$gameSystem.setSrpgActorCommandWindowNeedRefresh($gameSystem.EventToUnit($gameTemp.activeEvent().eventId()));
+			//$gameSystem.setSrpgActorCommandWindowNeedRefresh($gameSystem.EventToUnit($gameTemp.activeEvent().eventId()));
+			_this._mapSrpgActorCommandWindow.show();
+			_this._mapSrpgActorCommandWindow.activate();
 		}
     };	
 	

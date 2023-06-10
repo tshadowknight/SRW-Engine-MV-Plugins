@@ -151,7 +151,7 @@ StatCalc.prototype.canStandOnTileAfterTransformation = function(actor, transform
 	testActor.event = event;
 	this.invalidateAbilityCache(actor);
 	if(this.canFly(testActor)){
-		this.setFlying(testActor, isFlying, true);
+		this.setFlying(testActor, true, true);
 	}	
 	return this.canStandOnTile(testActor, {x: event.posX(), y: event.posY()});
 }
@@ -2483,6 +2483,7 @@ StatCalc.prototype.transform = function(actor, idx, force, forcedId, noRestore){
 					}			
 				});					
 				this.invalidateAbilityCache(actor);
+				this.updateFlightState(actor);
 			}			
 		}		
 	}
@@ -2621,16 +2622,14 @@ StatCalc.prototype.split = function(actor){
 		var combinesFrom = actor.SRWStats.mech.combinesFrom;
 		for(var i = 0; i < combinesFrom.length; i++){
 			var actor;
-			if(i == 0){
-				actor = targetActor;
-			} else {
-				actor = $gameActors.actor(subPilots[i-1]);	
-			}
+			actor = $gameActors.actor(combinesFrom[i]);	
 			var actionsResult = this.applyDeployActions(actor.SRWStats.pilot.id, combinesFrom[i]);
 			if(!actionsResult && i == 0){//if no deploy actions are assigned to main split target
 				targetActor.SRWStats.mech = this.getMechDataById(combinesFrom[i], true);
 				this.calculateSRWMechStats(targetActor.SRWStats.mech);					
 			}			
+			actor.isSubPilot = false;
+			
 			var event = actor.event;
 			if(!event){
 				event = $gameMap.requestDynamicEvent(targetActor.event)
@@ -2699,7 +2698,7 @@ StatCalc.prototype.combine = function(actor, forced){
 			
 			this.applyDeployActions(actor.SRWStats.pilot.id, combinesInto);
 			
-			var targetActor = this.getCurrentPilot(combinesInto, true);
+			var targetActor = this.getCurrentPilot(combinesInto);
 			if(!targetActor){
 				targetActor = actor;
 				actor.SRWStats.mech = targetMechData;
