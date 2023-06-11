@@ -2447,9 +2447,7 @@ StatCalc.prototype.transform = function(actor, idx, force, forcedId, noRestore){
 				var actionsResult = this.applyDeployActions(actor.SRWStats.pilot.id, actor.SRWStats.mech.id);
 				
 				if(!actionsResult){//if no deploy actions are assigned to main split target
-					if(!actor._intermissionClassId){
-						actor._intermissionClassId = actor._classId;
-					}				
+					$gameSystem.registerPilotFallbackInfo(actor);	
 				}
 				
 				var targetActor = this.getCurrentPilot(transformIntoId, true);
@@ -2511,11 +2509,6 @@ StatCalc.prototype.transformOnDestruction = function(actor, force){
 		actor.SRWStats.mech = this.getMechDataById(transformIntoId, true);
 		this.calculateSRWMechStats(actor.SRWStats.mech, false, actor);
 		let actionsResult = this.applyDeployActions(actor.SRWStats.pilot.id, actor.SRWStats.mech.id);
-		if(!actionsResult){//if no deploy actions are assigned to main split target
-			if(!actor._intermissionClassId){
-				actor._intermissionClassId = actor._classId;
-			}				
-		}
 		
 		if(targetActorId != null){
 			var targetActor = $gameActors.actor(targetActorId);
@@ -2584,16 +2577,9 @@ StatCalc.prototype.swapPilot = function(actor, newActorId){
 		
 		let targetPilot = $gameActors.actor(newActorId);
 		var actionsResult = this.applyDeployActions(newActorId, currentMechId);
-		if(!actionsResult){//if no deploy actions are assigned		
-			if(!actor._intermissionClassId){
-				actor._intermissionClassId = actor._classId;
-			}
+		if(!actionsResult){//if no deploy actions are assigned	
 			actor._classId = 0;
 			$statCalc.reloadSRWStats(actor, false, true);			
-			
-			if(!targetPilot._intermissionClassId){
-				targetPilot._intermissionClassId = targetPilot._classId;
-			}
 			targetPilot._classId = currentMechId;
 			targetPilot.isSubPilot = false;
 			$statCalc.reloadSRWStats(targetPilot, false, true);				
@@ -2643,9 +2629,6 @@ StatCalc.prototype.split = function(actor){
 			if(actor){			
 				var actionsResult = this.applyDeployActions(actor.SRWStats.pilot.id, combinesFrom[i]);
 				if(!actionsResult){//if no deploy actions are assigned to main split target
-					if(!actor._intermissionClassId){
-						actor._intermissionClassId = actor._classId;
-					}
 					actor.SRWStats.mech = this.getMechDataById(combinesFrom[i], true);
 					this.calculateSRWMechStats(actor.SRWStats.mech);					
 				}			
@@ -2719,11 +2702,6 @@ StatCalc.prototype.combine = function(actor, forced){
 			var targetMechData = this.getMechDataById(combinesInto, true);
 			
 			let actionsResult = this.applyDeployActions(actor.SRWStats.pilot.id, combinesInto);
-			if(!actionsResult){
-				if(!actor._intermissionClassId){
-					actor._intermissionClassId = actor._classId;
-				}
-			}
 			
 			var targetActor = this.getCurrentPilot(combinesInto);
 			if(!targetActor){
@@ -7076,10 +7054,7 @@ StatCalc.prototype.isValidForDeploy = function(actor){
 	if(this.isActorSRWInitialized(actor)){
 		var deployConditionsMet = true;
 		
-		var referenceMechId = actor._classId;
-		if(actor._intermissionClassId){
-			referenceMechId = actor._intermissionClassId;
-		}
+		var referenceMechId = $gameSystem.getPilotFallbackInfo(actor).classId;
 		
 		var deployActions = this.getDeployActions(actor.SRWStats.pilot.id, referenceMechId);
 		
@@ -7290,9 +7265,7 @@ StatCalc.prototype.applyDeployActions = function(actorId, mechId){
 					});
 					
 					var actor = $gameActors.actor(actorId);
-					if(!actor._intermissionClassId){
-						actor._intermissionClassId = actor._classId;
-					}
+					$gameSystem.registerPilotFallbackInfo(actor);	
 					actor._classId = 0;
 					$statCalc.reloadSRWStats(actor, false, true);	
 				});		
@@ -7306,9 +7279,7 @@ StatCalc.prototype.applyDeployActions = function(actorId, mechId){
 					if(sourceId != 0 && sourceId != -1){
 						var targetPilot = $gameActors.actor(sourceId);	
 						if(!lockedPilots[sourceId]){
-							if(!targetPilot._intermissionClassId){
-								targetPilot._intermissionClassId = targetPilot._classId;
-							}
+							$gameSystem.registerPilotFallbackInfo(targetPilot);	
 							targetPilot._classId = targetMechId;
 							
 							if(targetDef.type == "main"){								
@@ -7326,7 +7297,8 @@ StatCalc.prototype.applyDeployActions = function(actorId, mechId){
 								if(currentPilot){
 									$statCalc.reloadSRWStats(currentPilot, false, true);
 								}
-							}
+								$gameSystem.registerMechFallbackInfo(targetMechId, JSON.parse(JSON.stringify(targetMech.subPilots)));	
+							}							
 						}					
 					}
 				});
@@ -7334,7 +7306,9 @@ StatCalc.prototype.applyDeployActions = function(actorId, mechId){
 		});	
 					
 		this.reloadSRWStats($gameActors.actor(actorId), false, true);
-	}		
+	} else {
+		$gameSystem.registerPilotFallbackInfo($gameActors.actor(actorId));	
+	}
 	this.unlockAbilityCache();
 	this.invalidateAbilityCache();
 	return result;

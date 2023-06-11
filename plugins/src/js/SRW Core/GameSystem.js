@@ -245,6 +245,7 @@
 		};
 
 		Game_System.prototype.updateAvailableUnits = function(ignoreEventDeploys, preservePilotTypes){
+			const _this = this;
 			this._availableMechs = [];//available mechs must be cleared to avoid conflicts with previously serialized entries in the listing
 			this._availableUnits = $gameParty.allMembers();
 			$statCalc.invalidateAbilityCache();
@@ -256,18 +257,24 @@
 				//revert any class changes made during the stage by a deploy action
 				var refEvent = $statCalc.getReferenceEvent(actor);
 				if(!ignoreEventDeploys || !refEvent || !refEvent.isScriptedDeploy){
-					if(actor._intermissionClassId){
-						actor._classId = actor._intermissionClassId;
+					//if(actor._intermissionClassId){
+					//	actor._classId = actor._intermissionClassId;
 						//actor.isSubPilot = false;
-						delete actor._intermissionClassId;
+					//	delete actor._intermissionClassId;
+					//}
+					if(_this._pilotFallbackInfo && _this._pilotFallbackInfo[actor.actorId()]){
+						let info = _this._pilotFallbackInfo[actor.actorId()];
+						actor._classId = info.classId;
+						actor.isSubPilot = info.isSubPilot;
 					}
 					
-					var targetMech = $statCalc.getMechData($dataClasses[actor._classId], true);
-					if(targetMech._intermissionSubPilots){
-						targetMech.subPilots = targetMech._intermissionSubPilots;
-						delete targetMech._intermissionSubPilots;
+					var targetMech = $statCalc.getMechData($dataClasses[actor._classId], true);					
+					if(_this._mechFallbackInfo && _this._mechFallbackInfo[actor._classId]){
+						let info = _this._mechFallbackInfo[actor._classId];
+						targetMech.subPilots = info.subPilots;
 						$statCalc.storeMechData(targetMech);
-					}					
+					}
+					
 					/*if(!preservePilotTypes){
 						actor.isSubPilot = false;
 					}*/
@@ -346,6 +353,9 @@
 					$statCalc.calculateSRWMechStats(mechData, false, result);		
 				}
 			}	
+			
+			_this._pilotFallbackInfo = {};
+			_this._mechFallbackInfo = {};
 		}
 		
 		Game_System.prototype.startIntermission = function(){
@@ -647,14 +657,17 @@
 
 		// イベントのメモからアクターを読み込み、対応するイベントＩＤに紐づけする
 		Game_System.prototype.setSrpgActors = function() {
-	  
+			const _this = this;
 			$gameVariables.setValue(_existActorVarID, 0);
 			$gameVariables.setValue(_actorsDestroyed, 0);
 			$gameVariables.setValue(_existShipVarId, 0);	
-
+			_this._pilotFallbackInfo = {};
+			_this._mechFallbackInfo = {};
+			
 			this._availableUnits = $gameParty.allMembers();
 			this._availableUnits.forEach(function(actor){
 				$statCalc.initSRWStats(actor);
+				_this.registerPilotFallbackInfo(actor);
 				actor.event = null;
 			});
 			
@@ -664,6 +677,48 @@
 				}
 			});
 		};
+		
+		Game_System.prototype.registerPilotFallbackInfo = function(actor) {
+			const _this = this;
+			if(_this._pilotFallbackInfo[actor.actorId()] == null){
+				_this._pilotFallbackInfo[actor.actorId()] = {
+					classId: actor._classId,
+					isSubPilot: actor.isSubPilot
+				};
+			}
+		}
+		
+		Game_System.prototype.registerMechFallbackInfo = function(mechId, subPilots) {
+			const _this = this;
+			if(_this._mechFallbackInfo[mechId] == null){
+				_this._mechFallbackInfo[mechId] = {
+					subPilots: subPilots
+				};
+			}
+		}		
+		
+		Game_System.prototype.getPilotFallbackInfo = function(actor) {
+			const _this = this;
+			if(_this._pilotFallbackInfo[actor.actorId()]){
+				return _this._pilotFallbackInfo[actor.actorId()];
+			} else {
+				return {
+					classId: actor._classId,
+					isSubPilot: actor.isSubPilot
+				}
+			}
+		}
+		
+		Game_System.prototype.getMechFallbackInfo = function(mechId) {
+			const _this = this;
+			if(_this._mechFallbackInfo[mechId]){
+				return _this._mechFallbackInfo[mechId];
+			} else {
+				return {
+					subPilots: $statCalc.getMechData($dataClasses[mechId], true).subPilots
+				}
+			}
+		}
 
 		Game_System.prototype.deployShips = function(toAnimQueue) {		
 			var _this = this;
