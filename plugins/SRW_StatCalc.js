@@ -160,6 +160,10 @@ StatCalc.prototype.updateFlightState = function(actor, noSE){
 	if(this.isActorSRWInitialized(actor)){
 		var event = this.getReferenceEvent(actor);
 		if(event){
+			if(!this.canHover(actor) && actor.SRWStats.stageTemp.isHovering){
+				actor.SRWStats.stageTemp.isHovering = false;
+			}
+			
 			var position = {x: event.posX(), y: event.posY()};
 			if($gameMap.regionId(position.x, position.y) % 8 == 1){//air
 				if(this.canFly(actor)){
@@ -178,7 +182,9 @@ StatCalc.prototype.updateFlightState = function(actor, noSE){
 				}
 			}
 			if($gameMap.regionId(position.x, position.y) % 8 == 3){//water
-				if(!this.canBeOnWater(actor)){
+				if(this.canHover(actor)){
+					actor.SRWStats.stageTemp.isHovering = true;
+				} else if(!this.canBeOnWater(actor)){
 					if(this.canFly(actor)){
 						if(!this.isFlying(actor)){
 							this.setFlying(actor, true, noSE);
@@ -2440,6 +2446,12 @@ StatCalc.prototype.transform = function(actor, idx, force, forcedId, noRestore){
 				
 				var actionsResult = this.applyDeployActions(actor.SRWStats.pilot.id, actor.SRWStats.mech.id);
 				
+				if(!actionsResult){//if no deploy actions are assigned to main split target
+					if(!actor._intermissionClassId){
+						actor._intermissionClassId = actor._classId;
+					}				
+				}
+				
 				var targetActor = this.getCurrentPilot(transformIntoId, true);
 				if(targetActor && targetActor.actorId() != actor.actorId() && actor.event){
 					targetActor.event = actor.event;
@@ -2498,7 +2510,12 @@ StatCalc.prototype.transformOnDestruction = function(actor, force){
 		actor.isSubPilot = false;
 		actor.SRWStats.mech = this.getMechDataById(transformIntoId, true);
 		this.calculateSRWMechStats(actor.SRWStats.mech, false, actor);
-		this.applyDeployActions(actor.SRWStats.pilot.id, actor.SRWStats.mech.id);
+		let actionsResult = this.applyDeployActions(actor.SRWStats.pilot.id, actor.SRWStats.mech.id);
+		if(!actionsResult){//if no deploy actions are assigned to main split target
+			if(!actor._intermissionClassId){
+				actor._intermissionClassId = actor._classId;
+			}				
+		}
 		
 		if(targetActorId != null){
 			var targetActor = $gameActors.actor(targetActorId);
@@ -2623,51 +2640,56 @@ StatCalc.prototype.split = function(actor){
 		for(var i = 0; i < combinesFrom.length; i++){
 			var actor;
 			actor = $gameActors.actor(combinesFrom[i]);	
-			var actionsResult = this.applyDeployActions(actor.SRWStats.pilot.id, combinesFrom[i]);
-			if(!actionsResult && i == 0){//if no deploy actions are assigned to main split target
-				targetActor.SRWStats.mech = this.getMechDataById(combinesFrom[i], true);
-				this.calculateSRWMechStats(targetActor.SRWStats.mech);					
-			}			
-			actor.isSubPilot = false;
-			
-			var event = actor.event;
-			if(!event){
-				event = $gameMap.requestDynamicEvent(targetActor.event)
-				actor.event = event;
-				event.setType(targetActor.event.isType());
-				$gameSystem.setEventToUnit(actor.event.eventId(), 'actor', actor.actorId());
+			if(actor){			
+				var actionsResult = this.applyDeployActions(actor.SRWStats.pilot.id, combinesFrom[i]);
+				if(!actionsResult){//if no deploy actions are assigned to main split target
+					if(!actor._intermissionClassId){
+						actor._intermissionClassId = actor._classId;
+					}
+					actor.SRWStats.mech = this.getMechDataById(combinesFrom[i], true);
+					this.calculateSRWMechStats(actor.SRWStats.mech);					
+				}			
+				actor.isSubPilot = false;
 				
-				//SceneManager.reloadCharacters();
+				var event = actor.event;
+				if(!event){
+					event = $gameMap.requestDynamicEvent(targetActor.event)
+					actor.event = event;
+					event.setType(targetActor.event.isType());
+					$gameSystem.setEventToUnit(actor.event.eventId(), 'actor', actor.actorId());
+					
+					//SceneManager.reloadCharacters();
+				}
+				if(event){
+					//if(actor.actorId() != targetActor.actorId()){
+					var space;
+					if(actor.positionBeforeCombine){
+						space = actor.positionBeforeCombine;
+						actor.positionBeforeCombine = null;
+					} else if(actor.actorId() != targetActor.actorId()){
+						space = this.getAdjacentFreeSpace({x: targetActor.event.posX(), y: targetActor.event.posY()});
+					}
+					
+					if(space){
+						event.appear();
+						event.locate(space.x, space.y);
+					}
+					
+					//}
+					event.refreshImage();
+					actor.initImages(actor.SRWStats.mech.classData.meta.srpgOverworld.split(","));
+					actor.event.refreshImage();
+				}	
+				
+				//this invalidation and reload ensures that the spawned unit has its stats calculated with abilities taken into account
+				this.invalidateAbilityCache();
+				this.reloadSRWStats(actor, true);
+				
+				var calculatedStats = this.getCalculatedMechStats(actor);
+				calculatedStats.currentHP = Math.round(combinedHPRatio * calculatedStats.maxHP);
+				calculatedStats.currentEN = Math.round(combinedENRatio * calculatedStats.maxEN);	
+				//
 			}
-			if(event){
-				//if(actor.actorId() != targetActor.actorId()){
-				var space;
-				if(actor.positionBeforeCombine){
-					space = actor.positionBeforeCombine;
-					actor.positionBeforeCombine = null;
-				} else if(actor.actorId() != targetActor.actorId()){
-					space = this.getAdjacentFreeSpace({x: targetActor.event.posX(), y: targetActor.event.posY()});
-				}
-				
-				if(space){
-					event.appear();
-					event.locate(space.x, space.y);
-				}
-				
-				//}
-				event.refreshImage();
-				actor.initImages(actor.SRWStats.mech.classData.meta.srpgOverworld.split(","));
-				actor.event.refreshImage();
-			}	
-			
-			//this invalidation and reload ensures that the spawned unit has its stats calculated with abilities taken into account
-			this.invalidateAbilityCache();
-			this.reloadSRWStats(actor, true);
-			
-			var calculatedStats = this.getCalculatedMechStats(actor);
-			calculatedStats.currentHP = Math.round(combinedHPRatio * calculatedStats.maxHP);
-			calculatedStats.currentEN = Math.round(combinedENRatio * calculatedStats.maxEN);	
-			//
 		}				
 	}
 }
@@ -2696,7 +2718,12 @@ StatCalc.prototype.combine = function(actor, forced){
 			
 			var targetMechData = this.getMechDataById(combinesInto, true);
 			
-			this.applyDeployActions(actor.SRWStats.pilot.id, combinesInto);
+			let actionsResult = this.applyDeployActions(actor.SRWStats.pilot.id, combinesInto);
+			if(!actionsResult){
+				if(!actor._intermissionClassId){
+					actor._intermissionClassId = actor._classId;
+				}
+			}
 			
 			var targetActor = this.getCurrentPilot(combinesInto);
 			if(!targetActor){
@@ -2753,7 +2780,7 @@ StatCalc.prototype.canCombine = function(actor, forced){
 			if(!required){
 				return result; //early return if no combinesFrom info is defined
 			}
-			var requiredWill = mechData.combineWill || 0;
+			var requiredWill = actor.SRWStats.mech.combineWill || 0;
 			var requiredLookup = {};
 			for(var i = 0; i < required.length; i++){
 				requiredLookup[required[i]] = true;

@@ -626,15 +626,18 @@
 								this._upperBody.opacity = this._frameCount + 80;
 								this._upperBodyTop.opacity = this._frameCount + 80;
 								this._lowerBody.opacity = this._frameCount + 80;
+								this.opacity = this._frameCount + 80;
 							} else {
 								this._upperBody.opacity = 200 + 80 - this._frameCount;
 								this._upperBodyTop.opacity = 200 + 80 - this._frameCount;
 								this._lowerBody.opacity = 200 + 80 - this._frameCount;
+								this.opacity = 200 + 80 - this._frameCount;
 							}
 						} else {
 							this._upperBody.opacity = 255;
 							this._upperBodyTop.opacity = 255;
 							this._lowerBody.opacity = 255;
+							this.opacity = 255;
 						}
 						
 						this._upperBodyOverlay.opacity = 0;
@@ -649,12 +652,15 @@
 								if($gameSystem.foregroundSpriteToggleState == 0){
 									this._upperBodyOverlay.opacity = 0;
 									this._lowerBodyOverlay.opacity = 0;
+									this.opacity = 0;
 								} else if($gameSystem.foregroundSpriteToggleState == 1){
 									this._upperBodyOverlay.opacity = 128;
 									this._lowerBodyOverlay.opacity = 128;
+									this.opacity = 128;
 								} else if($gameSystem.foregroundSpriteToggleState == 2){
 									this._upperBodyOverlay.opacity = 255;
 									this._lowerBodyOverlay.opacity = 255;
+									this.opacity = 255;
 								}
 								//this._upperBodyOverlay.opacity = 128;
 								//this._lowerBodyOverlay.opacity = 128;
@@ -668,24 +674,28 @@
 								if($gameSystem.foregroundSpriteToggleState == 0){
 									this._upperBodyOverlay.opacity = 0;
 									this._lowerBodyOverlay.opacity = 0;
+									this.opacity = 0;
 								} else if($gameSystem.foregroundSpriteToggleState == 1){
 									this._upperBodyOverlay.opacity = 128;
 									this._lowerBodyOverlay.opacity = 128;
+									this.opacity = 128;
 								} else if($gameSystem.foregroundSpriteToggleState == 2){
 									this._upperBodyOverlay.opacity = 255;
 									this._lowerBodyOverlay.opacity = 255;
+									this.opacity = 255;
 								}
 								//this._upperBodyOverlay.opacity = 128;
 								//this._lowerBodyOverlay.opacity = 128;
 							} else {
 								this._upperBodyTop.opacity = 255;
+								this.opacity = 255;
 								this._upperBody.opacity = 0;
 							}
 						}	
-						if($gameTemp.activeEvent() == this._character || 
+						if(//$gameTemp.activeEvent() == this._character || 
 							$gameTemp._TargetEvent == this._character ||
-							$gameSystem.isSubBattlePhase() == "actor_move" || 
-							$gameSystem.isSubBattlePhase()== "enemy_move" || 
+							($gameSystem.isSubBattlePhase() == "actor_move" && $gameTemp.activeEvent() == this._character) || 
+							($gameSystem.isSubBattlePhase()== "enemy_move" && $gameTemp.activeEvent() == this._character) || 
 							$gameSystem.isSubBattlePhase()== "actor_target" || 
 							$gameSystem.isSubBattlePhase() == "enemy_targeting_display" ||
 							$gameSystem.isSubBattlePhase() == "post_move_command_window" ||
@@ -694,6 +704,7 @@
 						){
 							this._upperBodyOverlay.opacity = 255;
 							this._lowerBodyOverlay.opacity = 255;
+							this.opacity = 255;
 						}
 						if(battlerArray && battlerArray[1] && $statCalc.getCurrentTerrain(battlerArray[1]) == "water" && !$statCalc.hoversOnWater(battlerArray[1])){
 							this._upperBody.opacity-=120;

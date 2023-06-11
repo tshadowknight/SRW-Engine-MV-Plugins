@@ -258,6 +258,7 @@
 				if(!ignoreEventDeploys || !refEvent || !refEvent.isScriptedDeploy){
 					if(actor._intermissionClassId){
 						actor._classId = actor._intermissionClassId;
+						//actor.isSubPilot = false;
 						delete actor._intermissionClassId;
 					}
 					
