@@ -2446,10 +2446,6 @@ StatCalc.prototype.transform = function(actor, idx, force, forcedId, noRestore){
 				
 				var actionsResult = this.applyDeployActions(actor.SRWStats.pilot.id, actor.SRWStats.mech.id);
 				
-				if(!actionsResult){//if no deploy actions are assigned to main split target
-					$gameSystem.registerPilotFallbackInfo(actor);	
-				}
-				
 				var targetActor = this.getCurrentPilot(transformIntoId, true);
 				if(targetActor && targetActor.actorId() != actor.actorId() && actor.event){
 					targetActor.event = actor.event;
@@ -7288,6 +7284,8 @@ StatCalc.prototype.applyDeployActions = function(actorId, mechId){
 								targetPilot.isSubPilot = false;//reaffirm in case the unit reload processed a previous main pilot and set the new main pilot back to sub pilot
 							} else {
 								var targetMech = $statCalc.getMechData($dataClasses[targetMechId], true);
+								$gameSystem.registerMechFallbackInfo(targetMechId, JSON.parse(JSON.stringify(targetMech.subPilots)));	
+
 								targetMech.subPilots[targetDef.slot] = targetPilot.actorId();							
 								$statCalc.storeMechData(targetMech);
 								targetPilot.isSubPilot = true;//set to false for unit reinit
@@ -7297,7 +7295,7 @@ StatCalc.prototype.applyDeployActions = function(actorId, mechId){
 								if(currentPilot){
 									$statCalc.reloadSRWStats(currentPilot, false, true);
 								}
-								$gameSystem.registerMechFallbackInfo(targetMechId, JSON.parse(JSON.stringify(targetMech.subPilots)));	
+								
 							}							
 						}					
 					}
