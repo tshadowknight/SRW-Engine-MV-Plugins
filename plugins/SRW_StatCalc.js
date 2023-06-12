@@ -2625,6 +2625,7 @@ StatCalc.prototype.split = function(actor){
 		calculatedStats.currentHP = Math.round(combinedHPRatio * calculatedStats.maxHP);
 		calculatedStats.currentEN = Math.round(combinedENRatio * calculatedStats.maxEN);*/
 		var combinesFrom = actor.SRWStats.mech.combinesFrom;
+
 		for(var i = 0; i < combineInfo.participants.length; i++){
 			var actor;
 			actor = $gameActors.actor(combineInfo.participants[i]);	
@@ -2649,7 +2650,7 @@ StatCalc.prototype.split = function(actor){
 				if(event){
 					//if(actor.actorId() != targetActor.actorId()){
 					var space;
-					if(actor.positionBeforeCombine){
+					if(actor.positionBeforeCombine && (this.isFreeSpace(actor.positionBeforeCombine) || (targetActor.event.posX() == actor.positionBeforeCombine.x && targetActor.event.posY() == actor.positionBeforeCombine.y))){
 						space = actor.positionBeforeCombine;
 						actor.positionBeforeCombine = null;
 					} else if(actor.actorId() != targetActor.actorId()){
