@@ -283,6 +283,7 @@
 					$statCalc.invalidateAbilityCache(actor);
 					$statCalc.initSRWStats(actor);	
 				}
+				$statCalc.applyBattleStartWill(actor);
 			}
 			
 			//main twin must be initialized first to ensure a reference event is available for their sub twin

@@ -159,8 +159,7 @@ Window_SpiritActivation.prototype.getActorInfo = function() {
 }
 
 Window_SpiritActivation.prototype.show = function(softRefresh) {
-	var _this = this;
-	this._bgFadeContainer.style.display = "show";
+	var _this = this;	
 	this._doubleSpeedEnabled = false;
 	this._processingAction = false;
 	this._finishing = false;
@@ -177,6 +176,7 @@ Window_SpiritActivation.prototype.show = function(softRefresh) {
 		_this._visibility = "";
 		_this.refresh();	
 		Graphics._updateCanvas();
+		this._bgFadeContainer.style.display = "show";
 	});	
 };
 
