@@ -661,14 +661,12 @@
 			$gameVariables.setValue(_existActorVarID, 0);
 			$gameVariables.setValue(_actorsDestroyed, 0);
 			$gameVariables.setValue(_existShipVarId, 0);	
-			_this._pilotFallbackInfo = {};
-			_this._mechFallbackInfo = {};
 			
 			this._availableUnits = $gameParty.allMembers();
 			this._availableUnits.forEach(function(actor){
 				$statCalc.initSRWStats(actor);
-				_this.registerPilotFallbackInfo(actor);
 				actor.event = null;
+				actor.reversalInfo = {};
 			});
 			
 			$gameMap.events().forEach(function(event) {
@@ -688,8 +686,22 @@
 			}
 		}
 		
+		Game_System.prototype.overwritePilotFallbackInfo = function(actor) {
+			const _this = this;
+			if(!_this._pilotFallbackInfo){
+				_this._pilotFallbackInfo = {};
+			}
+			_this._pilotFallbackInfo[actor.actorId()] = {
+				classId: actor._classId,
+				isSubPilot: actor.isSubPilot
+			};
+		}
+		
 		Game_System.prototype.registerMechFallbackInfo = function(mechId, subPilots) {
 			const _this = this;
+			if(!_this._mechFallbackInfo){
+				_this._mechFallbackInfo = {};
+			}
 			if(_this._mechFallbackInfo[mechId] == null){
 				_this._mechFallbackInfo[mechId] = {
 					subPilots: subPilots
@@ -699,6 +711,9 @@
 		
 		Game_System.prototype.getPilotFallbackInfo = function(actor) {
 			const _this = this;
+			if(!_this._pilotFallbackInfo){
+				_this._pilotFallbackInfo = {};
+			}
 			if(_this._pilotFallbackInfo[actor.actorId()]){
 				return _this._pilotFallbackInfo[actor.actorId()];
 			} else {
@@ -711,6 +726,9 @@
 		
 		Game_System.prototype.getMechFallbackInfo = function(mechId) {
 			const _this = this;
+			if(!_this._mechFallbackInfo){
+				_this._mechFallbackInfo = {};
+			}
 			if(_this._mechFallbackInfo[mechId]){
 				return _this._mechFallbackInfo[mechId];
 			} else {

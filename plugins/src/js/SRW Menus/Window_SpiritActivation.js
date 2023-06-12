@@ -160,6 +160,7 @@ Window_SpiritActivation.prototype.getActorInfo = function() {
 
 Window_SpiritActivation.prototype.show = function(softRefresh) {
 	var _this = this;
+	this._bgFadeContainer.style.display = "show";
 	this._doubleSpeedEnabled = false;
 	this._processingAction = false;
 	this._finishing = false;
@@ -229,6 +230,13 @@ Window_SpiritActivation.prototype.animateHP = function(elem, fillElem, startPerc
 
 }*/
 
+Window_SpiritActivation.prototype.hide = function() {
+    this.visible = false;
+	this._visibility = "none";
+	this._bgFadeContainer.style.display = "none";
+	this.refresh();
+};
+
 Window_SpiritActivation.prototype.update = function() {
 	var _this = this;
 	Window_Base.prototype.update.call(this);
@@ -242,6 +250,7 @@ Window_SpiritActivation.prototype.update = function() {
 				}				
 			}
 			this._finishTimer--;
+			return;
 		}
 		
 		if(!this._processingAction){

@@ -51,8 +51,10 @@
 				
 				if (command === 'assignUnit') {
 					const actor = $gameActors.actor(args[0]);
-					actor._classId = args[1] * 1; 
-					actor._intermissionClassId = args[1] * 1; 
+					actor._classId = args[1] * 1;
+					actor.isSubPilot = false;
+					//actor._intermissionClassId = args[1] * 1; 
+					$gameSystem.overwritePilotFallbackInfo(actor);
 				}
 				
 				if (command === 'UnlockUnit') {
