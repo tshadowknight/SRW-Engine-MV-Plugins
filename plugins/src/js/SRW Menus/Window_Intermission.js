@@ -180,6 +180,9 @@ Window_Intermission.prototype.createComponents = function() {
 	
 	var windowNode = this.getWindowNode();
 	
+	if(ENGINE_SETTINGS.ENABLE_FAV_POINTS){
+		windowNode.classList.add("fav_points_enabled");
+	}
 	
 	this._header = document.createElement("div");
 	this._header.id = this.createId("header");
@@ -243,6 +246,17 @@ Window_Intermission.prototype.createComponents = function() {
 	this._srPointsValue.classList.add("sr_value");
 	this._srDisplay.appendChild(this._srPointsValue);	
 	
+	if(ENGINE_SETTINGS.ENABLE_FAV_POINTS){
+		this._favDisplay = document.createElement("div");
+		this._favDisplay.classList.add("fav_display");
+		this._favPointsLabel = document.createElement("div");
+		this._favPointsLabel.innerHTML = APPSTRINGS.INTERMISSION.fav_points;
+		this._favDisplay.appendChild(this._favPointsLabel);	
+		this._favPointsValue = document.createElement("div");
+		this._favPointsValue.classList.add("fav_value");
+		this._favDisplay.appendChild(this._favPointsValue);
+	}
+	
 	this._fundsDisplay = document.createElement("div");	
 	this._fundsDisplay.classList.add("funds_display");
 	this._fundsLabel = document.createElement("div");
@@ -253,6 +267,9 @@ Window_Intermission.prototype.createComponents = function() {
 	this._fundsDisplay.appendChild(this._fundsValue);	
 	
 	this._srFundsDisplay.appendChild(this._srDisplay);
+	if(ENGINE_SETTINGS.ENABLE_FAV_POINTS){
+		this._srFundsDisplay.appendChild(this._favDisplay);
+	}
 	this._srFundsDisplay.appendChild(this._fundsDisplay);
 	
 	windowNode.appendChild(this._srFundsDisplay);
@@ -429,6 +446,10 @@ Window_Intermission.prototype.redraw = function() {
 	
 	this._deployCountText.innerHTML = APPSTRINGS.INTERMISSION.next_map_units+": <div class='deploy_amount'>"+$gameSystem.getDeployInfo().count+"</div>";
 	this._srPointsValue.innerHTML = $SRWSaveManager.getSRCount();		
+	if(ENGINE_SETTINGS.ENABLE_FAV_POINTS){
+		this._favPointsValue.innerHTML = $gameSystem.getCurrentFavPoints();		
+	}
+	
 	
 	this._fundsValue.innerHTML = $gameParty.gold();		
 	

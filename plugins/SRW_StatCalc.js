@@ -5474,6 +5474,21 @@ StatCalc.prototype.getRealMechTerrainStrings = function(actor){
 	}
 }
 
+StatCalc.prototype.getFavPoints = function(actor){
+	return actor.SRWStats.pilot.favPoints || 0;
+}
+
+StatCalc.prototype.addFavPoints = function(actor, amount){
+	if(!actor.SRWStats.pilot.favPoints){
+		actor.SRWStats.pilot.favPoints = 0;
+	}
+	actor.SRWStats.pilot.favPoints+=amount;
+	if(actor.SRWStats.pilot.favPoints < 0){
+		actor.SRWStats.pilot.favPoints = 0;
+	}
+	this.storeActorData(actor);
+}
+
 StatCalc.prototype.getExp = function(actor){
 	return actor.SRWStats.pilot.exp;
 }
@@ -6336,6 +6351,27 @@ StatCalc.prototype.getActiveStatMods = function(actor, excludedSkills){
 			}			
 			
 			accumulateFromAbilityList(abilities, $mechAbilityManager);
+			
+			if(ENGINE_SETTINGS.ENABLE_FAV_POINTS){
+				if(actor.isActor()){				
+					let abilityList = ENGINE_SETTINGS.FAV_POINT_ABILITIES[actor.actorId()] || ENGINE_SETTINGS.FAV_POINT_ABILITIES[-1];
+					if(abilityList){
+						let pointCount = this.getFavPoints(actor);
+						let ctr = 0;
+						let favAbilities = [];
+						while(ctr < abilityList.length && pointCount >= abilityList[ctr].cost){
+							favAbilities.push({
+								idx: abilityList[ctr].id,
+								level: 0,
+								appliesTo: null
+							})							
+							pointCount-=abilityList[ctr].cost;
+							ctr++;
+						}
+						accumulateFromAbilityList(favAbilities, $pilotAbilityManager);
+					}	
+				}	
+			}
 			
 			var FUBAbility = actor.SRWStats.mech.fullUpgradeAbility;	
 			if(typeof FUBAbility != "undefined" && FUBAbility != -1 && FUBAbility.idx != -1){

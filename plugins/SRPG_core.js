@@ -1096,9 +1096,9 @@ SceneManager.isInSaveScene = function(){
 	
 	Scene_Map.prototype.handleMultipleSpiritSelection = function(spirits, callback) {
 		var _this = this;
-		if($gameTemp.playingSpiritAnimations){
-			return;//fix attempt for issue where spirit activation window lingers after activating a spirit
-		}
+		//if($gameTemp.playingSpiritAnimations){
+		//	return;//fix attempt for issue where spirit activation window lingers after activating a spirit
+		//}
 		$gameTemp.playingSpiritAnimations = true;
 		var currentSpirit = spirits.pop();	
 		this._spiritWindow.close();
@@ -1127,10 +1127,7 @@ SceneManager.isInSaveScene = function(){
 				if(callback){
 					callback();
 				} else {
-					$gameTemp.playingSpiritAnimations = false;
 					$gameTemp.popMenu = true;
-					_this.idToMenu["spirit_activation"].hide();
-					$gameTemp.killMenu("spirit_activation")
 					$gameSystem.setSrpgActorCommandWindowNeedRefresh($gameSystem.EventToUnit($gameTemp.activeEvent().eventId()));
 					$gameSystem.setSubBattlePhase("actor_command_window");
 				}				

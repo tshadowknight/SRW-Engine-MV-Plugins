@@ -1965,4 +1965,86 @@ $SRWConfig.pilotAbilties = function(){
 			return true;		
 		}
 	);	
+	
+	this.addDefinition(
+		97, 
+		"Funds gained x1.5", 
+		"Receive more funds when shooting down enemies.", 
+		false,
+		true,
+		function(actor, level){
+			return [{type: "fund_gain_destroy", modType: "mult", value: 1.5}];
+		},
+		function(actor, level){
+			return true;
+		},
+		[0],
+		1
+	);
+	
+	this.addDefinition(
+		98, 
+		"Exp. gained x1.5", 
+		"Receive more exp. when shooting down enemies.", 
+		false,
+		true,
+		function(actor, level){
+			return [{type: "exp", modType: "mult", value: 1.5}];
+		},
+		function(actor, level){
+			return true;
+		},
+		[0],
+		1
+	);
+	
+	this.addDefinition(
+		99, 
+		"Movement +2", 
+		"Gain additional movement.", 
+		false,
+		true,
+		function(actor, level){
+			return [{type: "movement", modType: "addFlat", value: 2}];
+		},
+		function(actor, level){
+			return true;
+		},
+		[0],
+		1
+	);
+	
+	this.addDefinition(
+		100, 
+		"Final Damage x1.2", 
+		"Deal more damage to enemies.", 
+		false,
+		true,
+		function(actor, level){
+			return [{type: "final_damage", modType: "mult", value: 1.2}];
+		},
+		function(actor, level){
+			return true
+		},
+		[0],
+		1,
+	);
+	
+	this.addDefinition(
+		101, 
+		"+1 Action", 
+		"Gain an extra action per turn.", 
+		false,
+		true,
+		function(actor, level){
+			return [
+				{type: "extra_action", modType: "addFlat", value: 1}
+			];
+		},
+		function(actor, level){
+			return true;
+		},
+		[0],
+		1
+	);
 }

@@ -115,12 +115,33 @@
 	height: 10%;
 }
 
+.fav_points_enabled #intermission_menu_sr_and_funds {
+	position: absolute;
+    right: 2.6%;
+    border: 0.1vw solid #FFFFFF;
+    width: 20%;
+    bottom: 1%;
+    padding: 1%;
+    border-radius: 1vw;
+    height: 14%;
+}
+
 .sr_display {
 	color: var(--text-color-highlight);
 	display: flex;
 }
 
 .sr_value {
+	margin-left: auto;
+	color: #FFFFFF;
+}
+
+.fav_display {
+	color: var(--text-color-highlight);
+	display: flex;
+}
+
+.fav_value {
 	margin-left: auto;
 	color: #FFFFFF;
 }

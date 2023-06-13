@@ -201,6 +201,34 @@ var ENGINE_SETTINGS = {
 	DISCLAIMER_TEXT: "",
 	ALLY_ZONE_COUNT: 4,
 	EXPIRE_ZONES_ON_DEATH: true,
+	ENABLE_FAV_POINTS: true,
+	FAV_POINT_ABILITIES: {
+		//all ability ids are for pilot abilities
+		//cost are in number of fav points
+		//max 5 abilities may be defined
+		"-1": [ //default if no specific abilities are defined for a pilot
+			{
+				id: 97,
+				cost: 2
+			},
+			{
+				id: 98,
+				cost: 3
+			},
+			{
+				id: 99,
+				cost: 4
+			},
+			{
+				id: 100,
+				cost: 5
+			},
+			{
+				id: 101,
+				cost: 10
+			},
+		]
+	},
 	PRELOADER: function(){//function called on game boot, should be used to preload system assets
 	
 		AudioManager.loadStaticSe({name: "SRWAppear"});

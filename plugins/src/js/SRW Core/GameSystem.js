@@ -2835,4 +2835,18 @@
 				interactionType: interactionType
 			};
 		}
+		
+		Game_System.prototype.awardFavPoints = function(amount) {
+			if(!this.favPoints){
+				this.favPoints = 0;
+			}
+			this.favPoints+=(amount * 1);
+		}
+		
+		Game_System.prototype.getCurrentFavPoints = function(weapon) {
+			if(!this.favPoints){
+				this.favPoints = 0;
+			}
+			return this.favPoints;
+		}
 	}

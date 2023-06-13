@@ -686,7 +686,8 @@
 				clearLocationHeader: true,
 				deployMech: true,
 				setCustomSpirit: true, 
-				clearCustomSpirit: true
+				clearCustomSpirit: true,
+				awardFavPoints: true
 			}
 			var scriptCommands = {
 				fadeIn: function(eventList, indent, params){

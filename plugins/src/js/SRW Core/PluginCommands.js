@@ -1267,6 +1267,10 @@
 						);
 					}
 				}
+				
+				if (command === 'awardFavPoints') {					
+					$gameSystem.awardFavPoints(args[0]);
+				}
 							
 			} catch(e){
 				var msg = "";

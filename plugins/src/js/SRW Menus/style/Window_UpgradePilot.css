@@ -13,6 +13,79 @@
 	opacity: 0.5;
 }
 
+#upgrade_pilot .fav_point_controls {
+	position: absolute;
+    height: 59%;
+    top: 27%;
+    border: 0.1vw solid #FFFFFF;
+    border-radius: 1vw;
+    left: 26%;
+    width: 69%;
+    background-color: var(--section-bg-color);
+}
+
+#upgrade_pilot .fav_point_controls.inactive {
+	opacity: 0.5;
+}
+
+#upgrade_pilot .fav_point_controls img{
+	width: 36%;
+	margin-bottom: 4%;
+}
+
+#upgrade_pilot .fav_point_controls.inactive {
+	opacity: 0.5;
+}
+
+#upgrade_pilot .fav_point_controls img.fav_locked {
+	filter: invert(100%) sepia(0%) saturate(0%) hue-rotate(93deg) brightness(103%) contrast(103%);
+	opacity: 0.6;
+}
+
+#upgrade_pilot .fav_point_controls img.fav_not_obtained {
+	filter: invert(100%) sepia(0%) saturate(0%) hue-rotate(93deg) brightness(103%) contrast(103%);
+	opacity: 0.6;
+}
+
+#upgrade_pilot .fav_point_controls img.arrow_indic {
+	filter: invert(100%) sepia(0%) saturate(0%) hue-rotate(93deg) brightness(103%) contrast(103%);
+}
+
+#upgrade_pilot .fav_point_controls img.fav_pending {
+	filter: invert(83%) sepia(47%) saturate(2569%) hue-rotate(155deg) brightness(99%) contrast(97%);
+}
+
+#upgrade_pilot .fav_point_controls img.fav_obtained {
+	filter: invert(74%) sepia(47%) saturate(582%) hue-rotate(96deg) brightness(96%) contrast(90%);
+}
+
+#upgrade_pilot .fav_point_controls .upgrade_control_row {
+	height: 15%;
+}
+
+#upgrade_pilot .fav_point_controls .upgrade_control_row.header {
+	height: 9%;
+}
+
+#upgrade_pilot .fav_point_controls .upgrade_control_block:nth-child(1){
+	width: 10%;
+}
+
+#upgrade_pilot .fav_point_controls .upgrade_control_block:nth-child(2) {
+	width: 63%;
+}
+
+#upgrade_pilot .fav_point_controls .upgrade_control_row.disabled {
+	opacity: 0.5
+}
+
+#upgrade_pilot .fav_point_controls .status_block {
+	display: flex;
+	height: 100%;
+	align-items: self-end;
+	justify-content: center;
+}
+
 #upgrade_pilot .tool_tip{
 	border: 0.1vw solid #FFFFFF;
     border-radius: 1vw;
@@ -94,7 +167,18 @@
     width: 20%;
     left: 5%;
     background-color: var(--section-bg-color);
-}btn_apply
+}
+
+#upgrade_pilot .point_display {
+	position: absolute;
+    height: 27%;
+    top: 59%;
+    border: 0.1vw solid #FFFFFF;
+    border-radius: 1vw;
+    width: 20%;
+    left: 5%;
+    background-color: var(--section-bg-color);
+}
 
 #upgrade_pilot .fund_entries {
 	height: 90%;
@@ -321,6 +405,10 @@
 	width: 20%;
 }
 
+.fav_points_enabled .tab_button {
+	width: 14%;
+}
+
 .tab_button.selected {
 	color: #FFFFFF;
 	border: 0.1vw solid #FFFFFF;
@@ -332,6 +420,22 @@
 
 .abilities_button {	
     left: 60%;   
+}
+
+.fav_points_button {
+	display: none;
+}
+
+.fav_points_enabled .pilot_stats_button {	
+    left: 38%;   
+}
+
+.fav_points_enabled .abilities_button {	
+    left: 54%;   
+}
+
+.fav_points_enabled .fav_points_button {
+	left: 70%;
 }
 
 .current_abilities {
@@ -414,6 +518,27 @@
 	border: 0.1vw solid #FFFFFF;
 }
 
+#upgrade_pilot #btn_apply_points {
+	width: 33%;
+    color: #FFFFFF;
+    border: 0.1vw solid #FFFFFF;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    top: 5%;
+    padding: 0.4%;
+    border-radius: 999px;
+    margin-left: auto;
+    margin-right: auto;
+    margin-top: 2%;
+    --fontsize: 2.4px;
+}
+
+#upgrade_pilot #btn_apply_points.disabled {
+	color: #888888;
+	border: 0.1vw solid #FFFFFF;
+}
+
 #upgrade_pilot .pending_upgrades {
 	display: flex;
 	align-items: center;
@@ -430,6 +555,8 @@
 #upgrade_pilot .terrain_upgraded .upgrade_control{
 	width: 100%;
 }
+
+
 
 #upgrade_pilot .upgrade_control {
 	filter: var(--white-filter);

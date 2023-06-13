@@ -31,7 +31,7 @@ Window_UpgradePilot.prototype.initialize = function() {
 	}
 	this._currentUIState = "tab_selection"; //tab_selection, upgrading_pilot_stats, ability_selection, ability_replace_selection
 	this._currentTab = 0;
-	this._maxTab = 2;
+	this._maxTab = ENGINE_SETTINGS.ENABLE_FAV_POINTS ? 3 : 2;
 	
 	this._currentPage = 0;
 	this._maxSelection = 10;
@@ -40,6 +40,9 @@ Window_UpgradePilot.prototype.initialize = function() {
 	
 	this._maxEquipSelection = 6;
 	this._currentEquipSelection = 0;
+	
+	this._currentFavSkillSelection = 0;
+	this._currentFavSkillsPending = {};
 	
 	Window_CSS.prototype.initialize.call(this, 0, 0, 0, 0);	
 }
@@ -57,6 +60,59 @@ Window_UpgradePilot.prototype.resetDeltas = function() {
 		water: 0,
 		space:0	
 	};
+}
+
+Window_UpgradePilot.prototype.getCurrentFavAbilityList = function(){
+	let abilityList = ENGINE_SETTINGS.FAV_POINT_ABILITIES[$gameTemp.currentMenuUnit.actor.actorId()] || ENGINE_SETTINGS.FAV_POINT_ABILITIES[-1];
+	return abilityList;
+}
+
+Window_UpgradePilot.prototype.getUnlockedFavAbilities = function(){
+	let abilityList = ENGINE_SETTINGS.FAV_POINT_ABILITIES[$gameTemp.currentMenuUnit.actor.actorId()] || ENGINE_SETTINGS.FAV_POINT_ABILITIES[-1];
+	let pointCount = $statCalc.getFavPoints($gameTemp.currentMenuUnit.actor);
+	let unlocked = {};
+	for(let i = 0; i < abilityList.length; i++){
+		let def = abilityList[i];	
+		if(pointCount >= def.cost){
+			unlocked[i] = true;
+		} 
+		pointCount-=def.cost;
+	}
+	return unlocked;
+}
+
+Window_UpgradePilot.prototype.isCurrentFavAbilityUnlocked = function(){
+	return this.getUnlockedFavAbilities()[this._currentFavSkillSelection];
+}
+
+Window_UpgradePilot.prototype.isFavAbilityUnlocked = function(idx){
+	return this.getUnlockedFavAbilities()[idx];
+}
+
+Window_UpgradePilot.prototype.canCurrentFavAbilityBeBought = function(){
+	return this.canFavAbilityBeBought(this._currentFavSkillSelection);
+}
+
+Window_UpgradePilot.prototype.canFavAbilityBeBought = function(idx){
+	let unlockedCount = 0;
+	let unlocked = this.getUnlockedFavAbilities();
+	for(let id in this._currentFavSkillsPending){
+		if(this._currentFavSkillsPending[id]){
+			unlocked[id] = true;
+		}
+	}
+	for(let idx in unlocked){
+		if(unlocked[idx]){
+			unlockedCount++;
+		}
+	}
+	return idx == unlockedCount;
+}
+
+Window_UpgradePilot.prototype.getCurrentFavAbilityInfo = function(){
+	let abilityList = ENGINE_SETTINGS.FAV_POINT_ABILITIES[$gameTemp.currentMenuUnit.actor.actorId()] || ENGINE_SETTINGS.FAV_POINT_ABILITIES[-1];
+	let def = abilityList[this._currentFavSkillSelection];
+	return $pilotAbilityManager.getAbilityDisplayInfo(def.id);
 }
 
 Window_UpgradePilot.prototype.getCurrentSelection = function(){
@@ -83,6 +139,13 @@ Window_UpgradePilot.prototype.incrementSelection = function(){
 		if(this._currentEquipSelection >= this._maxEquipSelection){
 			this._currentEquipSelection = 0;
 		}
+	} else if(this._currentUIState == "fav_point_selection"){
+		SoundManager.playCursor();
+		let abilityList = this.getCurrentFavAbilityList();
+		this._currentFavSkillSelection++;
+		if(this._currentFavSkillSelection > abilityList.length - 1){
+			this._currentFavSkillSelection = 0;
+		}
 	}
 }
 
@@ -105,6 +168,13 @@ Window_UpgradePilot.prototype.decrementSelection = function(){
 		this._currentEquipSelection--;
 		if(this._currentEquipSelection < 0){
 			this._currentEquipSelection = this._maxEquipSelection - 1;
+		}
+	} else if(this._currentUIState == "fav_point_selection"){
+		SoundManager.playCursor();
+		let abilityList = this.getCurrentFavAbilityList();
+		this._currentFavSkillSelection--;
+		if(this._currentFavSkillSelection < 0){
+			this._currentFavSkillSelection = abilityList.length - 1;
 		}
 	}
 }
@@ -145,6 +215,10 @@ Window_UpgradePilot.prototype.incrementUpgradeLevel = function(){
 	} else if(this._currentUIState == "ability_selection"){
 		this._abilityList.incrementPage();
 		SoundManager.playCursor();
+	} else if(this._currentUIState == "fav_point_selection"){
+		if(this.canCurrentFavAbilityBeBought()){
+			this._currentFavSkillsPending[this._currentFavSkillSelection] = true;
+		}
 	}
 }
 
@@ -171,6 +245,14 @@ Window_UpgradePilot.prototype.decrementUpgradeLevel = function(){
 	} else if(this._currentUIState == "ability_selection"){
 		SoundManager.playCursor();
 		this._abilityList.decrementPage();
+	}  else if(this._currentUIState == "fav_point_selection"){
+		if(this._currentFavSkillsPending[this._currentFavSkillSelection]){
+			for(let idx in this._currentFavSkillsPending){
+				if(idx >= this._currentFavSkillSelection){
+					this._currentFavSkillsPending[idx] = false;
+				}
+			}		
+		}		
 	}
 }
 
@@ -180,6 +262,9 @@ Window_UpgradePilot.prototype.createComponents = function() {
 	
 	var windowNode = this.getWindowNode();
 	
+	if(ENGINE_SETTINGS.ENABLE_FAV_POINTS){
+		windowNode.classList.add("fav_points_enabled");
+	}
 	
 	this._header = document.createElement("div");
 	this._header.id = this.createId("header");
@@ -197,6 +282,10 @@ Window_UpgradePilot.prototype.createComponents = function() {
 	this._fundsDisplay = document.createElement("div");	
 	this._fundsDisplay.classList.add("fund_display");	
 	windowNode.appendChild(this._fundsDisplay);
+	
+	this._pointsDisplay = document.createElement("div");	
+	this._pointsDisplay.classList.add("point_display");	
+	windowNode.appendChild(this._pointsDisplay);
 	
 	this._pilotInfoDisplay = document.createElement("div");	
 	this._pilotInfoDisplay.classList.add("pilot_info");	
@@ -219,6 +308,7 @@ Window_UpgradePilot.prototype.createComponents = function() {
 		_this.requestRedraw();
 	});
 	
+	
 	this._abilitiesTabButton = document.createElement("div");	
 	this._abilitiesTabButton.classList.add("tab_button");	
 	this._abilitiesTabButton.classList.add("abilities_button");	
@@ -232,6 +322,21 @@ Window_UpgradePilot.prototype.createComponents = function() {
 		_this._currentUIState = "ability_selection";			
 		_this.requestRedraw();
 	});
+	
+	
+	this._favPointsTabButton = document.createElement("div");	
+	this._favPointsTabButton.classList.add("tab_button");	
+	this._favPointsTabButton.classList.add("fav_points_button");	
+	this._favPointsTabButton.classList.add("scaled_text");	
+	this._favPointsTabButton.innerHTML = APPSTRINGS.INTERMISSION.fav_points;
+	windowNode.appendChild(this._favPointsTabButton);
+	this._favPointsTabButton.addEventListener("click", function(){		
+		_this._currentTab = 2;
+		_this._currentSelection = 0;
+		_this._currentUIState = "fav_point_selection";			
+		_this.requestRedraw();
+	});
+	
 	
 	this._upgradeControls = document.createElement("div");	
 	this._upgradeControls.classList.add("upgrade_controls");	
@@ -250,6 +355,11 @@ Window_UpgradePilot.prototype.createComponents = function() {
 	this._abilityList.registerTouchObserver("left", function(){if(_this._currentUIState == "ability_selection"){_this._touchLeft = true;}});
 	this._abilityList.registerTouchObserver("right", function(){if(_this._currentUIState == "ability_selection"){_this._touchRight = true;}});
 	this._abilityList.registerObserver("redraw", function(){if(_this._currentUIState == "ability_selection"){_this.requestRedraw();}});
+	
+	this._favPointControls = document.createElement("div");	
+	this._favPointControls.classList.add("fav_point_controls");	
+	windowNode.appendChild(this._favPointControls);
+
 }	
 
 
@@ -317,10 +427,14 @@ Window_UpgradePilot.prototype.update = function() {
 				SoundManager.playOk();
 				if(this._currentTab == 0){
 					this._currentUIState = "upgrading_pilot_stats";					
-				} else {
+				} else if(this._currentTab == 1){
 					this._currentSelection = 0;
 					this.resetDeltas();
 					this._currentUIState = "ability_selection";				
+				} else {
+					this._currentFavSkillSelection = 0;
+					this._currentUIState = "fav_point_selection";	
+					this._currentFavSkillsPending = {};	
 				}				
 			} else if(this._currentUIState == "upgrading_pilot_stats"){			
 				var cost = this.currentCost();		
@@ -422,6 +536,19 @@ Window_UpgradePilot.prototype.update = function() {
 					
 					this._currentUIState = "ability_selection";
 				}
+			} else if(this._currentUIState == "fav_point_selection"){				
+				var cost = this.currentPointCost();		
+				if(cost > 0){
+					var pilotData = this.getCurrentSelection();
+					if(cost <= $gameSystem.getCurrentFavPoints()){
+						SoundManager.playOk();
+						$statCalc.addFavPoints(pilotData, cost);
+						 $gameSystem.awardFavPoints(cost * -1);
+					} else {
+						SoundManager.playCancel();
+					}
+					_this._currentFavSkillsPending = {};
+				}							
 			}
 			this.refresh();
 			return;	
@@ -433,11 +560,14 @@ Window_UpgradePilot.prototype.update = function() {
 				this._currentSelection = 0;
 				this.resetDeltas();	
 				$gameTemp.popMenu = true;	
-			} else if(this._currentUIState == "upgrading_pilot_stats" || this._currentUIState == "ability_selection"){			
+			} else if(this._currentUIState == "upgrading_pilot_stats" || this._currentUIState == "ability_selection" || this._currentUIState == "fav_point_selection"){			
 				this._currentUIState = "tab_selection";							
+				this._currentFavSkillsPending = {};	
+				_this._currentFavSkillSelection = 0;
 			}  else if(this._currentUIState == "ability_equip_selection" || this._currentUIState == "ability_purchase_selection"){			
 				this._currentUIState = "ability_selection";							
 			}
+			
 			this.refresh();
 			return;		
 		}		
@@ -482,6 +612,20 @@ Window_UpgradePilot.prototype.currentCost = function() {
 			}
 		}
 	});
+	return cost;	
+}
+
+Window_UpgradePilot.prototype.currentPointCost = function() {
+	var _this = this;
+
+	let cost = 0;
+	let abilityList = this.getCurrentFavAbilityList();
+	for(let i = 0; i < abilityList.length; i++){
+		if(this._currentFavSkillsPending[i]){
+			cost+=abilityList[i].cost;
+		}
+	}
+
 	return cost;	
 }
 
@@ -548,6 +692,32 @@ Window_UpgradePilot.prototype.redraw = function() {
 	fundDisplayContent+="</div>";
 	
 	this._fundsDisplay.innerHTML = fundDisplayContent;
+	
+	var pointsDisplayContent = "";
+	pointsDisplayContent+="<div class='fund_entries'>";
+	pointsDisplayContent+="<div class='fund_entry'>";
+	pointsDisplayContent+="<div class='fund_entry_label scaled_text'>"+APPSTRINGS.PILOTUPGRADES.label_available_points+"</div>";
+	pointsDisplayContent+="<div class='fund_entry_value scaled_text'>"+$gameSystem.getCurrentFavPoints()+"</div>";
+	pointsDisplayContent+="</div>";
+	
+	pointsDisplayContent+="<div class='fund_entry'>";
+	pointsDisplayContent+="<div class='fund_entry_label scaled_text'>"+APPSTRINGS.PILOTUPGRADES.label_required_points+"</div>";
+	pointsDisplayContent+="<div class='fund_entry_value scaled_text'>"+this.currentPointCost()+"</div>";
+	pointsDisplayContent+="</div>";
+	
+	pointsDisplayContent+="<div class='fund_entry'>";
+	pointsDisplayContent+="<div class='fund_entry_label scaled_text'>"+APPSTRINGS.PILOTUPGRADES.label_remaining_points+"</div>";
+	var remaining = $gameSystem.getCurrentFavPoints() - this.currentPointCost();
+	pointsDisplayContent+="<div class='fund_entry_value scaled_text "+(remaining < 0 ? "underflow" : "")+"'>"+remaining+"</div>";
+	pointsDisplayContent+="</div>";
+	
+	
+	pointsDisplayContent+="<div id='btn_apply_points' class='disabled scaled_text'>"+APPSTRINGS.MECHUPGRADES.label_apply+"</div>";
+	pointsDisplayContent+="</div>";
+	pointsDisplayContent+="</div>";
+	
+	this._pointsDisplay.innerHTML = pointsDisplayContent;
+	
 	
 	var actorIcon = this._container.querySelector("#upgrade_pilot_icon");
 	this.loadActorFace(pilotData.actorId(), actorIcon);
@@ -661,6 +831,57 @@ Window_UpgradePilot.prototype.redraw = function() {
 	
 	this._upgradeControls.innerHTML = upgradeControlContent;
 	
+	if(ENGINE_SETTINGS.ENABLE_FAV_POINTS){
+		var favPointControlsContent = "";
+		let abilityList = ENGINE_SETTINGS.FAV_POINT_ABILITIES[pilotData.actorId()] || ENGINE_SETTINGS.FAV_POINT_ABILITIES[-1];
+		let pointCount = $statCalc.getFavPoints(pilotData);
+		
+		favPointControlsContent+="<div class='upgrade_control_row header'>";
+		favPointControlsContent+="<div class='upgrade_control_block scaled_text'>";
+		//favPointControlsContent+=APPSTRINGS.PILOTUPGRADES.label_ability;
+		favPointControlsContent+="</div>";
+		favPointControlsContent+="<div class='upgrade_control_block scaled_text'>";
+		favPointControlsContent+=APPSTRINGS.PILOTUPGRADES.label_perk;
+		favPointControlsContent+="</div>";
+		favPointControlsContent+="<div class='upgrade_control_block scaled_text'>";
+		favPointControlsContent+=APPSTRINGS.PILOTUPGRADES.label_cost;
+		favPointControlsContent+="</div>";
+		favPointControlsContent+="</div>";
+		
+		for(let i = 0; i < abilityList.length; i++){
+			let def = abilityList[i];
+			var displayInfo = $pilotAbilityManager.getAbilityDisplayInfo(def.id);
+			let isEnabled = this.canFavAbilityBeBought(i) || this.isFavAbilityUnlocked(i) || _this._currentFavSkillsPending[i];
+			favPointControlsContent+="<div data-idx='"+i+"' class='upgrade_control_row "+(_this._currentFavSkillSelection == i ? "selected" : "")+" "+(isEnabled ? "enabled" : "disabled")+"'>";
+			favPointControlsContent+="<div class='upgrade_control_block scaled_text status_block'>";
+			//favPointControlsContent+=APPSTRINGS.PILOTUPGRADES.label_ability;
+			favPointControlsContent+="<img class='arrow_indic' src='svg/arrow-right-s-fill.svg'>";
+			if(!isEnabled){
+				favPointControlsContent+="<img class='fav_locked' src='svg/close-circle-line.svg'>";
+			} else if(pointCount >= def.cost){
+				favPointControlsContent+="<img class='fav_obtained' src='svg/checkbox-circle-fill.svg'>";
+			} else if(_this._currentFavSkillsPending[i]){
+				favPointControlsContent+="<img class='fav_pending' src='svg/indeterminate-circle-line.svg'>";
+			} else {
+				favPointControlsContent+="<img class='fav_not_obtained' src='svg/checkbox-blank-circle-line.svg'>";
+			}
+			
+			
+			
+			favPointControlsContent+="</div>";
+			favPointControlsContent+="<div class='upgrade_control_block scaled_text'>";
+			favPointControlsContent+=displayInfo.name;
+			favPointControlsContent+="</div>";
+			favPointControlsContent+="<div class='upgrade_control_block scaled_text'>";
+			favPointControlsContent+=def.cost;
+			favPointControlsContent+="</div>";
+			favPointControlsContent+="</div>";
+			pointCount-=def.cost;
+		}
+		
+		
+		this._favPointControls.innerHTML = favPointControlsContent;
+	}
 	
 	var currentAbilitiesContent = "";
 	currentAbilitiesContent+="<div class='abilities_label scaled_text'>";
@@ -697,28 +918,42 @@ Window_UpgradePilot.prototype.redraw = function() {
 	
 	this._currentAbilities.innerHTML = currentAbilitiesContent;
 	
+	
+	
 	this._pilotStatsTabButton.classList.remove("selected");
 	this._abilitiesTabButton.classList.remove("selected");
+	this._favPointsTabButton.classList.remove("selected");
+	this._fundsDisplay.style.display = "";
+	this._upgradeControls.style.display = "none";
+	this._currentAbilities.style.display = "none";
+	this._abilityListContainer.style.display = "none";
+	this._favPointControls.style.display = "none";
+	this._pointsDisplay.style.display = "none";
 	if(_this._currentTab == 0){
 		this._pilotStatsTabButton.classList.add("selected");
-		this._currentAbilities.style.display = "none";
-		this._abilityListContainer.style.display = "none";
 		this._upgradeControls.style.display = "";
-	} else {
+	} else if(_this._currentTab == 1){
 		this._abilitiesTabButton.classList.add("selected");
-		this._upgradeControls.style.display = "none";
 		this._currentAbilities.style.display = "";
 		this._abilityListContainer.style.display = "";
-	}	
+	} else {
+		this._favPointsTabButton.classList.add("selected");		
+		this._favPointControls.style.display = "";
+		this._fundsDisplay.style.display = "none";		
+		this._pointsDisplay.style.display = "";
+	}
+	
 	this._upgradeControls.classList.remove("inactive");
 	this._currentAbilities.classList.remove("inactive");	
 	this._abilityListContainer.classList.remove("inactive");
+	this._favPointControls.classList.remove("inactive");
 	
 	if(this._currentUIState == "tab_selection"){
 		_this._toolTip.innerHTML = APPSTRINGS.PILOTUPGRADES.tool_tip_start;
 		this._upgradeControls.classList.add("inactive");
 		this._currentAbilities.classList.add("inactive");
 		this._abilityListContainer.classList.add("inactive");
+		this._favPointControls.classList.add("inactive");
 	} else if(this._currentUIState == "upgrading_pilot_stats"){
 		this._upgradeControls.style.display = "";
 		this._currentAbilities.style.display = "none";
@@ -730,6 +965,8 @@ Window_UpgradePilot.prototype.redraw = function() {
 		this._abilityListContainer.style.display = "";
 	} else if(this._currentUIState == "ability_purchase_selection"){
 		this._toolTip.innerHTML = this._abilityList.getCurrentSelection().info.desc;
+	} else if(this._currentUIState == "fav_point_selection"){
+		this._toolTip.innerHTML = this.getCurrentFavAbilityInfo().desc;
 	}
 	
 	this._abilityList.redraw();
@@ -808,6 +1045,14 @@ Window_UpgradePilot.prototype.redraw = function() {
 		windowNode.querySelector("#btn_apply").classList.remove("disabled");		
 	} else {
 		windowNode.querySelector("#btn_apply").classList.add("disabled");
+	}
+	if(this._currentUIState == "fav_point_selection"){
+		var cost = this.currentPointCost();	
+		if(cost > 0 && cost <= $gameSystem.getCurrentFavPoints()){
+			windowNode.querySelector("#btn_apply_points").classList.remove("disabled");		
+		} else {
+			windowNode.querySelector("#btn_apply_points").classList.add("disabled");
+		}
 	}
 	
 	var entries = windowNode.querySelectorAll(".upgrade_control");
