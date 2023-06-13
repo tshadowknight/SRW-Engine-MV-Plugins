@@ -25,7 +25,10 @@ SRWSaveManager.prototype.getActorData = function(actorId){
 			PP: 0,
 			exp: 500,
 			kills: 0,
-			abilities: null
+			abilities: null,
+			relationships: null,
+			favPoints: null,
+			customSpirits: {}
 		};
 	}
 	return JSON.parse(JSON.stringify($gameSystem.actorData[actorId]));

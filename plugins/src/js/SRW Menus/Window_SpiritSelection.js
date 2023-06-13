@@ -653,7 +653,7 @@ Window_SpiritSelection.prototype.redraw = function() {
 				content+="</div>"
 				content+="<div class='section_column'>";
 			}
-			if(typeof spiritList[i] != "undefined" && spiritList[i].idx != "" && spiritList[i].level <= currentLevel){
+			if(typeof spiritList[i] != "undefined" && spiritList[i].idx !== "" && spiritList[i].level <= currentLevel){
 				targetType = $spiritManager.getSpiritDef(spiritList[i].idx).targetType;
 				var displayInfo = $spiritManager.getSpiritDisplayInfo(spiritList[i].idx);
 				displayName = "<div class='scaled_width spirit_label scaled_text fitted_text'>"+displayInfo.name+"</div>("+spiritList[i].cost+")" ;

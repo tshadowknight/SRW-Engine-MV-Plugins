@@ -1241,6 +1241,32 @@
 				if (command === 'clearLocationHeader') {					
 					$gameTemp.locationHeader = null;
 				}
+				if (command === 'clearLocationHeader') {					
+					$gameTemp.locationHeader = null;
+				}
+				
+				if (command === 'setCustomSpirit') {					
+					var actor = $gameActors.actor(args[0]);
+					if(actor){
+						$statCalc.setCustomSpirit(
+							actor,
+							args[1],//slot
+							args[2],//idx
+							args[3],//cost
+							args[4],//level						
+						);
+					}
+				}
+				
+				if (command === 'clearCustomSpirit') {					
+					var actor = $gameActors.actor(args[0]);
+					if(actor){
+						$statCalc.clearCustomSpirit(
+							actor,
+							args[1],//slot				
+						);
+					}
+				}
 							
 			} catch(e){
 				var msg = "";

@@ -684,7 +684,9 @@
 				hideAllPortraitOverlays: true,
 				setLocationHeader: true,
 				clearLocationHeader: true,
-				deployMech: true
+				deployMech: true,
+				setCustomSpirit: true, 
+				clearCustomSpirit: true
 			}
 			var scriptCommands = {
 				fadeIn: function(eventList, indent, params){

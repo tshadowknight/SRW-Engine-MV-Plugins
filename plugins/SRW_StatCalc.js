@@ -1451,6 +1451,8 @@ StatCalc.prototype.initSRWStats = function(actor, level, itemIds, preserveVolati
 	var dbAbilities = this.getPilotAbilityInfo(actorProperties, this.getCurrentLevel(actor));	
 	var dbRelationships = this.getPilotRelationshipInfo(actorProperties);
 	
+	actor.SRWStats.pilot.spirits = this.getSpiritInfo(actor, actorProperties);	
+	
 	if(actor.isActor()){
 		this.applyStoredActorData(actor, dbAbilities, dbRelationships);
 	} else {
@@ -1546,7 +1548,7 @@ StatCalc.prototype.initSRWStats = function(actor, level, itemIds, preserveVolati
 			}
 		}
 	}
-	actor.SRWStats.pilot.spirits = this.getSpiritInfo(actor, actorProperties);	
+	
 	
 	if(actorProperties.pilotTwinSpirit){
 		var parts = actorProperties.pilotTwinSpirit.split(",");
@@ -2827,7 +2829,8 @@ StatCalc.prototype.applyStoredActorData = function(actor, dbAbilities, dbRelatio
 		actor.SRWStats.pilot.PP = storedData.PP;
 		actor.SRWStats.pilot.exp = storedData.exp;
 		actor.SRWStats.pilot.kills = storedData.kills;
-		actor.SRWStats.pilot.stats.upgrades = storedData.pilotUpgrades;			
+		actor.SRWStats.pilot.stats.upgrades = storedData.pilotUpgrades;	
+		actor.SRWStats.pilot.customSpirits = storedData.customSpirits || {};	
 		
 		var storedAbilities = $SRWSaveManager.getActorData(actor.actorId()).abilities || {};
 		var usedSlots = {};
@@ -2876,7 +2879,39 @@ StatCalc.prototype.applyStoredActorData = function(actor, dbAbilities, dbRelatio
 		});
 		
 		actor.SRWStats.pilot.relationships = storedRelationships;
+		
+		if(storedData.customSpirits){
+			for(let slot in storedData.customSpirits){
+				actor.SRWStats.pilot.spirits[slot] = {
+					idx: storedData.customSpirits[slot].idx * 1,
+					level: storedData.customSpirits[slot].level * 1,
+					cost: storedData.customSpirits[slot].cost * 1,
+				};
+			}
+		}
 	}
+}
+
+StatCalc.prototype.setCustomSpirit = function(actor, slot, spiritIdx, spiritCost, spiritIdxLevel){
+	if(!this.isActorSRWInitialized(actor)){
+		this.initSRWStats(actor);//convenience to allow custom spirits to be set on units before they've been deployed
+	}
+	if(!actor.SRWStats.pilot.customSpirits){
+		actor.SRWStats.pilot.customSpirits = {};
+	}
+	actor.SRWStats.pilot.customSpirits[slot] = {
+		idx: spiritIdx,
+		level: spiritIdxLevel,
+		cost: spiritCost
+	};	
+	this.storeActorData(actor);
+}
+
+StatCalc.prototype.clearCustomSpirit = function(actor, slot){
+	if(this.isActorSRWInitialized(actor) && actor.SRWStats.pilot.customSpirits){
+		delete actor.SRWStats.pilot.customSpirits[slot];
+	}
+	this.storeActorData(actor);
 }
 
 StatCalc.prototype.getStoredMechData = function(mechId){
@@ -2891,22 +2926,10 @@ StatCalc.prototype.storeActorData = function(actor){
 			exp: actor.SRWStats.pilot.exp,
 			kills: actor.SRWStats.pilot.kills,
 			abilities: actor.SRWStats.pilot.abilities,
-			relationships: actor.SRWStats.pilot.relationships
+			relationships: actor.SRWStats.pilot.relationships,
+			favPoints: actor.SRWStats.pilot.favPoints,
+			customSpirits: actor.SRWStats.pilot.customSpirits
 		});
-		/*var classId;
-		if(actor.SRWStats.mech.inheritsUpgradesFrom != null){
-			classId = actor.SRWStats.mech.inheritsUpgradesFrom;
-		} else if(actor.currentClass()){
-			classId = actor.currentClass().id;
-		}
-		if(classId){
-			$SRWSaveManager.storeMechData(classId, {
-				mechUpgrades: actor.SRWStats.mech.stats.upgradeLevels,
-				genericFUBAbilityIdx: actor.SRWStats.mech.genericFUBAbilityIdx,
-				unlockedWeapons: actor.SRWStats.mech.unlockedWeapons,
-				subPilots: actor.SRWStats.mech.subPilots
-			});	
-		}*/		
 		this.storeMechData(actor.SRWStats.mech);
 	}	
 }
