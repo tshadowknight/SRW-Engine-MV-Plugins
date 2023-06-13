@@ -160,24 +160,27 @@ Window_SpiritActivation.prototype.getActorInfo = function() {
 
 Window_SpiritActivation.prototype.show = function(softRefresh) {
 	var _this = this;	
-	this._doubleSpeedEnabled = false;
-	this._processingAction = false;
-	this._finishing = false;
-	_this.clearMessage();
-	if(!softRefresh){
-		_this.createComponents();
-	}
-	
-	_this.getActorInfo();	
-	_this.loadRequiredImages().then(function(){
-		_this._handlingInput = false;
-		_this.visible = true;
-		_this._redrawRequested = true;
-		_this._visibility = "";
-		_this.refresh();	
-		Graphics._updateCanvas();
-		this._bgFadeContainer.style.display = "show";
-	});	
+	if(!_this.running){
+		_this.running = true;
+		this._doubleSpeedEnabled = false;
+		this._processingAction = false;
+		this._finishing = false;
+		_this.clearMessage();
+		if(!softRefresh){
+			_this.createComponents();
+		}
+		
+		_this.getActorInfo();	
+		_this.loadRequiredImages().then(function(){
+			_this._handlingInput = false;
+			_this.visible = true;
+			_this._redrawRequested = true;
+			_this._visibility = "";
+			_this.refresh();	
+			Graphics._updateCanvas();
+			//_this._bgFadeContainer.style.display = "";
+		});
+	}		
 };
 
 Window_SpiritActivation.prototype.setMessage = function(message, color) {
@@ -233,7 +236,7 @@ Window_SpiritActivation.prototype.animateHP = function(elem, fillElem, startPerc
 Window_SpiritActivation.prototype.hide = function() {
     this.visible = false;
 	this._visibility = "none";
-	this._bgFadeContainer.style.display = "none";
+	//this._bgFadeContainer.style.display = "none";
 	this.refresh();
 };
 
@@ -245,6 +248,7 @@ Window_SpiritActivation.prototype.update = function() {
 		if(this._finishing){
 			if(this._finishTimer <= 0){
 				this._finishing = false;
+				_this.running = false;
 				if(_this._callbacks.done){
 					_this._callbacks.done();
 				}				
