@@ -1448,7 +1448,13 @@ SceneManager.isInSaveScene = function(){
     var _SRPG_SceneMap_update = Scene_Map.prototype.update;
     Scene_Map.prototype.update = function() {
 		var _this = this;
-	
+		let ctr;
+		/*let lagVar = 6500;
+		for(var i = 0; i < lagVar; i++){
+			for(var j = 0; j < lagVar; j++){
+				ctr++;
+			}
+		}*/
 		//Soft Reset
 		if(!$gameSystem.isIntermission() && Input.isPressed("ok") && Input.isPressed("cancel") && Input.isPressed("pageup") && Input.isPressed("pagedown")){
 			Input.clear();

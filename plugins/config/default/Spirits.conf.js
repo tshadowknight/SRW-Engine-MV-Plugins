@@ -955,7 +955,7 @@ $SRWConfig.spirits = function(){
 		}, 
 		null,
 		{
-			src: "Fortune",
+			src: "Focus",
 			duration: 800
 		}
 	);

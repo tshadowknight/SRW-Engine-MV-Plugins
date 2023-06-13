@@ -160,6 +160,19 @@ Window_SpiritActivation.prototype.getActorInfo = function() {
 
 Window_SpiritActivation.prototype.show = function(softRefresh) {
 	var _this = this;	
+	
+	function printStackTrace() {
+	  const error = new Error();
+	  const stack = error.stack
+		.split('\n')
+		.slice(2)
+		.map((line) => line.replace(/\s+at\s+/, ''))
+		.join('\n');
+	  console.log(stack);
+	}
+	
+	console.log("Window_SpiritActivation.prototype.show called at "+Date.now());
+	printStackTrace();
 	this._doubleSpeedEnabled = false;
 	this._processingAction = false;
 	this._finishing = false;
