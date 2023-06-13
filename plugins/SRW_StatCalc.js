@@ -2452,7 +2452,7 @@ StatCalc.prototype.transform = function(actor, idx, force, forcedId, noRestore){
 				
 				var actionsResult = this.applyDeployActions(actor.SRWStats.pilot.id, actor.SRWStats.mech.id);
 				
-				var targetActor = this.getCurrentPilot(transformIntoId, false);
+				var targetActor = this.getCurrentPilot(transformIntoId, true);
 				if(targetActor && targetActor.actorId() != actor.actorId() && actor.event){
 					targetActor.event = actor.event;
 					actor.event = null;

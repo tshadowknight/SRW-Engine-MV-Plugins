@@ -1119,7 +1119,7 @@ SceneManager.isInSaveScene = function(){
 			
 			$gameTemp.spiritTargetActor = currentSpirit.target;
 			$gameTemp.queuedActorEffects = [{type: "spirit", parameters: {target: currentSpirit.target, idx: currentSpirit.idx}}];	
-			//_this._spiritAnimWindow.show(true);	
+			_this._spiritAnimWindow.show(true);	
 		}
 			
 		$gameTemp.spiritWindowDoneHandler = function(){
@@ -1153,7 +1153,7 @@ SceneManager.isInSaveScene = function(){
 			$spiritManager.applyEffect(currentSpirit.idx, currentSpirit.caster, [currentSpirit.target], 0);			
 			$gameTemp.spiritTargetActor = currentSpirit.target;
 			$gameTemp.queuedActorEffects = [{type: "spirit", parameters: {target: currentSpirit.target, idx: currentSpirit.idx}}];	
-			//_this._spiritAnimWindow.show(true);	
+			_this._spiritAnimWindow.show(true);	
 		}
 			
 		$gameTemp.spiritWindowDoneHandler = function(){
@@ -1448,8 +1448,7 @@ SceneManager.isInSaveScene = function(){
     var _SRPG_SceneMap_update = Scene_Map.prototype.update;
     Scene_Map.prototype.update = function() {
 		var _this = this;
-		let ctr;
-		
+			
 		//Soft Reset
 		if(!$gameSystem.isIntermission() && Input.isPressed("ok") && Input.isPressed("cancel") && Input.isPressed("pageup") && Input.isPressed("pagedown")){
 			Input.clear();
