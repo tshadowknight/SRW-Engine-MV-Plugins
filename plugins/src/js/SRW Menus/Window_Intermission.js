@@ -18,6 +18,25 @@ Window_Intermission.prototype.show = function() {
 	Graphics._updateCanvas();
 };
 
+Window_Intermission.prototype.getCategoryIdx = function(category) {
+	let result = -1;
+	let ctr = 0;
+	while(ctr < this._commands.length && result == -1){
+		if(this._commands[ctr].key == category){
+			result = ctr;
+		}
+		ctr++;
+	}
+	return result;
+}
+
+Window_Intermission.prototype.createSubCategoryList = function(container, category, id) {
+	let idx = this.getCategoryIdx(category);
+	if(idx != -1){
+		this.createEntryList(container, this._commands[idx].subCommands, id);	
+	}	
+}
+
 Window_Intermission.prototype.initialize = function() {
 	var _this = this;
 	
@@ -70,6 +89,11 @@ Window_Intermission.prototype.initialize = function() {
 		]},
 		{name: APPSTRINGS.INTERMISSION.next_map, key: "next_map"}
 	];
+	if(ENGINE_SETTINGS.INTERMISSION_CATEGORIES){
+		const enabledCategories = ENGINE_SETTINGS.INTERMISSION_CATEGORIES;
+		this._commands = this._commands.filter((item) => {return enabledCategories[item.key]});	
+	}	
+	
 	this._tooltips = APPSTRINGS.INTERMISSION.tool_tips;
 	this._menuLevels = [0];
 	this._currentLevel = 0;		
@@ -210,15 +234,15 @@ Window_Intermission.prototype.createComponents = function() {
 	windowNode.appendChild(this._menuSection1);	
 	
 	this._menuSectionMech = document.createElement("div");
-	this.createEntryList(this._menuSectionMech, this._commands[0].subCommands, "section_mech");	
+	this.createSubCategoryList(this._menuSectionMech, "mech", "section_mech");	
 	windowNode.appendChild(this._menuSectionMech);
 	
 	this._menuSectionPilot = document.createElement("div");
-	this.createEntryList(this._menuSectionPilot, this._commands[1].subCommands, "section_pilot");	
+	this.createSubCategoryList(this._menuSectionPilot, "pilot", "section_pilot");	
 	windowNode.appendChild(this._menuSectionPilot);
 	
 	this._menuSectionData = document.createElement("div");
-	this.createEntryList(this._menuSectionData, this._commands[5].subCommands, "section_data");	
+	this.createSubCategoryList(this._menuSectionData, "data", "section_data");	
 	windowNode.appendChild(this._menuSectionData);
 	
 	this._deployCount = document.createElement("div");
@@ -401,22 +425,22 @@ Window_Intermission.prototype.redraw = function() {
 	this._redrawRequested = false;
 	
 	this.createEntryList(this._menuSection1, this._commands, "section_1");	
-	this.createEntryList(this._menuSectionMech, this._commands[0].subCommands, "section_mech");	
-	this.createEntryList(this._menuSectionPilot, this._commands[1].subCommands, "section_pilot");	
-	this.createEntryList(this._menuSectionData, this._commands[5].subCommands, "section_data");
+	this.createSubCategoryList(this._menuSectionMech, "mech", "section_mech");	
+	this.createSubCategoryList(this._menuSectionPilot, "pilot", "section_pilot");	
+	this.createSubCategoryList(this._menuSectionData, "data", "section_data");
 	
 	
 	this._menuSectionMech.style.display = "none";
 	this._menuSectionPilot.style.display = "none";
 	this._menuSectionData.style.display = "none";
 	if(this._menuLevels.length >= 2){
-		if(this._menuLevels[0] == 0){
+		if(this._menuLevels[0] == this.getCategoryIdx("mech")){
 			this._menuSectionMech.style.display = "block";
 		}
-		if(this._menuLevels[0] == 1){
+		if(this._menuLevels[0] == this.getCategoryIdx("pilot")){
 			this._menuSectionPilot.style.display = "block";
 		}
-		if(this._menuLevels[0] == 5){
+		if(this._menuLevels[0] == this.getCategoryIdx("data")){
 			this._menuSectionData.style.display = "block";
 		}
 	}
