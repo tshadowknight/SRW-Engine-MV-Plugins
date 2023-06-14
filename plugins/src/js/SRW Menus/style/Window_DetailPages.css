@@ -233,9 +233,30 @@
 
 #detail_pages .pilot_detail_2 {
 	width: 88%;
-	height: 40%;
+	height: 43%;
     top: 46%;
 	align-items: baseline;
+	flex-flow: row wrap;
+}
+
+#detail_pages.fav_points_enabled .pilot_detail_2 {
+	height: 46%;
+}
+
+#detail_pages .pilot_detail_2 .perks {
+	display: none;
+}
+
+#detail_pages.fav_points_enabled .pilot_detail_2 .perks {
+	margin-bottom: 1%;
+	display: block;
+}
+
+#detail_pages .pilot_detail_2 .break{
+	flex-basis: 100%;
+	width: 0px; 
+	height: 0px; 
+	overflow: hidden;
 }
 
 #detail_pages .pilot_detail_2 .spirit_label {
@@ -247,16 +268,23 @@
     margin-top: 1%;
 	border: 0.1vw solid rgba(255,255,255,0.5);
     padding: 0.5%;
+	width: 30.73333333%;
 }
 
 #detail_pages .pilot_detail_2 .ability_block.ace_bonus {
 	border: 0.1vw solid rgba(255,255,255,0.5);
     padding: 0.5%;
-	position: absolute;
+	/*position: absolute;*/
 	--widthscaling: 50;
-	left: 0;
+	/*left: 0;*/
 	height: 36%;
-	width: 97%;
+	width: 96.7%;
+	margin-bottom: 1%;
+}
+
+#detail_pages.fav_points_enabled .pilot_detail_2 .ability_block.ace_bonus {
+	height: 41%;
+	width: 63.7%;
 }
 
 #detail_pages .pilot_detail_2 .spirit_list_entry .stat_value{

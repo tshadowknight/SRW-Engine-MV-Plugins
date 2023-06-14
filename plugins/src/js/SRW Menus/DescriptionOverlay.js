@@ -84,6 +84,14 @@ DescriptionOverlay.prototype.redraw = function() {
 				this._text.innerHTML = displayInfo.desc;				
 			} else if(type == "status"){				
 				this._text.innerHTML = APPSTRINGS.STATUS[describedElement.getAttribute("data-ref")].description;				
+			} else if(type == "fav_skill"){	
+				const isUnlocked = describedElement.getAttribute("data-isunlocked");
+				if(!isUnlocked){
+					this._text.innerHTML = "?????";
+				} else {
+					this._text.innerHTML = $pilotAbilityManager.getAbilityDisplayInfo(idx).desc;
+				}
+								
 			} else {
 				var isHidden = false;
 				var actor = $gameTemp.currentMenuUnit.actor;

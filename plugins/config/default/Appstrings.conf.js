@@ -25,6 +25,7 @@ APPSTRINGS.GENERAL = {
 	label_stats: "Stats",
 	label_abilities: "Abilities",
 	label_spirits: "Spirits",
+	label_perks: "Perks",
 	label_ace_bonus: "Ace Bonus", 
 	label_abilities: "Abilities",
 	label_parts: "Parts",

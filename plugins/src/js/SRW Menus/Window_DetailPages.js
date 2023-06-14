@@ -68,7 +68,9 @@ Window_DetailPages.prototype.createComponents = function() {
 	Window_CSS.prototype.createComponents.call(this);
 	
 	var windowNode = this.getWindowNode();
-	
+	if(ENGINE_SETTINGS.ENABLE_FAV_POINTS){
+		windowNode.classList.add("fav_points_enabled");
+	}
 	
 	this._header = document.createElement("div");
 	this._header.id = this.createId("header");
@@ -771,8 +773,8 @@ Window_DetailPages.prototype.drawPilotStats2 = function() {
 	
 	 
 
-	detailContent+="<div class='ability_block details scaled_width'>";	
-	detailContent+="<div class='ability_block_label scaled_text scaled_width'>";
+	detailContent+="<div class='ability_block details'>";	
+	detailContent+="<div class='ability_block_label scaled_text'>";
 	detailContent+=APPSTRINGS.GENERAL.label_stats;
 	detailContent+="</div>";
 	
@@ -839,8 +841,8 @@ Window_DetailPages.prototype.drawPilotStats2 = function() {
 	
 	detailContent+="</div>";
 	
-	detailContent+="<div class='ability_block skills scaled_width'>";	
-	detailContent+="<div class='ability_block_label scaled_text scaled_width'>";
+	detailContent+="<div class='ability_block skills'>";	
+	detailContent+="<div class='ability_block_label scaled_text'>";
 	detailContent+=APPSTRINGS.GENERAL.label_abilities;
 	detailContent+="</div>";
 	
@@ -895,8 +897,8 @@ Window_DetailPages.prototype.drawPilotStats2 = function() {
 	
 	detailContent+="</div>";
 	
-	detailContent+="<div class='ability_block skills scaled_width'>";	
-	detailContent+="<div class='ability_block_label scaled_text scaled_width'>";
+	detailContent+="<div class='ability_block skills'>";	
+	detailContent+="<div class='ability_block_label scaled_text'>";
 	detailContent+=APPSTRINGS.GENERAL.label_spirits;
 	detailContent+="</div>";
 	
@@ -928,10 +930,13 @@ Window_DetailPages.prototype.drawPilotStats2 = function() {
 		rowCounter++;
 	}
 	detailContent+="</div>";
+	detailContent+="</div>";
 	
+	
+	detailContent+="<div class='break'></div>";	
 	
 	detailContent+="<div class='ability_block skills ace_bonus'>";	
-	detailContent+="<div class='ability_block_label scaled_text scaled_width'>";
+	detailContent+="<div class='ability_block_label scaled_text'>";
 	detailContent+=APPSTRINGS.GENERAL.label_ace_bonus;
 	detailContent+="</div>";
 	
@@ -946,6 +951,59 @@ Window_DetailPages.prototype.drawPilotStats2 = function() {
 		detailContent+="</div>";
 	}	
 	
+	detailContent+="</div>";
+	
+	detailContent+="<div class='ability_block skills perks'>";	
+	detailContent+="<div class='ability_block_label scaled_text'>";
+	detailContent+=APPSTRINGS.GENERAL.label_perks;
+	detailContent+="</div>";
+	
+	detailContent+="<div class='ability_block_row scaled_height'>";
+	
+	abilityList = ENGINE_SETTINGS.FAV_POINT_ABILITIES[$gameTemp.currentMenuUnit.actor.actorId()] || ENGINE_SETTINGS.FAV_POINT_ABILITIES[-1];
+	if(abilityList){
+		let pointCount = $statCalc.getFavPoints($gameTemp.currentMenuUnit.actor);
+		let unlocked = {};
+		for(let i = 0; i < abilityList.length; i++){
+			let def = abilityList[i];	
+			if(pointCount >= def.cost){
+				unlocked[i] = true;
+			} 
+			pointCount-=def.cost;
+		}
+		
+		var rowCounter = 0;
+		for(var i = 0; i < 6; i++){
+			if(rowCounter >= 2){
+				rowCounter = 0;
+				detailContent+="</div>";
+				detailContent+="<div class='ability_block_row scaled_height'>";
+			}		
+			
+			var displayName = "---";
+			if(i >= abilityList.length){
+				displayName = "";
+			} else if(!unlocked[i]){
+				displayName = "???";
+			}
+			var uniqueString = "";
+			var descriptionData = "";
+			var descriptionClass = "";
+			if(typeof abilityList[i] != "undefined" && unlocked[i]){
+				descriptionClass = "described_element";
+				descriptionData = "data-type='fav_skill' data-isunlocked="+(unlocked[i] ? 1 : 0)+" data-idx='"+abilityList[i].id+"'";
+				
+				var displayInfo = $pilotAbilityManager.getAbilityDisplayInfo(abilityList[i].id);
+				displayName = "<div class='scaled_width spirit_label'>"+displayInfo.name+"</div>";
+			}
+			
+			detailContent+="<div "+descriptionData+" class='pilot_stat_container "+descriptionClass+" scaled_text scaled_width fitted_text spirit_list_entry'>";
+			detailContent+="<div class='stat_value'>"+displayName+"</div>";
+			detailContent+="</div>";		
+			
+			rowCounter++;
+		}
+	}
 	detailContent+="</div>";
 
 	
