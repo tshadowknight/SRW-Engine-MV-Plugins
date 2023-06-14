@@ -190,6 +190,8 @@ Window_SpiritActivation.prototype.show = function(softRefresh) {
 	Graphics._updateCanvas();	
 	
 	_this.getActorInfo();	
+	//this._actorImg.style.display = "block";
+	this.redraw();
 	_this._waitingTimer = 120;//wait 120 frames max for images to load
 	_this.loadRequiredImages().then(function(){
 		_this._handlingInput = false;
@@ -265,10 +267,13 @@ Window_SpiritActivation.prototype.update = function() {
 		_this._waitingTimer--;
 		return;
 	}
+	
 	if(this.isOpen() && !this._handlingInput){
+		
 		if(this._finishing){
 			if(this._finishTimer <= 0){
 				this._finishing = false;
+				//this._actorImg.style.display = "none";
 				if(_this._callbacks.done){
 					_this._callbacks.done();
 				}				

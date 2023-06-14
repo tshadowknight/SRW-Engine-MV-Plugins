@@ -1398,7 +1398,7 @@ StatCalc.prototype.initSRWStats = function(actor, level, itemIds, preserveVolati
 		actorProperties = $dataEnemies[actorId].meta;
 	}
 	
-	actor.SRWStats.pilot.grantsGainsTo = actorProperties.pilotGrantsGainsTo;
+	actor.SRWStats.pilot.grantsGainsTo = null;//actorProperties.pilotGrantsGainsTo;
 	
 	actor.SRWStats.pilot.id = actorId;
 	actor.SRWStats.pilot.name = actor.name();
