@@ -190,12 +190,10 @@ Window_SpiritActivation.prototype.show = function(softRefresh) {
 	Graphics._updateCanvas();	
 	
 	_this.getActorInfo();	
+	_this._waitingTimer = 120;//wait 120 frames max for images to load
 	_this.loadRequiredImages().then(function(){
 		_this._handlingInput = false;
-		if(!softRefresh){
-			
-			//_this._bgFadeContainer.style.display = "";
-		}		
+		_this._waitingTimer = 0;//immediately clear load wait	
 	});	
 };
 
@@ -263,6 +261,10 @@ Window_SpiritActivation.prototype.update = function() {
 	var _this = this;
 	Window_Base.prototype.update.call(this);
 	
+	if(_this._waitingTimer > 0){
+		_this._waitingTimer--;
+		return;
+	}
 	if(this.isOpen() && !this._handlingInput){
 		if(this._finishing){
 			if(this._finishTimer <= 0){
