@@ -422,8 +422,12 @@
     left: 60%;   
 }
 
-.fav_points_button {
+.tab_button.fav_points_button {
 	display: none;
+}
+
+.fav_points_enabled .tab_button.fav_points_button {
+	display: flex;
 }
 
 .fav_points_enabled .pilot_stats_button {	
