@@ -5,6 +5,17 @@ export default function Window_SpiritActivation() {
 	this.initialize.apply(this, arguments);	
 }
 
+function printStackTrace() {
+  const error = new Error();
+  const stack = error.stack
+	.split('\n')
+	.slice(2)
+	.map((line) => line.replace(/\s+at\s+/, ''))
+	.join('\n');
+  console.log(stack);
+}
+	
+
 Window_SpiritActivation.prototype = Object.create(Window_CSS.prototype);
 Window_SpiritActivation.prototype.constructor = Window_SpiritActivation;
 
@@ -161,15 +172,6 @@ Window_SpiritActivation.prototype.getActorInfo = function() {
 Window_SpiritActivation.prototype.show = function(softRefresh) {
 	var _this = this;	
 	
-	function printStackTrace() {
-	  const error = new Error();
-	  const stack = error.stack
-		.split('\n')
-		.slice(2)
-		.map((line) => line.replace(/\s+at\s+/, ''))
-		.join('\n');
-	  console.log(stack);
-	}
 	
 	console.log("Window_SpiritActivation.prototype.show called at "+Date.now());
 	printStackTrace();
@@ -181,15 +183,17 @@ Window_SpiritActivation.prototype.show = function(softRefresh) {
 		_this.createComponents();
 	}
 	
+	_this.visible = true;
+	_this._redrawRequested = true;
+	_this._visibility = "";
+	_this.refresh();	
+	Graphics._updateCanvas();	
+	
 	_this.getActorInfo();	
 	_this.loadRequiredImages().then(function(){
 		_this._handlingInput = false;
 		if(!softRefresh){
-			_this.visible = true;
-			_this._redrawRequested = true;
-			_this._visibility = "";
-			_this.refresh();	
-			Graphics._updateCanvas();
+			
 			//_this._bgFadeContainer.style.display = "";
 		}		
 	});	
@@ -246,6 +250,9 @@ Window_SpiritActivation.prototype.animateHP = function(elem, fillElem, startPerc
 }*/
 
 Window_SpiritActivation.prototype.hide = function() {
+	console.log("Window_SpiritActivation.prototype.hide called at "+Date.now());
+	printStackTrace();
+	
     this.visible = false;
 	this._visibility = "none";
 	//this._bgFadeContainer.style.display = "none";

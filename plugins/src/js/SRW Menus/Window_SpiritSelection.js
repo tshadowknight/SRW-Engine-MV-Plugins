@@ -252,6 +252,10 @@ Window_SpiritSelection.prototype.update = function() {
 							}											
 						});
 					});
+					let debug = [];
+					for(let entry of spirits){
+						debug.push(entry);
+					}
 					if(_this._callbacks["selectedMultiple"]){
 						_this._callbacks["selectedMultiple"](spirits);
 					}
@@ -265,7 +269,7 @@ Window_SpiritSelection.prototype.update = function() {
 				}	
 				
 				$gameTemp.popMenu = true;	
-				
+				this._handlingInput = true;
 				
 			}
 			this.refresh();

@@ -2452,6 +2452,7 @@ StatCalc.prototype.transform = function(actor, idx, force, forcedId, noRestore){
 				
 				var actionsResult = this.applyDeployActions(actor.SRWStats.pilot.id, actor.SRWStats.mech.id);
 				
+				//undeployed pilost must be checked to properly transform with a subpilot to main pilot transition
 				var targetActor = this.getCurrentPilot(transformIntoId, true);
 				if(targetActor && targetActor.actorId() != actor.actorId() && actor.event){
 					targetActor.event = actor.event;
