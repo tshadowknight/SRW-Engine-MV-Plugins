@@ -1804,7 +1804,7 @@ BattleSceneManager.prototype.hookBeforeRender = function(){
 		
 		Input.update();
 		_this.isOKHeld = Input.isPressed("ok") || Input.isLongPressed("ok") || TouchInput.isLongPressed();
-		if(!_this._animsPaused){
+		if(!_this._animsPaused && !$gameTemp.editMode){
 			if((Input.isPressed("cancel") || TouchInput.isCancelled()) && _this._sceneCanEnd && !_this._sceneIsEnding){
 				_this.endScene();
 			}
@@ -3089,7 +3089,7 @@ BattleSceneManager.prototype.executeAnimation = function(animation, startTick){
 				}
 				var targetRotation = new BABYLON.Vector3(0,0,0);
 				
-				if( params.rotation){
+				if(params.rotation){
 					targetRotation = new BABYLON.Vector3(params.rotation.x, params.rotation.y, params.rotation.z);
 				}
 				if(_this._animationDirection == -1){
@@ -3107,7 +3107,11 @@ BattleSceneManager.prototype.executeAnimation = function(animation, startTick){
 				}
 				targetObj.rotation = targetRotation;
 				if(targetObj.handle){//support for effekseer handles
-					targetObj.setRotation(targetObj.rotation.x, targetObj.rotation.y, targetObj.rotation.z);
+					if(targetObj.parent){			
+						targetObj.offsetRotation = {x: params.rotation.x, y: params.rotation.y, z: params.rotation.z};
+					} else {
+						targetObj.handle.setRotation(targetObj.rotation.x, targetObj.rotation.y, targetObj.rotation.z);
+					}					
 				}
 			}
 		},
