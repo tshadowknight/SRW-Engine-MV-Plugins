@@ -11,6 +11,114 @@ import SpineManager from "./SpineManager.js";
 
 import DragonBonesManager from "./dragonBones/DragonBonesManager.js";
 
+/*stupid patch for forcing render group like behavior for effekseer particles*/
+
+BABYLON.RenderingManager.prototype.render = function(customRenderFunction, activeMeshes, renderParticles, renderSprites){
+// Update the observable context (not null as it only goes away on dispose)
+	const info = this._renderingGroupInfo;
+	info.scene = this._scene;
+	info.camera = this._scene.activeCamera;
+
+	// Dispatch sprites
+	if (this._scene.spriteManagers && renderSprites) {
+		for (let index = 0; index < this._scene.spriteManagers.length; index++) {
+			var manager = this._scene.spriteManagers[index];
+			this.dispatchSprites(manager);
+		}
+	}
+
+	// Render
+	for (let index = BABYLON.RenderingManager.MIN_RENDERINGGROUPS; index < BABYLON.RenderingManager.MAX_RENDERINGGROUPS; index++) {
+		this._depthStencilBufferAlreadyCleaned = index === BABYLON.RenderingManager.MIN_RENDERINGGROUPS;
+		var renderingGroup = this._renderingGroups[index];
+		
+		//render effekseer particles before render group 3 is rendered, this makes effekseer particles behave like they're in render group 1
+		if($battleSceneManager && index == 2){			
+			let projectionMatrix = new BABYLON.Matrix().copyFrom($battleSceneManager._camera.getProjectionMatrix()).m;
+			$battleSceneManager._effksContextBack.setProjectionMatrix(projectionMatrix);
+			let worldMatrix = new BABYLON.Matrix().copyFrom(BABYLON.Matrix.Invert($battleSceneManager._camera.getWorldMatrix())).m;		
+			$battleSceneManager._effksContextBack.setCameraMatrix(worldMatrix);
+			$battleSceneManager._effksContextBack.draw();
+			
+			projectionMatrix = new BABYLON.Matrix().copyFrom($battleSceneManager._camera.getProjectionMatrix()).m;
+			//projectionMatrix[0]*=-1;
+			$battleSceneManager._effksContextBackMirror.setProjectionMatrix(projectionMatrix);
+			
+			worldMatrix = new BABYLON.Matrix().copyFrom(BABYLON.Matrix.Invert($battleSceneManager._camera.getWorldMatrix())).m;
+			worldMatrix[0]*=-1;
+			worldMatrix[1]*=-1;
+			worldMatrix[2]*=-1;
+			//worldMatrix[3]*=-1;
+			$battleSceneManager._effksContextBackMirror.setCameraMatrix(worldMatrix);
+			$battleSceneManager._effksContextBackMirror.draw();		
+		}
+		
+		if (!renderingGroup) {
+			continue;
+		}
+
+		let renderingGroupMask = Math.pow(2, index);
+		info.renderingGroupId = index;
+
+		// Before Observable
+		this._scene.onBeforeRenderingGroupObservable.notifyObservers(info, renderingGroupMask);
+
+		// Clear depth/stencil if needed
+		if (BABYLON.RenderingManager.AUTOCLEAR) {
+			const autoClear = this._useSceneAutoClearSetup ?
+				this._scene.getAutoClearDepthStencilSetup(index) :
+				this._autoClearDepthStencil[index];
+
+			if (autoClear && autoClear.autoClear) {
+				this._clearDepthStencilBuffer(autoClear.depth, autoClear.stencil);
+			}
+		}
+
+		// Render
+		for (let step of this._scene._beforeRenderingGroupDrawStage) {
+			step.action(index);
+		}
+		renderingGroup.render(customRenderFunction, renderSprites, renderParticles, activeMeshes);
+		for (let step of this._scene._afterRenderingGroupDrawStage) {
+			step.action(index);
+		}
+		
+		
+		
+
+		// After Observable
+		this._scene.onAfterRenderingGroupObservable.notifyObservers(info, renderingGroupMask);
+	}
+	
+	
+	
+	
+	
+	if($battleSceneManager){
+		let projectionMatrix = new BABYLON.Matrix().copyFrom($battleSceneManager._camera.getProjectionMatrix()).m;
+		$battleSceneManager._effksContext.setProjectionMatrix(projectionMatrix);
+		let worldMatrix = new BABYLON.Matrix().copyFrom(BABYLON.Matrix.Invert($battleSceneManager._camera.getWorldMatrix())).m;		
+		$battleSceneManager._effksContext.setCameraMatrix(worldMatrix);
+		$battleSceneManager._effksContext.draw();
+		
+		projectionMatrix = new BABYLON.Matrix().copyFrom($battleSceneManager._camera.getProjectionMatrix()).m;
+		//projectionMatrix[0]*=-1;
+		$battleSceneManager._effksContextMirror.setProjectionMatrix(projectionMatrix);
+		
+		worldMatrix = new BABYLON.Matrix().copyFrom(BABYLON.Matrix.Invert($battleSceneManager._camera.getWorldMatrix())).m;
+		worldMatrix[0]*=-1;
+		worldMatrix[1]*=-1;
+		worldMatrix[2]*=-1;
+		//worldMatrix[3]*=-1;
+		$battleSceneManager._effksContextMirror.setCameraMatrix(worldMatrix);
+		$battleSceneManager._effksContextMirror.draw();		
+		
+		$battleSceneManager._effksContextAttached.setProjectionMatrix($battleSceneManager._camera.getProjectionMatrix().m);
+		$battleSceneManager._effksContextAttached.setCameraMatrix(BABYLON.Matrix.Invert($battleSceneManager._camera.getWorldMatrix()).m);
+		$battleSceneManager._effksContextAttached.draw();
+	}
+}
+
 export default function BattleSceneManager(){
 	this._initialized = false;
 	this._isLoading = 0;
@@ -314,8 +422,8 @@ BattleSceneManager.prototype.init = async function(attachControl){
 		
 		this._effksContext = effekseer.createContext();		
 		this._effksContextMirror = effekseer.createContext();		
-		this._effksContextBg = effekseer.createContext();
-		this._effksContextBgMirror = effekseer.createContext();
+		this._effksContextBack = effekseer.createContext();
+		this._effksContextBackMirror = effekseer.createContext();
 		this._effksContextAttached = effekseer.createContext();
 		
 		const settings = {
@@ -324,8 +432,8 @@ BattleSceneManager.prototype.init = async function(attachControl){
 		
 		this._effksContext.init(this._glContext, settings);
 		this._effksContextMirror.init(this._glContext, settings);
-		this._effksContextBg.init(this._glContext, settings);
-		this._effksContextBgMirror.init(this._glContext, settings);
+		this._effksContextBack.init(this._glContext, settings);
+		this._effksContextBackMirror.init(this._glContext, settings);
 		this._effksContextAttached.init(this._glContext, settings);
 		
 		this._engine = new BABYLON.Engine(this._canvas, true, {preserveDrawingBuffer: true, stencil: true, antialiasing: true}); // Generate the BABYLON 3D engine	
@@ -371,8 +479,8 @@ BattleSceneManager.prototype.dispose = function(){
 	this.disposeEffekseerInstances();
 	/*this.stopEffekContext(this._effksContext);
 	this.stopEffekContext(this._effksContextMirror);
-	this.stopEffekContext(this._effksContextBg);
-	this.stopEffekContext(this._effksContextBgMirror);
+	this.stopEffekContext(this._effksContextBack);
+	this.stopEffekContext(this._effksContextBackMirror);
 	this.stopEffekContext(this._effksContextAttached);*/
 	
 	
@@ -1946,7 +2054,14 @@ BattleSceneManager.prototype.hookBeforeRender = function(){
 					delete _this._matrixAnimations[animationId];
 				}	
 				if(targetObj.handle){ //support for effekseer handles
-					targetObj.handle.setLocation(targetObj.position.x, targetObj.position.y, targetObj.position.z);
+					if(targetObj.position){
+						targetObj.handle.setLocation(targetObj.position.x, targetObj.position.y, targetObj.position.z);
+					}
+					if(targetObj.rotation){
+						targetObj.handle.setRotation(targetObj.rotation.x, targetObj.rotation.y, targetObj.rotation.z);
+						targetObj.offsetRotation = {x: targetObj.rotation.x, y: targetObj.rotation.y, z: targetObj.rotation.z};
+					}
+					
 					//do a 0 speed update to rerender the effect at the new location without progressing the animation
 					for(let info of _this._effekseerInfo){
 						info.savedSpeed = info.handle.speed;
@@ -2279,8 +2394,8 @@ BattleSceneManager.prototype.disposeEffekseerInstances = function(){
 	
 	this.stopEffekContext(this._effksContext);
 	this.stopEffekContext(this._effksContextMirror);
-	this.stopEffekContext(this._effksContextBg);
-	this.stopEffekContext(this._effksContextBgMirror);
+	this.stopEffekContext(this._effksContextBack);
+	this.stopEffekContext(this._effksContextBackMirror);
 	this.stopEffekContext(this._effksContextAttached);
 }
 
@@ -2415,8 +2530,8 @@ BattleSceneManager.prototype.startScene = function(){
 		if(!_this._animsPaused){
 			_this._effksContext.update(60 / _this._engine.getFps() * ratio);
 			_this._effksContextMirror.update(60 / _this._engine.getFps() * ratio);
-			_this._effksContextBg.update(60 / _this._engine.getFps() * ratio);				
-			_this._effksContextBgMirror.update(60 / _this._engine.getFps() * ratio);	
+			_this._effksContextBack.update(60 / _this._engine.getFps() * ratio);				
+			_this._effksContextBackMirror.update(60 / _this._engine.getFps() * ratio);	
 			_this._effksContextAttached.update();	
 		}	
 	});
@@ -2433,7 +2548,7 @@ BattleSceneManager.prototype.startScene = function(){
 	
 	//foreground layer
 	this._scene.onAfterDrawPhaseObservable.add(() => {//onAfterRenderObservable 
-		let projectionMatrix = new BABYLON.Matrix().copyFrom(_this._camera.getProjectionMatrix()).m;
+		/*let projectionMatrix = new BABYLON.Matrix().copyFrom(_this._camera.getProjectionMatrix()).m;
 		_this._effksContext.setProjectionMatrix(projectionMatrix);
 		let worldMatrix = new BABYLON.Matrix().copyFrom(BABYLON.Matrix.Invert(_this._camera.getWorldMatrix())).m;		
 		_this._effksContext.setCameraMatrix(worldMatrix);
@@ -2453,18 +2568,18 @@ BattleSceneManager.prototype.startScene = function(){
 		
 		_this._effksContextAttached.setProjectionMatrix(_this._camera.getProjectionMatrix().m);
 		_this._effksContextAttached.setCameraMatrix(BABYLON.Matrix.Invert(_this._camera.getWorldMatrix()).m);
-		_this._effksContextAttached.draw();
+		_this._effksContextAttached.draw();*/
 	});
 	
 	//background layer
 	this._scene.onAfterParticlesRenderingObservable.add(() => {//onAfterRenderObservable 
-		_this._effksContextBg.setProjectionMatrix(_this._camera.getProjectionMatrix().m);
-		_this._effksContextBg.setCameraMatrix(BABYLON.Matrix.Invert(_this._camera.getWorldMatrix()).m);
-		_this._effksContextBg.draw();
+		/*_this._effksContextBack.setProjectionMatrix(_this._camera.getProjectionMatrix().m);
+		_this._effksContextBack.setCameraMatrix(BABYLON.Matrix.Invert(_this._camera.getWorldMatrix()).m);
+		_this._effksContextBack.draw();
 		
-		_this._effksContextBgMirror.setProjectionMatrix(_this._camera.getProjectionMatrix().m);
-		_this._effksContextBgMirror.setCameraMatrix(BABYLON.Matrix.Invert(_this._camera.getWorldMatrix()).m);
-		_this._effksContextBgMirror.draw();
+		_this._effksContextBackMirror.setProjectionMatrix(_this._camera.getProjectionMatrix().m);
+		_this._effksContextBackMirror.setCameraMatrix(BABYLON.Matrix.Invert(_this._camera.getWorldMatrix()).m);
+		_this._effksContextBackMirror.draw();*/
 	});
 		
 	this._engine.runRenderLoop(function () {
@@ -2634,6 +2749,13 @@ BattleSceneManager.prototype.registerMatrixAnimation = function(type, targetObj,
 		startPosition = this.applyAnimationDirection(startPosition);
 		endPosition = this.applyAnimationDirection(endPosition);
 	}	
+	
+	if(!startPosition){
+		startPosition = new BABYLON.Vector3(0, 0, 0);
+	}
+	if(!endPosition){
+		endPosition = new BABYLON.Vector3(0, 0, 0);
+	}
 
 	if(easingFunction && easingMode){
 		easingFunction.setEasingMode(easingMode);
@@ -4051,6 +4173,19 @@ BattleSceneManager.prototype.executeAnimation = function(animation, startTick){
 				position = _this.applyAnimationDirection(params.position || new BABYLON.Vector3(0,0,0));
 			}
 			var scale = params.scale || 1;
+			let parts = String(scale).split(",");
+			let xScale;
+			let yScale;
+			let zScale;
+			if(parts.length > 1){
+				xScale = parts[0]*1 || 1;
+				yScale = parts[1]*1 || 1;
+				zScale = parts[2]*1 || 1;
+			} else {
+				xScale = scale;
+				yScale = scale;
+				zScale = scale;
+			}
 			//scale*=_this._animationDirection;
 			var speed = params.speed || 1;
 			var rotation = params.rotation || new BABYLON.Vector3(0,0,0);
@@ -4059,16 +4194,15 @@ BattleSceneManager.prototype.executeAnimation = function(animation, startTick){
 				rotation.x = rotation.x * 1 + Math.PI;
 			}*/
 			var targetContext;
-			if(params.autoRotate && _this._animationDirection == -1){
-				
+			if(params.autoRotate && _this._animationDirection == -1){				
 				if(params.isBackground * 1){
-					targetContext = _this._effksContextBgMirror;//_this._effksContextBg;
+					targetContext = _this._effksContextBackMirror;//_this._effksContextBack;
 				} else {
 					targetContext =  _this._effksContextMirror;//_this._effksContext;
 				}
 			} else {
 				if(params.isBackground * 1){
-					targetContext = _this._effksContextBg;
+					targetContext = _this._effksContextBack;
 				} else {
 					targetContext = _this._effksContext;
 				}
@@ -4105,7 +4239,7 @@ BattleSceneManager.prototype.executeAnimation = function(animation, startTick){
 				handle.setRotation(rotation.x, rotation.y, rotation.z);
 				handle.setLocation(position.x, position.y, position.z);
 				
-				handle.setScale(scale, scale, scale * (params.flipZ ? -1 : 1));
+				handle.setScale(xScale, yScale, zScale * (params.flipZ ? -1 : 1));
 			
 				info = {name: target, effect: effect, context: targetContext, offset: {x: position.x, y: position.y, z: position.z}, offsetRotation: {x: rotation.x, y: rotation.y, z: rotation.z}};
 				info.handle = handle;
@@ -5338,7 +5472,7 @@ BattleSceneManager.prototype.readBattleCache = async function() {
 			spriteInfo.path = imgPath+"/spine/";
 			spriteInfo.id = "main";
 		} else if(spriteType == "3D"){
-			spriteInfo.path = imgPath+"/3D/";
+			spriteInfo.path = imgPath+"/3d/";
 			spriteInfo.id = "main";
 		}
 		
@@ -5921,8 +6055,8 @@ BattleSceneManager.prototype.preloadEffekseerParticles = async function(){
 							promises.push(new Promise(function(resolve, reject){
 								_this._effksContext.loadEffect("effekseer/"+params.path+".efk", 1.0, resolve);	
 								_this._effksContextMirror.loadEffect("effekseer/"+params.path+".efk", 1.0, resolve);	
-								_this._effksContextBg.loadEffect("effekseer/"+params.path+".efk", 1.0, resolve);	
-								_this._effksContextBgMirror.loadEffect("effekseer/"+params.path+".efk", 1.0, resolve);	
+								_this._effksContextBack.loadEffect("effekseer/"+params.path+".efk", 1.0, resolve);	
+								_this._effksContextBackMirror.loadEffect("effekseer/"+params.path+".efk", 1.0, resolve);	
 								_this._effksContextAttached.loadEffect("effekseer/"+params.path+".efk", 1.0, resolve);	
 							}));
 						}								
@@ -5946,8 +6080,8 @@ BattleSceneManager.prototype.preloadEffekseerParticles = async function(){
 							promises.push(new Promise(function(resolve, reject){
 								_this._effksContext.loadEffect("effekseer/"+params.path+".efk", 1.0, resolve);	
 								_this._effksContextMirror.loadEffect("effekseer/"+params.path+".efk", 1.0, resolve);	
-								_this._effksContextBg.loadEffect("effekseer/"+params.path+".efk", 1.0, resolve);	
-								_this._effksContextBgMirror.loadEffect("effekseer/"+params.path+".efk", 1.0, resolve);	
+								_this._effksContextBack.loadEffect("effekseer/"+params.path+".efk", 1.0, resolve);	
+								_this._effksContextBackMirror.loadEffect("effekseer/"+params.path+".efk", 1.0, resolve);	
 								_this._effksContextAttached.loadEffect("effekseer/"+params.path+".efk", 1.0, resolve);	
 							}));
 						}								

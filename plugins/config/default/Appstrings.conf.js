@@ -492,6 +492,8 @@ EDITORSTRINGS.GENERAL = {
 	hint_copy: "Copy this entry",
 	hint_erase: "Erase this entry",
 	
+	hint_animating: "An animation is playing",
+	
 	confirm_remove_entries: "Reducing the entry count to this number will discard existing entries. This cannot be undone! Continue?",
 	
 	label_general: "General",
