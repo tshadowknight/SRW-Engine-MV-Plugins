@@ -115,7 +115,20 @@ StatCalc.prototype.getReferenceEventId = function(actor){
 
 StatCalc.prototype.canStandOnTile = function(actor, position){
 	if(this.isActorSRWInitialized(actor)){
-		return this.canBeOnTerrain(actor, $gameMap.regionId(position.x, position.y) % 8);
+		const currentTerrain = $gameMap.regionId(position.x, position.y) % 8;
+		const baseTerrainOK = this.canBeOnTerrain(actor, currentTerrain);
+		const currentSuperStateOK = this.getValidSuperStatesLookup(actor, position)[this.getSuperState(actor)];
+		
+		let hasTransitionToValidSuperState = false;
+		
+		let transitions = this.getValidSuperStates(actor, position);
+		for(let transition of transitions){
+			if((transition.startState == currentTerrain || transition.startState == -1) && this.canBeOnTerrain(actor, transition.endState)){
+				hasTransitionToValidSuperState = true;
+			}
+		}
+		
+		return baseTerrainOK || currentSuperStateOK || hasTransitionToValidSuperState;		
 	} 
 	return false;	
 }
@@ -143,7 +156,7 @@ StatCalc.prototype.getValidTerrainStates = function(actor, position){
 		if(this.canBeOnTerrain(actor, terrain)){
 			availableStates[terrain] = true;
 		}
-		let availableSuperStateTransitions = this.getValidSuperStates(actor);	
+		let availableSuperStateTransitions = this.getValidSuperStates(actor, position);	
 		for(let transition of availableSuperStateTransitions){
 			if(transition.endState != -1){
 				availableStates[transition.endState] = true;
@@ -4068,7 +4081,7 @@ StatCalc.prototype.canBeOnTerrain = function(actor, terrain){
 	if(this.isActorSRWInitialized(actor) && actor.SRWStats.mech.enabledTerrainTypes){
 		let terrainDef = $terrainTypeManager.getTerrainDefinition(terrain);
 		var validTwin = true;
-		if(actor.subTwin && !(actor.subTwin.SRWStats.enabledTerrainTypes[terrain] * 1 || this.applyStatModsToValue(actor.subTwin, 0, [terrainDef.abilityName]))){
+		if(actor.subTwin && !(actor.subTwin.SRWStats.mech.enabledTerrainTypes[terrain] * 1 || this.applyStatModsToValue(actor.subTwin, 0, [terrainDef.abilityName]))){
 			validTwin = false;
 		}
 		if(actor.isSubTwin){
@@ -4091,15 +4104,24 @@ StatCalc.prototype.isTerrainSuperState = function(actor, terrain){
 	}
 }
 
-StatCalc.prototype.getValidSuperStates = function(actor){
-	return this.getAvailableSuperStateTransitions(actor, true);
+StatCalc.prototype.getValidSuperStates = function(actor, position){
+	return this.getAvailableSuperStateTransitions(actor, position, true);
 }
 
-StatCalc.prototype.getAvailableSuperStateTransitions = function(actor, fromBaseTerrain){
+StatCalc.prototype.getValidSuperStatesLookup = function(actor, position){
+	let result = {};
+	const transitions =  this.getAvailableSuperStateTransitions(actor, position, true);
+	for(let transition of transitions){
+		result[transition.endState] = true;
+	}
+	return result;
+}
+
+StatCalc.prototype.getAvailableSuperStateTransitions = function(actor, position, fromBaseTerrain){
 	let result = [];
 	let supersedingResult = [];
 	if(this.isActorSRWInitialized(actor)){
-		let currentTerrain = this.getCurrentRawTerrainIdx(actor);
+		let currentTerrain = $gameMap.regionId(position.x, position.y) % 8;
 		let terrainDef = $terrainTypeManager.getTerrainDefinition(currentTerrain);		
 		let currentSuperState = actor.SRWStats.mech.enabledTerrainSuperState;
 		if(fromBaseTerrain){//for checking if a super state is valid for a unit on the current terrain, ignoring its current super state

@@ -756,23 +756,7 @@
 						actor_unit = $gameActors.actor(actorId);
 					}
 					if (actor_unit) {
-						actor_unit.event = event;
-						_this.pushSrpgAllActors(event.eventId());
-						event.isDeployed = true;
-						var bitmap = ImageManager.loadFace(actor_unit.faceName()); //顔グラフィックをプリロードする
-						var oldValue = $gameVariables.value(_existShipVarId);
-						$gameVariables.setValue(_existShipVarId, oldValue + 1);
-						_this.setEventToUnit(event.eventId(), 'actor', actor_unit.actorId());
-						$statCalc.initSRWStats(actor_unit);
-						actor_unit.setSrpgTurnEnd(false);	
-						
-						if(toAnimQueue){				
-							$gameTemp.enemyAppearQueue.push(event);
-							event.erase();
-						} else {
-							event.appear();
-							$gameMap.setEventImages();			
-						}
+						_this.deployActor(actor_unit, event, toAnimQueue);
 					} else {
 						event.erase();
 					}
