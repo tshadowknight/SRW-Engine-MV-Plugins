@@ -349,7 +349,11 @@
 				}
 				
 				if (command === 'setSkyBattleEnv') {
-					$gameSystem.skyBattleEnv = args[0];
+					$gameSystem.superStateBattleEnv[1] = args[0];
+				}
+				
+				if (command === 'setSuperStateBattleEnv') {
+					$gameSystem.superStateBattleEnv[args[0]] = args[1];
 				}
 				
 				if (command === 'setRegionBattleEnv') {
@@ -357,7 +361,17 @@
 				}
 				
 				if (command === 'setRegionSkyBattleEnv') {
-					$gameSystem.regionSkyBattleEnv[args[0]] = args[1];
+					if(!$gameSystem.regionSuperStateBattleEnv[1]){
+						$gameSystem.regionSuperStateBattleEnv[1] = {};
+					}
+					$gameSystem.regionSuperStateBattleEnv[1][args[0]] = args[1];
+				}
+				
+				if (command === 'setRegionSuperStateBattleEnv') {
+					if(!$gameSystem.regionSuperStateBattleEnv[args[0]]){
+						$gameSystem.regionSuperStateBattleEnv[args[0]] = {};
+					}
+					$gameSystem.regionSuperStateBattleEnv[args[0]][args[1]] = args[2];
 				}
 				
 				if (command === 'resetRegionAttributes') {			
@@ -704,14 +718,14 @@
 				
 				if (command === 'setEventFlying') {
 					var actor = $gameSystem.EventToUnit(args[0])[1];
-					if($statCalc.canFly(actor)){
-						$statCalc.setFlying(actor, true, (args[1] || 0) * 1);
+					if($statCalc.canBeOnTerrain(actor, 1)){
+						$statCalc.setSuperState(actor, 1, (args[1] || 0) * 1);
 					}			
 				}
 				
 				if (command === 'setEventLanded') {
 					var actor = $gameSystem.EventToUnit(args[0])[1];		
-					$statCalc.setFlying(actor, false,(args[1] || 0) * 1);						
+					$statCalc.setSuperState(actor, -1,(args[1] || 0) * 1);						
 				}
 				
 				if (command === 'enableFaction') {

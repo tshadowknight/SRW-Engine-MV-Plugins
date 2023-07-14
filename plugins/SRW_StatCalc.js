@@ -115,86 +115,85 @@ StatCalc.prototype.getReferenceEventId = function(actor){
 
 StatCalc.prototype.canStandOnTile = function(actor, position){
 	if(this.isActorSRWInitialized(actor)){
-		if($gameMap.regionId(position.x, position.y) % 8 == 0){//void
-			return false;
-		}
-		if($gameMap.regionId(position.x, position.y) % 8 == 1 && !this.isFlying(actor)){//air			
-			return false;						
-		}
-		if($gameMap.regionId(position.x, position.y) % 8 == 2 && !this.isFlying(actor)){//land
-			if(!this.canBeOnLand(actor)){				
-				return false;				
-			}
-		}
-		if($gameMap.regionId(position.x, position.y) % 8 == 3 && !this.isFlying(actor)){//water
-			if(!this.canBeOnWater(actor)){				
-				return false;				
-			}
-		}
-		if($gameMap.regionId(position.x, position.y) % 8 == 4){//space
-			if(!this.canBeOnSpace(actor)){
-				return false;
-			}
-		}
-		return true;
+		return this.canBeOnTerrain(actor, $gameMap.regionId(position.x, position.y) % 8);
 	} 
 	return false;	
 }
 
 StatCalc.prototype.canStandOnTileAfterTransformation = function(actor, transformTarget){
-	var testActor = this.createEmptyActor();
-	var isFlying = this.isFlying(actor);
-	testActor.SRWStats = JSON.parse(JSON.stringify(actor.SRWStats));
-	testActor.SRWStats.mech = this.getMechDataById(transformTarget, true);
-	testActor.SRWStats.mech.items = actor.SRWStats.mech.items;
-	var event = this.getReferenceEvent(actor);
-	testActor.event = event;
-	this.invalidateAbilityCache(actor);
-	if(this.canFly(testActor)){
-		this.setFlying(testActor, true, true);
-	}	
-	return this.canStandOnTile(testActor, {x: event.posX(), y: event.posY()});
+	if(transformTarget){
+		var testActor = this.createEmptyActor();
+		testActor.SRWStats = JSON.parse(JSON.stringify(actor.SRWStats));
+		testActor.SRWStats.mech = this.getMechDataById(transformTarget, true);
+		testActor.SRWStats.mech.items = actor.SRWStats.mech.items;
+		var event = this.getReferenceEvent(actor);
+		testActor.event = event;
+		this.invalidateAbilityCache(actor);
+		return this.canStandOnTile(testActor, {x: event.posX(), y: event.posY()});
+	} else {
+		return false;
+	}
 }
 
-StatCalc.prototype.updateFlightState = function(actor, noSE){
+StatCalc.prototype.getValidTerrainStates = function(actor, position){
+	let result = {};
+	if(this.isActorSRWInitialized(actor)){		
+		let terrain = $gameMap.regionId(position.x, position.y) % 8;
+		let availableStates = {};	
+		if(this.canBeOnTerrain(actor, terrain)){
+			availableStates[terrain] = true;
+		}
+		let availableSuperStateTransitions = this.getValidSuperStates(actor);	
+		for(let transition of availableSuperStateTransitions){
+			if(transition.endState != -1){
+				availableStates[transition.endState] = true;
+			}
+		}
+		result = availableStates;				
+	} 	
+	return result;
+}
+
+StatCalc.prototype.getBestSuperState = function(possibleStates){
+	let result = {
+		isSuperseding: false,
+		id: -1
+	};
+	if(possibleStates.length){
+		let terrainDef = $terrainTypeManager.getTerrainDefinition(possibleStates[0]);
+		let currentPriority = terrainDef.priority;
+		let currentSupersedingPriority = terrainDef.supersedingPriority;		
+		result.id = possibleStates[0];
+		result.isSuperseding = currentSupersedingPriority > 0;
+		for(let i = 1; i < possibleStates.length; i++){
+			terrainDef = $terrainTypeManager.getTerrainDefinition(possibleStates[i]);
+			let newPriotity = terrainDef.priority;
+			let newSupersedingPriority = terrainDef.supersedingPriority;
+			if(newSupersedingPriority > currentSupersedingPriority){
+				result.id = possibleStates[i];
+				result.isSuperseding = true;
+				currentSupersedingPriority = newSupersedingPriority;
+			}
+			if(currentSupersedingPriority < 1){
+				if(newPriotity > currentPriority){
+					result.id = possibleStates[i];
+					currentPriority = newPriotity;
+				}
+			}			
+		}		
+	}
+	return result;
+}
+
+StatCalc.prototype.updateSuperState = function(actor, noSE, forceUpgrade){
 	if(this.isActorSRWInitialized(actor)){
-		var event = this.getReferenceEvent(actor);
-		if(event){
-			if(!this.canHover(actor) && actor.SRWStats.stageTemp.isHovering){
-				actor.SRWStats.stageTemp.isHovering = false;
-			}
-			
-			if(!this.canFly(actor)){
-				this.setFlying(actor, false, noSE);
-			}
-			
-			var position = {x: event.posX(), y: event.posY()};
-			if($gameMap.regionId(position.x, position.y) % 8 == 1){//air
-				if(this.canFly(actor)){
-					if(!this.isFlying(actor)){
-						this.setFlying(actor, true, noSE);
-					}
-				}		
-			}
-			if($gameMap.regionId(position.x, position.y) % 8 == 2){//land
-				if(!this.canBeOnLand(actor)){
-					if(this.canFly(actor)){
-						if(!this.isFlying(actor)){
-							this.setFlying(actor, true, noSE);
-						}
-					} 
-				}
-			}
-			if($gameMap.regionId(position.x, position.y) % 8 == 3){//water
-				if(this.canHover(actor)){
-					actor.SRWStats.stageTemp.isHovering = true;
-				} else if(!this.canBeOnWater(actor)){
-					if(this.canFly(actor)){
-						if(!this.isFlying(actor)){
-							this.setFlying(actor, true, noSE);
-						}
-					} 
-				}
+		const event = this.getReferenceEvent(actor);
+		if(event){			
+			const position = {x: event.posX(), y: event.posY()};			
+			let validStates = this.getValidTerrainStates(actor, position);
+			let bestStateInfo = this.getBestSuperState(Object.keys(validStates));
+			if(bestStateInfo.isSuperseding || !validStates[this.getCurrentTerrainIdx(actor)] || forceUpgrade){//preserve the current super state if it still valid				
+				this.setSuperState(actor, bestStateInfo.id, noSE);
 			}		
 		}		
 	} 	
@@ -320,14 +319,49 @@ StatCalc.prototype.updateTerrainInfo = function(actor){
 	}
 }
 
+StatCalc.prototype.getCurrentRawTerrainIdx = function(actor){
+	if(this.isActorSRWInitialized(actor)){	
+		let referenceEvent = this.getReferenceEvent(actor);	
+		if(referenceEvent){
+			return $gameMap.regionId(referenceEvent.posX(), referenceEvent.posY()) % 8;
+		}					
+	}		
+	return 0;
+}
+
+StatCalc.prototype.getCurrentTerrainIdx = function(actor){
+	let result = 0;
+	if(this.isActorSRWInitialized(actor)){
+		if(actor.SRWStats.mech.enabledTerrainSuperState != -1){
+			result = actor.SRWStats.mech.enabledTerrainSuperState;
+		} else {
+			let referenceEvent = this.getReferenceEvent(actor);	
+			if(referenceEvent){
+				result = $gameMap.regionId(referenceEvent.posX(), referenceEvent.posY()) % 8;
+			}
+		}				
+	}		
+	return result;
+}
+
+StatCalc.prototype.getCurrentAliasedTerrainIdx = function(actor){
+	let result = this.getCurrentTerrainIdx(actor);
+	let terrainDef = $terrainTypeManager.getTerrainDefinition(result);
+	if(terrainDef.alias){
+		result = terrainDef.alias;
+	}
+	return result;
+}
+
 StatCalc.prototype.getCurrentTerrain = function(actor){
 	if(this.isActorSRWInitialized(actor)){
-		if(this.isFlying(actor)){
-			return this._terrainStringLookup[1];
-		} else {
-			this.updateTerrainInfo(actor);
-			return actor.SRWStats.mech.currentTerrain;
-		}		
+		return this._terrainStringLookup[this.getCurrentTerrainIdx(actor)];		
+	}		
+}
+
+StatCalc.prototype.getCurrentAliasedTerrain = function(actor){
+	if(this.isActorSRWInitialized(actor)){
+		return this._terrainStringLookup[this.getCurrentAliasedTerrainIdx(actor)];		
 	}		
 }
 
@@ -341,7 +375,8 @@ StatCalc.prototype.getCurrentTerrainMods = function(actor){
 StatCalc.prototype.getCurrentMoveCost = function(actor){
 	if(this.isActorSRWInitialized(actor)){
 		var event = this.getReferenceEvent(actor);
-		return $gameSystem.getTerrainMoveCosts()[this.getCurrentTerrain(actor)] * event.lastMoveCount;
+		var moveCost = $terrainTypeManager.getTerrainDefinition(this.getCurrentTerrainIdx(actor)).moveCost;
+		return moveCost * event.lastMoveCount; 
 	} else {
 		return 0;
 	}	
@@ -805,8 +840,7 @@ StatCalc.prototype.resetStageTemp = function(actor){
 			isEssential: false,
 			additionalActions: 0,
 			disabledTurn: -1,
-			popUpAnimsPlayed: {},
-			isHovering: !!this.canHover(actor)
+			popUpAnimsPlayed: {}
 		};
 		this.resetStatus(actor);
 	}
@@ -1482,7 +1516,7 @@ StatCalc.prototype.initSRWStats = function(actor, level, itemIds, preserveVolati
 	if(mech){
 		var previousWeapons = [];
 		var previousStats;
-		var previousFlightState;
+		var previousSuperState;
 		var previousCombineInfo;
 		var previousBoarded;
 		var customStats;
@@ -1493,7 +1527,7 @@ StatCalc.prototype.initSRWStats = function(actor, level, itemIds, preserveVolati
 				if(preserveVolatile){
 					previousWeapons = actor.SRWStats.mech.weapons;
 				}
-				previousFlightState = actor.SRWStats.mech.isFlying;
+				previousSuperState = actor.SRWStats.mech.enabledTerrainSuperState;
 				previousCombineInfo = actor.SRWStats.mech.combineInfo;
 				previousBoarded = actor.SRWStats.mech.unitsOnBoard;
 				customStats = actor.SRWStats.mech.stats.custom;
@@ -1521,8 +1555,8 @@ StatCalc.prototype.initSRWStats = function(actor, level, itemIds, preserveVolati
 					actor.SRWStats.mech.stats.calculated[stat] = customStats[stat];
 				});
 			}
-			if(previousFlightState){
-				actor.SRWStats.mech.isFlying = previousFlightState;
+			if(previousSuperState != null){
+				actor.SRWStats.mech.enabledTerrainSuperState = previousSuperState;
 			}
 			if(previousCombineInfo){
 				actor.SRWStats.mech.combineInfo = previousCombineInfo;
@@ -1536,11 +1570,6 @@ StatCalc.prototype.initSRWStats = function(actor, level, itemIds, preserveVolati
 	}			
 	
 	if(!preserveVolatile){		
-		if(!isForActor){
-			if(this.canFly(actor)){
-				this.setFlying(actor, true, true);
-			}		
-		}	
 		if(actor.event && $dataMap){ //hacky solution to the initializer being called in context where either no event has been assigned to the actor(initial load of map, intermission) or where $dataMap has not loaded yet(loading save)
 			var validPosition = this.canStandOnTile(actor, {x: actor.event.posX(), y: actor.event.posY()});
 			if(!validPosition){
@@ -1622,8 +1651,6 @@ StatCalc.prototype.getMechData = function(mech, forActor, items, previousWeapons
 		id: -1,
 		isShip: false,
 		unitsOnBoard: [],
-		canFly: false,
-		isFlying: false,
 		currentTerrain: 0,
 		currentTerrainMods: {
 			defense: 0,
@@ -1674,12 +1701,17 @@ StatCalc.prototype.getMechData = function(mech, forActor, items, previousWeapons
 		result.classData = mech;
 		result.statsLabel = mechProperties.mechStatsLabel || "";
 		result.isShip = mechProperties.mechIsShip * 1;
-		result.canFly = mechProperties.mechAirEnabled * 1;
-		result.canLand = (mechProperties.mechLandEnabled || 0) * 1;
-		result.canWater = (mechProperties.mechWaterEnabled || 0) * 1;
-		result.canSpace = (mechProperties.mechSpaceEnabled || 0) * 1;
-		result.canHover =  (mechProperties.mechHoverEnabled || 0) * 1;
-		result.isFlying = mechProperties.mechAirEnabled * 1;
+		result.enabledTerrainTypes = {
+			1: mechProperties.mechAirEnabled * 1,
+			2: (mechProperties.mechLandEnabled || 0) * 1,
+			3: (mechProperties.mechWaterEnabled || 0) * 1,
+			4: (mechProperties.mechSpaceEnabled || 0) * 1,
+			5: (mechProperties.mechTerrain5Enabled || 0) * 1,
+			6: (mechProperties.mechTerrain6Enabled || 0) * 1,
+			7: (mechProperties.mechTerrain7Enabled || 0) * 1,
+			
+		};
+		result.enabledTerrainSuperState = -1;
 		result.id = mech.id;
 		result.expYield = parseInt(mechProperties.mechExpYield || 0);
 		result.PPYield = parseInt(mechProperties.mechPPYield || 0);
@@ -2273,11 +2305,13 @@ StatCalc.prototype.twin = function(actor, otherActor){
 			otherActor.event.erase();
 			otherActor.event.isUnused = true;
 			otherActor.event = null;	
-			if(!this.canFly(actor) || !this.canFly(otherActor)){
-				this.setFlying(actor, false, true);
-				this.setFlying(otherActor, false, true);
+			let actorSuperState = this.getSuperState(actor);
+			let otherActorSuperState = this.getSuperState(otherActor);
+			if(!this.canBeInSuperState(actor, otherActorSuperState) || !this.canBeInSuperState(otherActor, actorSuperState)){
+				this.setSuperState(actor, -1, true);
+				this.setSuperState(otherActor, -1, true);
 			}
-			
+
 			//this invalidation and reload ensures that the spawned unit has its stats calculated with abilities taken into account
 			this.invalidateAbilityCache();
 			this.reloadSRWStats(actor, true);
@@ -2434,7 +2468,6 @@ StatCalc.prototype.transform = function(actor, idx, force, forcedId, noRestore){
 			var previousHPRatio = calculatedStats.currentHP / calculatedStats.maxHP;
 			var previousENRatio = calculatedStats.currentEN / calculatedStats.maxEN;
 			var unitsOnBoard = actor.SRWStats.mech.unitsOnBoard;
-			var isFlying = this.isFlying(actor);
 			var restoreInfo = actor.SRWStats.mech.transformRestores || {HP: false, EN: false};
 			var transformIntoId = actor.SRWStats.mech.transformsInto[idx];
 			if(forcedId){
@@ -2462,13 +2495,7 @@ StatCalc.prototype.transform = function(actor, idx, force, forcedId, noRestore){
 				}			
 				
 				actor.SRWStats.mech.unitsOnBoard = unitsOnBoard;
-				if(this.canFly(actor)){
-					this.setFlying(actor, isFlying, true);
-				} else {
-					this.setFlying(actor, false, true);
-				}
-				
-				
+							
 				calculatedStats = this.getCalculatedMechStats(actor);
 				if(!restoreInfo.HP || !noRestore){				
 					calculatedStats.currentHP = Math.round(previousHPRatio * calculatedStats.maxHP);
@@ -2496,7 +2523,7 @@ StatCalc.prototype.transform = function(actor, idx, force, forcedId, noRestore){
 					}			
 				});					
 				this.invalidateAbilityCache(actor);
-				this.updateFlightState(actor);
+				this.updateSuperState(actor);
 			}			
 		}		
 	}
@@ -2611,14 +2638,13 @@ StatCalc.prototype.split = function(actor){
 	if(this.isActorSRWInitialized(actor) && actor.isActor()){
 		var combineInfo = actor.combineInfo;
 		var targetActor = actor;
-		const isFlying = this.isFlying(actor);
 		var calculatedStats = this.getCalculatedMechStats(actor);
 		var combinedHPRatio = calculatedStats.currentHP / calculatedStats.maxHP;
 		var combinedENRatio = calculatedStats.currentEN / calculatedStats.maxEN;
 		
 		var subPilots = JSON.parse(JSON.stringify(targetActor.SRWStats.mech.subPilots));
 		
-		const startFromMechId = actor._classId;
+		const startFromMechId = actor.SRWStats.mech.id;
 		/*targetActor.SRWStats.mech = this.getMechData(actor.currentClass(), true);
 		this.calculateSRWMechStats(targetActor.SRWStats.mech);	*/	
 		
@@ -2636,7 +2662,7 @@ StatCalc.prototype.split = function(actor){
 				
 				var actionsResult = this.applyDeployActions(combineInfo.participants[i], actor.reversalInfo[startFromMechId]);
 				if(!actionsResult){//if no deploy actions are assigned to main split target
-					actor.SRWStats.mech = this.getMechDataById(combinesFrom[i], true);
+					actor.SRWStats.mech = this.getMechDataById(actor.reversalInfo[startFromMechId], true);
 					this.calculateSRWMechStats(actor.SRWStats.mech);					
 				}			
 				actor.isSubPilot = false;
@@ -2679,10 +2705,7 @@ StatCalc.prototype.split = function(actor){
 				calculatedStats.currentHP = Math.round(combinedHPRatio * calculatedStats.maxHP);
 				calculatedStats.currentEN = Math.round(combinedENRatio * calculatedStats.maxEN);	
 				
-				if(isFlying){
-					this.setFlying(actor, true, true);
-				}
-				this.updateFlightState(actor);	
+				this.updateSuperState(actor);	
 				//
 			}
 		}				
@@ -2699,7 +2722,7 @@ StatCalc.prototype.combine = function(actor, forced){
 			var ENRatioSum = 0;
 			var ENRatioCount = 0;
 			var combinesInto = combineResult.combinesInto;
-			let hasFlyer = false;
+			let potentialSuperStates = {}; 
 			
 			for(var i = 0; i < combineResult.participants.length; i++){
 				var combineActor = $gameActors.actor(combineResult.participants[i]);
@@ -2714,9 +2737,7 @@ StatCalc.prototype.combine = function(actor, forced){
 				HPRatioCount++;
 				ENRatioSum+=calculatedStats.currentEN / calculatedStats.maxEN;
 				ENRatioCount++;	
-				if(this.isFlying(combineActor)){
-					hasFlyer++;
-				}
+				potentialSuperStates[this.getSuperState(combineActor)] = true;
 			}
 			
 			var targetMechData = this.getMechDataById(combinesInto, true);
@@ -2753,8 +2774,18 @@ StatCalc.prototype.combine = function(actor, forced){
 			targetActor.initImages(targetActor.SRWStats.mech.classData.meta.srpgOverworld.split(","));
 			targetActor.event.refreshImage();
 			
-			this.setFlying(targetActor, hasFlyer, true);
-			this.updateFlightState(targetActor);
+			//this.setSuperState(targetActor, hasFlyer, true);
+			let sortedStates = Object.keys(potentialSuperStates).sort((a,b) => {return $terrainTypeManager.getTerrainDefinition(b).priority - $terrainTypeManager.getTerrainDefinition(a).priority});
+			let newState = -1;
+			let ctr = 0;
+			while(newState == -1 && ctr < sortedStates.length){
+				if(this.canBeOnTerrain(targetActor, sortedStates[ctr])){
+					newState = sortedStates[ctr];
+				}
+				ctr++;
+			}
+			this.setSuperState(targetActor, newState);
+			this.updateSuperState(targetActor, false);
 		}		
 	}
 }
@@ -4014,7 +4045,7 @@ StatCalc.prototype.getCurrentMoveRange = function(actor){
 			totalMove = 1;
 		}
 		
-		var moveCost = $gameSystem.getTerrainMoveCosts()[this.getCurrentTerrain(actor)];
+		var moveCost = $terrainTypeManager.getTerrainDefinition(this.getCurrentTerrainIdx(actor)).moveCost;
 		if(moveCost > 0){
 			var currentEN = this.getCurrenEN(actor);
 			var maxMove = Math.floor(currentEN / moveCost);
@@ -4033,101 +4064,249 @@ StatCalc.prototype.getCurrentMoveRange = function(actor){
 	}		
 }
 
-StatCalc.prototype.canBeOnLand = function(actor){
-	if(this.isActorSRWInitialized(actor)){
-		return actor.SRWStats.mech.canLand * 1 || this.applyStatModsToValue(actor, 0, ["land_enabled"]);
-	} else {
-		return false;
-	}		
-}
-
-StatCalc.prototype.canBeOnWater = function(actor){
-	if(this.isActorSRWInitialized(actor)){
-		return actor.SRWStats.mech.canWater * 1 || this.applyStatModsToValue(actor, 0, ["water_enabled"]) || this.canHover(actor);
-	} else {
-		return false;
-	}		
-}
-
-StatCalc.prototype.canHover = function(actor){
-	if(this.isActorSRWInitialized(actor)){
-		return this.applyStatModsToValue(actor, 0, ["is_hover"]) || actor.SRWStats.mech.canHover;
-	} else {
-		return false;
-	}		
-}
-
-StatCalc.prototype.hoversOnWater = function(actor){
-	if(this.isActorSRWInitialized(actor)){
-		return actor.SRWStats.stageTemp.isHovering;
-	} else {
-		return false;
-	}		
-}
-
-StatCalc.prototype.canBeOnSpace = function(actor){
-	if(this.isActorSRWInitialized(actor)){
-		return actor.SRWStats.mech.canSpace * 1 || this.applyStatModsToValue(actor, 0, ["space_enabled"]);
-	} else {
-		return false;
-	}		
-}
-
-StatCalc.prototype.canFly = function(actor){
-	if(this.isActorSRWInitialized(actor)){
+StatCalc.prototype.canBeOnTerrain = function(actor, terrain){
+	if(this.isActorSRWInitialized(actor) && actor.SRWStats.mech.enabledTerrainTypes){
+		let terrainDef = $terrainTypeManager.getTerrainDefinition(terrain);
 		var validTwin = true;
-		if(actor.subTwin && !(actor.subTwin.SRWStats.mech.canFly * 1 || this.applyStatModsToValue(actor.subTwin, 0, ["fly"]))){
+		if(actor.subTwin && !(actor.subTwin.SRWStats.enabledTerrainTypes[terrain] * 1 || this.applyStatModsToValue(actor.subTwin, 0, [terrainDef.abilityName]))){
 			validTwin = false;
 		}
 		if(actor.isSubTwin){
 			var mainTwin = this.getMainTwin(actor);
-			if(mainTwin && !(mainTwin.SRWStats.mech.canFly * 1 || this.applyStatModsToValue(mainTwin, 0, ["fly"]))){
+			if(mainTwin && !(mainTwin.SRWStats.mech.enabledTerrainTypes[terrain] * 1 || this.applyStatModsToValue(mainTwin, 0, [terrainDef.abilityName]))){
 				validTwin = false;
 			}
 		}
-		return ((actor.SRWStats.mech.canFly * 1 || this.applyStatModsToValue(actor, 0, ["fly"])) && this.getTileType(actor) != "space" && validTwin);
+		return ((actor.SRWStats.mech.enabledTerrainTypes[terrain] * 1 || this.applyStatModsToValue(actor, 0, [terrainDef.abilityName])) && validTwin);
 	} else {
 		return false;
-	}		
+	}
 }
 
-StatCalc.prototype.isFlying = function(actor){
+StatCalc.prototype.isTerrainSuperState = function(actor, terrain){
 	if(this.isActorSRWInitialized(actor)){
-		return actor.SRWStats.mech.isFlying;
+		return actor.SRWStats.mech.enabledTerrainSuperState == terrain;
 	} else {
 		return false;
-	}		
+	}
 }
 
-StatCalc.prototype.setFlying = function(actor, newVal, noSE){
+StatCalc.prototype.getValidSuperStates = function(actor){
+	return this.getAvailableSuperStateTransitions(actor, true);
+}
+
+StatCalc.prototype.getAvailableSuperStateTransitions = function(actor, fromBaseTerrain){
+	let result = [];
+	let supersedingResult = [];
 	if(this.isActorSRWInitialized(actor)){
-		actor.SRWStats.mech.isFlying = newVal;
-		if(!noSE){
-			if(newVal){
-				var se = {};
-				se.name = "SRWFloat";
-				se.pan = 0;
-				se.pitch = 100;
-				se.volume = 80;
-				AudioManager.playSe(se);
-			} else {
-				if(this.getCurrentTerrain(actor) == "water"){
-					var se = {};
-					se.name = "SRWSubmerge";
-					se.pan = 0;
-					se.pitch = 100;
-					se.volume = 80;
-					AudioManager.playSe(se);
+		let currentTerrain = this.getCurrentRawTerrainIdx(actor);
+		let terrainDef = $terrainTypeManager.getTerrainDefinition(currentTerrain);		
+		let currentSuperState = actor.SRWStats.mech.enabledTerrainSuperState;
+		if(fromBaseTerrain){//for checking if a super state is valid for a unit on the current terrain, ignoring its current super state
+			currentSuperState = -1;
+		}
+		let rules = terrainDef.superStateRules || [];
+		let currentSupersedingPriority = 0;
+		for(let rule of rules){
+			let currentTerrainValid = (rule.currentTerrain == null || currentTerrain == rule.currentTerrain);
+			let currentSuperStateValue = (currentSuperState == rule.startState);
+			if(currentTerrainValid && currentSuperStateValue && ((rule.endState == -1 && this.canBeOnTerrain(actor, currentTerrain)) || this.canBeOnTerrain(actor, rule.endState))){
+				let candidateTerrainDef;
+				if(rule.endState == -1){
+					candidateTerrainDef = terrainDef;
 				} else {
+					candidateTerrainDef = $terrainTypeManager.getTerrainDefinition(rule.endState);	
+				}
+					
+				if(candidateTerrainDef.supersedingPriority > 0){
+					supersedingResult.push(rule);
+				} else {
+					result.push(rule);
+				}
+				
+			}
+		}
+		if(supersedingResult.length){
+			let tmp = [];
+			let usedEndStates = {};
+			for(let rule of supersedingResult){
+				if(!usedEndStates[rule.endState]){
+					usedEndStates[rule.endState] = true;
+					tmp.push(rule);
+				}
+			}
+			return tmp;
+		} else {
+			return result;
+		}
+		
+	} else {
+		return result;
+	}
+}
+
+StatCalc.prototype.getAvailableSuperStateCommand = function(actor){
+	if(this.isActorSRWInitialized(actor)){
+		let currentTerrain = this.getCurrentRawTerrainIdx(actor);
+		let terrainDef = $terrainTypeManager.getTerrainDefinition(currentTerrain);		
+		let currentSuperState = actor.SRWStats.mech.enabledTerrainSuperState;
+		let rules = terrainDef.superStateRules || [];
+		let command;
+		for(let rule of rules){
+			let currentTerrainValid = (rule.currentTerrain == null || currentTerrain == rule.currentTerrain);
+			let currentSuperStateValue = (currentSuperState == rule.startState);
+			if(currentTerrainValid && currentSuperStateValue && ((rule.endState == -1 && this.canBeOnTerrain(actor, currentTerrain)) || this.canBeOnTerrain(actor, rule.endState))){
+				command = rule;
+			}
+		}
+		return command;
+	} else {
+		return null;
+	}
+}
+
+StatCalc.prototype.resolveTerrainRules = function(actor, rules){
+	let result = false;
+	let ctr = 0;
+	while(!result && ctr < rules.length){
+		result = true;
+		let innerCtr = 0;
+		while(result && innerCtr < rules[ctr].length){
+			let rule = rules[ctr][innerCtr];
+			if(rule.type == "terrainEnabled"){
+				result = this.canBeOnTerrain(actor, rule.value);
+			} else if(rule.type == "superState"){
+				result = this.isTerrainSuperState(actor, rule.value);
+			}
+			innerCtr++;
+		}
+		
+		ctr++;
+	}
+	return result;
+}
+
+StatCalc.prototype.canEnterTerrain = function(actor, terrain){
+	if(terrain == 0){
+		return false;
+	}
+	if(this.isActorSRWInitialized(actor)){
+		let terrainDef = $terrainTypeManager.getTerrainDefinition(terrain);
+		let entryRulesResult = this.resolveTerrainRules(actor, terrainDef.entryRules);
+		let entryForbiddenRuleResult = this.resolveTerrainRules(actor, terrainDef.entryForbiddenRules);
+		return entryRulesResult && !entryForbiddenRuleResult;
+	} else {
+		return false;
+	}
+}
+
+StatCalc.prototype.isRegionBlocked = function(actor, region){
+	if(this.isActorSRWInitialized(actor)){
+		let currentTerrain = this.getCurrentTerrainIdx(actor);
+		let terrainDef = $terrainTypeManager.getTerrainDefinition(currentTerrain);
+		return terrainDef.regionBlackList.indexOf(region) != -1;
+	} else {
+		return false;
+	}
+}
+
+StatCalc.prototype.getFlyingAnimInfo = function(actor){
+	if(this.isActorSRWInitialized(actor)){
+		let currentTerrain = this.getCurrentTerrainIdx(actor);
+		if(this.canBeOnTerrain(actor, currentTerrain)){
+			let terrainDef = $terrainTypeManager.getTerrainDefinition(currentTerrain);		
+			return terrainDef.displaysFlying;
+		}		
+	}
+	return false;	
+}
+
+
+StatCalc.prototype.ignoresTerrainCollision = function(actor, regionIdx){
+	if(this.isActorSRWInitialized(actor)){
+		let currentTerrain = this.getCurrentTerrainIdx(actor);
+		let terrainDef = $terrainTypeManager.getTerrainDefinition(currentTerrain);		
+		if(Array.isArray(terrainDef.ignoresTerrainCollision)){
+			return terrainDef.ignoresTerrainCollision.indexOf(regionIdx) != -1;
+		} else {
+			return terrainDef.ignoresTerrainCollision;
+		}		
+	} else {
+		return false;
+	}
+}
+
+StatCalc.prototype.ignoresTerrainCost = function(actor, regionIdx){
+	if(this.isActorSRWInitialized(actor)){
+		let currentTerrain = this.getCurrentTerrainIdx(actor);
+		let terrainDef = $terrainTypeManager.getTerrainDefinition(currentTerrain);		
+		if(Array.isArray(terrainDef.ignoresTerrainCost)){
+			return terrainDef.ignoresTerrainCost.indexOf(regionIdx) != -1;
+		} else {
+			return terrainDef.ignoresTerrainCost;
+		}		
+	} else {
+		return false;
+	}		
+}
+
+StatCalc.prototype.canAttackOnCurrentTerrain = function(actor){
+	if(this.isActorSRWInitialized(actor)){
+		let currentTerrain = this.getCurrentTerrainIdx(actor);
+		let terrainDef = $terrainTypeManager.getTerrainDefinition(currentTerrain);		
+		return terrainDef.canAttack;		
+	} else {
+		return true;
+	}		
+}
+
+StatCalc.prototype.canBeTargetedOnCurrentTerrain = function(actor){
+	if(this.isActorSRWInitialized(actor)){
+		let currentTerrain = this.getCurrentTerrainIdx(actor);
+		let terrainDef = $terrainTypeManager.getTerrainDefinition(currentTerrain);		
+		return terrainDef.canBeTargeted;		
+	} else {
+		return true;
+	}		
+}
+
+StatCalc.prototype.isBattleShadowHiddenOnCurrentTerrain = function(actor){
+	if(this.isActorSRWInitialized(actor)){
+		let currentTerrain = this.getCurrentTerrainIdx(actor);
+		let terrainDef = $terrainTypeManager.getTerrainDefinition(currentTerrain);		
+		return terrainDef.hideBattleShadows;		
+	} else {
+		return true;
+	}		
+}
+
+StatCalc.prototype.getSuperState = function(actor){
+	if(this.isActorSRWInitialized(actor)){
+		return actor.SRWStats.mech.enabledTerrainSuperState;
+	} else {
+		return -1;
+	}
+}
+
+StatCalc.prototype.canBeInSuperState = function(actor, state){
+	return this.canBeOnTerrain(actor, state);
+}
+
+StatCalc.prototype.setSuperState = function(actor, newVal, noSE, seName){
+	if(this.isActorSRWInitialized(actor)){
+		if(this.canBeOnTerrain(actor, newVal) || newVal == -1){
+			actor.SRWStats.mech.enabledTerrainSuperState = newVal || -1;//force false values to -1
+			if(!noSE){
+				if(se){
 					var se = {};
-					se.name = "SRWLand";
+					se.name = seName;
 					se.pan = 0;
 					se.pitch = 100;
 					se.volume = 80;
 					AudioManager.playSe(se);
-				}			
-			}
-		}		
+				}
+			}	
+		}				
 	} 		
 }	
 
@@ -5179,20 +5358,10 @@ StatCalc.prototype.hasSupportAttack = function(supportingActor){
 StatCalc.prototype.canSupportAttack = function(supportedActor, supportingActor){
 	var _this = this;
 	var result = false;
-	var terrain = this.getCurrentTerrain(supportedActor);
+	var terrainIdx = this.getCurrentAliasedTerrainIdx(supportedActor);
 	var maxSupportAttacks = $statCalc.applyStatModsToValue(supportingActor, 0, ["support_attack"]);
 	if(supportedActor != supportingActor && maxSupportAttacks > supportingActor.SRWStats.battleTemp.supportAttackCount && (!supportingActor.SRWStats.battleTemp.hasFinishedTurn || ENGINE_SETTINGS.ALLOW_TURN_END_SUPPORT) && !_this.isDisabled(supportingActor)){
-		var validTerrain = true;
-		if(terrain == "air"){
-			validTerrain = _this.canFly(supportingActor)
-		} else if(terrain == "land"){
-			validTerrain = _this.canBeOnLand(supportingActor)
-		} else if(terrain == "water"){
-			validTerrain = _this.canBeOnWater(supportingActor)
-		} else if(terrain == "space"){
-			validTerrain = _this.canBeOnSpace(supportingActor)
-		}
-		
+		var validTerrain = this.canBeOnTerrain(supportingActor, terrainIdx);			
 		if($gameSystem.isFriendly(supportingActor, $gameSystem.getFactionId(supportedActor)) && validTerrain){
 			result = true;
 		}				
@@ -5200,24 +5369,14 @@ StatCalc.prototype.canSupportAttack = function(supportedActor, supportingActor){
 	return result;
 }
 
-StatCalc.prototype.getSupportAttackCandidates = function(factionId, position, terrain, eventId, ignoreConditions){
+StatCalc.prototype.getSupportAttackCandidates = function(factionId, position, terrainIdx, eventId, ignoreConditions){
 	var _this = this;
 	var result = [];
 	this.iterateAllActors(null, function(actor, event){
 		if(!event.isErased() && (Math.abs(event.posX() - position.x) + Math.abs(event.posY() - position.y)) == 1 && (eventId == null || event.eventId() != eventId) && !actor.isSubTwin){
 			var maxSupportAttacks = $statCalc.applyStatModsToValue(actor, 0, ["support_attack"]);
 			if(ignoreConditions || (maxSupportAttacks > actor.SRWStats.battleTemp.supportAttackCount && (!actor.SRWStats.battleTemp.hasFinishedTurn || ENGINE_SETTINGS.ALLOW_TURN_END_SUPPORT) && !_this.isDisabled(actor))){
-				var validTerrain = true;
-				if(terrain == "air"){
-					validTerrain = _this.canFly(actor)
-				} else if(terrain == "land"){
-					validTerrain = _this.canBeOnLand(actor)
-				} else if(terrain == "water"){
-					validTerrain = _this.canBeOnWater(actor)
-				} else if(terrain == "space"){
-					validTerrain = _this.canBeOnSpace(actor)
-				}
-				
+				var validTerrain = _this.canBeOnTerrain(actor, terrainIdx);							
 				if($gameSystem.isFriendly(actor, factionId) && validTerrain){
 					result.push({actor: actor, pos: {x: event.posX(), y: event.posY()}});	
 				}				
@@ -5242,19 +5401,10 @@ StatCalc.prototype.canSupportDefend = function(supportedActor, supportingActor){
 	var _this = this;
 	var result = false;
 	if(this.isActorSRWInitialized(supportingActor) && this.isActorSRWInitialized(supportedActor)){
-		var terrain = this.getCurrentTerrain(supportedActor);
+		var terrainIdx = this.getCurrentAliasedTerrainIdx(supportedActor);
 		var maxSupportDefends = $statCalc.applyStatModsToValue(supportingActor, 0, ["support_defend"]);			
 		if(supportedActor != supportingActor && maxSupportDefends > supportingActor.SRWStats.battleTemp.supportDefendCount && !_this.isDisabled(supportingActor)){
-			var validTerrain = true;
-			if(terrain == "air"){
-				validTerrain = _this.canFly(supportingActor)
-			} else if(terrain == "land"){
-				validTerrain = _this.canBeOnLand(supportingActor)
-			} else if(terrain == "water"){
-				validTerrain = _this.canBeOnWater(supportingActor)
-			} else if(terrain == "space"){
-				validTerrain = _this.canBeOnSpace(supportingActor)
-			}
+			var validTerrain = this.canBeOnTerrain(supportingActor, terrainIdx);	
 			if($gameSystem.isFriendly(supportingActor, $gameSystem.getFactionId(supportedActor)) && validTerrain){
 				result = true;
 			}				
@@ -5263,23 +5413,14 @@ StatCalc.prototype.canSupportDefend = function(supportedActor, supportingActor){
 	return result;
 }
 	
-StatCalc.prototype.getSupportDefendCandidates = function(factionId, position, terrain, eventId){
+StatCalc.prototype.getSupportDefendCandidates = function(factionId, position, terrainIdx, eventId){
 	var _this = this;
 	var result = [];
 	this.iterateAllActors(null, function(actor, event){
 		if(!event.isErased() && (Math.abs(event.posX() - position.x) + Math.abs(event.posY() - position.y)) == 1 && (eventId == null || event.eventId() != eventId)){
 			var maxSupportDefends = $statCalc.applyStatModsToValue(actor, 0, ["support_defend"]);			
 			if(maxSupportDefends > actor.SRWStats.battleTemp.supportDefendCount && !_this.isDisabled(actor)){
-				var validTerrain = true;
-				if(terrain == "air"){
-					validTerrain = _this.canFly(actor)
-				} else if(terrain == "land"){
-					validTerrain = _this.canBeOnLand(actor)
-				} else if(terrain == "water"){
-					validTerrain = _this.canBeOnWater(actor)
-				} else if(terrain == "space"){
-					validTerrain = _this.canBeOnSpace(actor)
-				}
+				var validTerrain = _this.canBeOnTerrain(actor, terrainIdx);	;
 				if($gameSystem.isFriendly(actor, factionId) && validTerrain){
 					result.push({actor: actor, pos: {x: event.posX(), y: event.posY()}});
 				}				
@@ -5395,7 +5536,7 @@ StatCalc.prototype.getFinalTerrainString = function(actor, terrain){
 		if(terrain){
 			currentTerrain = terrain;
 		} else {
-			currentTerrain = this.getCurrentTerrain(actor);
+			currentTerrain = this.getCurrentAliasedTerrain(actor);
 		}		
 		var pilotTerrainLevel = actor.SRWStats.pilot.stats.calculated.terrain[currentTerrain];
 		var mechTerrainLevel = actor.SRWStats.mech.stats.calculated.terrain[currentTerrain]; 
@@ -6303,6 +6444,8 @@ StatCalc.prototype.getActiveStatMods = function(actor, excludedSkills){
 							
 							statMod.originType = actor.isActor() ? "actor" : "enemy";
 							statMod.originId = actor.SRWStats.pilot.id;
+							
+							statMod.originLevel = abilityDef.level;
 							
 							if(targetList){
 								targetList.push(statMod);

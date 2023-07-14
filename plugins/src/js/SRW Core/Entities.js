@@ -1181,12 +1181,54 @@
 				}
 			});
 		};
-
-		//移動範囲の計算
+	
 		Game_CharacterBase.prototype.makeMoveTable = function(x, y, move, route, actor) {
+			let moveBudget = {};
+			let terrainDefs = $terrainTypeManager.getDefinitions();
+			for(let terrainId in terrainDefs){
+				moveBudget[terrainId] = {
+					standard: move + 1,
+					extra: 0
+				}
+			}
+			let visitedNodes = {};
+			return this.makeMoveTableRecursive(x, y, moveBudget, visitedNodes, actor);
+		}
+		
+		Game_CharacterBase.prototype.updateMoveBudget = function(moveBudget, cost, fromTerrain) {
+			let result = {};
+			for(let terrainId in moveBudget){
+				if(moveBudget[terrainId].extra > 0 && terrainId == fromTerrain){
+					result[terrainId] = {
+						standard: moveBudget[terrainId].standard,
+						extra: Math.max(0, moveBudget[terrainId].extra - cost)
+					}
+				} else {
+					result[terrainId] = {
+						standard: Math.max(0, moveBudget[terrainId].standard - cost),
+						extra: moveBudget[terrainId].extra
+					}
+				}				
+				
+			}
+			return result;
+		}
+		
+		Game_CharacterBase.prototype.hasMoveBudgetRemaining = function(moveBudget) {
+			let result = false;
+			for(let terrainId in moveBudget){
+				if(moveBudget[terrainId].standard > 0){
+					result = true;
+				}
+			}
+			return result;
+		}
+		
+		//移動範囲の計算
+		Game_CharacterBase.prototype.makeMoveTableRecursive = function(x, y, moveBudget, visitedNodes, actor) {
 			var _this = this;
 			function isPassableTile(currentX, currentY, x, y, actor){
-				if(ENGINE_SETTINGS.USE_TILE_PASSAGE && !$statCalc.isFlying(actor)){
+				if(ENGINE_SETTINGS.USE_TILE_PASSAGE && !$statCalc.ignoresTerrainCollision(actor, $gameMap.regionId(x, y) % 8)){
 					var direction = 0;			
 					if(currentX == x){
 						if(currentY > y){
@@ -1215,18 +1257,15 @@
 				if($gameTemp._MoveTable[x][y] == undefined){
 					return false;
 				}
-				if($gameMap.regionId(x, y) % 8 == 1 && !$statCalc.isFlying(actor)){
+				
+				if(!$statCalc.canEnterTerrain(actor, $gameMap.regionId(x, y) % 8)){
 					return false;
 				}
-				if($gameMap.regionId(x, y) % 8 == 2 && !$statCalc.canBeOnLand(actor) && !$statCalc.isFlying(actor)){
+				
+				if($statCalc.isRegionBlocked(actor, $gameMap.regionId(x, y))){
 					return false;
 				}
-				if($gameMap.regionId(x, y) % 8 == 3 && !$statCalc.canBeOnWater(actor) && !$statCalc.isFlying(actor)){
-					return false;
-				}
-				if($gameMap.regionId(x, y) % 8 == 4 && !$statCalc.canBeOnSpace(actor)){
-					return false;
-				}
+				
 				if(!actor.isActor() && $gameSystem.enemySolidTerrain && $gameSystem.enemySolidTerrain[$gameMap.regionId(x, y)]){
 					return false;
 				}
@@ -1235,81 +1274,67 @@
 			
 			var currentRegion = $gameMap.regionId(x, y) % 8; //1 air, 2 land, 3 water, 4 space
 			var moveCost = 1;
-			if(route.length > 1){//no movecost for the start tile
+			if($gameTemp.moveList().length > 1){//no movecost for the start tile
 				var taggedCost = $gameMap.SRPGTerrainTag(x, y);
-				if(taggedCost > 1){
-					if(currentRegion == 4 || (!$statCalc.isFlying(actor) && !$statCalc.hoversOnWater(actor))){
+				if(taggedCost > 1){								
+					if(!$statCalc.ignoresTerrainCost(actor, currentRegion)){
 						moveCost = taggedCost;
-					}					
-					
+					}
 				}
-			}		
-
-			if(currentRegion == 3 && !$statCalc.isFlying(actor) && !$statCalc.hoversOnWater(actor)){
-				if($statCalc.canBeOnWater(actor, "water") < 2){
-					moveCost*=2;
-				}
-			} 		
+			}
 			
-			if (move <= 0) {
+			let terrainDef = $terrainTypeManager.getTerrainDefinition(currentRegion);	
+			if($statCalc.canBeOnTerrain(actor, currentRegion) < 2 && !$statCalc.ignoresTerrainCost(actor, currentRegion)){
+				moveCost*=terrainDef.moveCostMod;
+			}	
+			
+			if (!_this.hasMoveBudgetRemaining(moveBudget)) {
 				return;
 			}
-			//上方向を探索
-			if (route[route.length - 1] != 2) {
-				if (isPassableTile(x, y, x, y-1, actor)) {
-					if ($gameTemp.MoveTable(x, $gameMap.roundY(y - 1))[0] < move - moveCost) {
-						if ($gameTemp.MoveTable(x, $gameMap.roundY(y - 1))[0] < 0) {
-							$gameTemp.pushMoveList([x, $gameMap.roundY(y - 1), false]);
-						}
-						$gameTemp.setMoveTable(x, $gameMap.roundY(y - 1), move - moveCost, route.concat(8));
-						this.makeMoveTable(x, $gameMap.roundY(y - 1), move - moveCost, route.concat(8), actor);
+			$gameTemp.pushMoveList([x, y, false]);
+			
+			
+			let extraBudgetRefTerrain = $statCalc.getSuperState(actor);
+			if(extraBudgetRefTerrain == -1){
+				extraBudgetRefTerrain = currentRegion;
+			}
+			const remainingBudget = this.updateMoveBudget(moveBudget, moveCost, extraBudgetRefTerrain);	
+			let nextStepBudget = remainingBudget[currentRegion];
+
+			let checkedDirs = [
+				{x: 0, y: -1},
+				{x: 1, y: 0},
+				{x: 0, y: 1},
+				{x: -1, y: 0},				
+			];
+			
+			for(let dir of checkedDirs){
+				let newX = x + dir.x;
+				let newY = y + dir.y;
+				if (isPassableTile(x, y, newX,newY, actor)) {
+					if(!visitedNodes[newX]){
+						visitedNodes[newX] = {};
 					}
-				} else if ($gameTemp.isSrpgBestSearchFlag() == true) {
-					this.isSrpgCollidedWithOpponentsUnit(x, y, 8, route);
+					if(!visitedNodes[newX][newY]){
+						visitedNodes[newX][newY] = {
+							standard: 0,
+							extra: 0
+						};
+					}
+					let isUpgrade = false;
+					if(nextStepBudget.extra > visitedNodes[newX][newY].extra){
+						isUpgrade = true;
+					} 
+					if(nextStepBudget.standard > visitedNodes[newX][newY].standard){
+						isUpgrade = true;
+					}
+					if(isUpgrade){
+						visitedNodes[newX][newY] = nextStepBudget;
+						this.makeMoveTableRecursive(newX, newY, remainingBudget, visitedNodes, actor);
+					}					
 				}
 			}
-			//右方向を探索
-			if (route[route.length - 1] != 4) {
-				if (isPassableTile(x, y, x+1, y, actor)) {
-					if ($gameTemp.MoveTable($gameMap.roundX(x + 1), y)[0] < move - moveCost) {
-						if ($gameTemp.MoveTable($gameMap.roundX(x + 1), y)[0] < 0) {
-							$gameTemp.pushMoveList([$gameMap.roundX(x + 1), y, false]);
-						}
-						$gameTemp.setMoveTable($gameMap.roundX(x + 1), y, move - moveCost, route.concat(6));
-						this.makeMoveTable($gameMap.roundX(x + 1), y, move - moveCost, route.concat(6), actor);
-					}
-				} else if ($gameTemp.isSrpgBestSearchFlag() == true) {
-					this.isSrpgCollidedWithOpponentsUnit(x, y, 6, route);
-				}
-			}
-			//左方向を探索
-			if (route[route.length - 1] != 6) {
-				if (isPassableTile(x, y, x-1, y, actor)) {
-					if ($gameTemp.MoveTable($gameMap.roundX(x - 1), y)[0] < move - moveCost) {
-						if ($gameTemp.MoveTable($gameMap.roundX(x - 1), y)[0] < 0) {
-							$gameTemp.pushMoveList([$gameMap.roundX(x - 1), y, false]);
-						}
-						$gameTemp.setMoveTable($gameMap.roundX(x - 1), y, move - moveCost, route.concat(4));
-						this.makeMoveTable($gameMap.roundX(x - 1), y, move - moveCost, route.concat(4), actor);
-					}
-				} else if ($gameTemp.isSrpgBestSearchFlag() == true) {
-					this.isSrpgCollidedWithOpponentsUnit(x, y, 4, route);
-				}
-			}
-			//下方向を探索
-			if (route[route.length - 1] != 8) {
-				if (isPassableTile(x, y, x, y+1, actor)) {
-					if ($gameTemp.MoveTable(x, $gameMap.roundY(y + 1))[0] < move - moveCost) {
-						if ($gameTemp.MoveTable(x, $gameMap.roundY(y + 1))[0] < 0) {
-							$gameTemp.pushMoveList([x, $gameMap.roundY(y + 1), false]);
-						}
-						$gameTemp.setMoveTable(x, $gameMap.roundY(y + 1), move - moveCost, route.concat(2));
-						this.makeMoveTable(x, $gameMap.roundY(y + 1), move - moveCost, route.concat(2), actor);
-					}
-				} else if ($gameTemp.isSrpgBestSearchFlag() == true) {
-					this.isSrpgCollidedWithOpponentsUnit(x, y, 2, route);
-				}
-			}
+		
 		};
 
 		//通行可能かを判定する（攻撃射程演算用）
@@ -1474,42 +1499,42 @@
 			Game_CharacterBase_initialize.call(this);
 			this._floatOffset = 0;
 			this._floatAmount = 10;
+			this._animStartFloat = 0;
+			this._lastTargetFloat = 0;
+			
 			this._floating = false;
 		}
 		
 		var Game_CharacterBase_screenY = Game_CharacterBase.prototype.screenY;
 		Game_CharacterBase.prototype.screenY = function() {
+			const lerp = (x, y, a) => x * (1 - a) + y * a;
+			
 			var value = Game_CharacterBase_screenY.call(this);
 			var battlerArray = $gameSystem.EventToUnit(this._eventId);
 			var floatSpeed = 8;
-			if(battlerArray && $statCalc.isFlying(battlerArray[1])){
-				if(!this._floating){
+			if(battlerArray){
+				let flyInfo = $statCalc.getFlyingAnimInfo(battlerArray[1])
+				let floatAmount = 0;
+				if(flyInfo){
+					floatAmount = flyInfo.floatAmount;
+				}
+				if(!this.transitioningFloat && this._lastTargetFloat != floatAmount){
+					this._lastTargetFloat = floatAmount;
+					this._animStartFloat = this._floatOffset * -1;
 					this.transitioningFloat = true;
 					this._floatOffset = 0;
-					this._floating = true;
-					this._floatTimer = this._floatAmount * floatSpeed;
+					this._floating = true;						
+					this._floatTimer = (floatAmount - this._animStartFloat) * floatSpeed;
+					this._floatTimer = Math.abs(this._floatTimer);
+					this._floatTimerTotal = this._floatTimer;
 				}
 				if(this._floatTimer >= 0) {
 					this._floatTimer--;					
-					this._floatOffset = (this._floatAmount - (this._floatTimer / floatSpeed)) * -1;										
+					this._floatOffset = lerp(floatAmount, this._animStartFloat, this._floatTimer/this._floatTimerTotal) * -1;					
 				} else {
 					this.transitioningFloat = false;
-				}						
-			} else {
-				if(this._floating){
-					this.transitioningFloat = true;
-					this._floatOffset = this._floatAmount * -1;
-					this._floating = false;
-					this._floatTimer = this._floatAmount * floatSpeed;
 				}
-				if(this._floatTimer >= 0) {
-					this._floatTimer--;					
-					this._floatOffset = (this._floatTimer / floatSpeed) * -1;				
-				} else {
-					this.transitioningFloat = false;
-					this._floatOffset = 0;
-				}
-			}	
+			}					
 			value+=this._floatOffset;
 			return Math.round(value);
 		};
@@ -1801,7 +1826,7 @@
 		//戦闘中、サブフェーズの状況に応じてプレイヤーの移動を制限する
 		var _SRPG_Game_Player_canMove = Game_Player.prototype.canMove;
 		Game_Player.prototype.canMove = function() {					
-			return $SRWGameState.canCursorMove() && _SRPG_Game_Player_canMove.call(this);
+			return $SRWGameState.canCursorMove() == 2 || ($SRWGameState.canCursorMove() > 0 && _SRPG_Game_Player_canMove.call(this));
 		};
 
 		//戦闘中、サブフェーズの状況に応じて決定キー・タッチの処理を変える
@@ -2024,7 +2049,7 @@
 						
 						var weight = 1 ;
 						if(i >= 0 && j >= 0){
-							if(!$statCalc.isFlying(actor)){
+							if(!$statCalc.ignoresTerrainCost(actor, $gameMap.regionId(i, j) % 8)){
 								weight+=$gameMap.SRPGTerrainTag(i, j);
 							}
 							if(ignoreObstacles){
@@ -2047,7 +2072,7 @@
 								var isBottomPassable;
 								var isLeftPassable;
 								var isRightPassable;
-								if(!isCenterPassable || $statCalc.isFlying(actor) || !ENGINE_SETTINGS.USE_TILE_PASSAGE){
+								if(!isCenterPassable || $statCalc.ignoresTerrainCollision(actor, $gameMap.regionId(i, j) % 8) || !ENGINE_SETTINGS.USE_TILE_PASSAGE){
 									isTopPassable = isCenterPassable;
 									isBottomPassable = isCenterPassable;
 									isLeftPassable = isCenterPassable;

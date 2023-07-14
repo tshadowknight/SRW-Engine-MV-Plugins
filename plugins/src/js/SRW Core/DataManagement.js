@@ -277,7 +277,8 @@
 				//"DeployActions",
 				"RelationshipBonuses",
 				"Constants",
-				"AbilityZones"
+				"AbilityZones",
+				"TerrainTypes"
 			];
 			
 			var defs = [];
@@ -354,6 +355,7 @@
 					//$mapAttackManager.initDefinitions();
 					$SRWStageInfoManager.initDefinitions();
 					$abilityZoneManager.initDefinitions();
+					$terrainTypeManager.initDefinitions();
 					_this._configLoaded = true;
 				}
 			});
@@ -565,8 +567,10 @@
 				setSRWDefaultBattleEnv: true,
 				setDefaultBattleEnv: true,
 				setSkyBattleEnv: true,
+				setSuperStateBattleEnv: true,
 				setRegionBattleEnv: true,
 				setRegionSkyBattleEnv: true,
+				setRegionSuperStateBattleEnv: true,
 				resetRegionAttributes: true,
 				addRegionAttributes: true,
 				addMapHighlight: true,

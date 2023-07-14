@@ -325,9 +325,25 @@ SRWEditor.prototype.init = function(){
 			params: ["r", "g", "b", "duration", "easingFunction", "easingMode"],
 			desc: "Set the groundColor and diffuse color of specified light. scene_light is the global hemispheric light"
 		},
+		create_point_light: {
+			hasTarget: true,
+			params: ["parent", "position", "lightIntensity", "r", "g", "b", "includeOnly"],
+			desc: "Create a point light"
+		},
+		create_hemi_light: {
+			hasTarget: true,
+			params: ["parent", "position", "r", "g", "b", "includeOnly"],
+			desc: "Create a hemispheric light"
+		},
+		exclude_from_light: {
+			isLightCommand: true,
+			hasTarget: true,
+			params: ["excludedObj"],
+			desc: "Excluded a specific object form receiving light from the target light"
+		},
 		create_bg: {
 			hasTarget: true,
-			params: ["isPilotCutin", "path", "parent", "position", "size", "alpha", "billboardMode", "rotation", "frameSize", "lineCount", "columnCount", "animationLoop", "animationFrames", "animationDelay", "holdFrame", "scrollSpeed", "clamp"],
+			params: ["isPilotCutin", "path", "parent", "position", "size", "alpha", "billboardMode", "rotation", "frameSize", "lineCount", "columnCount", "animationLoop", "animationFrames", "animationDelay", "holdFrame", "scrollSpeed", "clamp"],//, "unlit"
 			aliases: {"animationLoop": "loopFromFrame", "animationFrames": "loopToFrame"},
 			desc: "Create a new background."
 		},
@@ -374,7 +390,7 @@ SRWEditor.prototype.init = function(){
 		},
 		create_model: {
 			hasTarget: true,
-			params: ["path", "parent", "moveOriginToParent", "position", "rotation", "size"],//"animGroup",  "animName", 
+			params: ["path", "parent", "moveOriginToParent", "position", "rotation", "size"],//"animGroup",  "animName", , "unlit"
 			aliases: {"moveOriginToParent": "syncOrigin"},
 			desc: "Create a new model."
 		},	
@@ -662,12 +678,16 @@ SRWEditor.prototype.init = function(){
 		shaderParam8: "A parameter for the custom shader. Defined as <param type>:<param name>=<param value>",
 		shaderParam9: "A parameter for the custom shader. Defined as <param type>:<param name>=<param value>",
 		shockwave_intensity: "The intensity of the shockwave effect.",
+		lightIntensity: "The intensity of the light",
+		excludedObj: "The object that will be excluded from the target light source",
+		includeOnly: "Specifiy one target object that will be the sole recipient of this light source",
 		immediate: "If 1 the change will be instant.",
 		position: "A position defined by an x, y and z coordinate.",
 		armatureName: "The name of Armature that will be shown", 
 		animGroup: "The name of the group of the model's animations",
 		animName: "The name of the animation that will be shown",
 		moveOriginToParent: "If 1 set the origin of the object to the parent's absolute position",
+		unlit: "If 1 the target will not receive influence from lights",
 		canvasWidth: "The width of the rendering surface for the external renderer", 
 		canvasHeight: "The height of the rendering surface for the external renderer",
 		parent: "The id of the object that will be the parent of this object.",
@@ -802,6 +822,16 @@ SRWEditor.prototype.init = function(){
 		shockwave_intensity: function(value){
 			
 		},
+		lightIntensity: function(value){
+			
+		},	
+		excludedObj: function(value){
+			
+		},	
+		includeOnly: function(value){
+			
+		},		
+		
 		immediate: function(value){
 			
 		}, 
@@ -820,6 +850,9 @@ SRWEditor.prototype.init = function(){
 		canvasWidth: function(value){
 			
 		}, 
+		unlit: function(value){
+			
+		},
 		canvasHeight: function(value){
 			
 		},
@@ -3082,18 +3115,20 @@ SRWEditor.prototype.showCameraState = function(){
 				}
 				
 			}
-			content+="<div>"
-			content+="<b>Rotation</b>"
-			content+="</div>"
-			content+="<div>"
-			content+="x: <input data-type='rotation' data-prop='x' value='"+rotation.x.toFixed(3)+"'></input>";
-			content+="</div>"
-			content+="<div>"
-			content+="y: <input data-type='rotation' data-prop='y' value='"+rotation.y.toFixed(3)+"'></input>";
-			content+="</div>"
-			content+="<div>"
-			content+="z: <input data-type='rotation' data-prop='z' value='"+rotation.z.toFixed(3)+"'></input>";
-			content+="</div>"
+			if(rotation){
+				content+="<div>"
+				content+="<b>Rotation</b>"
+				content+="</div>"
+				content+="<div>"
+				content+="x: <input data-type='rotation' data-prop='x' value='"+rotation.x.toFixed(3)+"'></input>";
+				content+="</div>"
+				content+="<div>"
+				content+="y: <input data-type='rotation' data-prop='y' value='"+rotation.y.toFixed(3)+"'></input>";
+				content+="</div>"
+				content+="<div>"
+				content+="z: <input data-type='rotation' data-prop='z' value='"+rotation.z.toFixed(3)+"'></input>";
+				content+="</div>"
+			}			
 			
 			cameraInfoContainer.innerHTML = content;
 			

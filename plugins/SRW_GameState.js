@@ -20,7 +20,7 @@ GameState.prototype.updateMapEvent = function(x, y, triggers){
 }
 
 GameState.prototype.canCursorMove = function(){
-	return !!this.allowedActions.cursor;
+	return this.allowedActions.cursor;
 }
 
 GameState.prototype.canUseMenu = function(){
@@ -1030,7 +1030,7 @@ GameState_actor_target.prototype.updateMapEvent = function(x, y, triggers){
 							x: $gameTemp.activeEvent().posX(),
 							y: $gameTemp.activeEvent().posY(),
 						};
-						var supporters = $statCalc.getSupportAttackCandidates("player", position, $statCalc.getCurrentTerrain($gameTemp.currentBattleActor));
+						var supporters = $statCalc.getSupportAttackCandidates("player", position, $statCalc.getCurrentAliasedTerrainIdx($gameTemp.currentBattleActor));
 						
 						var aSkill = $statCalc.getPilotStat($gameTemp.currentBattleActor, "skill");
 						var dSkill = $statCalc.getPilotStat($gameTemp.currentBattleEnemy, "skill");
@@ -1112,7 +1112,7 @@ GameState_actor_target.prototype.updateMapEvent = function(x, y, triggers){
 								var supporters = $statCalc.getSupportDefendCandidates(
 									$gameSystem.getFactionId($gameTemp.currentBattleEnemy), 
 									{x: event.posX(), y: event.posY()},
-									$statCalc.getCurrentTerrain($gameTemp.currentBattleEnemy)
+									$statCalc.getCurrentAliasedTerrainIdx($gameTemp.currentBattleEnemy)
 								);
 								
 								if($statCalc.applyStatModsToValue($gameTemp.currentBattleEnemy, 0, ["disable_support"]) || 
@@ -2422,7 +2422,7 @@ GameState_process_destroy_transform_queue.prototype.update = function(scene){
 function GameState_rearrange_deploys(){
 	GameState.call(this);
 	this.allowedActions = {
-		cursor: true,
+		cursor: 2,
 		menu: false,
 		summaries: false
 	};

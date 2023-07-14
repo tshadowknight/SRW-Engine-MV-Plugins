@@ -299,5 +299,6 @@ var ENGINE_SETTINGS = {
 		ImageManager.loadBitmap("img/basic_battle/", "destroyed");
 		
 		AudioManager.loadBgm({name: "SRW_Engine_1"});
-	}
+	},
+	
 }

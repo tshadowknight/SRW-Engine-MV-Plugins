@@ -1,3 +1,34 @@
+$SRWConfig.customSpecialEvasionActivationCheckers = {
+	"complex_shoot_down": function(level, attacker, defender){
+		const activationChances = [
+			0.10,
+			0.20,
+			0.30,
+			0.40,
+			0.50,
+			0.60,
+			0.70,
+			0.80,
+			0.90
+		];
+		
+		let bounces = false;
+		var aSkill = $statCalc.getPilotStat(attacker.actor, "skill");
+		var dSkill = $statCalc.getPilotStat(defender.actor, "skill");	
+		
+		if(dSkill > aSkill){
+			bounces = true;
+		}		
+		
+		if(Math.random() > activationChances[level-1]){
+			bounces = false;
+		}
+		
+		return bounces;		
+	}	
+}
+
+
 $SRWConfig.pilotAbilties = function(){
 	this.addDefinition(
 		0, 
@@ -2039,6 +2070,25 @@ $SRWConfig.pilotAbilties = function(){
 		function(actor, level){
 			return [
 				{type: "extra_action", modType: "addFlat", value: 1}
+			];
+		},
+		function(actor, level){
+			return true;
+		},
+		[0],
+		1
+	);
+	
+	this.addDefinition(
+		102, 
+		"Shoot Down", 
+		"Allows the pilot to deflect funnel and missile attacks. Activation depends on Skill stat difference with the enemy.", 
+		false,
+		true,
+		function(actor, level){
+			
+			return [
+				{type: "special_evade", subType: "missile", activation: "complex_shoot_down", name: "SHOOT DOWN", dodgePattern: 4},{type: "special_evade", subType: "funnel", activation: "complex_shoot_down", name: "SHOOT DOWN", dodgePattern: 4}
 			];
 		},
 		function(actor, level){

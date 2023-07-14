@@ -360,7 +360,7 @@
 						if(_this._actor.battleMode() != "fixed"){
 							_this.addMoveCommand();
 						}
-						if(hasTarget || hasMapWeapon){
+						if((hasTarget || hasMapWeapon) && $statCalc.canAttackOnCurrentTerrain(_this._actor)){
 							_this.addCommand(APPSTRINGS.MAPMENU.cmd_attack, 'attack');
 						}
 						if($statCalc.isShip(_this._actor) && $statCalc.hasBoardedUnits(_this._actor)){
@@ -379,15 +379,12 @@
 						if($statCalc.getAbilityCommands(_this._actor).length){
 							 _this.addCommand(APPSTRINGS.MAPMENU.cmd_ability, 'ability');
 						}
-						if($statCalc.canFly(_this._actor) && $statCalc.getCurrentTerrain(_this._actor) != "space"){
-							if($statCalc.isFlying(_this._actor)){
-								if(($statCalc.getTileType(_this._actor) == "land" && $statCalc.canBeOnLand(_this._actor)) || ($statCalc.getTileType(_this._actor) == "water" && $statCalc.canBeOnWater(_this._actor))){
-									_this.addCommand(APPSTRINGS.MAPMENU.cmd_land, 'land');
-								}
-							} else {
-								_this.addCommand(APPSTRINGS.MAPMENU.cmd_fly, 'fly');
-							}
-						}		
+
+						let terrainCmds = $statCalc.getAvailableSuperStateTransitions(_this._actor);	
+						for(let i = 0; i < Math.min(4, terrainCmds.length); i++){
+							_this.addCommand(terrainCmds[i].cmdName, 'change_super_state_'+i);
+						}
+						
 						if($gameSystem.getPersuadeOption(_this._actor)){
 							_this.addCommand(APPSTRINGS.MAPMENU.cmd_persuade, 'persuade');
 						}	
@@ -471,12 +468,9 @@
 					function deployMenu(){
 						_this.addMoveCommand();					
 						_this.addCommand(APPSTRINGS.MAPMENU.cmd_spirit, 'spirit');
-						if($statCalc.canFly(_this._actor) && $statCalc.getCurrentTerrain(_this._actor) != "space"){
-							if($statCalc.isFlying(_this._actor)){
-								_this.addCommand(APPSTRINGS.MAPMENU.cmd_land, 'land');
-							} else {
-								_this.addCommand(APPSTRINGS.MAPMENU.cmd_fly, 'fly');
-							}
+						let terrainCmds = $statCalc.getAvailableSuperStateTransitions(_this._actor);	
+						for(let i = 0; i < Math.min(4, terrainCmds.length); i++){
+							_this.addCommand(terrainCmds[i].cmdName, 'change_super_state_'+i);
 						}
 						if($statCalc.getConsumables(_this._actor).length){
 							 _this.addCommand(APPSTRINGS.MAPMENU.cmd_item, 'item');

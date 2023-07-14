@@ -25,6 +25,7 @@ var $plugins =
 {"name":"SRW_SongManager","status":true,"description":"","parameters":{}},
 {"name":"SRW_AbilityManager","status":true,"description":"","parameters":{}},
 {"name":"SRW_SpiritManager","status":true,"description":"","parameters":{}},
+{"name":"TerrainTypeManager","status":true,"description":"","parameters":{}},
 {"name":"SRW_BattleScene","status":true,"description":"","parameters":{}},
 {"name":"SRW_InventoryManager","status":true,"description":"","parameters":{}},
 {"name":"SRW_Menus","status":true,"description":"","parameters":{}},

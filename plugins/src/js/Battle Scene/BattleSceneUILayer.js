@@ -463,11 +463,11 @@ BattleSceneUILayer.prototype.resetTextBox = function(){
 	this.showTextBox();
 }
 
-BattleSceneUILayer.prototype.setTextBox = function(entityType, entityId, displayName, textInfo, showNoise){
+BattleSceneUILayer.prototype.setTextBox = function(entityType, entityId, displayName, textInfo, showNoise, immediate){
 	var _this = this;
 	return new Promise(function(resolve, reject){
 		var time = Date.now();
-		if(!_this._lastTextTime || time - _this._lastTextTime > 1000){
+		if(!_this._lastTextTime || time - _this._lastTextTime > 1000 || immediate){
 
 			_this._lastTextTime = time;
 			_this._currentEntityType = entityType;

@@ -98,6 +98,8 @@ var $abilityZoneManager = new AbilityZoneManager();
 
 var $inventoryManager = new SRWInventoryManager();
 
+var $terrainTypeManager = new TerrainTypeManager();
+
 var $scriptCharactersLoader = new ScriptCharactersLoader();
 var $deployActionsLoader = new DeployActionsLoader();
  
@@ -967,6 +969,11 @@ SceneManager.isInSaveScene = function(){
 		this._mapSrpgActorCommandWindow.setHandler('status', this.statusActorMenuCommand.bind(this));	
 		
 		this._mapSrpgActorCommandWindow.setHandler('swap_pilot', this.swapPilotMenuCommand.bind(this));	
+		
+		this._mapSrpgActorCommandWindow.setHandler('change_super_state_0',  this.commandChangeSuperState.bind(this, 0));
+		this._mapSrpgActorCommandWindow.setHandler('change_super_state_1',  this.commandChangeSuperState.bind(this, 1));
+		this._mapSrpgActorCommandWindow.setHandler('change_super_state_2',  this.commandChangeSuperState.bind(this, 2));
+		this._mapSrpgActorCommandWindow.setHandler('change_super_state_3',  this.commandChangeSuperState.bind(this, 3));
 		
 		
         this._mapSrpgActorCommandWindow.setHandler('cancel', this.cancelActorMenuCommand.bind(this));
@@ -2328,7 +2335,7 @@ SceneManager.isInSaveScene = function(){
 	
 	Scene_Map.prototype.commandLand = function() {
 		var actor = $gameSystem.EventToUnit($gameTemp.activeEvent().eventId())[1];
-		$statCalc.setFlying(actor, false);
+		$statCalc.setSuperState(actor, false);
 		
 		$gameTemp.activeEvent().transitioningFloat = true;
 		$gameSystem.setSubBattlePhase('await_actor_float');
@@ -2341,7 +2348,7 @@ SceneManager.isInSaveScene = function(){
 	Scene_Map.prototype.commandFly = function() {
 		
 		var actor = $gameSystem.EventToUnit($gameTemp.activeEvent().eventId())[1];
-		$statCalc.setFlying(actor, true);
+		$statCalc.setSuperState(actor, true);
 	   
 		$gameTemp.activeEvent().transitioningFloat = true;
 		$gameSystem.setSubBattlePhase('await_actor_float');
@@ -2350,6 +2357,19 @@ SceneManager.isInSaveScene = function(){
 		this._mapSrpgActorCommandWindow.refresh();
 		this._mapSrpgActorCommandWindow.deactivate();
     };
+	
+	Scene_Map.prototype.commandChangeSuperState = function(idx) {
+		
+		var actor = $gameSystem.EventToUnit($gameTemp.activeEvent().eventId())[1];
+		let terrainCmd = $statCalc.getAvailableSuperStateTransitions(actor)[idx];	
+		$statCalc.setSuperState(actor, terrainCmd.endState, false, terrainCmd.se);
+	   
+		$gameTemp.activeEvent().transitioningFloat = true;
+		$gameSystem.setSubBattlePhase('await_actor_float');		
+		
+		this._mapSrpgActorCommandWindow.refresh();
+		this._mapSrpgActorCommandWindow.deactivate();
+    };	
 	
 	Scene_Map.prototype.commandSpirit = function() {
 		var actionBattlerArray = $gameSystem.EventToUnit($gameTemp.activeEvent().eventId());
@@ -3496,7 +3516,7 @@ SceneManager.isInSaveScene = function(){
         var targets = $statCalc.getAllInRange(battler);
 		var tmp = [];
 		for(var i = 0; i < targets.length; i++){
-			if(!battler.isEnemy() || !$gameSystem.untargetableAllies[targets[i].eventId()]){		
+			if((!battler.isEnemy() || !$gameSystem.untargetableAllies[targets[i].eventId()]) && $statCalc.canBeTargetedOnCurrentTerrain($gameSystem.EventToUnit(targets[i].eventId())[1])){		
 				var actor = $gameSystem.EventToUnit(targets[i].eventId())[1];
 				
 				if($battleCalc.getBestWeapon({actor: battler, pos: {x: referenceEvent.posX(), y: referenceEvent.posY()}}, {actor: actor, pos: {x: targets[i].posX(), y: targets[i].posY()}}, false, false, false)){
@@ -3542,7 +3562,7 @@ SceneManager.isInSaveScene = function(){
         var targets =  $statCalc.getAllInRange(battler, true);
 		var tmp = [];
 		for(var i = 0; i < targets.length; i++){
-			if(!battler.isEnemy() || !$gameSystem.untargetableAllies[targets[i].eventId()]){			
+			if((!battler.isEnemy() || !$gameSystem.untargetableAllies[targets[i].eventId()]) && $statCalc.canBeTargetedOnCurrentTerrain($gameSystem.EventToUnit(targets[i].eventId())[1])){		
 				var actor = $gameSystem.EventToUnit(targets[i].eventId())[1];
 				if($battleCalc.getBestWeapon({actor: battler}, {actor: actor}, false, true, false)){
 					tmp.push(targets[i]);
@@ -3602,7 +3622,7 @@ SceneManager.isInSaveScene = function(){
 		var tauntTargetEvent = -1;
 		
 		canAttackTargets.forEach(function(event) {
-			if(!event.isErased() && !$gameSystem.untargetableAllies[event.eventId()]){					
+			if(!event.isErased() && !$gameSystem.untargetableAllies[event.eventId()] && $statCalc.canBeTargetedOnCurrentTerrain($gameSystem.EventToUnit(event.eventId())[1])){					
 				var defender = $gameSystem.EventToUnit(event.eventId())[1];
 				if(defender.isActor() && defender.actorId() == priorityTargetId){
 					priorityTargetEvent = event;
@@ -3853,7 +3873,7 @@ SceneManager.isInSaveScene = function(){
 				var isBottomPassable;
 				var isLeftPassable;
 				var isRightPassable;
-				if(!isCenterPassable || $statCalc.isFlying(battler) || !ENGINE_SETTINGS.USE_TILE_PASSAGE){
+				if(!isCenterPassable || $statCalc.ignoresTerrainCollision(battler, $gameMap.regionId(i, j) % 8) || !ENGINE_SETTINGS.USE_TILE_PASSAGE){
 				 	isTopPassable = isCenterPassable;
 					isBottomPassable = isCenterPassable;
 					isLeftPassable = isCenterPassable;
@@ -3867,7 +3887,7 @@ SceneManager.isInSaveScene = function(){
 				
 				var weight = 1 ;
 				
-				if(!$statCalc.isFlying(battler)){
+				if(!$statCalc.ignoresTerrainCost(battler, $gameMap.regionId(i, j) % 8)){
 					weight+=$gameMap.SRPGTerrainTag(i, j);
 				}				
 				pathfindingGrid[i][j] = isCenterPassable ? weight : 0; 	
@@ -3941,7 +3961,7 @@ SceneManager.isInSaveScene = function(){
 				var supporterDefenders = $statCalc.getSupportDefendCandidates(
 					$gameSystem.getFactionId(battler), 
 					{x: node.x, y: node.y},
-					$statCalc.getCurrentTerrain(battler),
+					$statCalc.getCurrentAliasedTerrainIdx(battler),
 					battler.event.eventId()
 				);
 				
@@ -3952,7 +3972,7 @@ SceneManager.isInSaveScene = function(){
 				var supportersAttackers = $statCalc.getSupportAttackCandidates(
 					$gameSystem.getFactionId(battler), 
 					{x: node.x, y: node.y},
-					$statCalc.getCurrentTerrain(battler),
+					$statCalc.getCurrentAliasedTerrainIdx(battler),
 					battler.event.eventId()
 				);
 				
@@ -4246,7 +4266,7 @@ SceneManager.isInSaveScene = function(){
 				var supporters = $statCalc.getSupportDefendCandidates(
 					$gameSystem.getFactionId(actorInfo.actor), 
 					actorInfo.pos,
-					$statCalc.getCurrentTerrain(actorInfo.actor)
+					$statCalc.getCurrentAliasedTerrainIdx(actorInfo.actor)
 				);
 				
 				if($statCalc.applyStatModsToValue($gameTemp.currentBattleActor, 0, ["disable_support"]) || 
@@ -4282,7 +4302,7 @@ SceneManager.isInSaveScene = function(){
 			var supporters = $statCalc.getSupportAttackCandidates(
 				$gameSystem.getFactionId(enemyInfo.actor), 
 				{x: $gameTemp.activeEvent().posX(), y: $gameTemp.activeEvent().posY()},
-				$statCalc.getCurrentTerrain($gameTemp.currentBattleEnemy)
+				$statCalc.getCurrentAliasedTerrainIdx($gameTemp.currentBattleEnemy)
 			);
 			
 			var aSkill = $statCalc.getPilotStat(enemyInfo.actor, "skill");

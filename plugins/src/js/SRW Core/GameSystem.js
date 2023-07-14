@@ -435,8 +435,10 @@
 			$gameTemp.eventToDeploySlot = null;
 			$gameSystem.defaultBattleEnv = null;
 			$gameSystem.skyBattleEnv = null;
+			$gameSystem.superStateBattleEnv = {};
 			$gameSystem.regionBattleEnv = {};
 			$gameSystem.regionSkyBattleEnv = {};
+			$gameSystem.regionSuperStateBattleEnv = {};
 			$gameSystem.stageTextId = null;
 			
 			if($gameSystem.foregroundSpriteToggleState == null){
@@ -837,7 +839,7 @@
 			$statCalc.invalidateAbilityCache(actor_unit);
 			$statCalc.initSRWStats(actor_unit);
 			$statCalc.applyBattleStartWill(actor_unit);
-			$statCalc.updateFlightState(actor_unit, true);
+			$statCalc.updateSuperState(actor_unit, true);
 			//call refresh to clear any lingering states of the actor
 			actor_unit.refresh();
 			
@@ -2136,18 +2138,19 @@
 			} else {
 				var event = $statCalc.getReferenceEvent(actor);
 				var region = $gameMap.regionId(event.posX(), event.posY());
-				if($statCalc.isFlying(actor)){
-					if($gameSystem.regionSkyBattleEnv[region] != null){
-						return $gameSystem.regionSkyBattleEnv[region];
+				let superState = $statCalc.getSuperState(actor);
+				if(superState == -1){
+					if($gameSystem.regionBattleEnv[region] != null){
+						return $gameSystem.regionBattleEnv[region];
 					}
-					
-					if($gameSystem.skyBattleEnv){
-						return $gameSystem.skyBattleEnv;
-					} 
-				} 
-				if($gameSystem.regionBattleEnv[region] != null){
-					return $gameSystem.regionBattleEnv[region];
-				}
+				} else {
+					if($gameSystem.regionSuperStateBattleEnv[superState] != null && $gameSystem.regionSuperStateBattleEnv[superState][region] != null){
+						return $gameSystem.regionSuperStateBattleEnv[superState][region];
+					}
+					if($gameSystem.superStateBattleEnv[superState]){
+						return $gameSystem.superStateBattleEnv[superState];
+					}
+				}				
 				return $gameSystem.defaultBattleEnv;						
 			}
 		};

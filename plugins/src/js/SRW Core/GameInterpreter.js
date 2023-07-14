@@ -537,7 +537,7 @@
 					$gameSystem.setEventToUnit(event.eventId(), 'enemy', enemy_unit);
 					$statCalc.initSRWStats(enemy_unit, level, items);
 					$statCalc.applyBattleStartWill(enemy_unit);
-					$statCalc.updateFlightState(enemy_unit);
+					$statCalc.updateSuperState(enemy_unit, false, true);
 					
 					
 					if(!noUpdateCount){

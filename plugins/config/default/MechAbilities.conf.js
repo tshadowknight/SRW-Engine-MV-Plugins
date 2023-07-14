@@ -696,7 +696,7 @@ $SRWConfig.mechAbilties = function(){
 		function(actor, level){
 			return [
 				//{type: "water_enabled", modType: "addFlat", value: 2},
-				{type: "is_hover", modType: "addFlat", value: 1},
+				{type: "hover_enabled", modType: "addFlat", value: 1},
 			];
 		},
 		function(actor, level){
@@ -749,4 +749,26 @@ $SRWConfig.mechAbilties = function(){
 			return false;
 		}
 	);
+	
+	this.addDefinition(
+		49, 
+		"Drill", 
+		"Enables underground movement.", 
+		false,
+		false,
+		function(actor, level){
+			return [
+				//{type: "water_enabled", modType: "addFlat", value: 2},
+				{type: "dig_enabled", modType: "addFlat", value: 1},
+			];
+		},
+		function(actor, level){
+			return true;
+		}
+	);
+	
+	/*Insert new ability here*/
+	
+
+	
 };

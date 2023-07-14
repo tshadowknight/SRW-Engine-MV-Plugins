@@ -11,114 +11,6 @@ import SpineManager from "./SpineManager.js";
 
 import DragonBonesManager from "./dragonBones/DragonBonesManager.js";
 
-/*stupid patch for forcing render group like behavior for effekseer particles*/
-
-BABYLON.RenderingManager.prototype.render = function(customRenderFunction, activeMeshes, renderParticles, renderSprites){
-// Update the observable context (not null as it only goes away on dispose)
-	const info = this._renderingGroupInfo;
-	info.scene = this._scene;
-	info.camera = this._scene.activeCamera;
-
-	// Dispatch sprites
-	if (this._scene.spriteManagers && renderSprites) {
-		for (let index = 0; index < this._scene.spriteManagers.length; index++) {
-			var manager = this._scene.spriteManagers[index];
-			this.dispatchSprites(manager);
-		}
-	}
-
-	// Render
-	for (let index = BABYLON.RenderingManager.MIN_RENDERINGGROUPS; index < BABYLON.RenderingManager.MAX_RENDERINGGROUPS; index++) {
-		this._depthStencilBufferAlreadyCleaned = index === BABYLON.RenderingManager.MIN_RENDERINGGROUPS;
-		var renderingGroup = this._renderingGroups[index];
-		
-		//render effekseer particles before render group 3 is rendered, this makes effekseer particles behave like they're in render group 1
-		if($battleSceneManager && index == 2){			
-			let projectionMatrix = new BABYLON.Matrix().copyFrom($battleSceneManager._camera.getProjectionMatrix()).m;
-			$battleSceneManager._effksContextBack.setProjectionMatrix(projectionMatrix);
-			let worldMatrix = new BABYLON.Matrix().copyFrom(BABYLON.Matrix.Invert($battleSceneManager._camera.getWorldMatrix())).m;		
-			$battleSceneManager._effksContextBack.setCameraMatrix(worldMatrix);
-			$battleSceneManager._effksContextBack.draw();
-			
-			projectionMatrix = new BABYLON.Matrix().copyFrom($battleSceneManager._camera.getProjectionMatrix()).m;
-			//projectionMatrix[0]*=-1;
-			$battleSceneManager._effksContextBackMirror.setProjectionMatrix(projectionMatrix);
-			
-			worldMatrix = new BABYLON.Matrix().copyFrom(BABYLON.Matrix.Invert($battleSceneManager._camera.getWorldMatrix())).m;
-			worldMatrix[0]*=-1;
-			worldMatrix[1]*=-1;
-			worldMatrix[2]*=-1;
-			//worldMatrix[3]*=-1;
-			$battleSceneManager._effksContextBackMirror.setCameraMatrix(worldMatrix);
-			$battleSceneManager._effksContextBackMirror.draw();		
-		}
-		
-		if (!renderingGroup) {
-			continue;
-		}
-
-		let renderingGroupMask = Math.pow(2, index);
-		info.renderingGroupId = index;
-
-		// Before Observable
-		this._scene.onBeforeRenderingGroupObservable.notifyObservers(info, renderingGroupMask);
-
-		// Clear depth/stencil if needed
-		if (BABYLON.RenderingManager.AUTOCLEAR) {
-			const autoClear = this._useSceneAutoClearSetup ?
-				this._scene.getAutoClearDepthStencilSetup(index) :
-				this._autoClearDepthStencil[index];
-
-			if (autoClear && autoClear.autoClear) {
-				this._clearDepthStencilBuffer(autoClear.depth, autoClear.stencil);
-			}
-		}
-
-		// Render
-		for (let step of this._scene._beforeRenderingGroupDrawStage) {
-			step.action(index);
-		}
-		renderingGroup.render(customRenderFunction, renderSprites, renderParticles, activeMeshes);
-		for (let step of this._scene._afterRenderingGroupDrawStage) {
-			step.action(index);
-		}
-		
-		
-		
-
-		// After Observable
-		this._scene.onAfterRenderingGroupObservable.notifyObservers(info, renderingGroupMask);
-	}
-	
-	
-	
-	
-	
-	if($battleSceneManager){
-		let projectionMatrix = new BABYLON.Matrix().copyFrom($battleSceneManager._camera.getProjectionMatrix()).m;
-		$battleSceneManager._effksContext.setProjectionMatrix(projectionMatrix);
-		let worldMatrix = new BABYLON.Matrix().copyFrom(BABYLON.Matrix.Invert($battleSceneManager._camera.getWorldMatrix())).m;		
-		$battleSceneManager._effksContext.setCameraMatrix(worldMatrix);
-		$battleSceneManager._effksContext.draw();
-		
-		projectionMatrix = new BABYLON.Matrix().copyFrom($battleSceneManager._camera.getProjectionMatrix()).m;
-		//projectionMatrix[0]*=-1;
-		$battleSceneManager._effksContextMirror.setProjectionMatrix(projectionMatrix);
-		
-		worldMatrix = new BABYLON.Matrix().copyFrom(BABYLON.Matrix.Invert($battleSceneManager._camera.getWorldMatrix())).m;
-		worldMatrix[0]*=-1;
-		worldMatrix[1]*=-1;
-		worldMatrix[2]*=-1;
-		//worldMatrix[3]*=-1;
-		$battleSceneManager._effksContextMirror.setCameraMatrix(worldMatrix);
-		$battleSceneManager._effksContextMirror.draw();		
-		
-		$battleSceneManager._effksContextAttached.setProjectionMatrix($battleSceneManager._camera.getProjectionMatrix().m);
-		$battleSceneManager._effksContextAttached.setCameraMatrix(BABYLON.Matrix.Invert($battleSceneManager._camera.getWorldMatrix()).m);
-		$battleSceneManager._effksContextAttached.draw();
-	}
-}
-
 export default function BattleSceneManager(){
 	this._initialized = false;
 	this._isLoading = 0;
@@ -198,6 +90,7 @@ export default function BattleSceneManager(){
 
 	this._spriteManagers = {};
 	this._animationSpritesInfo = [];
+	this._lights = [];
 	this._animationBackgroundsInfo = [];
 	this._spritersBackgroundsInfo = [];
 	this._spriterMainSpritesInfo = [];
@@ -422,8 +315,8 @@ BattleSceneManager.prototype.init = async function(attachControl){
 		
 		this._effksContext = effekseer.createContext();		
 		this._effksContextMirror = effekseer.createContext();		
-		this._effksContextBack = effekseer.createContext();
-		this._effksContextBackMirror = effekseer.createContext();
+		this._effksContextBg = effekseer.createContext();
+		this._effksContextBgMirror = effekseer.createContext();
 		this._effksContextAttached = effekseer.createContext();
 		
 		const settings = {
@@ -432,8 +325,8 @@ BattleSceneManager.prototype.init = async function(attachControl){
 		
 		this._effksContext.init(this._glContext, settings);
 		this._effksContextMirror.init(this._glContext, settings);
-		this._effksContextBack.init(this._glContext, settings);
-		this._effksContextBackMirror.init(this._glContext, settings);
+		this._effksContextBg.init(this._glContext, settings);
+		this._effksContextBgMirror.init(this._glContext, settings);
 		this._effksContextAttached.init(this._glContext, settings);
 		
 		this._engine = new BABYLON.Engine(this._canvas, true, {preserveDrawingBuffer: true, stencil: true, antialiasing: true}); // Generate the BABYLON 3D engine	
@@ -477,10 +370,11 @@ BattleSceneManager.prototype.dispose = function(){
 	this.disposeAnimationBackgrounds();
 	this.disposeSpriterBackgrounds();
 	this.disposeEffekseerInstances();
+	this.disposeLights();
 	/*this.stopEffekContext(this._effksContext);
 	this.stopEffekContext(this._effksContextMirror);
-	this.stopEffekContext(this._effksContextBack);
-	this.stopEffekContext(this._effksContextBackMirror);
+	this.stopEffekContext(this._effksContextBg);
+	this.stopEffekContext(this._effksContextBgMirror);
 	this.stopEffekContext(this._effksContextAttached);*/
 	
 	
@@ -951,7 +845,7 @@ BattleSceneManager.prototype.createBg = function(name, img, position, size, alph
 		material.opacityTexture = material.diffuseTexture;
 	}
 	
-	//material.specularColor = new BABYLON.Color3(0, 0, 0);
+	material.specularColor = new BABYLON.Color3(0, 0, 0);
 	//material.emissiveColor = new BABYLON.Color3(1, 1, 1);
 	//material.ambientColor = new BABYLON.Color3(0, 0, 0);
 	if(typeof alpha != "undefined" && alpha != -1){
@@ -969,7 +863,7 @@ BattleSceneManager.prototype.createBg = function(name, img, position, size, alph
 	return bg;
 }
 
-BattleSceneManager.prototype.createSceneBg = function(name, path, position, size, alpha, billboardMode, flipX, clamp){
+BattleSceneManager.prototype.createSceneBg = function(name, path, position, size, alpha, billboardMode, flipX, clamp, unlit){
 	var width;
 	var height;
 	if(typeof size != "undefined"){
@@ -998,10 +892,12 @@ BattleSceneManager.prototype.createSceneBg = function(name, path, position, size
 		material.diffuseTexture.uOffset = 1;
 	}
 	
+	material.specularColor = new BABYLON.Color3(0, 0, 0);
+	if(unlit){
+		material.emissiveColor = new BABYLON.Color3(0, 0, 0);
+		material.ambientColor = new BABYLON.Color3(0, 0, 0);	
+	}
 	
-	//material.specularColor = new BABYLON.Color3(0, 0, 0);
-	//material.emissiveColor = new BABYLON.Color3(0, 0, 0);
-	//material.ambientColor = new BABYLON.Color3(0, 0, 0);
 	if(typeof alpha != "undefined"){
 		material.alpha = alpha;
 		material.useAlphaFromDiffuseTexture  = true;
@@ -1317,7 +1213,7 @@ BattleSceneManager.prototype.createSpineSprite = function(name, path, position, 
 	return dynamicBgInfo;
 }
 
-BattleSceneManager.prototype.createModel = async function(name, path, position, flipX, animGroup, animName, scale, rotation){
+BattleSceneManager.prototype.createModel = async function(name, path, position, flipX, animGroup, animName, scale, rotation, unlit){
 	this._isLoading++;
 	let result = await BABYLON.SceneLoader.ImportMeshAsync(null, "img/SRWBattleScene/"+path, "", this._scene);
 	const root = result.meshes[0];
@@ -1336,10 +1232,10 @@ BattleSceneManager.prototype.createModel = async function(name, path, position, 
 		root.animationRef[animName].stop();
 	}
 	
-	return this.prepareModel(root, name, position, flipX, animGroup, animName, scale, rotation);	
+	return this.prepareModel(root, name, position, flipX, animGroup, animName, scale, rotation, null, unlit);	
 }
 
-BattleSceneManager.prototype.prepareModel = function(root, name, position, flipX, animGroup, animName, scale, rotation, BBHack){
+BattleSceneManager.prototype.prepareModel = function(root, name, position, flipX, animGroup, animName, scale, rotation, BBHack, unlit){
 	const _this = this;
 	scale = scale || 1;
 	let directionFactor = flipX ? -1 : 1;
@@ -1377,7 +1273,23 @@ BattleSceneManager.prototype.prepareModel = function(root, name, position, flipX
 		
 		//m.material.backFaceCulling = true;
 		//m.material.transparencyMode = BABYLON.Material.MATERIAL_ALPHATEST;
+		
+		if(m.material){
+			m.material.specularColor = new BABYLON.Color3(0, 0, 0);
+			if(unlit){
+				m.material.emissiveColor = new BABYLON.Color3(0, 0, 0);
+				m.material.ambientColor = new BABYLON.Color3(0, 0, 0);	
+			}
+		}
 	});
+	
+	if(body.material){
+		body.material.specularColor = new BABYLON.Color3(0, 0, 0);
+		if(unlit){
+			body.material.emissiveColor = new BABYLON.Color3(0, 0, 0);
+			body.material.ambientColor = new BABYLON.Color3(0, 0, 0);	
+		}
+	}
 	
 	if(BBHack){
 		//merge the leaf geometry to reduce draw calls
@@ -1637,7 +1549,7 @@ BattleSceneManager.prototype.createPlanarSprite = function(name, path, position,
 	material.diffuseTexture.wrapU = BABYLON.Texture.CLAMP_ADDRESSMODE;
 	material.diffuseTexture.wrapV = BABYLON.Texture.CLAMP_ADDRESSMODE;
 	
-	//material.specularColor = new BABYLON.Color3(0, 0, 0);
+	material.specularColor = new BABYLON.Color3(0, 0, 0);
 	material.emissiveColor = new BABYLON.Color3(1, 1, 1);
 	//material.ambientColor = new BABYLON.Color3(0, 0, 0);
 	//material.diffuseColor = new BABYLON.Color3(1, 1, 1);
@@ -1990,7 +1902,7 @@ BattleSceneManager.prototype.hookBeforeRender = function(){
 							_this.disposeAnimationSprites();
 							_this.disposeAnimationBackgrounds();
 							_this.disposeEffekseerInstances();
-							
+							_this.disposeLights();
 							//_this.disposeSpriterBackgrounds();
 							_this.disposeRMMVBackgrounds();
 							_this.disposeMovieBackgrounds();
@@ -2376,6 +2288,13 @@ BattleSceneManager.prototype.disposeAnimationSprites = function(){
 	this._animationSpritesInfo = [];
 }
 
+BattleSceneManager.prototype.disposeLights = function(){
+	this._lights.forEach(function(light){
+		light.dispose();
+	});
+	this._lights = [];
+}
+
 BattleSceneManager.prototype.disposeAnimationBackgrounds = function(){
 	this._animationBackgroundsInfo.forEach(function(bg){
 		bg.dispose();
@@ -2394,8 +2313,8 @@ BattleSceneManager.prototype.disposeEffekseerInstances = function(){
 	
 	this.stopEffekContext(this._effksContext);
 	this.stopEffekContext(this._effksContextMirror);
-	this.stopEffekContext(this._effksContextBack);
-	this.stopEffekContext(this._effksContextBackMirror);
+	this.stopEffekContext(this._effksContextBg);
+	this.stopEffekContext(this._effksContextBgMirror);
 	this.stopEffekContext(this._effksContextAttached);
 }
 
@@ -2530,8 +2449,8 @@ BattleSceneManager.prototype.startScene = function(){
 		if(!_this._animsPaused){
 			_this._effksContext.update(60 / _this._engine.getFps() * ratio);
 			_this._effksContextMirror.update(60 / _this._engine.getFps() * ratio);
-			_this._effksContextBack.update(60 / _this._engine.getFps() * ratio);				
-			_this._effksContextBackMirror.update(60 / _this._engine.getFps() * ratio);	
+			_this._effksContextBg.update(60 / _this._engine.getFps() * ratio);				
+			_this._effksContextBgMirror.update(60 / _this._engine.getFps() * ratio);	
 			_this._effksContextAttached.update();	
 		}	
 	});
@@ -2548,7 +2467,7 @@ BattleSceneManager.prototype.startScene = function(){
 	
 	//foreground layer
 	this._scene.onAfterDrawPhaseObservable.add(() => {//onAfterRenderObservable 
-		/*let projectionMatrix = new BABYLON.Matrix().copyFrom(_this._camera.getProjectionMatrix()).m;
+		let projectionMatrix = new BABYLON.Matrix().copyFrom(_this._camera.getProjectionMatrix()).m;
 		_this._effksContext.setProjectionMatrix(projectionMatrix);
 		let worldMatrix = new BABYLON.Matrix().copyFrom(BABYLON.Matrix.Invert(_this._camera.getWorldMatrix())).m;		
 		_this._effksContext.setCameraMatrix(worldMatrix);
@@ -2568,18 +2487,31 @@ BattleSceneManager.prototype.startScene = function(){
 		
 		_this._effksContextAttached.setProjectionMatrix(_this._camera.getProjectionMatrix().m);
 		_this._effksContextAttached.setCameraMatrix(BABYLON.Matrix.Invert(_this._camera.getWorldMatrix()).m);
-		_this._effksContextAttached.draw();*/
+		_this._effksContextAttached.draw();
 	});
 	
 	//background layer
-	this._scene.onAfterParticlesRenderingObservable.add(() => {//onAfterRenderObservable 
-		/*_this._effksContextBack.setProjectionMatrix(_this._camera.getProjectionMatrix().m);
-		_this._effksContextBack.setCameraMatrix(BABYLON.Matrix.Invert(_this._camera.getWorldMatrix()).m);
-		_this._effksContextBack.draw();
+	this._scene.onAfterRenderingGroupObservable.add((info) => {//onAfterRenderObservable 
+		if(info.renderingGroupId == 1){
+			let projectionMatrix = new BABYLON.Matrix().copyFrom(_this._camera.getProjectionMatrix()).m;
+			_this._effksContextBg.setProjectionMatrix(projectionMatrix);
+			let worldMatrix = new BABYLON.Matrix().copyFrom(BABYLON.Matrix.Invert(_this._camera.getWorldMatrix())).m;		
+			_this._effksContextBg.setCameraMatrix(worldMatrix);
+			_this._effksContextBg.draw();
+			
+			projectionMatrix = new BABYLON.Matrix().copyFrom(_this._camera.getProjectionMatrix()).m;
+			//projectionMatrix[0]*=-1;
+			_this._effksContextBgMirror.setProjectionMatrix(projectionMatrix);
+			
+			worldMatrix = new BABYLON.Matrix().copyFrom(BABYLON.Matrix.Invert(_this._camera.getWorldMatrix())).m;
+			worldMatrix[0]*=-1;
+			worldMatrix[1]*=-1;
+			worldMatrix[2]*=-1;
+			//worldMatrix[3]*=-1;
+			_this._effksContextBgMirror.setCameraMatrix(worldMatrix);
+			_this._effksContextBgMirror.draw();		
+		}
 		
-		_this._effksContextBackMirror.setProjectionMatrix(_this._camera.getProjectionMatrix().m);
-		_this._effksContextBackMirror.setCameraMatrix(BABYLON.Matrix.Invert(_this._camera.getWorldMatrix()).m);
-		_this._effksContextBackMirror.draw();*/
 	});
 		
 	this._engine.runRenderLoop(function () {
@@ -3024,6 +2956,16 @@ BattleSceneManager.prototype.getTargetObject = function(name){
 			}
 		}
 		
+		if(!obj){//check lights
+			var ctr = 0;
+			while(!obj && ctr < _this._lights.length){
+				if(_this._lights[ctr].name == name+"_light"){
+					obj = _this._lights[ctr];
+				}
+				ctr++;
+			}
+		}
+		
 		if(!obj){
 			obj = _this._scene.getMeshByName(name);
 		}
@@ -3412,7 +3354,7 @@ BattleSceneManager.prototype.executeAnimation = function(animation, startTick){
 			var entityId = action.ref.SRWStats.pilot.id;
 			var battleText = _this._battleTextManager.getText(entityType, action.ref, "attacks", action.isActor ? "enemy" : "actor", _this.getBattleTextId(_this._currentAnimatedAction), params.id, action.action.attack.id);
 			_this._awaitingText = true;
-			_this._UILayerManager.setTextBox(entityType, entityId, action.ref.SRWStats.pilot.name, battleText).then(function(){
+			_this._UILayerManager.setTextBox(entityType, entityId, action.ref.SRWStats.pilot.name, battleText, false, true).then(function(){
 				_this._awaitingText = false;
 			});
 		},
@@ -3555,7 +3497,7 @@ BattleSceneManager.prototype.executeAnimation = function(animation, startTick){
 			} else {
 				action = _this._currentAnimatedAction;
 			}
-			_this.setBgMode($statCalc.isFlying(action.ref) || $statCalc.getTileType(action.ref) == "space" ? "sky" : "land");			
+			_this.setBgMode($statCalc.isBattleShadowHiddenOnCurrentTerrain(action.ref) ? "sky" : "land");			
 		},	
 		next_phase: function(target, params){
 			let insertStartTick = _this._currentAnimationTick;
@@ -3723,6 +3665,93 @@ BattleSceneManager.prototype.executeAnimation = function(animation, startTick){
 				}				
 			}
 		},
+		create_hemi_light: function(target, params){
+			let position;
+			if(params.position){
+				position = params.position;
+			} else {
+				position = new BABYLON.Vector3(0, 0, 0);
+			}
+			const hemiLight = new BABYLON.HemisphericLight(target+"_light", position, _this._scene);
+			hemiLight.groundColor = new BABYLON.Color3(1,1,1);
+			hemiLight.diffuse = new BABYLON.Color3(1,1,1);
+			if(params.parent){
+				var parentObj = getTargetObject(params.parent);
+				if(parentObj){
+					hemiLight.parent = parentObj;
+				}
+			}
+			if(params.r == null || params.r == ""){
+				params.r = 255;
+			}
+			if(params.g == null || params.g == ""){
+				params.g = 255;
+			}
+			if(params.b == null || params.b == ""){
+				params.b = 255;
+			}
+			hemiLight.groundColor = new BABYLON.Color3(params.r / 255, params.g / 255, params.b / 255);
+			hemiLight.diffuse = new BABYLON.Color3(params.r / 255, params.g / 255, params.b / 255);	
+			if(params.includeOnly){
+				var includeOnlyObj = getTargetObject(params.includeOnly);
+				if(includeOnlyObj){
+					hemiLight.includedOnlyMeshes = [];
+					_this.applyMutator(includeOnlyObj, (mesh) => {
+						hemiLight.includedOnlyMeshes.push(mesh);
+					});
+				}
+				
+			}	
+			_this._lights.push(hemiLight);
+		},
+		create_point_light: function(target, params){
+			let position;
+			if(params.position){
+				position = params.position;
+			} else {
+				position = new BABYLON.Vector3(0, 0, 0);
+			}
+			const pointLight = new BABYLON.PointLight(target+"_light", position, _this._scene);
+			pointLight.intensity = params.lightIntensity || 1;
+			pointLight.specular = new BABYLON.Color3.Red();
+			if(params.parent){
+				var parentObj = getTargetObject(params.parent);
+				if(parentObj){
+					pointLight.parent = parentObj;
+				}
+			}
+			if(params.r == null || params.r == ""){
+				params.r = 255;
+			}
+			if(params.g == null || params.g == ""){
+				params.g = 255;
+			}
+			if(params.b == null || params.b == ""){
+				params.b = 255;
+			}
+			pointLight.groundColor = new BABYLON.Color3(params.r / 255, params.g / 255, params.b / 255);
+			pointLight.diffuse = new BABYLON.Color3(params.r / 255, params.g / 255, params.b / 255);	
+			if(params.includeOnly){
+				var includeOnlyObj = getTargetObject(params.includeOnly);
+				if(includeOnlyObj){
+					pointLight.includedOnlyMeshes = [];
+					_this.applyMutator(includeOnlyObj, (mesh) => {
+						pointLight.includedOnlyMeshes.push(mesh);
+					});
+				}
+				
+			}	
+			_this._lights.push(pointLight);
+		},
+		exclude_from_light: function(target, params){
+			const targetObj = getTargetObject(target);
+			const excluded = getTargetObject(params.excludedObj);
+			if(targetObj && excluded){				
+				_this.applyMutator(excluded, (mesh) => {
+					targetObj.excludedMeshes.push(mesh);
+				});
+			}			
+		},
 		create_bg: function(target, params){
 			var position;
 			if(params.position){
@@ -3749,7 +3778,7 @@ BattleSceneManager.prototype.executeAnimation = function(animation, startTick){
 			} else {
 				path = params.path;
 			}
-			var bg = _this.createSceneBg(target, path, _this.applyAnimationDirection(position), size, alpha, params.billboardMode, _this._animationDirection == -1 ? true : false, params.clamp);
+			var bg = _this.createSceneBg(target, path, _this.applyAnimationDirection(position), size, alpha, params.billboardMode, _this._animationDirection == -1 ? true : false, params.clamp, params.unlit);
 			if(params.rotation){
 				bg.rotation = _this.applyAnimationDirection(params.rotation);
 			}
@@ -4031,7 +4060,7 @@ BattleSceneManager.prototype.executeAnimation = function(animation, startTick){
 			const preload = _this.getPreloadedModel(target);
 			var bgInfo;
 			if(preload){
-				bgInfo = _this.prepareModel(preload, target, _this.applyAnimationDirection(position), _this._animationDirection == -1, params.animGroup, params.animName, (params.size || 1 )*1, params.rotation);
+				bgInfo = _this.prepareModel(preload, target, _this.applyAnimationDirection(position), _this._animationDirection == -1, params.animGroup, params.animName, (params.size || 1 )*1, params.rotation, null, params.unlit * 1);
 			} else {
 				bgInfo = _this.createModel(
 					target, 
@@ -4041,7 +4070,8 @@ BattleSceneManager.prototype.executeAnimation = function(animation, startTick){
 					params.animGroup,
 					params.animName,
 					(params.size || 1 )*1,
-					params.rotation
+					params.rotation,
+					params.unlit * 1
 				);	
 			}
 					
@@ -4194,15 +4224,16 @@ BattleSceneManager.prototype.executeAnimation = function(animation, startTick){
 				rotation.x = rotation.x * 1 + Math.PI;
 			}*/
 			var targetContext;
-			if(params.autoRotate && _this._animationDirection == -1){				
+			if(params.autoRotate && _this._animationDirection == -1){
+				
 				if(params.isBackground * 1){
-					targetContext = _this._effksContextBackMirror;//_this._effksContextBack;
+					targetContext = _this._effksContextBgMirror;//_this._effksContextBg;
 				} else {
 					targetContext =  _this._effksContextMirror;//_this._effksContext;
 				}
 			} else {
 				if(params.isBackground * 1){
-					targetContext = _this._effksContextBack;
+					targetContext = _this._effksContextBg;
 				} else {
 					targetContext = _this._effksContext;
 				}
@@ -4468,7 +4499,7 @@ BattleSceneManager.prototype.executeAnimation = function(animation, startTick){
 				targetObj.material.transparencyMode = BABYLON.Material.MATERIAL_ALPHATEST;
 				
 				
-				//targetObj.material.specularColor = new BABYLON.Color3(0, 0, 0);
+				targetObj.material.specularColor = new BABYLON.Color3(0, 0, 0);
 				//targetObj.material.emissiveColor = new BABYLON.Color3(1, 1, 1);
 				//targetObj.material.ambientColor = new BABYLON.Color3(0, 0, 0);
 				if(params.animationFrames){
@@ -4545,7 +4576,7 @@ BattleSceneManager.prototype.executeAnimation = function(animation, startTick){
 						targetObj.material.diffuseTexture.wrapV = BABYLON.Texture.CLAMP_ADDRESSMODE;
 						targetObj.material.transparencyMode = BABYLON.Material.MATERIAL_ALPHATEST;
 						
-						//targetObj.material.specularColor = new BABYLON.Color3(0, 0, 0);
+						targetObj.material.specularColor = new BABYLON.Color3(0, 0, 0);
 						//targetObj.material.emissiveColor = new BABYLON.Color3(1, 1, 1);
 						//targetObj.material.ambientColor = new BABYLON.Color3(0, 0, 0);
 						
@@ -5815,6 +5846,7 @@ BattleSceneManager.prototype.resetScene = function() {
 	_this.disposeAnimationBackgrounds();
 	_this.disposeSpriterBackgrounds();
 	_this.disposeEffekseerInstances();
+	_this.disposeLights();
 	_this.disposeMovieBackgrounds();
 	_this.disposeRMMVBackgrounds();
 	
@@ -6055,8 +6087,8 @@ BattleSceneManager.prototype.preloadEffekseerParticles = async function(){
 							promises.push(new Promise(function(resolve, reject){
 								_this._effksContext.loadEffect("effekseer/"+params.path+".efk", 1.0, resolve);	
 								_this._effksContextMirror.loadEffect("effekseer/"+params.path+".efk", 1.0, resolve);	
-								_this._effksContextBack.loadEffect("effekseer/"+params.path+".efk", 1.0, resolve);	
-								_this._effksContextBackMirror.loadEffect("effekseer/"+params.path+".efk", 1.0, resolve);	
+								_this._effksContextBg.loadEffect("effekseer/"+params.path+".efk", 1.0, resolve);	
+								_this._effksContextBgMirror.loadEffect("effekseer/"+params.path+".efk", 1.0, resolve);	
 								_this._effksContextAttached.loadEffect("effekseer/"+params.path+".efk", 1.0, resolve);	
 							}));
 						}								
@@ -6080,8 +6112,8 @@ BattleSceneManager.prototype.preloadEffekseerParticles = async function(){
 							promises.push(new Promise(function(resolve, reject){
 								_this._effksContext.loadEffect("effekseer/"+params.path+".efk", 1.0, resolve);	
 								_this._effksContextMirror.loadEffect("effekseer/"+params.path+".efk", 1.0, resolve);	
-								_this._effksContextBack.loadEffect("effekseer/"+params.path+".efk", 1.0, resolve);	
-								_this._effksContextBackMirror.loadEffect("effekseer/"+params.path+".efk", 1.0, resolve);	
+								_this._effksContextBg.loadEffect("effekseer/"+params.path+".efk", 1.0, resolve);	
+								_this._effksContextBgMirror.loadEffect("effekseer/"+params.path+".efk", 1.0, resolve);	
 								_this._effksContextAttached.loadEffect("effekseer/"+params.path+".efk", 1.0, resolve);	
 							}));
 						}								
@@ -6513,7 +6545,7 @@ BattleSceneManager.prototype.setUpActionSceneState = function(action) {
 		
 		
 		_this._bgsHidden = false;
-		_this.setBgMode($statCalc.isFlying(action.ref) || $statCalc.getTileType(action.ref) == "space" ? "sky" : "land");
+		_this.setBgMode($statCalc.isBattleShadowHiddenOnCurrentTerrain(action.ref) ? "sky" : "land");
 		_this._actorSprite.sprite.visibility = 1;
 		if(_this._actorSprite.sprite.material){
 			_this._actorSprite.sprite.material.diffuseTexture.uScale = 1;
@@ -6652,6 +6684,7 @@ BattleSceneManager.prototype.endScene = function(force) {
 			_this.disposeAnimationSprites();
 			_this.disposeAnimationBackgrounds();
 			_this.disposeSpriterBackgrounds();
+			_this.disposeLights();
 			_this.disposeEffekseerInstances();
 			_this.disposeMovieBackgrounds();
 			_this.disposeRMMVBackgrounds();
@@ -6678,6 +6711,7 @@ BattleSceneManager.prototype.endScene = function(force) {
 			_this.disposeAnimationBackgrounds();
 			_this.disposeSpriterBackgrounds();
 			_this.disposeEffekseerInstances();
+			_this.disposeLights();
 			_this.disposeRMMVBackgrounds();
 			_this.disposeMovieBackgrounds();
 			_this._animationList = [];

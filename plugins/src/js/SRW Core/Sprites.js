@@ -706,13 +706,15 @@
 							this._lowerBodyOverlay.opacity = 255;
 							this.opacity = 255;
 						}
-						if(battlerArray && battlerArray[1] && $statCalc.getCurrentTerrain(battlerArray[1]) == "water" && !$statCalc.hoversOnWater(battlerArray[1])){
-							this._upperBody.opacity-=120;
-							this._upperBodyOverlay.opacity-=120;
-							this._upperBodyTop.opacity-=120;
-							this._lowerBody.opacity-=120;
-							this._lowerBodyOverlay.opacity-=120;
-						}					
+						let currentTerrain = $statCalc.getCurrentTerrainIdx(battlerArray[1]);
+						let terrainDef = $terrainTypeManager.getTerrainDefinition(currentTerrain);
+						if(terrainDef.opacityMod){
+							this._upperBody.opacity+=terrainDef.opacityMod;
+							this._upperBodyOverlay.opacity+=terrainDef.opacityMod;
+							this._upperBodyTop.opacity+=terrainDef.opacityMod;
+							this._lowerBody.opacity+=terrainDef.opacityMod;
+							this._lowerBodyOverlay.opacity+=terrainDef.opacityMod;
+						}	
 					}
 				}			
 			}		
@@ -853,12 +855,6 @@
 					if(($gameSystem.isSubBattlePhase() !== 'actor_map_target_confirm' || $gameTemp.isMapTarget(this._character.eventId())) &&
 						($gameSystem.isSubBattlePhase() !== 'actor_target_spirit' || $gameTemp.isSpiritTarget(this._character.eventId()))
 					){				
-						if(battlerArray && battlerArray[1] && $statCalc.getCurrentTerrain(battlerArray[1]) == "water" && !$statCalc.hoversOnWater(battlerArray[1])){
-							this.setBlendColor([21, 87, 255, 64]);								
-							
-						} else {
-							this.setBlendColor([0, 0, 0, 0]);	
-						}	
 						this._currentColorState = ""
 						this.filters = [];
 											
@@ -957,21 +953,6 @@
 					if(($gameSystem.isSubBattlePhase() !== 'actor_map_target_confirm' || $gameTemp.isMapTarget(this._character.eventId())) &&
 						($gameSystem.isSubBattlePhase() !== 'actor_target_spirit' || $gameTemp.isSpiritTarget(this._character.eventId()))
 					){				
-						if(battlerArray && battlerArray[1] && $statCalc.getCurrentTerrain(battlerArray[1]) == "water" && !$statCalc.hoversOnWater(battlerArray[1])){
-							this._upperBody.setBlendColor([21, 87, 255, 64]);	
-							this._upperBodyOverlay.setBlendColor([21, 87, 255, 64]);	
-							this._upperBodyTop.setBlendColor([21, 87, 255, 64]);	
-							this._lowerBody.setBlendColor([21, 87, 255, 64]);
-							this._lowerBodyOverlay.setBlendColor([21, 87, 255, 64]);
-							
-							
-						} else {
-							this._upperBody.setBlendColor([0, 0, 0, 0]);	
-							this._upperBodyOverlay.setBlendColor([0, 0, 0, 0]);	
-							this._upperBodyTop.setBlendColor([0, 0, 0, 0]);
-							this._lowerBody.setBlendColor([0, 0, 0, 0]);
-							this._lowerBodyOverlay.setBlendColor([0, 0, 0, 0]);
-						}	
 						this._currentColorState = ""
 						this._upperBodyOverlay.filters = [];
 						this._upperBody.filters = [];
@@ -1143,9 +1124,9 @@
 			}
 		} else {
 			var prevUnit = $statCalc.activeUnitAtPosition({x: this._character._prevX, y: this._character._prevY});
-			var prevHoverState = prevUnit && $statCalc.isFlying(prevUnit);
+			var prevHoverState = prevUnit && $statCalc.getFlyingAnimInfo(prevUnit);
 			var newUnit = $statCalc.activeUnitAtPosition({x: this._character._x, y: this._character._y});
-			var newHoverState = newUnit && $statCalc.isFlying(newUnit);
+			var newHoverState = newUnit && $statCalc.getFlyingAnimInfo(newUnit);
 			if(newUnit && newUnit.event.transitioningFloat){
 				this.y = this.y + newUnit.event._floatOffset;		
 			} else if(prevHoverState == newHoverState){
@@ -1373,7 +1354,8 @@
 		var eventId = this._character.eventId();
 		var battlerArray = $gameSystem.EventToUnit(eventId);
 		if(battlerArray){
-			if (this._character._characterName == "" || this._character._transparent || (!$statCalc.isFlying(battlerArray[1]) && this._character._floatOffset == 0)) {
+			const flyInfo = $statCalc.getFlyingAnimInfo(battlerArray[1]);
+			if (this._character._characterName == "" || this._character._transparent || !flyInfo || !flyInfo.displayShadow || this._character._floatOffset == 0) {
 				this.opacity = 0;
 			} else {
 				this.y-=this._character._floatOffset;

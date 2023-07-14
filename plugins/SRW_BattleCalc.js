@@ -1211,7 +1211,9 @@ BattleCalc.prototype.generateBattleResult = function(isPrediction){
 			while(isHit && ctr < specialEvadeInfo.length){
 				var evasionType = specialEvadeInfo[ctr].subType;
 				if(evasionType == weaponType || evasionType == "all" || (evasionType == "ranged" && weaponref.type == "R") || (evasionType == "melee" && weaponref.type == "M")){
-					if(specialEvadeInfo[ctr].activation == "skill"){
+					if($SRWConfig.customSpecialEvasionActivationCheckers && $SRWConfig.customSpecialEvasionActivationCheckers[specialEvadeInfo[ctr].activation]){
+						isHit = !$SRWConfig.customSpecialEvasionActivationCheckers[specialEvadeInfo[ctr].activation](specialEvadeInfo[ctr].originLevel, attacker, defender);
+					} else if(specialEvadeInfo[ctr].activation == "skill"){
 						isHit = dSkill < aSkill;
 					} else if(specialEvadeInfo[ctr].activation == "random"){
 						isHit = Math.random() > specialEvadeInfo[ctr].value;

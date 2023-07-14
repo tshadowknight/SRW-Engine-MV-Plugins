@@ -194,10 +194,10 @@ MechUI.prototype.initPropertyHandlers = function(){
 					content+=terrains[i].type;
 					content+="</div>";
 					var value = _this.getMetaValue(terrains[i].prop);
-					if(terrains[i].type == "SEA"){
+					if($terrainTypeManager.getTerrainDefinition(i+1).moveCostMod > 1){
 						content+="<div >";
 						//content+="<input data-terrainidx='"+i+"' class='terrain_enabled_select' type=checkbox "+(value >= 1 ? "checked" : "")+"></input>";
-						content+="<select id='terrain_enabled_select'>";
+						content+="<select data-terrainidx='"+i+"' class='terrain_enabled_select'>";
 						var options = [
 							EDITORSTRINGS.GENERAL.label_no,
 							EDITORSTRINGS.MECH.label_move_penalty,
@@ -227,14 +227,14 @@ MechUI.prototype.initPropertyHandlers = function(){
 				content+="<div class='row'>";	
 				content+=_this.createTerrainControls("mechTerrain", EDITORSTRINGS.MECH.label_terrain_rank);
 				content+="</div>";
-				content+="<div class='row'>";
+				/*content+="<div class='row'>";
 				content+="<div class='cell'>";
 				content+=EDITORSTRINGS.MECH.label_can_hover;
 				content+="</div>";
 				content+="<div class='cell'>";
 				content+="<input id='can_hover' type=checkbox "+(_this.getMetaValue("mechHoverEnabled")*1 ? "checked" : "")+"></input>";
 				content+="</div>";
-				content+="</div>";
+				content+="</div>";*/
 				return content;
 			},
 			hook(){
@@ -260,17 +260,17 @@ MechUI.prototype.initPropertyHandlers = function(){
 					});
 				});
 				
-				containerNode.querySelector("#terrain_enabled_select").addEventListener("change", function(){
-					_this.setMetaValue(terrains[2].prop, this.value);
+				containerNode.querySelector(".terrain_enabled_select").addEventListener("change", function(){
+					_this.setMetaValue(terrains[this.getAttribute("data-terrainidx")].prop, this.value);
 					_this.show();
 					_this._mainUIHandler.setModified();
 				});
 				
-				containerNode.querySelector("#can_hover").addEventListener("change", function(){
+				/*containerNode.querySelector("#can_hover").addEventListener("change", function(){
 					_this.setMetaValue("mechHoverEnabled", this.checked ? 1 : 0);
 					_this.show();
 					_this._mainUIHandler.setModified();
-				});
+				});*/
 			}
 		},
 		exp_yield: handleDefaultProp("mechExpYield",  EDITORSTRINGS.MECH.label_exp_yield),
