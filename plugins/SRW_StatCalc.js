@@ -349,7 +349,7 @@ StatCalc.prototype.getCurrentTerrainIdx = function(actor){
 			result = actor.SRWStats.mech.enabledTerrainSuperState;
 		} else {
 			let referenceEvent = this.getReferenceEvent(actor);	
-			if(referenceEvent){
+			if(referenceEvent && $dataMap){//hacky fix for issue in attack editor preview where it crashes when trying to get the terrain info from a non-existant map
 				result = $gameMap.regionId(referenceEvent.posX(), referenceEvent.posY()) % 8;
 			}
 		}				
