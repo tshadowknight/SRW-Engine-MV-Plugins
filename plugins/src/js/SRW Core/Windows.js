@@ -380,7 +380,7 @@
 							 _this.addCommand(APPSTRINGS.MAPMENU.cmd_ability, 'ability');
 						}
 
-						let terrainCmds = $statCalc.getAvailableSuperStateTransitions(_this._actor);	
+						let terrainCmds = $statCalc.getAvailableSuperStateTransitionsForCurrentPosition(_this._actor);	
 						for(let i = 0; i < Math.min(4, terrainCmds.length); i++){
 							_this.addCommand(terrainCmds[i].cmdName, 'change_super_state_'+i);
 						}
@@ -468,7 +468,7 @@
 					function deployMenu(){
 						_this.addMoveCommand();					
 						_this.addCommand(APPSTRINGS.MAPMENU.cmd_spirit, 'spirit');
-						let terrainCmds = $statCalc.getAvailableSuperStateTransitions(_this._actor);	
+						let terrainCmds = $statCalc.getAvailableSuperStateTransitionsForCurrentPosition(_this._actor);	
 						for(let i = 0; i < Math.min(4, terrainCmds.length); i++){
 							_this.addCommand(terrainCmds[i].cmdName, 'change_super_state_'+i);
 						}

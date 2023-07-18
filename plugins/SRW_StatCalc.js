@@ -1463,6 +1463,9 @@ StatCalc.prototype.initSRWStats = function(actor, level, itemIds, preserveVolati
 		actor.SRWStats.pilot.textAlias = -1;
 	}
 	
+	actor.SRWStats.pilot.attribute1 = actorProperties.pilotAttribute1;
+	actor.SRWStats.pilot.attribute2 = actorProperties.pilotAttribute2;
+	
 	var aceAbilityIdx = actorProperties.pilotAbilityAce;
 	if(typeof aceAbilityIdx != "undefined" && aceAbilityIdx != ""){
 		actor.SRWStats.pilot.aceAbility = {
@@ -4115,6 +4118,15 @@ StatCalc.prototype.getValidSuperStatesLookup = function(actor, position){
 		result[transition.endState] = true;
 	}
 	return result;
+}
+
+StatCalc.prototype.getAvailableSuperStateTransitionsForCurrentPosition = function(actor){
+	const referenceEvent = this.getReferenceEvent(actor);
+	if(referenceEvent){
+		const position = {x: referenceEvent.posX(), y: referenceEvent.posY()};
+		return this.getAvailableSuperStateTransitions(actor, position);
+	}
+	return [];
 }
 
 StatCalc.prototype.getAvailableSuperStateTransitions = function(actor, position, fromBaseTerrain){
@@ -7625,6 +7637,27 @@ StatCalc.prototype.getActiveCombatInfo = function(actor){
 	return null;
 }
 
+
+StatCalc.prototype.getParticipantAttribute = function(participant, attribute, weaponInfo){
+	let result = "";
+	if(weaponInfo && ENGINE_SETTINGS.USE_WEAPON_ATTRIBUTE){
+		result = weaponInfo[attribute];
+	}
+	
+	if(!result){
+		result = participant.SRWStats.stageTemp[attribute] || "";
+	}
+	
+	if(!result){
+		result = participant.SRWStats.pilot[attribute] || "";
+	}
+	
+	if(!result){
+		result = participant.SRWStats.mech[attribute] || "";
+	}
+	return result;
+}
+
 StatCalc.prototype.getAttributeInfo = function(actor){
 	var result = {
 		attribute1: "",
@@ -7632,8 +7665,8 @@ StatCalc.prototype.getAttributeInfo = function(actor){
 	}
 	if(this.isActorSRWInitialized(actor)){	
 		result = {
-			attribute1: String(actor.SRWStats.mech.attribute1).toLowerCase(),
-			attribute2: String(actor.SRWStats.mech.attribute2).toLowerCase()
+			attribute1: this.getParticipantAttribute(actor, "attribute1").toLowerCase(),
+			attribute2: this.getParticipantAttribute(actor, "attribute2").toLowerCase()
 		}
 	}	
 	return result;
@@ -7649,26 +7682,17 @@ StatCalc.prototype.getEffectivenessMultipler = function(attacker, weaponInfo, de
 		}
 		return result;
 	}
-	var attackerAttr1;
-	if(ENGINE_SETTINGS.USE_WEAPON_ATTRIBUTE){
-		attackerAttr1 = weaponInfo.attribute1 || "";
-	} else {
-		attackerAttr1 = attacker.SRWStats.mech.attribute1 || "";
-	}
-	 
-	var defenderAttr1 = defender.SRWStats.mech.attribute1 || ""; 
 	
-	var attr1Mult = readLookup(ENGINE_SETTINGS.EFFECTIVENESS.attribute1, attackerAttr1, defenderAttr1);
 	
-	var attackerAttr2;
-	if(ENGINE_SETTINGS.USE_WEAPON_ATTRIBUTE){
-		attackerAttr2 = weaponInfo.attribute2 || "";
-	} else {
-		attackerAttr2 = attacker.SRWStats.mech.attribute2 || "";
-	}
-	var defenderAttr2 = defender.SRWStats.mech.attribute2 || ""; 
+	let attackerAttr1 = this.getParticipantAttribute(attacker, "attribute1", weaponInfo);
+	let defenderAttr1 = this.getParticipantAttribute(defender, "attribute1");
 	
-	var attr2Mult = readLookup(ENGINE_SETTINGS.EFFECTIVENESS.attribute2, attackerAttr2, defenderAttr2);
+	let attr1Mult = readLookup(ENGINE_SETTINGS.EFFECTIVENESS.attribute1, attackerAttr1, defenderAttr1);
+	
+	let attackerAttr2 = this.getParticipantAttribute(attacker, "attribute2", weaponInfo);
+	let defenderAttr2 = this.getParticipantAttribute(defender, "attribute2");
+	
+	let attr2Mult = readLookup(ENGINE_SETTINGS.EFFECTIVENESS.attribute2, attackerAttr2, defenderAttr2);
 	
 	return attr1Mult * attr2Mult;
 }

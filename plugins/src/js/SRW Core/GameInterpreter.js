@@ -449,12 +449,17 @@
 					params.items, 
 					params.squadId, 
 					params.targetRegion,
-					params.factionId
+					params.factionId,
+					params.counterBehavior,
+					params.attackBehavior,
+					params.noUpdateCount,
+					params.attribute1,
+					params.attribute2
 				);
 			}
 		}
 
-		Game_Interpreter.prototype.addEnemies = function(toAnimQueue, startId, endId, enemyId, mechClass, level, mode, targetId, items, squadId, targetRegion, factionId) {
+		Game_Interpreter.prototype.addEnemies = function(toAnimQueue, startId, endId, enemyId, mechClass, level, mode, targetId, items, squadId, targetRegion, factionId, attribute1, attribute2) {
 			for(var i = startId; i <= endId; i++){
 				this.addEnemy(toAnimQueue, i, enemyId, mechClass, level, mode, targetId, items, squadId, targetRegion, factionId);
 			}
@@ -475,12 +480,14 @@
 				params.factionId,
 				params.counterBehavior,
 				params.attackBehavior,
-				params.noUpdateCount
+				params.noUpdateCount,
+				params.attribute1,
+				params.attribute2
 			);
 		}
 
 		// 新規エネミーを追加する（増援）
-		Game_Interpreter.prototype.addEnemy = function(toAnimQueue, eventId, enemyId, mechClass, level, mode, targetId, items, squadId, targetRegion, factionId, counterBehavior, attackBehavior, noUpdateCount) {
+		Game_Interpreter.prototype.addEnemy = function(toAnimQueue, eventId, enemyId, mechClass, level, mode, targetId, items, squadId, targetRegion, factionId, counterBehavior, attackBehavior, noUpdateCount, attribute1, attribute2) {
 			if(!$dataEnemies[enemyId] || !$dataEnemies[enemyId].meta || !Object.keys($dataEnemies[enemyId].meta).length){
 				throw("Attempted to create an enemy pilot with id '"+enemyId+"' which does not have SRW data.");
 			}
@@ -566,8 +573,16 @@
 						$gameMap.setEventImages();
 					}
 				}
+				if(attribute1){
+					$statCalc.setStageTemp(enemy_unit, "attribute1", attribute1);
+				}
+				if(attribute2){
+					$statCalc.setStageTemp(enemy_unit, "attribute2", attribute2);
+				}
 			}
 			//$statCalc.invalidateAbilityCache();
+			
+			
 			return true;
 		};
 		

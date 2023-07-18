@@ -2361,7 +2361,7 @@ SceneManager.isInSaveScene = function(){
 	Scene_Map.prototype.commandChangeSuperState = function(idx) {
 		
 		var actor = $gameSystem.EventToUnit($gameTemp.activeEvent().eventId())[1];
-		let terrainCmd = $statCalc.getAvailableSuperStateTransitions(actor)[idx];	
+		let terrainCmd = $statCalc.getAvailableSuperStateTransitionsForCurrentPosition(actor)[idx];	
 		$statCalc.setSuperState(actor, terrainCmd.endState, false, terrainCmd.se);
 	   
 		$gameTemp.activeEvent().transitioningFloat = true;

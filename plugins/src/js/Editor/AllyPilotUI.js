@@ -373,6 +373,8 @@ AllyPilotUI.prototype.initPropertyHandlers = function(){
 				});
 			}
 		},
+		attribute1: handleDefaultProp("pilotAttribute1",  EDITORSTRINGS.MECH.label_attribute1),
+		attribute2: handleDefaultProp("pilotAttribute2",  EDITORSTRINGS.MECH.label_attribute2),
 		spirits: {
 			createControls(){		
 				var spiritDefs = $spiritManager.getSpiritDefinitions();
@@ -916,6 +918,14 @@ AllyPilotUI.prototype.show = async function(){
 	content+="</div>";	
 
 	content+=_this._propertyHandlers.text_alias.createControls();
+	
+	content+="<div class='row'>";
+	content+=_this._propertyHandlers.attribute1.createControls();
+	content+="</div>";
+	
+	content+="<div class='row'>";
+	content+=_this._propertyHandlers.attribute2.createControls();
+	content+="</div>";
 
 	content+="</div>";
 	content+="</div>";

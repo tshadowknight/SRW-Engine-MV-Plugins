@@ -148,6 +148,7 @@ var ENGINE_SETTINGS = {
 	MERGE_ATTACK_UPGRADES: false,
 	ENABLE_ATTRIBUTE_SYSTEM: false,
 	USE_WEAPON_ATTRIBUTE: false,
+	ATTRIBUTE_DISPLAY_NAMES: {},
 	EFFECTIVENESS: { //example tables
 		attribute1: {
 			"vaccine": {

@@ -24,6 +24,7 @@
 			this._SrpgActorCommandStatusWindowRefreshFlag = [false, null];
 			this._srpgAllActors = []; //SRPGモードに参加する全てのアクターの配列
 			this._searchedItemList = [];
+			this._pilotFallbackInfo = {};
 			this.initOptions();
 			
 			

@@ -1143,25 +1143,26 @@ Window_DetailPages.prototype.redraw = function() {
 	
 	this._attribute1Display.style.display = "none";
 	this._attribute2Display.style.display = "none";
-	if(this.getCurrentSelection().mech.attribute1){
+	let attr1 = $statCalc.getParticipantAttribute(this.getCurrentSelection().actor, "attribute1");
+	if(attr1){
 		var content = "";
 		content+="<div class='label scaled_text fitted_text'>";
 		content+=APPSTRINGS.DETAILPAGES.label_attribute_1;
 		content+="</div>";
 		content+="<div class='value scaled_text fitted_text'>";
-		content+=this.getCurrentSelection().mech.attribute1;
+		content+=ENGINE_SETTINGS.ATTRIBUTE_DISPLAY_NAMES[attr1] || attr1;
 		content+="</div>";
 		this._attribute1Display.innerHTML = content;
 		this._attribute1Display.style.display = "block";		
 	}
-	
-	if(this.getCurrentSelection().mech.attribute2){
+	let attr2 = $statCalc.getParticipantAttribute(this.getCurrentSelection().actor, "attribute2");
+	if(attr2){
 		var content = "";
 		content+="<div class='label scaled_text fitted_text'>";
 		content+=APPSTRINGS.DETAILPAGES.label_attribute_2;
 		content+="</div>";
 		content+="<div class='value scaled_text fitted_text'>";
-		content+=this.getCurrentSelection().mech.attribute2;
+		content+=ENGINE_SETTINGS.ATTRIBUTE_DISPLAY_NAMES[attr2] || attr2;
 		content+="</div>";
 		this._attribute2Display.innerHTML = content;
 		this._attribute2Display.style.display = "block";		
