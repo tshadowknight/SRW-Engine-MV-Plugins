@@ -6580,8 +6580,19 @@ StatCalc.prototype.getActiveStatMods = function(actor, excludedSkills){
 				accumulateFromAbilityList(relationshipBonuses, $relationshipBonusManager);	
 			}
 			
-			if(actor.SRWStats.pilot.activeEffects && actor.SRWStats.pilot.activeEffects.length){
-				actor.SRWStats.pilot.activeEffects.forEach(function(statMod){
+			let directEffects = [];
+			directEffects = directEffects.concat(actor.SRWStats.pilot.activeEffects || []);
+			
+			if(ENGINE_SETTINGS.ENABLE_ATTRIBUTE_SYSTEM && ENGINE_SETTINGS.ATTRIBUTE_MODS){
+				let attributeMods = [];
+				let attribute = this.getParticipantAttribute(actor, "attribute1");
+				if(ENGINE_SETTINGS.ATTRIBUTE_MODS[attribute]){
+					directEffects = directEffects.concat(JSON.parse(JSON.stringify(ENGINE_SETTINGS.ATTRIBUTE_MODS[attribute])));
+				}
+			}			
+			
+			if(directEffects && directEffects.length){
+				directEffects.forEach(function(statMod){
 					var targetList;	
 					if(statMod.modType == "mult"){
 						targetList = result.mult;
@@ -7672,12 +7683,15 @@ StatCalc.prototype.getAttributeInfo = function(actor){
 	return result;
 }
 
-StatCalc.prototype.getEffectivenessMultipler = function(attacker, weaponInfo, defender){
+StatCalc.prototype.getEffectivenessMultiplier = function(attacker, weaponInfo, defender, type){
 	function readLookup(lookup, attackerAttr, defenderAttr){
 		var result = 1;
 		if(lookup){
 			if(lookup[attackerAttr] && lookup[attackerAttr][defenderAttr]){
 				result = lookup[attackerAttr][defenderAttr];
+				if(result[type]){
+					result = result[type];
+				}
 			}
 		}
 		return result;

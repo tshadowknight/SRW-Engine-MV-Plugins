@@ -1142,16 +1142,29 @@ Window_DetailPages.prototype.redraw = function() {
 	}
 	
 	this._attribute1Display.style.display = "none";
+	this._attribute1Display.classList.remove("effects");
 	this._attribute2Display.style.display = "none";
 	let attr1 = $statCalc.getParticipantAttribute(this.getCurrentSelection().actor, "attribute1");
 	if(attr1){
+		let attrInfo = ENGINE_SETTINGS.ATTRIBUTE_DISPLAY_NAMES[attr1];
+		if(attrInfo.effects){
+			this._attribute1Display.classList.add("effects");
+		}
 		var content = "";
 		content+="<div class='label scaled_text fitted_text'>";
 		content+=APPSTRINGS.DETAILPAGES.label_attribute_1;
+		content+="</div>";		
+		content+="<div class='value scaled_text fitted_text primary'>";		
+		content+=attrInfo.name || attr1;
 		content+="</div>";
-		content+="<div class='value scaled_text fitted_text'>";
-		content+=ENGINE_SETTINGS.ATTRIBUTE_DISPLAY_NAMES[attr1] || attr1;
-		content+="</div>";
+		if(attrInfo.effects){
+			for(let effectDesc of attrInfo.effects){
+				content+="<div class='value scaled_text fitted_text effect_desc'>";		
+				content+=effectDesc;
+				content+="</div>";
+			}
+		}		
+		
 		this._attribute1Display.innerHTML = content;
 		this._attribute1Display.style.display = "block";		
 	}
@@ -1162,7 +1175,8 @@ Window_DetailPages.prototype.redraw = function() {
 		content+=APPSTRINGS.DETAILPAGES.label_attribute_2;
 		content+="</div>";
 		content+="<div class='value scaled_text fitted_text'>";
-		content+=ENGINE_SETTINGS.ATTRIBUTE_DISPLAY_NAMES[attr2] || attr2;
+		let attrInfo = ENGINE_SETTINGS.ATTRIBUTE_DISPLAY_NAMES[attr2];
+		content+=attrInfo.name || attr2;
 		content+="</div>";
 		this._attribute2Display.innerHTML = content;
 		this._attribute2Display.style.display = "block";		

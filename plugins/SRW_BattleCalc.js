@@ -203,6 +203,9 @@ BattleCalc.prototype.performHitCalculation = function(attackerInfo, defenderInfo
 			finalHit-=30;
 		}
 		
+		if(ENGINE_SETTINGS.ENABLE_ATTRIBUTE_SYSTEM){
+			finalHit*=$statCalc.getEffectivenessMultiplier(attackerInfo.actor, weaponInfo, defenderInfo.actor, "hit");
+		}
 					
 		
 		if($statCalc.getActiveSpirits(attackerInfo.actor).disrupt) {
@@ -228,6 +231,7 @@ BattleCalc.prototype.performHitCalculation = function(attackerInfo, defenderInfo
 		if(finalHit < 0){
 			finalHit = 0;
 		}
+		
 		if(!$statCalc.applyStatModsToValue(attackerInfo.actor, 0, ["hit_cap_break"])){
 			if(finalHit > 1){
 				finalHit = 1;
@@ -399,7 +403,7 @@ BattleCalc.prototype.performDamageCalculation = function(attackerInfo, defenderI
 		
 				
 		if(ENGINE_SETTINGS.ENABLE_ATTRIBUTE_SYSTEM){
-			finalDamage*=$statCalc.getEffectivenessMultipler(attackerInfo.actor, weaponInfo, defenderInfo.actor);
+			finalDamage*=$statCalc.getEffectivenessMultiplier(attackerInfo.actor, weaponInfo, defenderInfo.actor, "damage");
 		}
 		
 		if(!isSupportAttacker){

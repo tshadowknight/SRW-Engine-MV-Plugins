@@ -148,6 +148,32 @@ var ENGINE_SETTINGS = {
 	MERGE_ATTACK_UPGRADES: false,
 	ENABLE_ATTRIBUTE_SYSTEM: false,
 	USE_WEAPON_ATTRIBUTE: false,
+	ATTRIBUTE_MODS: {
+		"fire": [
+			
+		],
+		"ice": [
+		
+		],
+		"water": [
+		
+		],
+		"electric": [
+		
+		],
+		"air": [
+		
+		],
+		"earth": [
+		
+		],
+		"light": [
+		
+		],
+		"dark": [
+		
+		]
+	},
 	ATTRIBUTE_DISPLAY_NAMES: {},
 	EFFECTIVENESS: { //example tables
 		attribute1: {

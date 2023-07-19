@@ -485,7 +485,7 @@
     padding-left: 0.5%;
     padding-right: 0.5%;
 	position: absolute;
-	height: 10%;
+	height: fit-content;
 	right: 0;
 	background-color: var(--section-bg-color);
 	border-bottom-left-radius: 2vw;
@@ -493,6 +493,14 @@
 	display: none;
 	--fontsize: 2px;
 	color: #FFFFFF;
+}
+
+#detail_pages .attribute_display.effects {
+	
+}
+
+#detail_pages .attribute_display .value.effect_desc{
+	--fontsize: 1.4px;
 }
 
 #detail_pages .attribute_display .label{
@@ -503,6 +511,10 @@
 #detail_pages .attribute_display .value{
 	width: 100%;
 	text-align: center;
+}
+
+#detail_pages .attribute_display .value.primary{
+	color: var(--text-color-highlight2);
 }
 
 #detail_pages .attribute_display.primary {
