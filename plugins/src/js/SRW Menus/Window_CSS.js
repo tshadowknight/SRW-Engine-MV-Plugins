@@ -563,3 +563,25 @@ Window_CSS.prototype.handleElemScrol = function(scrolledElem, scroll) {
 	}
 	return scrolledElem.scrollTop;
 }
+
+Window_CSS.prototype.createAttributeEffectivenessBlock = function(actor, attribute, attack, target) {
+	let content = "";
+	let effectClass = "";
+	if(target){
+		let effectiveness = $statCalc.getEffectivenessMultiplier(actor, attack, target, "damage");
+		if(effectiveness > 1){
+			effectClass = "SE";
+		} else if(effectiveness < 1){
+			effectClass = "NVE";
+		}
+	}
+	content+="<div class='attribute_effectiveness_block "+effectClass+"'>";
+	let attr = $statCalc.getParticipantAttribute(actor, attribute, attack);
+	if(attr){
+		
+		content+="<img class='effectiveness_icon' src='img/system/attribute_"+attr+".png'>";	
+		content+="<div class='effectiveness_indicator glowing_elem'></div>";	
+	}			
+	content+="</div>";
+	return content;
+}

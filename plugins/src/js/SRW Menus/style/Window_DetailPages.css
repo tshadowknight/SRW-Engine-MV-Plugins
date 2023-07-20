@@ -515,6 +515,15 @@
 
 #detail_pages .attribute_display .value.primary{
 	color: var(--text-color-highlight2);
+	display: flex;
+	align-items: center;
+	justify-content: center;
+}
+
+#detail_pages .attribute_display .value.primary img{
+	width: 14%;
+    margin: 2%;
+	/*image-rendering: pixelated;*/
 }
 
 #detail_pages .attribute_display.primary {

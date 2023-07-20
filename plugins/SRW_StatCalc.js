@@ -6583,48 +6583,71 @@ StatCalc.prototype.getActiveStatMods = function(actor, excludedSkills){
 			let directEffects = [];
 			directEffects = directEffects.concat(actor.SRWStats.pilot.activeEffects || []);
 			
-			if(ENGINE_SETTINGS.ENABLE_ATTRIBUTE_SYSTEM && ENGINE_SETTINGS.ATTRIBUTE_MODS){
-				let attributeMods = [];
-				let attribute = this.getParticipantAttribute(actor, "attribute1");
-				if(ENGINE_SETTINGS.ATTRIBUTE_MODS[attribute]){
-					directEffects = directEffects.concat(JSON.parse(JSON.stringify(ENGINE_SETTINGS.ATTRIBUTE_MODS[attribute])));
+				
+			
+			function processStatMod(statMod){
+				var targetList;	
+				if(statMod.modType == "mult"){
+					targetList = result.mult;
+				} else if(statMod.modType == "addPercent"){
+					targetList = result.addPercent;
+				} else if(statMod.modType == "addFlat"){
+					targetList = result.addFlat;
+				} else if(statMod.modType == "mult_ceil"){
+					targetList = result.mult_ceil;
 				}
-			}			
+				
+				statMod.rangeInfo = {min: 0, max: 0, targets: "own"};
+				
+				statMod.stackId = "active_effect";
+				statMod.canStack = true;
+				
+				statMod.appliesTo = null;
+				
+				statMod.originType = actor.isActor() ? "actor" : "enemy";
+				statMod.originId = actor.SRWStats.pilot.id;
+				
+				if(targetList){
+					targetList.push(statMod);
+				}
+				var listEntry = JSON.parse(JSON.stringify(statMod));
+				if(!listEntry.name){
+					listEntry.name = "Active Effect";
+				}
+				
+				result.list.push(listEntry);
+			}
 			
 			if(directEffects && directEffects.length){
 				directEffects.forEach(function(statMod){
-					var targetList;	
-					if(statMod.modType == "mult"){
-						targetList = result.mult;
-					} else if(statMod.modType == "addPercent"){
-						targetList = result.addPercent;
-					} else if(statMod.modType == "addFlat"){
-						targetList = result.addFlat;
-					} else if(statMod.modType == "mult_ceil"){
-						targetList = result.mult_ceil;
-					}
-					
-					statMod.rangeInfo = {min: 0, max: 0, targets: "own"};
-					
-					statMod.stackId = "active_effect";
-					statMod.canStack = true;
-					
-					statMod.appliesTo = null;
-					
-					statMod.originType = actor.isActor() ? "actor" : "enemy";
-					statMod.originId = actor.SRWStats.pilot.id;
-					
-					if(targetList){
-						targetList.push(statMod);
-					}
-					var listEntry = JSON.parse(JSON.stringify(statMod));
-					if(!listEntry.name){
-						listEntry.name = "Active Effect";
-					}
-					
-					result.list.push(listEntry);
+					processStatMod(statMod)
 				});
 			}
+			
+			
+			if(ENGINE_SETTINGS.ENABLE_ATTRIBUTE_SYSTEM && ENGINE_SETTINGS.ATTRIBUTE_MODS){
+				let attributeMods = [];
+				let attribute = this.getParticipantAttribute(actor, "attribute1");
+				//hacky fix to ability given attribute changes not being available with the getParticipantAttribute call at this point of processing
+				let statModAttributes = [];
+				for(let statMod of result.list){
+					if(statMod.type == "attribute"){
+						statModAttributes.push(statMod.attribute);
+					}
+				}
+				if(statModAttributes.length){
+					attribute = statModAttributes[0];
+				}
+				if(ENGINE_SETTINGS.ATTRIBUTE_MODS[attribute]){
+					attributeMods =JSON.parse(JSON.stringify(ENGINE_SETTINGS.ATTRIBUTE_MODS[attribute]));
+				}
+				
+				if(attributeMods && attributeMods.length){
+					attributeMods.forEach(function(statMod){
+						processStatMod(statMod)
+					});
+				}
+			}		
 		}
 	}
 	return result;
@@ -7652,7 +7675,19 @@ StatCalc.prototype.getActiveCombatInfo = function(actor){
 StatCalc.prototype.getParticipantAttribute = function(participant, attribute, weaponInfo){
 	let result = "";
 	if(weaponInfo && ENGINE_SETTINGS.USE_WEAPON_ATTRIBUTE){
-		result = weaponInfo[attribute];
+		const weapAttributeOverrides = $statCalc.getModDefinitions(participant, ["weapon_attribute"]);
+		if(weapAttributeOverrides.length){
+			result = weapAttributeOverrides[0].attribute;
+		} else {
+			result = weaponInfo[attribute];
+		}	
+	}
+	
+	if(!result && attribute == "attribute1"){
+		const attributeOverrides = $statCalc.getModDefinitions(participant, ["attribute"]);
+		if(attributeOverrides.length){
+			result = attributeOverrides[0].attribute;
+		}
 	}
 	
 	if(!result){
@@ -7708,7 +7743,17 @@ StatCalc.prototype.getEffectivenessMultiplier = function(attacker, weaponInfo, d
 	
 	let attr2Mult = readLookup(ENGINE_SETTINGS.EFFECTIVENESS.attribute2, attackerAttr2, defenderAttr2);
 	
-	return attr1Mult * attr2Mult;
+	let result = attr1Mult * attr2Mult;
+	
+	if(this.applyStatModsToValue(attacker, 0, ["always_se"])){
+		result = ENGINE_SETTINGS.DEFAULT_SE_MULTIPLIER;
+	}
+	
+	if(this.applyStatModsToValue(defender, 0, ["ignore_se"])){
+		result = 1;
+	}
+	
+	return result;
 }
 
 StatCalc.prototype.setAIFlags = function(actor, flags){

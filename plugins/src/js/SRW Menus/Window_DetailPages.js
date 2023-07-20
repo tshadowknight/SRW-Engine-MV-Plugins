@@ -1155,6 +1155,7 @@ Window_DetailPages.prototype.redraw = function() {
 		content+=APPSTRINGS.DETAILPAGES.label_attribute_1;
 		content+="</div>";		
 		content+="<div class='value scaled_text fitted_text primary'>";		
+		content+="<img src='img/system/attribute_"+attr1+".png'>";		
 		content+=attrInfo.name || attr1;
 		content+="</div>";
 		if(attrInfo.effects){

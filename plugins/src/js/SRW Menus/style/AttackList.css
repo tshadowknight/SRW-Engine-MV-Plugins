@@ -219,6 +219,14 @@
 	font-weight: bold;
 }
 
+.attribute_block_entry.effectiveness{
+	--widthscaling: 2.4;
+}
+
+.attribute_block_entry img{
+	width: 100%;
+}
+
 .attribute_block_entry.all{
 	--widthscaling: 3;
 	/*padding-left: 1.5%;

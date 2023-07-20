@@ -378,7 +378,9 @@
 				$gameMap.events().forEach(function(event) {
 					this.createDefendIndicator(event._eventId, event);
 					this.createAttackIndicator(event._eventId, event);
+					this.createAttributeIndicator(event._eventId, event);
 					this.createWillIndicator(event._eventId, event);
+					
 					this.createTwinIndicator(event._eventId, event);
 					this.createExplosionSprite(event._eventId, event);
 					this.createAppearSprite(event._eventId, event);
@@ -488,7 +490,9 @@
 				$gameMap.events().forEach(function(event) {
 					this.createDefendIndicator(event._eventId, event);
 					this.createAttackIndicator(event._eventId, event);
+					this.createAttributeIndicator(event._eventId, event);
 					this.createWillIndicator(event._eventId, event);
+					
 					this.createTwinIndicator(event._eventId, event);
 					this.createExplosionSprite(event._eventId, event);
 					this.createAppearSprite(event._eventId, event);
@@ -576,6 +580,7 @@
 				this._appearSprites = {};
 				this._disappearSprites = {};
 				this._willIndicators = {};
+				this._attributeIndicators = {};
 				this._defendIndicators = {};
 				this._attackIndicators = {};
 				this._twinIndicators = {};
@@ -622,6 +627,7 @@
 			this._appearSprites = {};
 			this._disappearSprites = {};
 			this._willIndicators = {};
+			this._attributeIndicators = {};
 			this._defendIndicators = {};
 			this._attackIndicators = {};
 			this._twinIndicators = {};
@@ -753,6 +759,15 @@
 				character._willIndicator = true;
 			};
 		};	
+		
+		Spriteset_Map.prototype.createAttributeIndicator = function(id,character) {
+			if (!character) return;
+			if (!this._attributeIndicators[id]) {
+				this._attributeIndicators[id] = new Sprite_AttributeIndicator(character);
+				this.addCharacterToBaseSprite(this._attributeIndicators[id]);
+				character._attributeIndicator = true;
+			};
+		};
 		
 		Spriteset_Map.prototype.createDefendIndicator = function(id,character) {
 			if (!character) return;

@@ -125,6 +125,16 @@ AttackList.prototype.createComponents = function(){
 AttackList.prototype.createAttributeBlock = function(attack) {
 	var content = "";
 	content+="<div class='attribute_block'>";
+	
+	if(ENGINE_SETTINGS.USE_WEAPON_ATTRIBUTE){
+		content+="<div class='attribute_block_entry scaled_width scaled_height scaled_text effectiveness'>";
+		let attr1 = $statCalc.getParticipantAttribute($gameTemp.currentMenuUnit.actor, "attribute1", attack);
+		if(attr1){
+			content+="<img src='img/system/attribute_"+attr1+".png'>";	
+		}			
+		content+="</div>";
+	}
+	
 	content+="<div class='attribute_block_entry scaled_width scaled_height scaled_text'>";
 	if(attack.effects.length){
 		content+="S";

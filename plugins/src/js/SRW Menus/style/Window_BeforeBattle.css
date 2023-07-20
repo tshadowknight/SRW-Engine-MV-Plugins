@@ -124,6 +124,7 @@
 	height: 79%;
 	width: 100%;
 	display: flex;
+	position: relative;
 }
 
 .participant_block .main_row .percent_indicator {
@@ -367,7 +368,7 @@
 }
 
 .participant_block .main_row .main_content .attack_name .attack_list_type {
-	margin-right: 2%;
+	margin-right: 0%;
 }
 
 .participant_block .active_spirits {
@@ -960,4 +961,72 @@
     justify-content: left;
 	font-style: italic;
 	--fontsize: 1.3px;
+}
+
+.attribute_effectiveness_block {
+	display: flex;
+	align-items: center;
+	justify-content: center;
+	--widthpixels: 26;
+	--heightpixels: 26;
+	margin-right: 0%;
+	position: relative;
+}
+
+.attribute_effectiveness_block .effectiveness_indicator {
+	position: absolute;
+	/*transform: rotate(45deg);
+	transform: rotate(45deg);
+	--widthpixels: 26;
+	--heightpixels: 26;
+	width: 1px;*/
+	z-index: 0;
+	border-radius: 0.5vw;
+}
+
+.attribute_effectiveness_block.SE .effectiveness_indicator{
+	background-color: #1ff299;
+}
+
+.attribute_effectiveness_block.NVE .effectiveness_indicator{
+	background-color: #d74f67;
+}
+
+.effectiveness_icon {
+	width: 80%;	
+	z-index: 1;
+}
+
+
+#before_battle .main_row .attribute_effectiveness_block{
+	position: absolute;
+}
+
+#before_battle .main_row .attack_name  .attribute_effectiveness_block{
+	position: relative;
+}
+
+
+#before_battle .participant_block.ally .main_row .attribute_effectiveness_block{
+	bottom: 0;
+    left: 2%;
+}
+
+#before_battle .participant_block.enemy .main_row .attribute_effectiveness_block{
+	bottom: 0;
+    right: 2%;
+}
+
+#before_battle .participant_block.ally .main_row .attack_name .attribute_effectiveness_block{
+	bottom: 0;
+    left: 0%;
+}
+
+#before_battle .participant_block.enemy .main_row .attack_name .attribute_effectiveness_block{
+	bottom: 0;
+    right: 0%;
+}
+
+#before_battle .participant_block_small.support_defend .attribute_effectiveness_block{
+	margin: 2%;
 }

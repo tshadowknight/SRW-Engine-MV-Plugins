@@ -767,6 +767,70 @@ $SRWConfig.mechAbilties = function(){
 		}
 	);
 	
+	this.addDefinition(
+		50, 
+		"Weapon Reenergize - Fire", 
+		"Changes the attribute of the unit's weapons to Fire", 
+		false,
+		false,
+		function(actor, level){
+			return [
+				{type: "weapon_attribute", modType: "addFlat", value: 1, attribute: "fire"},
+			];
+		},
+		function(actor, level){
+			return true;
+		}
+	);
+	
+	this.addDefinition(
+		51, 
+		"Reenergize - Air", 
+		"Changes the attribute of the unit to Fire", 
+		false,
+		false,
+		function(actor, level){
+			return [
+				{type: "attribute", modType: "addFlat", value: 1, attribute: "air"},
+			];
+		},
+		function(actor, level){
+			return true;
+		}
+	);
+	
+	this.addDefinition(
+		52, 
+		"Elemental Master", 
+		"All damage inflicted becomes super effective", 
+		false,
+		false,
+		function(actor, level){
+			return [
+				{type: "always_se", modType: "addFlat", value: 1},
+			];
+		},
+		function(actor, level){
+			return true;
+		}
+	);
+	
+	this.addDefinition(
+		53, 
+		"Nullify Elements", 
+		"Ignore the penalties from elemental matchups", 
+		false,
+		false,
+		function(actor, level){
+			return [
+				{type: "ignore_se", modType: "addFlat", value: 1},
+			];
+		},
+		function(actor, level){
+			return true;
+		}
+	);
+	
 	/*Insert new ability here*/
 	
 

@@ -148,24 +148,36 @@ var ENGINE_SETTINGS = {
 	MERGE_ATTACK_UPGRADES: false,
 	ENABLE_ATTRIBUTE_SYSTEM: false,
 	USE_WEAPON_ATTRIBUTE: false,
+	DEFAULT_SE_MULTIPLIER: 1,//used for abilities that always grant super effective damage
 	ATTRIBUTE_MODS: {
 		"fire": [
-			
+			{type: "hit", modType: "addFlat", value: -30},
+			{type: "weapon_melee", modType: "addFlat", value: 200},
+			{type: "weapon_ranged", modType: "addFlat", value: 200},
 		],
 		"ice": [
-		
+			{type: "crit", modType: "addFlat", value: -20},
+			{type: "armor", modType: "addFlat", value: -300},
+			{type: "weapon_melee", modType: "addFlat", value: 300},
+			{type: "weapon_ranged", modType: "addFlat", value: 300},
 		],
 		"water": [
-		
+			{type: "accuracy", modType: "addFlat", value: 30},
+			{type: "evade", modType: "addFlat", value: 20},
+			{type: "crit", modType: "addFlat", value: -20},
 		],
 		"electric": [
-		
+			{type: "crit", modType: "addFlat", value: 40},
+			{type: "armor", modType: "addFlat", value: -200},
 		],
 		"air": [
-		
+			{type: "movement", modType: "addFlat", value: 2},
+			{type: "weapon_melee", modType: "addFlat", value: -200},
+			{type: "weapon_ranged", modType: "addFlat", value: -200},
 		],
 		"earth": [
-		
+			{type: "movement", modType: "addFlat", value: -1},
+			{type: "armor", modType: "addFlat", value: 500},
 		],
 		"light": [
 		
@@ -174,54 +186,47 @@ var ENGINE_SETTINGS = {
 		
 		]
 	},
-	ATTRIBUTE_DISPLAY_NAMES: {},
+	ATTRIBUTE_DISPLAY_NAMES: {
+		"fire": {name: "Fire", effects: ["Weapon Power +200", "Hit Rate -30"]},
+		"ice":  {name: "Ice", effects: ["Weapon Power +300", "Crit Rate -20", "Armor -300"]},
+		"water":  {name: "Water", effects: ["Accuracy +30", "Evade +20", "Crit -20"]},
+		"electric":  {name: "Electric", effects: ["Crit +40", "Armor -200"]},
+		"air":  {name: "Air", effects: ["Movement +2", "Weapon Power -200"]},
+		"earth":  {name: "Earth", effects: ["Armor +500", "Movement -1"]},
+		"light":  {name: "Light", effects: []},
+		"dark":  {name: "Dark", effects: []},
+	},
 	EFFECTIVENESS: { //example tables
-		attribute1: {
-			"vaccine": {
-				"vaccine": 1,
-				"virus": 1.5,
-				"data": 0.75,			
-			},
-			"data": {
-				"vaccine": 1.5,
-				"virus": 0.75,
-				"data": 1,
-			},
-			"virus": {
-				"vaccine": 0.75,
-				"virus": 1,
-				"data": 1.5,
-			},
-			"free": {
-				"vaccine": 1,
-				"virus": 1,
-				"data": 1,
-			}
-		},
-		attribute2: {	
+		attribute1: {	
 			"fire": {
-				"plant": 1.1,
+				"ice": {damage: 2, hit: 1.3},
+				"water": {damage: 0.5, hit: 0.7},
 			},
-			"plant": {
-				"water": 1.1,
+			"ice": {
+				"air": {damage: 2, hit: 1.3},	
+				"fire": {damage: 0.5, hit: 0.7},
 			},
 			"water": {
-				"fire": 1.1,
+				"fire": {damage: 2,	 hit: 1.3},
+				"electric": {damage: 0.5, hit: 0.7},
 			},
-			"electric": {
-				"wind": 1.1,
+			"electric": {					
+				"water": {damage: 2, hit: 1.3},
+				"earth": {damage: 0.5, hit: 0.7},
 			},
-			"wind": {
-				"earth": 1.1,
+			"air": {
+				"earth": {damage: 2, hit: 1.3},	
+				"ice": {damage: 0.5, hit: 0.7},
 			},
 			"earth": {
-				"electric": 1.1,
+				"electric": {damage: 2,	 hit: 1.3},
+				"air": {damage: 0.5, hit: 0.7},
 			},
 			"light": {
-				"dark": 1.1,
+				"dark": {damage: 2}
 			},
 			"dark": {
-				"light": 1.1,
+				"light": {damage: 2}	
 			},
 		}
 	},
