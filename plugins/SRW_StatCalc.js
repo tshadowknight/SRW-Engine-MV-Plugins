@@ -4093,7 +4093,12 @@ StatCalc.prototype.canBeOnTerrain = function(actor, terrain){
 				validTwin = false;
 			}
 		}
-		return ((actor.SRWStats.mech.enabledTerrainTypes[terrain] * 1 || this.applyStatModsToValue(actor, 0, [terrainDef.abilityName])) && validTwin);
+		if(validTwin){
+			return Math.max(actor.SRWStats.mech.enabledTerrainTypes[terrain] * 1, this.applyStatModsToValue(actor, 0, [terrainDef.abilityName]) * 1);
+		} else {
+			return false;
+		}
+	
 	} else {
 		return false;
 	}

@@ -14,9 +14,15 @@ module.exports = {
     path: __dirname + '/..'
   },
   mode: 'development',
-  node: {
+  /*node: {
 	fs: 'empty'
-},
+},*/
+   resolve: {
+    extensions: [".ts", ".tsx", ".js", ".css"],
+    fallback: {
+      fs: false,
+    },
+  },
   module: {
     rules: [
       {
@@ -25,7 +31,7 @@ module.exports = {
       },
 	{
 		 test: /\.(ttf|otf)(\?[a-z0-9=.]+)?$/, 
-		loader: 'url-loader?limit=100000'
+		loader: 'url-loader'
 	  }
     ],
   },

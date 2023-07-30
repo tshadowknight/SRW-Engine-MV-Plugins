@@ -1348,48 +1348,52 @@
 	};
 
 	Sprite_AttributeIndicator.prototype.update = function() {
-		var type = this._character.isType();
-		this._isEnemy = type === 'enemy';
-		var eventId = this._character.eventId();
-		var battlerArray = $gameSystem.EventToUnit(eventId);
-		if(battlerArray){
-			var unit = battlerArray[1];
-			var attribute = $statCalc.getParticipantAttribute(unit, "attribute1");
-			if(!attribute){
-				this.opacity = 0;
-				return;
-			}
-			if(this._previousAttribute != attribute){
-				this._previousAttribute = attribute;			
-				this.bitmap = ImageManager.loadSystem('attribute_'+attribute+"_small");			
-			}		
+		if(ENGINE_SETTINGS.USE_WEAPON_ATTRIBUTE){			
+			var type = this._character.isType();
+			this._isEnemy = type === 'enemy';
+			var eventId = this._character.eventId();
+			var battlerArray = $gameSystem.EventToUnit(eventId);
+			if(battlerArray){
+				var unit = battlerArray[1];
+				var attribute = $statCalc.getParticipantAttribute(unit, "attribute1");
+				if(!attribute){
+					this.opacity = 0;
+					return;
+				}
+				if(this._previousAttribute != attribute){
+					this._previousAttribute = attribute;			
+					this.bitmap = ImageManager.loadSystem('attribute_'+attribute+"_small");			
+				}		
+				
+				this.anchor.x = 0.5;
+				this.anchor.y = 1;
+				
+				this.x = this._character.screenX();
+				this.y = this._character.screenY();
+				this.y-=18;
+				if(this._isEnemy){
+					//this.anchor.set(0);
+					this.x-=16;				
+				} else {
+					//this.anchor.set(1); 
+					this.x+=16;
+				}	
+				
+				
+				
+				//this.z = this._character.screenZ() - 1;
 			
-			this.anchor.x = 0.5;
-			this.anchor.y = 1;
-			
-			this.x = this._character.screenX();
-			this.y = this._character.screenY();
-			this.y-=18;
-			if(this._isEnemy){
-				//this.anchor.set(0);
-				this.x-=16;				
-			} else {
-				//this.anchor.set(1); 
-				this.x+=16;
-			}	
-			
-			
-			
-			//this.z = this._character.screenZ() - 1;
-		
-			if(unit && !this._character.isErased() && $gameSystem.showWillIndicator){
-				this.opacity = 255;
+				if(unit && !this._character.isErased() && $gameSystem.showWillIndicator){
+					this.opacity = 255;
+				} else {
+					this.opacity = 0;
+				}
 			} else {
 				this.opacity = 0;
 			}
 		} else {
 			this.opacity = 0;
-		}		
+		}	
 	};	
 	
 //====================================================================
