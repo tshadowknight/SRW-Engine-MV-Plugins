@@ -831,6 +831,20 @@ $SRWConfig.mechAbilties = function(){
 		}
 	);
 	
+	this.addDefinition(
+		54, 
+		"HP Degen XXL", 
+		"50% HP reduced at the start of the turn.", 
+		false,
+		false,
+		function(actor, level){
+			return [{type: "HP_regen", modType: "addFlat", value: -50}];
+		},
+		function(actor, level){
+			return true;
+		}
+	);
+	
 	/*Insert new ability here*/
 	
 

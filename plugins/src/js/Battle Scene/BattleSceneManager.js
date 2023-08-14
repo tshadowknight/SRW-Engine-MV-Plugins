@@ -863,7 +863,7 @@ BattleSceneManager.prototype.createBg = function(name, img, position, size, alph
 	return bg;
 }
 
-BattleSceneManager.prototype.createSceneBg = function(name, path, position, size, alpha, billboardMode, flipX, clamp, unlit){
+BattleSceneManager.prototype.createSceneBg = function(name, path, position, size, alpha, billboardMode, flipX, clamp, unlit, uScale, vScale, uOffset, vOffset){
 	var width;
 	var height;
 	if(typeof size != "undefined"){
@@ -886,10 +886,19 @@ BattleSceneManager.prototype.createSceneBg = function(name, path, position, size
 	material.diffuseTexture = new BABYLON.Texture("img/SRWBattleScene/"+path+".png", this._scene, false, true, BABYLON.Texture.NEAREST_NEAREST);
 	material.diffuseTexture.hasAlpha = true;
 	//
+	material.diffuseTexture.uScale = uScale || 1;
+	material.diffuseTexture.vScale = vScale || 1;
+	
+	if(uOffset != null){
+		material.diffuseTexture.uOffset = uOffset;	
+	}
+	if(vOffset != null){
+		material.diffuseTexture.vOffset = vOffset;
+	}	
 	
 	if(flipX){
-		material.diffuseTexture.uScale = -1;
-		material.diffuseTexture.uOffset = 1;
+		material.diffuseTexture.uScale*= -1;
+		material.diffuseTexture.uOffset = material.diffuseTexture.uScale * -1;
 	}
 	
 	material.specularColor = new BABYLON.Color3(0, 0, 0);
@@ -902,14 +911,19 @@ BattleSceneManager.prototype.createSceneBg = function(name, path, position, size
 		material.alpha = alpha;
 		material.useAlphaFromDiffuseTexture  = true;
 	}
-
-	if(clamp){
-		material.diffuseTexture.wrapU = BABYLON.Texture.CLAMP_ADDRESSMODE;
-	} else {
-		material.diffuseTexture.wrapU = BABYLON.Texture.WRAP_ADDRESSMODE;
+	
+	if(material.diffuseTexture.uScale == 1){
+		if(clamp){
+			material.diffuseTexture.wrapU = BABYLON.Texture.CLAMP_ADDRESSMODE;
+		} else {
+			material.diffuseTexture.wrapU = BABYLON.Texture.WRAP_ADDRESSMODE;
+		}
 	}
 	
-	material.diffuseTexture.wrapV = BABYLON.Texture.CLAMP_ADDRESSMODE;
+	if(material.diffuseTexture.vScale == 1){
+		material.diffuseTexture.wrapV = BABYLON.Texture.CLAMP_ADDRESSMODE;
+	}
+	
 
     bg.material = material;
 	
@@ -3778,7 +3792,7 @@ BattleSceneManager.prototype.executeAnimation = function(animation, startTick){
 			} else {
 				path = params.path;
 			}
-			var bg = _this.createSceneBg(target, path, _this.applyAnimationDirection(position), size, alpha, params.billboardMode, _this._animationDirection == -1 ? true : false, params.clamp, params.unlit);
+			var bg = _this.createSceneBg(target, path, _this.applyAnimationDirection(position), size, alpha, params.billboardMode, _this._animationDirection == -1 ? true : false, params.clamp, params.unlit, params.uScale * 1, params.vScale * 1, params.uOffset * 1, params.vOffset * 1);
 			if(params.rotation){
 				bg.rotation = _this.applyAnimationDirection(params.rotation);
 			}

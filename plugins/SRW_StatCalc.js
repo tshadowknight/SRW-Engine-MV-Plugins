@@ -5770,7 +5770,7 @@ StatCalc.prototype.applyHPRegen = function(type, factionId){
 			if(_this.isBoarded(actor)){
 				_this.recoverHPPercent(actor, 20);	
 			} else {
-				_this.recoverHPPercent(actor, _this.applyMaxStatModsToValue(actor, 0, ["HP_regen"]));			
+				_this.recoverHPPercent(actor, _this.applyStatModsToValue(actor, 0, ["HP_regen"]));			
 				_this.recoverHPPercent(actor, _this.getCurrentTerrainMods(actor).hp_regen);	
 				_this.recoverHPPercent(actor, ENGINE_SETTINGS.DEFAULT_HP_REGEN || 0);	
 			}
@@ -5972,7 +5972,7 @@ StatCalc.prototype.applyENRegen = function(type, factionId){
 			if(_this.isBoarded(actor)){
 				_this.recoverENPercent(actor, 20);	
 			} else {
-				_this.recoverENPercent(actor, _this.applyMaxStatModsToValue(actor, 0, ["EN_regen"]));	
+				_this.recoverENPercent(actor, _this.applyStatModsToValue(actor, 0, ["EN_regen"]));	
 				_this.recoverENPercent(actor, _this.getCurrentTerrainMods(actor).en_regen);	
 				_this.recoverENPercent(actor, ENGINE_SETTINGS.DEFAULT_EN_REGEN || 0);			
 				_this.recoverEN(actor, 5);	

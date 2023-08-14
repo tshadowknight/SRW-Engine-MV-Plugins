@@ -343,7 +343,7 @@ SRWEditor.prototype.init = function(){
 		},
 		create_bg: {
 			hasTarget: true,
-			params: ["isPilotCutin", "path", "parent", "position", "size", "alpha", "billboardMode", "rotation", "frameSize", "lineCount", "columnCount", "animationLoop", "animationFrames", "animationDelay", "holdFrame", "scrollSpeed", "clamp"],//, "unlit"
+			params: ["isPilotCutin", "path", "parent", "position", "size", "alpha", "billboardMode", "rotation", "frameSize", "lineCount", "columnCount", "animationLoop", "animationFrames", "animationDelay", "holdFrame", "scrollSpeed", "clamp", "uScale", "vScale", "uOffset", "vOffset"],//, "unlit"
 			aliases: {"animationLoop": "loopFromFrame", "animationFrames": "loopToFrame"},
 			desc: "Create a new background."
 		},
@@ -728,6 +728,10 @@ SRWEditor.prototype.init = function(){
 		attachId: "The name/id of the attachment",
 		holdFrame: "If 1 the sprite will hold the final frame of the animation, ignored if animation looping is enabled.",
 		scrollSpeed: "Sets the horizontal scroll speed of the background, use negative values to change the scroll direction",
+		uScale: "Sets the horizontal scale of the UV(default 1)",
+		vScale: "Sets the vertical scale of the UV(default 1)",
+		uOffset: "Sets the horizontal offset of the UV(default 1)",
+		vOffset: "Sets the vertical offset of the UV(default 1)",
 		clamp: "If 1 U Wrap will be set to clamp.",
 		noWait: "If 1 the engine will not wait for the destruction animation to complete.",
 		noDamage: "If 1 the damage number will not be shown",
@@ -1074,6 +1078,18 @@ SRWEditor.prototype.init = function(){
 			
 		},
 		to: function(value){
+			
+		},
+		uScale: function(value){
+			
+		},
+		vScale: function(value){
+			
+		},
+		uOffset: function(value){
+			
+		},
+		vOffset: function(value){
 			
 		},
 		animationLoop: function(value){
