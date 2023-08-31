@@ -164,6 +164,8 @@ DetailBarAttackSummary.prototype.redraw = function(){
 				var info = APPSTRINGS.ATTACKLIST.label_HP_gated;
 				info = info.replace("{HP_THRESHOLD}", attackData.HPThreshold);
 				detailContent+=info;
+			} else if(detail.tag){
+				detailContent+=APPSTRINGS.ATTACKLIST.label_invalid_tags;
 			} 		
 		}
 	

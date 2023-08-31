@@ -323,6 +323,7 @@ APPSTRINGS.ATTACKLIST = {
 	label_no_combo_support: "Combo attack unavailable!",
 	label_counter_only: "Can only be used to counter attack!",
 	label_no_MP: "Out of MP!",
+	label_invalid_tags: "This weapon doesn't work against this enemy!",
 	
 	label_target_both: "All",
 	label_target_enemies: "Enemy",
@@ -642,6 +643,7 @@ EDITORSTRINGS.WEAPON = {
 	label_ALL: "ALL Weapon",
 	label_animation: "Animation",
 	label_animation_ally: "Animation(Ally)",
+	label_invalid_target_tags: "Invalid Target Tags",
 	
 	hint_effects: "Only the first two effects are shown in the UI",
 	

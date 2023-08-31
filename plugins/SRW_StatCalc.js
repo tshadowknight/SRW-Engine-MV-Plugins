@@ -565,6 +565,13 @@ StatCalc.prototype.getMechWeapons = function(actor, mechProperties, previousWeap
 				if(isNaN(vsAllyAnimId)){
 					vsAllyAnimId = -1;
 				}
+				let invalidTargetTags = {};
+				if(weaponProperties.weaponInvalidTags){					
+					var parts = weaponProperties.weaponInvalidTags.split(",");
+					parts.forEach(function(tag){
+						invalidTargetTags[String(tag).trim()] = true;
+					});				
+				}
 				result.push({
 					id: parseInt(weaponDefinition.id),
 					name: weaponDefinition.name,
@@ -605,6 +612,7 @@ StatCalc.prototype.getMechWeapons = function(actor, mechProperties, previousWeap
 					alliesCounter: alliesCounter,
 					enemiesInteraction: weaponProperties.weaponEnemyInteraction || "damage_and_status",
 					alliesInteraction: weaponProperties.weaponAllyInteraction || "damage_and_status",
+					invalidTargetTags: invalidTargetTags
 				});
 			}
 		}
@@ -2132,6 +2140,14 @@ StatCalc.prototype.getMechTags = function(actor){
 	var result = {};
 	if(this.isActorSRWInitialized(actor)){
 		result = actor.SRWStats.mech.tags;
+	}
+	return result;
+}
+
+StatCalc.prototype.getWeaponTags = function(weapon){
+	var result = {};
+	if(this.isActorSRWInitialized(actor)){
+		result = weapon.tags;
 	}
 	return result;
 }
@@ -4581,7 +4597,21 @@ StatCalc.prototype.canUseWeaponDetail = function(actor, weapon, postMoveEnabledO
 				if(terrainRank == "-"){
 					canUse = false;
 					detail.terrain = true;
-				}
+				}				
+			
+				if(weapon.invalidTargetTags){
+					var targetTags = {...this.getPilotTags(rangeTarget), ...this.getActorTags(rangeTarget)};
+					let isValid = true;
+					for(let tag in weapon.invalidTargetTags){
+						if(targetTags[tag]){
+							isValid = false;
+						}
+					}
+					if(!isValid){
+						canUse = false;
+						detail.tag = true;
+					}
+				}						
 			} else {
 				var rangeResult;
 				var type = actor.isActor() ? "enemy" : "actor";
@@ -4675,6 +4705,18 @@ StatCalc.prototype.canUseWeapon = function(actor, weapon, postMoveEnabledOnly, d
 			if(terrainRank == "-"){
 				return false;
 			}
+			if(weapon.invalidTargetTags){
+				var targetTags = {...this.getPilotTags(defender), ...this.getActorTags(defender)};
+				let isValid = true;
+				for(let tag in weapon.invalidTargetTags){
+					if(targetTags[tag]){
+						isValid = false;
+					}
+				}
+				if(!isValid){
+					return false;
+				}
+			}			
 		}	
 		if(weapon.HPThreshold != -1){
 			var stats = this.getCalculatedMechStats(actor);
