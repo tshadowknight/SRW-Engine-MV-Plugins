@@ -515,6 +515,7 @@ EDITORSTRINGS.ATTACKS = {
 	label_enemy_side: "Enemy Side",
 	label_hits: "Attack Hits",
 	label_destroys: "Attack Destroys",
+	label_toggle_pivots: "Show Pivots",
 	label_show_barrier: "Show Barrier",
 	label_break: "Break",
 	label_environment: "Environment",

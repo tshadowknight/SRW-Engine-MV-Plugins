@@ -184,7 +184,7 @@ SRWEditor.prototype.init = function(){
 		},
 		rotate_to: {
 			hasTarget: true,
-			params: ["rotation"],
+			params: ["aroundPivot", "rotation"],
 			desc: "Immediately set to rotation of an object."
 		},
 		translate: {
@@ -194,7 +194,7 @@ SRWEditor.prototype.init = function(){
 		},
 		rotate: {
 			hasTarget: true,
-			params: ["startRotation", "rotation", "duration", "easingFunction", "easingMode"],
+			params: ["aroundPivot", "startRotation", "rotation", "duration", "easingFunction", "easingMode"],
 			desc: "Rotate an object from the start rotation to the end rotation."
 		},
 		resize: {
@@ -701,6 +701,7 @@ SRWEditor.prototype.init = function(){
 		hide: "Hide the target object after the command has finished.",
 		catmullRom: "Describes two addtional points for a Catmull-Rom spline.",
 		startRotation: "A rotation defined by an x, y and z component. The rotations are described with radian values.",
+		aroundPivot: "If 1 the rotation will be done around the pivot helper instead of the element origin. Only avaialable for unit sprites.",
 		startSize: "The initial size of the target object.",
 		endSize: "The final size of the target object.",
 		x: "If 1 the object will be flipped along its x-axis.",
@@ -974,6 +975,9 @@ SRWEditor.prototype.init = function(){
 		},
 		startRotation: function(value){
 			return _this._paramDisplayHandlers.rotation(value);
+		},
+		aroundPivot: function(value){
+		
 		},
 		startSize: function(value){
 		
@@ -2781,7 +2785,13 @@ SRWEditor.prototype.showAttackEditor = function(){
 	//content+="<input id='chk_barriers' type='checkbox'></input>";	
 	content+="</div>";	
 	
+	content+="<div class='extra_control'>";
+	content+="<div class='editor_label'>"+EDITORSTRINGS.ATTACKS.label_toggle_pivots+"</div>";
+	content+="<input id='chk_pivots' type='checkbox'></input>";	
+	content+="</div>";	
 	content+="</div>";
+	
+	
 	
 	content+="<div class='preview_extra_controls'>";
 	
@@ -3015,6 +3025,10 @@ SRWEditor.prototype.showAttackEditor = function(){
 		_this._previewAttackDestroys = this.checked;
 	});
 	
+	document.querySelector("#chk_pivots").addEventListener("change", function(){
+		$battleSceneManager.toggleUnitPivots(this.checked);
+	});
+	
 	document.querySelector("#barriers_select").addEventListener("change", function(){
 		_this._previewShowsBarriers = this.value * 1;
 	});	
@@ -3097,6 +3111,7 @@ SRWEditor.prototype.showCameraState = function(){
 		const name = document.querySelector("#helper_target").value;
 		let targetObj = $battleSceneManager.getTargetObject(name);
 		if(targetObj) {
+			let pivotHelper = targetObj.pivothelper;
 			if(targetObj.parent_handle){
 				targetObj = targetObj.parent_handle;
 			}
@@ -3144,7 +3159,25 @@ SRWEditor.prototype.showCameraState = function(){
 				content+="<div>"
 				content+="z: <input data-type='rotation' data-prop='z' value='"+rotation.z.toFixed(3)+"'></input>";
 				content+="</div>"
-			}			
+			}	
+
+			if(pivotHelper){
+				var rotation = pivotHelper.rotation;
+				if(rotation){
+					content+="<div>"
+					content+="<b>Pivot Rotation</b>"
+					content+="</div>"
+					content+="<div>"
+					content+="x: <input data-type='pivot_rotation' data-prop='x' value='"+rotation.x.toFixed(3)+"'></input>";
+					content+="</div>"
+					content+="<div>"
+					content+="y: <input data-type='pivot_rotation' data-prop='y' value='"+rotation.y.toFixed(3)+"'></input>";
+					content+="</div>"
+					content+="<div>"
+					content+="z: <input data-type='pivot_rotation' data-prop='z' value='"+rotation.z.toFixed(3)+"'></input>";
+					content+="</div>"
+				}
+			}	
 			
 			cameraInfoContainer.innerHTML = content;
 			
@@ -3153,7 +3186,7 @@ SRWEditor.prototype.showCameraState = function(){
 				var prop = input.getAttribute("data-prop");
 				var value = input.value;
 				if(!isNaN(value)){					
-					if(targetObj.handle){					
+					if(targetObj.handle){
 						if(type == "rotation"){
 							var newVector;
 							if(targetObj.parent){
@@ -3217,9 +3250,15 @@ SRWEditor.prototype.showCameraState = function(){
 						targetObj.context.update();
 						targetObj.context.draw();
 					} else {
-						var newVector = new BABYLON.Vector3().copyFrom(targetObj[type]);
-						newVector[prop] = value * 1;
-						targetObj[type] = newVector;
+						if(type == "pivot_rotation"){
+							var newVector = new BABYLON.Vector3().copyFrom(pivotHelper.rotation);
+							newVector[prop] = value * 1;
+							pivotHelper.rotation = newVector;
+						} else {
+							var newVector = new BABYLON.Vector3().copyFrom(targetObj[type]);
+							newVector[prop] = value * 1;
+							targetObj[type] = newVector;
+						}						
 					}					
 				}
 			}

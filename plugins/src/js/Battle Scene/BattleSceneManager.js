@@ -1079,8 +1079,11 @@ BattleSceneManager.prototype.updateMainSprite = async function(type, name, sprit
 		var spriteInfo;
 		var spriteParent = _this.createBg(name, "", position, 0, 1, null, true);
 		spriteParent.isVisible = false;
-		var pivothelper = _this.createBg(name+"_pivot", "", new BABYLON.Vector3(0, 0, 0), 0, 1, null, true);
+		var pivothelper = _this.createBg(name+"_pivot", "", new BABYLON.Vector3(0, 0, 0), 0.5, 1, null, true);
+		let pivotYOffset = 0;
+		let pivotXOffset = 0;
 		pivothelper.isVisible = false;
+		pivothelper.renderingGroupId = 6;
 		let xOffset = spriteConfig.xOffset;
 		if(flipX){
 			xOffset*=-1;
@@ -1090,17 +1093,17 @@ BattleSceneManager.prototype.updateMainSprite = async function(type, name, sprit
 			spriteInfo.sprite.setPivotMatrix(BABYLON.Matrix.Translation(-0, spriteInfo.size.height/2, -0), false);
 		} else if(spriteConfig.type == "spriter"){
 			spriteInfo = _this.createSpriterSprite(name+"_displayed", path,  new BABYLON.Vector3(xOffset, spriteConfig.yOffset, 0), flipX);
-			pivothelper.position.y+=spriteConfig.referenceSize / 2;			
+			pivotYOffset+=spriteConfig.referenceSize / 2;			
 		} else if(spriteConfig.type == "dragonbones"){
 			spriteInfo = _this.createDragonBonesSprite(name+"_displayed", path, spriteConfig.armatureName, new BABYLON.Vector3(xOffset, spriteConfig.yOffset, 0), flipX, spriteConfig.dragonbonesWorldSize, spriteConfig.canvasDims);
-			pivothelper.position.y+=spriteConfig.referenceSize / 2 - spriteConfig.yOffset;			
+			pivotYOffset+=spriteConfig.referenceSize / 2 - spriteConfig.yOffset;			
 		} else if(spriteConfig.type == "spine"){
 			spriteInfo = _this.createSpineSprite(name+"_displayed", path,  new BABYLON.Vector3(xOffset, spriteConfig.yOffset, 0), flipX, "main", spriteConfig.referenceSize, spriteConfig.canvasDims.width, spriteConfig.canvasDims.height);
-			pivothelper.position.y+=spriteConfig.referenceSize / 2 - spriteConfig.yOffset;				
+			pivotYOffset+=spriteConfig.referenceSize / 2 - spriteConfig.yOffset;				
 		} else if(spriteConfig.type == "3D"){
 			spriteInfo = await _this.createUnitModel(name+"_displayed", path,  new BABYLON.Vector3(xOffset, spriteConfig.yOffset, 0), flipX, spriteConfig.animGroup, "main",  spriteConfig.scale, new BABYLON.Vector3(0, BABYLON.Tools.ToRadians(spriteConfig.rotation || 0), 0), spriteConfig.BBHack);
-			pivothelper.position.y+=spriteConfig.referenceSize / 2 - spriteConfig.yOffset + spriteConfig.centerYOffset;	
-			pivothelper.position.x+=spriteConfig.centerXOffset;
+			pivotYOffset+=spriteConfig.referenceSize / 2 - spriteConfig.yOffset + spriteConfig.centerYOffset;	
+			pivotXOffset+=spriteConfig.centerXOffset;
 			/*if(flipX){
 				spriteParent.rotation.y = -BABYLON.Tools.ToRadians(spriteConfig.rotation || 0) ;
 				spriteParent.scaling = new BABYLON.Vector3(spriteConfig.scale * -1, spriteConfig.scale, spriteConfig.scale);	
@@ -1117,14 +1120,20 @@ BattleSceneManager.prototype.updateMainSprite = async function(type, name, sprit
 				animInfo.start(false, 1.0, animInfo.from, animInfo.to, false);
 			}
 		} 	
+		
+		pivothelper.position.y+=pivotYOffset;
+		pivothelper.position.x+=pivotXOffset;
+		
+		spriteInfo.sprite.position.y-=pivotYOffset;
 			
-		pivothelper.parent = spriteInfo.sprite;
+		pivothelper.parent = spriteParent;
 		spriteInfo.sprite.pivothelper = pivothelper;
 		spriteInfo.sprite.spriteInfo = spriteInfo;
 		spriteInfo.sprite.spriteConfig = spriteConfig;
 		
-		spriteInfo.sprite.parent = spriteParent;
+		spriteInfo.sprite.parent = pivothelper;
 		spriteInfo.sprite.parent_handle = spriteParent;
+		
 		return spriteInfo;	
 	}
 	
@@ -2443,7 +2452,8 @@ BattleSceneManager.prototype.startScene = function(){
 	this._frame = 0;
 	
 	
-	this._scene.onBeforeAnimationsObservable.add(() => {
+	this._scene.onAfterAnimationsObservable.add(() => {
+		
 		var deltaTime = _this._engine.getDeltaTime();
 		var ratio = 1;
 		if(_this.isOKHeld){
@@ -2466,7 +2476,8 @@ BattleSceneManager.prototype.startScene = function(){
 			_this._effksContextBg.update(60 / _this._engine.getFps() * ratio);				
 			_this._effksContextBgMirror.update(60 / _this._engine.getFps() * ratio);	
 			_this._effksContextAttached.update();	
-		}	
+		}
+		
 	});
 	this._scene.onBeforeRenderObservable.add(() => {
 		var ratio = 1;
@@ -3013,6 +3024,8 @@ BattleSceneManager.prototype.stopShakeAnimations = function(target){
 			for(let animCtr in _this._shakeAnimations){
 				if(_this._shakeAnimations[animCtr].targetObj != targetObj){
 					tmp.push(_this._shakeAnimations[animCtr]);
+				} else {
+					targetObj.position = targetObj.realPosition;
 				}
 			}
 			_this._shakeAnimations = tmp;
@@ -3144,7 +3157,7 @@ BattleSceneManager.prototype.executeAnimation = function(animation, startTick){
 			}
 			if(targetObj){
 				targetObj.wasMoved = true;
-				_this.stopShakeAnimations(target);
+				//_this.stopShakeAnimations(target);
 				targetObj.position = _this.applyAnimationDirection(params.position || new BABYLON.Vector3(0,0,0));
 				targetObj.realPosition = new BABYLON.Vector3().copyFrom(targetObj.position);
 				if(targetObj.handle){
@@ -3162,7 +3175,9 @@ BattleSceneManager.prototype.executeAnimation = function(animation, startTick){
 			//console.log("teleport: "+target);
 			var targetObj = getTargetObject(target);
 			if(targetObj){
-				if(targetObj.parent_handle){
+				if(params.aroundPivot * 1 && targetObj.pivothelper){
+					targetObj = targetObj.pivothelper;
+				} else if(targetObj.parent_handle){
 					targetObj = targetObj.parent_handle;
 				}
 				var targetRotation = new BABYLON.Vector3(0,0,0);
@@ -3208,7 +3223,7 @@ BattleSceneManager.prototype.executeAnimation = function(animation, startTick){
 		},
 		translate: function(target, params){
 			var targetObj = getTargetObject(target);
-			_this.stopShakeAnimations(target);
+			//_this.stopShakeAnimations(target);
 			if(targetObj.parent_handle){
 				targetObj = targetObj.parent_handle;
 			}
@@ -3249,7 +3264,9 @@ BattleSceneManager.prototype.executeAnimation = function(animation, startTick){
 		rotate: function(target, params){
 			var targetObj = getTargetObject(target);
 			if(targetObj){
-				if(targetObj.parent_handle){
+				if(params.aroundPivot * 1 && targetObj.pivothelper){
+					targetObj = targetObj.pivothelper;
+				} else if(targetObj.parent_handle){
 					targetObj = targetObj.parent_handle;
 				}
 				var startRotation;
@@ -3792,7 +3809,7 @@ BattleSceneManager.prototype.executeAnimation = function(animation, startTick){
 			} else {
 				path = params.path;
 			}
-			var bg = _this.createSceneBg(target, path, _this.applyAnimationDirection(position), size, alpha, params.billboardMode, _this._animationDirection == -1 ? true : false, params.clamp, params.unlit, params.uScale * 1, params.vScale * 1, params.uOffset * 1, params.vOffset * 1);
+			var bg = _this.createSceneBg(target, path, _this.applyAnimationDirection(position), size, alpha, params.billboardMode, _this._animationDirection == -1 ? true : false, params.clamp, params.unlit, (params.uScale || 0) * 1, (params.vScale || 0) * 1, (params.uOffset || 0) * 1, (params.vOffset || 0) * 1);
 			if(params.rotation){
 				bg.rotation = _this.applyAnimationDirection(params.rotation);
 			}
@@ -7269,4 +7286,32 @@ BattleSceneManager.prototype.toggleTextBox = function(state) {
 			this._UILayerManager.fadeOutTextBox(true);
 		}	
 	}	
+}
+
+BattleSceneManager.prototype.toggleUnitPivots = function(state) {	
+	const _this = this;
+	if(_this._actorSprite && _this._actorSprite.sprite.pivothelper){
+		_this._actorSprite.sprite.pivothelper.isVisible = state;
+	}
+	if(_this._actorTwinSprite && _this._actorTwinSprite.sprite.pivothelper){
+		_this._actorTwinSprite.sprite.pivothelper.isVisible = state;
+	}
+	if(_this._enemySprite && _this._enemySprite.sprite.pivothelper){
+		_this._enemySprite.sprite.pivothelper.isVisible = state;
+	}
+	if(_this._enemyTwinSprite && _this._enemyTwinSprite.sprite.pivothelper){
+		_this._enemyTwinSprite.sprite.pivothelper.isVisible = state;
+	}
+	if(_this._actorSupporterSprite && _this._actorSupporterSprite.sprite.pivothelper){
+		_this._actorSupporterSprite.sprite.pivothelper.isVisible = state;
+	}
+	if(_this._actorTwinSupporterSprite && _this._actorTwinSupporterSprite.sprite.pivothelper){
+		_this._actorTwinSupporterSprite.sprite.pivothelper.isVisible = state;
+	}
+	if(_this._enemySupporterSprite && _this._enemySupporterSprite.sprite.pivothelper){
+		_this._enemySupporterSprite.sprite.pivothelper.isVisible = state;
+	}
+	if(_this._enemyTwinSupporterSprite && _this._enemyTwinSupporterSprite.sprite.pivothelper){
+		_this._enemyTwinSupporterSprite.sprite.pivothelper.isVisible = state;
+	}
 }

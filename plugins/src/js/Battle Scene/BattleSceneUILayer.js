@@ -305,8 +305,9 @@ BattleSceneUILayer.prototype.animateStat = function(slot, elems, maxValue, oldPe
 	var ticks = duration / 10;
 	var oldValue = maxValue / 100 * oldPercent;
 	var newValue = maxValue / 100 * newPercent;
+	var totalDelta = newValue - oldValue;
 	var direction = Math.sign(newValue - oldValue);		
-	var tickValue = Math.abs((oldValue - newValue) / ticks);
+	//var tickValue = Math.abs((oldValue - newValue) / ticks);
 	var currentTick = 0;
 	var animIntervalKey;
 	if(slot == "twin"){
@@ -317,8 +318,13 @@ BattleSceneUILayer.prototype.animateStat = function(slot, elems, maxValue, oldPe
 	if(_this[animIntervalKey]){
 		clearInterval(_this[animIntervalKey]);
 	}
-	_this[animIntervalKey] = setInterval(function(){		
-		var currentVal = oldValue+Math.floor(tickValue * currentTick * direction)
+	let startTime = Date.now();
+	_this[animIntervalKey] = setInterval(function(){	
+		let t = (Date.now() - startTime) / duration;
+		if(t > 1){
+			t = 1;
+		}
+		var currentVal = oldValue+Math.floor(totalDelta * t);//Math.floor(tickValue * currentTick * direction)
 		if(((oldValue < newValue) && currentVal <= newValue) || ((oldValue > newValue) && currentVal >= newValue)){		
 			if(type == "HP" && newValue <= 100000){ 
 				isHidden = false;
