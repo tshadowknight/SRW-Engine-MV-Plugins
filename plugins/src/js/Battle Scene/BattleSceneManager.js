@@ -1867,12 +1867,14 @@ BattleSceneManager.prototype.hookBeforeRender = function(){
 				//_this._currentAnimationTick+=ticksSinceLastUpdate;			
 				
 				
-				for(var i = _this._lastAnimationTick + 1; i <=_this._currentAnimationTick; i++){					
+				for(var i = 0; i <=_this._currentAnimationTick; i++){					
 					if(_this._animationList[i]){
-						for(var j = 0; j < _this._animationList[i].length; j++){
+						let current = _this._animationList[i];
+						_this._animationList[i] = null;
+						for(var j = 0; j < current.length; j++){
 							//_this.executeAnimation(_this._animationList[i][j], i);
 							_this._animQueue.push({
-								def: _this._animationList[i][j],
+								def: current[j],
 								tick: i
 							});
 						}
@@ -1882,9 +1884,9 @@ BattleSceneManager.prototype.hookBeforeRender = function(){
 				while(command){
 					_this.executeAnimation(command.def, command.tick);
 					command = null;
-					if(!_this._isLoading){
+					//if(!_this._isLoading){
 						command = _this._animQueue.shift();
-					}
+					//}
 				}
 				
 					
@@ -3187,7 +3189,7 @@ BattleSceneManager.prototype.executeAnimation = function(animation, startTick){
 				}
 				if(_this._animationDirection == -1){
 					//targetRotation.x*=-1;
-					if(usesPropRotation(target)){
+					if(params.aroundPivot || usesPropRotation(target)){
 						//targetRotation.y+=Math.PI;
 						//targetRotation.x = targetRotation.x * -1 + Math.PI;
 						targetRotation.z*=-1;
@@ -3282,7 +3284,7 @@ BattleSceneManager.prototype.executeAnimation = function(animation, startTick){
 				}
 				if(_this._animationDirection == -1){
 					//targetRotation.x*=-1;					
-					if(usesPropRotation(target)){
+					if(params.aroundPivot || usesPropRotation(target)){
 						//targetRotation.y+=Math.PI;						
 						//targetRotation.x = targetRotation.x * -1 + Math.PI;
 						
