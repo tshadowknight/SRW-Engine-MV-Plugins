@@ -1342,6 +1342,7 @@
 			if($gameVariables.value(_turnVarID) != 1){
 				$statCalc.applyTurnStartWill("actor");
 			}
+			$statCalc.applyMPRegen("actor");
 			$statCalc.applyENRegen("actor");
 			$statCalc.applyAmmoRegen("actor");
 			$statCalc.applyHPRegen("actor");
@@ -1433,6 +1434,7 @@
 			$gameSystem.expireAbilityZones();
 			$statCalc.applyTurnStartWill("enemy", factionId);
 			$statCalc.applyENRegen("enemy", factionId);
+			$statCalc.applyMPRegen("enemy", factionId);
 			$statCalc.applyAmmoRegen("enemy", factionId);
 			$statCalc.applyHPRegen("enemy", factionId);
 			$statCalc.resetAllBattleTemp(null, factionId);

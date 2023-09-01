@@ -903,4 +903,25 @@ $SRWConfig.itemEffects = function(){
 		null,
 		150
 	);
+	
+	this.addDefinition(
+		51, 
+		"Throat lozenge", 
+		"Restore all MP once per stage.", 
+		false,
+		true,
+		function(actor, level){
+			return [
+				{type: "MP_recover", modType: "addFlat", value: 100}
+			];
+		},
+		function(actor, level){
+			return $statCalc.canRecoverMP(actor);	
+		},
+		{
+			type: "repair",
+			animId: "resupply"
+		},
+		500
+	);
 }

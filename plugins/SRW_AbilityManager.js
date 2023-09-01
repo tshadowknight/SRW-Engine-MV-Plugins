@@ -272,6 +272,12 @@ ItemEffectManager.prototype.applyConsumable = function(actor, itemIdx, handler){
 			$statCalc.recoverHPPercent(actor, value);
 			return {startAmount: oldHP, endAmount: $statCalc.getCalculatedMechStats(actor).currentHP, maxAmount: stats.maxHP};
 		},
+		"MP_recover": function(value){
+			var stats = $statCalc.getCalculatedPilotStats(actor);
+			var oldVal = stats.currentMP;
+			$statCalc.recoverMPPercent(actor, value);
+			return {startAmount: oldVal, endAmount: $statCalc.getCalculatedPilotStats(actor).currentMP, maxAmount: stats.MP};
+		},
 		"EN_recover": function(value){
 			var stats = $statCalc.getCalculatedMechStats(actor);
 			var oldVal = stats.currentEN;

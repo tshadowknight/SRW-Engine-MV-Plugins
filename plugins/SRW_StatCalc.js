@@ -5981,6 +5981,24 @@ StatCalc.prototype.recoverMP = function(actor, amount){
 	} 	
 }
 
+
+StatCalc.prototype.recoverMPPercent = function(actor, percent){
+	if(this.isActorSRWInitialized(actor)){
+		var pilotStats = this.getCalculatedPilotStats(actor);
+		this.recoverMP(actor, Math.floor(pilotStats.MP * percent / 100));
+	}
+}
+
+StatCalc.prototype.applyMPRegen = function(type, factionId){
+	var _this = this;
+	this.iterateAllActors(type, function(actor, event){		
+		if(actor.isActor() || actor.factionId == factionId || factionId == null){			
+			_this.recoverMPPercent(actor, _this.applyStatModsToValue(actor, 0, ["MP_regen"]));	
+			_this.recoverMPPercent(actor, ENGINE_SETTINGS.DEFAULT_MP_REGEN || 0);					
+		}	
+	});
+}
+
 StatCalc.prototype.getCurrenEN = function(actor){
 	if(this.isActorSRWInitialized(actor)){
 		return actor.SRWStats.mech.stats.calculated.currentEN;
