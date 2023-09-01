@@ -5203,6 +5203,18 @@ BattleSceneManager.prototype.executeAnimation = function(animation, startTick){
 		},
 		toggle_bg_scroll:  function(target, params){
 			_this.setBgScrollDirection(_this._bgScrollDirection * -1);
+		},
+		include_animation:  function(target, params){
+			let additions = _this._animationBuilder.buildAnimation(params.battleAnimId, _this).mainAnimation;
+			if(additions){
+				let tmp = [];
+				for(var i = 0; i < additions.length; i++){
+					if(additions[i]){
+						tmp[i + startTick + 1] = additions[i];
+					}			
+				}
+				_this.mergeAnimList(tmp);	
+			}				
 		}
 		
 	};

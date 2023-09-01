@@ -648,6 +648,11 @@ SRWEditor.prototype.init = function(){
 			hasTarget: false,
 			params: [],
 			desc: "Invert the current background scroll direction."
+		},
+		include_animation: {
+			hasTarget: false,
+			params: ["battleAnimId"],
+			desc: "Include the main track of the animation with id battleAnimId starting at the current tick +1."
 		}
 	};
 	
@@ -761,6 +766,7 @@ SRWEditor.prototype.init = function(){
 		volume: "The volume to play the sound effect at.",
 		ratio: "The factor by which the scroll speed is multiplied.",
 		smooth: "If set to 1 the ratio change will be smoothed out over the specified duration.",
+		battleAnimId: "The id of the battle animation",
 		animId: "The id of the RMMV animation.",
 		loop: "If set to 1 the animation will continue looping.",
 		noFlash: "If set to 1 the flashing effects of the RMMV animation are not shown.",
@@ -1184,6 +1190,9 @@ SRWEditor.prototype.init = function(){
 			
 		},
 		smooth: function(value){
+			
+		},
+		battleAnimId: function(value){
 			
 		},
 		animId: function(value){
