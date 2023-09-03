@@ -347,6 +347,45 @@
 	font-size: 14px;
 }
 
+#srw_editor .command_label.variable {
+	font-size: 14px;
+	margin-right: 5px;
+	width: fit-content;
+}
+
+#srw_editor .var_controls {
+	padding-top: 3px;
+	padding-bottom: 3px;
+}
+
+#srw_editor .var_controls input{
+	width: 30px;
+}
+
+#srw_editor .command_label.variable_value {
+	font-size: 14px;
+	margin-right: 5px;
+	width: fit-content;
+}
+
+#srw_editor .quote_variable {
+	margin-right: 5px;
+	background-color: #2f3754;
+    color: white;
+    border: 0;
+    border-radius: 99px;
+    padding-left: 5px;
+}
+
+#srw_editor .quote_variable_value {
+	margin-right: 5px;
+	background-color: #2f3754;
+    color: white;
+    border: 0;
+    border-radius: 99px;
+    padding-left: 5px;
+}
+
 #srw_editor .quote_duration {
 	width: 60px;
 }

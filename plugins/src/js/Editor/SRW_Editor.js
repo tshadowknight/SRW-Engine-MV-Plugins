@@ -1958,6 +1958,8 @@ SRWEditor.prototype.showBattleTextEditorControls = function(){
 				faceIndex: elem.closest(".quote_line").querySelector(".quote_face_index").value,
 				displayName: elem.closest(".quote_line").querySelector(".quote_display_name").value,
 				duration: elem.closest(".quote_line").querySelector(".quote_duration").value,
+				variable: elem.closest(".quote_line").querySelector(".quote_variable").value,
+				variableValue: elem.closest(".quote_line").querySelector(".quote_variable_value").value,
 			}
 			var params = getLocatorInfo(elem);
 			if(params.type == "attacks"){
@@ -1993,9 +1995,15 @@ SRWEditor.prototype.showBattleTextEditorControls = function(){
 			input.addEventListener("change", updateQuote);
 		});
 		
-		
+		var inputs = containerNode.querySelectorAll(".quote_variable");
+		inputs.forEach(function(input){
+			input.addEventListener("change", updateQuote);
+		});
 					
-		
+		var inputs = containerNode.querySelectorAll(".quote_variable_value");
+		inputs.forEach(function(input){
+			input.addEventListener("change", updateQuote);
+		});
 		
 		var inputs = containerNode.querySelectorAll(".quote_id");
 		inputs.forEach(function(input){
@@ -2189,6 +2197,17 @@ SRWEditor.prototype.createQuoteContent = function(type, idx, quote, unitBaseInfo
 		content+="<div data-lineidx='"+(lineCounter)+"'  data-targetunit='"+(quote.unitId)+"'  class='quote_line'>";
 		
 		content+="<div class='line_title'>"+EDITORSTRINGS.TEXT.label_line+" "+(lineCounter+1)+"</div>";		
+		
+		if(lineCounter == 0){	
+			content+="<div class='var_controls'>";
+			content+="<div class='command_label variable'>"+EDITORSTRINGS.TEXT.label_variable+":</div>";
+			content+="<input class='quote_variable' value='"+(quote.variable || "")+"'></input>";
+			
+			content+="<div class='command_label variable_value'>"+EDITORSTRINGS.TEXT.label_value+":</div>";
+			content+="<input class='quote_variable_value' value='"+(quote.variableValue ||  "")+"'></input>";
+			content+="</div>";
+		}		
+		
 		content+="<div class='quote_config'>";
 		
 		
@@ -2217,6 +2236,9 @@ SRWEditor.prototype.createQuoteContent = function(type, idx, quote, unitBaseInfo
 		content+="<div title='"+EDITORSTRINGS.TEXT.hint_delete+"' class='delete_text_btn'><img src='"+_this._svgPath+"close-line.svg'></div>"
 		content+="</div>";
 		content+="</div>";
+
+		
+		
 		
 		content+="<div>";
 		content+="<div class='command_label name'>"+EDITORSTRINGS.TEXT.label_name+":</div>";

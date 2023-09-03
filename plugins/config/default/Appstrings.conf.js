@@ -578,6 +578,8 @@ EDITORSTRINGS.TEXT = {
 	label_add: "Add",
 	label_name: "Name",
 	label_duration: "Duration",
+	label_variable: "Variable",
+	label_value: "Value",
 	label_copy_face: "Copy Face",
 	label_paste_face: "Paste Face",
 	label_face_name: "Face Name",
@@ -835,6 +837,7 @@ EDITORSTRINGS.PILOT = {
 	label_name: "Name",
 	label_use_mech_name: "Use Mech Name",
 	label_stats_label: "Stats Label",
+	
 
 	label_default_mech: "Default Mech",
 	

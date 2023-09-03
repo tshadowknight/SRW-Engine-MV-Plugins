@@ -230,6 +230,15 @@ SRWBattleTextManager.prototype.getTextCandidate = function(definitions, target, 
 				if(subType == "default"){
 					options = definitions.default;
 				} 
+				
+				var tmp = [];
+				for(let option of options){
+					if(option[0].variable == null || $gameVariables.value(option[0].variable) == option[0].variableValue){
+						tmp.push(option);
+					}
+				}
+				options = tmp;
+				
 				var idx = -1;
 				if(type == "attacks"){
 					var ctr = 0;
