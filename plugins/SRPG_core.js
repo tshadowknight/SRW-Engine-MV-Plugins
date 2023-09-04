@@ -1548,7 +1548,7 @@ SceneManager.isInSaveScene = function(){
 			}
 		}
 		
-		if($gameTemp.enemyAppearQueueIsProcessing){
+		if($gameTemp.enemyAppearQueueIsProcessing && $gameTemp.enemyAppearQueue){
 			if(ImageManager.isReady()){//wait for potential still pending character sheet loading by addEnemy or deployActor
 				$gameTemp.unitAppearTimer--;
 				if($gameTemp.unitAppearTimer <= 0){
@@ -1571,7 +1571,7 @@ SceneManager.isInSaveScene = function(){
 			}			
 		}
 		
-		if($gameTemp.disappearQueueIsProcessing){
+		if($gameTemp.disappearQueueIsProcessing && $gameTemp.disappearQueue){
 			$gameTemp.unitAppearTimer--;
 			if($gameTemp.unitAppearTimer <= 0){
 				if(!$gameTemp.disappearQueue || !$gameTemp.disappearQueue.length){

@@ -1286,14 +1286,27 @@ SRWEditor.prototype.show = function(){
 	
 	
 	function finalize(){	
+	
+		
+	
 		$battleSceneManager.toggleTextBox(true);
 	
 		if(!_this._preferences){
 			_this._preferences = {};
 		}
+		if(_this._preferences.font_scale != null){
+			nw.Window.get(window).zoomLevel = Math.log(_this._preferences.font_scale/100.0) / Math.log(1.2);
+		}
+		
 		var currentEditorInfo = _this._editorData[_this._currentEditor];
 		content+="<div class='header'>";
 		content+=_this._title + " - " + currentEditorInfo.title;
+		
+		content+="<div id='scale_controls'>";	
+		content+="<div class='label'>Editor Zoom</div>";	
+		content+="<div class='value' id='scale_label'>"+(_this._preferences.font_scale || 100)+"%</div>";	
+		content+="<input type='range' min='50' max='200' value='"+(_this._preferences.font_scale || 100)+"' step=5 id='font_scaler_slider'>";
+		content+="</div>";
 		
 		content+="<select id='editor_selector'>";	
 		
@@ -1336,7 +1349,15 @@ SRWEditor.prototype.show = function(){
 				return false;
 			}			
 		});
+		_this._contentDiv.querySelector("#font_scaler_slider").addEventListener("change", function(){
+			nw.Window.get(window).zoomLevel = Math.log(this.value/100.0) / Math.log(1.2);
+			_this._preferences["font_scale"] = this.value;
+			_this.savePreferences();
+		});
 		
+		_this._contentDiv.querySelector("#font_scaler_slider").addEventListener("input", function(){
+			_this._contentDiv.querySelector("#scale_label").innerHTML = this.value + "%";
+		});
 		currentEditorInfo.func.call(_this);
 		Graphics.updatePreviewWindowWidth()
 	}
@@ -2696,6 +2717,8 @@ SRWEditor.prototype.applyPreferences = function(){
 		if(_this._preferences.enemy_twin_mech_select != null){
 			_this._currentEnemyTwinMech = _this._preferences.enemy_twin_mech_select;
 		}
+		
+		
 	}
 }
 
@@ -2731,6 +2754,9 @@ SRWEditor.prototype.showPatternEditor = function(){
 
 SRWEditor.prototype.showAttackEditor = function(){
 	var _this = this;
+	
+	
+	
 	var containerNode = _this._contentDiv.querySelector(".content");
 	var content = "";
 	content+="<div id='attack_editor'>";
