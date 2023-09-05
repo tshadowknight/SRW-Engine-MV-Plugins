@@ -7785,7 +7785,7 @@ StatCalc.prototype.getAttributeInfo = function(actor){
 
 StatCalc.prototype.getEffectivenessMultiplier = function(attacker, weaponInfo, defender, type){
 	function readLookup(lookup, attackerAttr, defenderAttr){
-		var result = 1;
+		var result = {damage: 1, hit: 1};
 		if(lookup){
 			if(lookup[attackerAttr] && lookup[attackerAttr][defenderAttr]){
 				result = lookup[attackerAttr][defenderAttr];
@@ -7808,7 +7808,7 @@ StatCalc.prototype.getEffectivenessMultiplier = function(attacker, weaponInfo, d
 	
 	let attr2Mult = readLookup(ENGINE_SETTINGS.EFFECTIVENESS.attribute2, attackerAttr2, defenderAttr2);
 	
-	let result = attr1Mult * attr2Mult;
+	let result = attr1Mult[type] * attr2Mult[type];
 	
 	if(this.applyStatModsToValue(attacker, 0, ["always_se"])){
 		result = ENGINE_SETTINGS.DEFAULT_SE_MULTIPLIER;
