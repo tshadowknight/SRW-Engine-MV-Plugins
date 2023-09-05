@@ -863,7 +863,25 @@ Window_DeploymentTwin.prototype.redraw = function() {
 	pilotInfoContent+="</div>";
 	pilotInfoContent+="</div>";
 	
+	
+	pilotInfoContent+="<div class='sub_pilot_list'>";
+	const subPilots = $statCalc.getSubPilots(pilotData);
+	for(let i = 0; i < Math.min(subPilots.length, 5); i++){
+		if(subPilots[i] != -1 && subPilots[i] != null){	
+			pilotInfoContent+="<div data-pilotid="+subPilots[i]+" data-type=twin class='left twin selection_icon'></div>";//icon 	
+		}
+	}
+	
+	pilotInfoContent+="</div>";
+	
 	_this._pilotInfoDisplay.innerHTML = pilotInfoContent;
+	
+	var selectionIcons =  this._pilotInfoDisplay.querySelectorAll(".selection_icon")
+	selectionIcons.forEach(function(selectionIcon){
+		_this.updateScaledDiv(selectionIcon);		
+		const pilotId = selectionIcon.getAttribute("data-pilotid");					
+		_this.loadActorFace(pilotId, selectionIcon);						
+	});
 	
 	if(pilotData && $statCalc.isValidForDeploy(pilotData)){
 		var actorIcon = this._container.querySelector("#deploy_pilot_icon");

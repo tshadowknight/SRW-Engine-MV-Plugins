@@ -525,7 +525,6 @@
 				UnlockUnit: true,
 				unlockUnit: true,
 				assignUnit: true,
-				setSubPilot: true,
 				lockUnit: true,
 				SetLevel: true,
 				setLevel: true,
