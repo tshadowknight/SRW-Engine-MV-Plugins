@@ -2589,7 +2589,9 @@ StatCalc.prototype.transformOnDestruction = function(actor, force){
 		if(subTwin){
 			actor.subTwin = subTwin;
 		}
-							
+		this.recoverHPPercent(actor, 100);			
+		this.recoverENPercent(actor, 100);		
+		this.recoverAmmoPercent(actor, 100);			
 		actor.initImages(actor.SRWStats.mech.classData.meta.srpgOverworld.split(","));
 		actor.event.refreshImage();							
 	}
