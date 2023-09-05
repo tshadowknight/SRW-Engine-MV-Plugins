@@ -3187,7 +3187,7 @@ StatCalc.prototype.addBoardedUnit = function(actor, ship){
 
 StatCalc.prototype.getBattleSceneInfo = function(actor){
 	var result = {};
-	if(this.isActorSRWInitialized(actor)){
+	if(this.isActorSRWInitialized(actor) && actor.SRWStats.mech.id != -1){
 		var mechProperties = $dataClasses[actor.SRWStats.mech.id].meta;
 		result.basicBattleSpriteName = mechProperties.mechBasicBattleSprite;
 		result.battleSceneSpriteName = mechProperties.mechBattleSceneSprite;
@@ -7572,7 +7572,8 @@ StatCalc.prototype.unbindLinkedDeploySlots = function(actorId, mechId, type, slo
 	this.invalidateAbilityCache();
 }
 
-StatCalc.prototype.applyDeployActions = function(actorId, mechId){
+//if overwriteFallbackInfo is set the stored state for all affected units will be update to the state after the deploy actions are applied
+StatCalc.prototype.applyDeployActions = function(actorId, mechId, overwriteFallbackInfo){
 	var _this = this;
 	this.lockAbilityCache();
 	var deployActions = this.getDeployActions(actorId, mechId);
@@ -7620,8 +7621,10 @@ StatCalc.prototype.applyDeployActions = function(actorId, mechId){
 						}	
 					});
 					
-					var actor = $gameActors.actor(actorId);
+					var actor = $gameActors.actor(actorId);					
 					$gameSystem.registerPilotFallbackInfo(actor);	
+					
+					
 					actor._classId = 0;
 					$statCalc.reloadSRWStats(actor, false, true);	
 				});		
@@ -7634,16 +7637,16 @@ StatCalc.prototype.applyDeployActions = function(actorId, mechId){
 					
 					if(sourceId != 0 && sourceId != -1){
 						var targetPilot = $gameActors.actor(sourceId);	
-						if(!lockedPilots[sourceId]){
-							$gameSystem.registerPilotFallbackInfo(targetPilot);	
+						if(!lockedPilots[sourceId]){						
+							$gameSystem.registerPilotFallbackInfo(targetPilot);								
 							targetPilot._classId = targetMechId;
 							
+							var targetMech = $statCalc.getMechData($dataClasses[targetMechId], true);
 							if(targetDef.type == "main"){								
 								targetPilot.isSubPilot = false;//set to false for unit reload
 								$statCalc.reloadSRWStats(targetPilot, false, true);
 								targetPilot.isSubPilot = false;//reaffirm in case the unit reload processed a previous main pilot and set the new main pilot back to sub pilot
-							} else {
-								var targetMech = $statCalc.getMechData($dataClasses[targetMechId], true);
+							} else {								
 								$gameSystem.registerMechFallbackInfo(targetMechId, JSON.parse(JSON.stringify(targetMech.subPilots)));	
 
 								targetMech.subPilots[targetDef.slot] = targetPilot.actorId();							
@@ -7656,7 +7659,11 @@ StatCalc.prototype.applyDeployActions = function(actorId, mechId){
 									$statCalc.reloadSRWStats(currentPilot, false, true);
 								}
 								
-							}							
+							}	
+							if(overwriteFallbackInfo){
+								$gameSystem.overwritePilotFallbackInfo(targetPilot);
+								$gameSystem.overwriteMechFallbackInfo(targetMechId, JSON.parse(JSON.stringify(targetMech.subPilots)));		
+							}	
 						}					
 					}
 				});
@@ -7665,7 +7672,11 @@ StatCalc.prototype.applyDeployActions = function(actorId, mechId){
 					
 		this.reloadSRWStats($gameActors.actor(actorId), false, true);
 	} else {
-		$gameSystem.registerPilotFallbackInfo($gameActors.actor(actorId));	
+		if(overwriteFallbackInfo){
+			$gameSystem.overwritePilotFallbackInfo($gameActors.actor(actorId));	
+		} else {
+			$gameSystem.registerPilotFallbackInfo($gameActors.actor(actorId));	
+		}
 	}
 	this.unlockAbilityCache();
 	this.invalidateAbilityCache();

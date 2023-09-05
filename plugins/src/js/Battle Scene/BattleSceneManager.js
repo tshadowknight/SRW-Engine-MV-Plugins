@@ -1884,9 +1884,9 @@ BattleSceneManager.prototype.hookBeforeRender = function(){
 				while(command){
 					_this.executeAnimation(command.def, command.tick);
 					command = null;
-					//if(!_this._isLoading){
+					if(!_this._isLoading){
 						command = _this._animQueue.shift();
-					//}
+					}
 				}
 				
 					
@@ -3226,10 +3226,11 @@ BattleSceneManager.prototype.executeAnimation = function(animation, startTick){
 		translate: function(target, params){
 			var targetObj = getTargetObject(target);
 			//_this.stopShakeAnimations(target);
-			if(targetObj.parent_handle){
-				targetObj = targetObj.parent_handle;
-			}
+			
 			if(targetObj){
+				if(targetObj.parent_handle){
+					targetObj = targetObj.parent_handle;
+				}
 				targetObj.wasMoved = true;
 				var startPosition;
 				if(params.startPosition){

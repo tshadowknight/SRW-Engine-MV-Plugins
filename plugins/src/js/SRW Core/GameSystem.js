@@ -711,7 +711,18 @@
 					subPilots: subPilots
 				};
 			}
-		}		
+		}	
+
+		Game_System.prototype.overwriteMechFallbackInfo = function(mechId, subPilots) {
+			const _this = this;
+			if(!_this._mechFallbackInfo){
+				_this._mechFallbackInfo = {};
+			}
+			
+			_this._mechFallbackInfo[mechId] = {
+				subPilots: subPilots
+			};			
+		}			
 		
 		Game_System.prototype.getPilotFallbackInfo = function(actor) {
 			const _this = this;

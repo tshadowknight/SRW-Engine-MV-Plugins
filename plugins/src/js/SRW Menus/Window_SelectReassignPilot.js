@@ -259,7 +259,7 @@ Window_SelectReassignPilot.prototype.update = function() {
 				}
 				
 				if(this.getCurrentSelection().mech.forcePilots){
-					$statCalc.applyDeployActions(this.getCurrentSelection().actor.actorId(), mechId);
+					$statCalc.applyDeployActions(this.getCurrentSelection().actor.actorId(), mechId, true);
 				} else {
 					$statCalc.unbindLinkedDeploySlots(this.getCurrentSelection().actor.actorId(), mechId, target.type, $gameTemp.reassignTargetMech.slot);
 				}			
