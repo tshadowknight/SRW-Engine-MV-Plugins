@@ -304,10 +304,7 @@ BattleCalc.prototype.performDamageCalculation = function(attackerInfo, defenderI
 		var attackerPilotStats = $statCalc.getCalculatedPilotStats(attackerInfo.actor);
 		var attackerMechStats = $statCalc.getCalculatedMechStats(attackerInfo.actor);
 		var defenderMechStats = $statCalc.getCalculatedMechStats(defenderInfo.actor);
-		/*if(weaponInfo.particleType == "beam" && $statCalc.getCurrentTerrain(defenderInfo.actor) == "water"){
-			weaponTerrainRating = this._weaponTerrainValues["D"];
-		}*/
-		
+
 		var activeAttackerSpirits = $statCalc.getActiveSpirits(attackerInfo.actor);
 			
 		if(weaponInfo.type == "M"){ //melee
@@ -355,7 +352,7 @@ BattleCalc.prototype.performDamageCalculation = function(attackerInfo, defenderI
 			armor = 1;
 		}	
 		
-		var defenderTerrainRating = this._mechTerrainValues[defenderMechStats.terrain[$statCalc.getCurrentTerrain(defenderInfo.actor)]] || 0;
+		var defenderTerrainRating = this._mechTerrainValues[defenderMechStats.terrain[$statCalc.getCurrentAliasedTerrain(defenderInfo.actor)]] || 0;
 		
 		//final damage
 		var terrainDefenseFactor = $statCalc.getCurrentTerrainMods(defenderInfo.actor).defense || 0; 

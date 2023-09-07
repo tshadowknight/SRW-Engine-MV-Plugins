@@ -541,7 +541,7 @@
 				
 				if (command === 'deployMech') {
 					var mechId = args[0];
-					var actor_unit = $statCalc.getCurrentPilot(mechId);
+					var actor_unit = $statCalc.getCurrentPilot(mechId, true);
 					var event = $gameMap.event(args[1]);
 					if(actor_unit && event){
 						var type;

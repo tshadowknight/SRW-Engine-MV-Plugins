@@ -13,7 +13,7 @@
 		Object.defineProperties(Game_BattlerBase.prototype, {
 			// Hit Points
 			hp: { get: function() { 
-				if($statCalc.isActorSRWInitialized(this)){
+				if($statCalc.isActorSRWInitialized(this) && this.SRWStats.mech){
 					return this.SRWStats.mech.stats.calculated.currentHP;
 				} else {
 					return 0; 
@@ -21,7 +21,7 @@
 			}, configurable: true },
 			// Magic Points
 			mp: { get: function() { 
-				if($statCalc.isActorSRWInitialized(this)){
+				if($statCalc.isActorSRWInitialized(this) && this.SRWStats.mech){
 					return this.SRWStats.mech.stats.calculated.currentEN;
 				} else {
 					return 0; 
@@ -29,7 +29,7 @@
 			}, configurable: true },
 			// Tactical Points
 			mhp: { get: function() { 
-				if($statCalc.isActorSRWInitialized(this)){
+				if($statCalc.isActorSRWInitialized(this) && this.SRWStats.mech){
 					return this.SRWStats.mech.stats.calculated.maxHP;
 				} else {
 					return 0; 
@@ -37,7 +37,7 @@
 			}, configurable: true },
 			// Maximum Magic Points
 			mmp: { get: function() { 
-				if($statCalc.isActorSRWInitialized(this)){
+				if($statCalc.isActorSRWInitialized(this) && this.SRWStats.mech){
 					return this.SRWStats.mech.stats.calculated.maxEN;
 				} else {
 					return 0; 
@@ -60,7 +60,7 @@
 				if(hp < 0){
 					hp = 0;
 				}
-				if($statCalc.isActorSRWInitialized(this)){
+				if($statCalc.isActorSRWInitialized(this) && this.SRWStats.mech){
 					this.SRWStats.mech.stats.calculated.currentHP = hp;
 				}
 				this._hp = hp;
@@ -75,7 +75,7 @@
 				if(mp < 0){
 					mp = 0;
 				}
-				if($statCalc.isActorSRWInitialized(this)){
+				if($statCalc.isActorSRWInitialized(this) && this.SRWStats.mech){
 					this.SRWStats.mech.stats.calculated.currentEN = mp;
 				}
 				this._mp = mp;

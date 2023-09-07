@@ -651,7 +651,7 @@
 				var battlerArray = _this.EventToUnit(event.eventId());
 				if(!event.isErased() && battlerArray){
 					var actor = battlerArray[1];
-					if(actor.isActor() && !actor.srpgTurnEnd()){
+					if(actor.isActor() && !actor.srpgTurnEnd() && !$statCalc.isAI(actor)){
 						result.push(actor);
 					}
 				}

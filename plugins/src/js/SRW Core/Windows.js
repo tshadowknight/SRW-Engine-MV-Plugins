@@ -462,6 +462,10 @@
 								_this.addCommand(APPSTRINGS.MAPMENU.cmd_join, 'join');
 							}	
 						}
+						if($statCalc.canSwapPilot(_this._actor)){
+							_this.addCommand(APPSTRINGS.MAPMENU.cmd_swap_pilot, 'swap_pilot');
+						}	
+						
 						_this.addWaitCommand();
 					}
 					

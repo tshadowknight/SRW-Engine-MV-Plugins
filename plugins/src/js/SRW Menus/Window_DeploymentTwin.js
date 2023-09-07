@@ -867,7 +867,7 @@ Window_DeploymentTwin.prototype.redraw = function() {
 	pilotInfoContent+="<div class='sub_pilot_list'>";
 	const subPilots = $statCalc.getSubPilots(pilotData);
 	for(let i = 0; i < Math.min(subPilots.length, 5); i++){
-		if(subPilots[i] != -1 && subPilots[i] != null){	
+		if(subPilots[i] != -1 && subPilots[i] != null && subPilots[i] != ""){	
 			pilotInfoContent+="<div data-pilotid="+subPilots[i]+" data-type=twin class='left twin selection_icon'></div>";//icon 	
 		}
 	}

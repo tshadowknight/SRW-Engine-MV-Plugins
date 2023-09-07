@@ -325,7 +325,7 @@ BattleSceneUILayer.prototype.animateStat = function(slot, elems, maxValue, oldPe
 			t = 1;
 		}
 		var currentVal = oldValue+Math.floor(totalDelta * t);//Math.floor(tickValue * currentTick * direction)
-		if(((oldValue < newValue) && currentVal <= newValue) || ((oldValue > newValue) && currentVal >= newValue)){		
+		if(t < 1){		
 			if(type == "HP" && newValue <= 100000){ 
 				isHidden = false;
 				if(target == "actor"){
@@ -430,9 +430,11 @@ BattleSceneUILayer.prototype.setStat = function(effect, type) {
 	if(type == "HP"){
 		maxValue = stats.maxHP;
 		value = effect.currentAnimHP;
+		console.log("Setting stat "+type+" to "+effect.currentAnimHP);
 	} else {
 		maxValue = stats.maxEN;
 		value = effect.currentAnimEN;
+		console.log("Setting stat "+type+" to "+effect.currentAnimEN);
 	}
 	isHidden = !$statCalc.isRevealed(effect.ref);
 	var elems = _this.getStatElements(target, slot, type);	

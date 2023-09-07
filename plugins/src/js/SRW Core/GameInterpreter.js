@@ -1028,9 +1028,11 @@
 		}
 
 		Game_Interpreter.prototype.processDisappearQueue = function(){
-			this.setWaitMode("enemy_appear");
-			$gameTemp.disappearQueueIsProcessing = true;
-			$gameTemp.unitAppearTimer = 0;
+			if($gameTemp.disappearQueue && $gameTemp.disappearQueue.length){
+				this.setWaitMode("enemy_appear");
+				$gameTemp.disappearQueueIsProcessing = true;
+				$gameTemp.unitAppearTimer = 0;
+			}			
 		}
 
 		Game_Interpreter.prototype.manualDeploy = function(unlockedOnly){

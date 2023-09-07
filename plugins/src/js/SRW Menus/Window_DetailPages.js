@@ -1146,7 +1146,7 @@ Window_DetailPages.prototype.redraw = function() {
 	this._attribute2Display.style.display = "none";
 	let attr1 = $statCalc.getParticipantAttribute(this.getCurrentSelection().actor, "attribute1");
 	if(attr1){
-		let attrInfo = ENGINE_SETTINGS.ATTRIBUTE_DISPLAY_NAMES[attr1];
+		let attrInfo = ENGINE_SETTINGS.ATTRIBUTE_DISPLAY_NAMES[attr1] || {};
 		if(attrInfo.effects){
 			this._attribute1Display.classList.add("effects");
 		}

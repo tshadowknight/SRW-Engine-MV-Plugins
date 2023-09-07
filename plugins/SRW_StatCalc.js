@@ -388,7 +388,7 @@ StatCalc.prototype.getCurrentTerrainMods = function(actor){
 StatCalc.prototype.getCurrentMoveCost = function(actor){
 	if(this.isActorSRWInitialized(actor)){
 		var event = this.getReferenceEvent(actor);
-		var moveCost = $terrainTypeManager.getTerrainDefinition(this.getCurrentTerrainIdx(actor)).moveCost;
+		var moveCost = $terrainTypeManager.getTerrainDefinition(this.getCurrentAliasedTerrainIdx(actor)).moveCost;
 		return moveCost * event.lastMoveCount; 
 	} else {
 		return 0;
@@ -2579,7 +2579,7 @@ StatCalc.prototype.transformOnDestruction = function(actor, force){
 					targetActor.event = actor.event;
 					actor.event = null;
 					actor.isSubPilot = true;
-					actor.SRWStats.mech = null;
+					//actor.SRWStats.mech = null;
 					$gameSystem.setEventToUnit(targetActor.event.eventId(), 'actor', targetActor.actorId());
 					actor = targetActor;
 				}
@@ -3582,7 +3582,7 @@ StatCalc.prototype.getActiveMapWeapons = function(actor, isPostMove){
 		var weapons =  actor.SRWStats.mech.weapons;	
 		var mapWeapons = [];
 		weapons.forEach(function(weapon){
-			if(weapon.isMap && _this.canUseWeapon(actor, weapon, isPostMove)){
+			if(weapon.isMap && _this.isWeaponUnlocked(actor, weapon) && _this.canUseWeapon(actor, weapon, isPostMove)){
 				mapWeapons.push(weapon);
 			}
 		});
@@ -4079,7 +4079,7 @@ StatCalc.prototype.getCurrentMoveRange = function(actor){
 			totalMove = 1;
 		}
 		
-		var moveCost = $terrainTypeManager.getTerrainDefinition(this.getCurrentTerrainIdx(actor)).moveCost;
+		var moveCost = $terrainTypeManager.getTerrainDefinition(this.getCurrentAliasedTerrainIdx(actor)).moveCost;
 		if(moveCost > 0){
 			var currentEN = this.getCurrenEN(actor);
 			var maxMove = Math.floor(currentEN / moveCost);
@@ -4594,7 +4594,7 @@ StatCalc.prototype.canUseWeaponDetail = function(actor, weapon, postMoveEnabledO
 					canUse = false;
 					detail.target = true;
 				}
-				var targetTerrain = this.getCurrentTerrain(rangeTarget);
+				var targetTerrain = this.getCurrentAliasedTerrain(rangeTarget);
 				var terrainRank = weapon.terrain[targetTerrain];
 				if(terrainRank == "-"){
 					canUse = false;
@@ -4702,7 +4702,7 @@ StatCalc.prototype.canUseWeapon = function(actor, weapon, postMoveEnabledOnly, d
 		}
 		
 		if(defender){
-			var targetTerrain = this.getCurrentTerrain(defender)
+			var targetTerrain = this.getCurrentAliasedTerrain(defender)
 			var terrainRank = weapon.terrain[targetTerrain];
 			if(terrainRank == "-"){
 				return false;
@@ -5596,7 +5596,7 @@ StatCalc.prototype.getMechTerrainString = function(actor, terrain){
 		if(terrain){
 			currentTerrain = terrain;
 		} else {
-			currentTerrain = this.getCurrentTerrain(actor);
+			currentTerrain = this.getCurrentAliasedTerrain(actor);
 		}		
 		var mechTerrainLevel = actor.SRWStats.mech.stats.calculated.terrain[currentTerrain]; 
 		var mechTerrainNumeric = this._terrainToNumeric[mechTerrainLevel];
@@ -5635,7 +5635,7 @@ StatCalc.prototype.getFinalTerrainString = function(actor, terrain){
 
 StatCalc.prototype.getWeaponTerrainMod = function(actor, weaponInfo){
 	if(this.isActorSRWInitialized(actor)){
-		var currentTerrain = this.getCurrentTerrain(actor);
+		var currentTerrain = this.getCurrentAliasedTerrain(actor);
 		var weaponTerrainRanking = weaponInfo.terrain[currentTerrain];
 		
 		var weaponTerrainNumeric = this._terrainToNumeric[weaponTerrainRanking];
@@ -7802,10 +7802,14 @@ StatCalc.prototype.getEffectivenessMultiplier = function(attacker, weaponInfo, d
 		if(lookup){
 			if(lookup[attackerAttr] && lookup[attackerAttr][defenderAttr]){
 				result = lookup[attackerAttr][defenderAttr];
-				if(result[type]){
-					result = result[type];
-				}
+							
 			}
+		}
+		if(result.damage == null){
+			result.damage = 1;
+		}
+		if(result.hit == null){
+			result.hit = 1;
 		}
 		return result;
 	}
