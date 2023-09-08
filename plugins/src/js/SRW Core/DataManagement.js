@@ -692,7 +692,8 @@
 				setCustomSpirit: true, 
 				clearCustomSpirit: true,
 				awardFavPoints: true,
-				deployItemBox: true
+				deployItemBox: true,
+				collectItemsBoxes: true
 			}
 			var scriptCommands = {
 				fadeIn: function(eventList, indent, params){

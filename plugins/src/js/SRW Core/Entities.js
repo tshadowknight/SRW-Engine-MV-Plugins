@@ -1518,7 +1518,7 @@
 				if(flyInfo){
 					floatAmount = flyInfo.floatAmount;
 				}
-				if(!this.transitioningFloat && this._lastTargetFloat != floatAmount){
+				if(floatAmount != 0 && !this.transitioningFloat && this._lastTargetFloat != floatAmount){
 					this._lastTargetFloat = floatAmount;
 					this._animStartFloat = this._floatOffset * -1;
 					this.transitioningFloat = true;

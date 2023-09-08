@@ -447,7 +447,7 @@
 				
 				drawScene(gl, programInfo, buffers);
 				
-				//renderer.gl.useProgram(prevShaderProgram);
+				renderer.gl.useProgram(prevShaderProgram);
 				//prevBuffer.bind();	
 				return;
 			}

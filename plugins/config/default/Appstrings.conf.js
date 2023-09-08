@@ -36,6 +36,7 @@ APPSTRINGS.GENERAL = {
 	label_mastery_completed: "Completed!",
 	label_mastery_completed_message: "Mastery Condition completed!",
 	label_box_pickup: "Collected: {ITEMS}!",
+	label_box_pickup_scripted: "Collected all remaining boxes and obtained:\n{ITEMS}!",
 	label_box_stolen: "The item box was taken!",
 	label_enemy_phase: "Enemy Phase",
 	label_ally_phase: "Ally Phase",

@@ -1294,6 +1294,32 @@
 				if (command === 'deployItemBox') {					
 					$gameSystem.deployItemBox($gameMap.event(args[0] * 1), JSON.parse(args[1] || "[]"))
 				}
+				
+				if (command === 'collectItemsBoxes') {		
+					let targetId = args[0];
+					if(targetId == null){
+						targetId = -1;
+					}
+					let items = [];
+					for(let event of $gameMap.events()){
+						if(event.isDropBox && (targetId == -1 || event.eventId() == targetId)){
+							items = items.concat(event.dropBoxItems);
+							event.isDropBox = false;
+							event.erase();
+						}
+					}
+					if(items.length){
+						$gameMessage.setFaceImage("", "");
+						$gameMessage.setBackground(1);
+						$gameMessage.setPositionType(1);
+						let names = items.map((itemId) => $itemEffectManager.getAbilityDisplayInfo(itemId).name);
+						$gameMessage.add("\\TA[1]\n" + APPSTRINGS.GENERAL.label_box_pickup_scripted.replace("{ITEMS}", names.join(", ")));
+						
+						for(let item of items){
+							$inventoryManager.addItem(item);
+						}
+					}
+				}
 							
 			} catch(e){
 				var msg = "";
