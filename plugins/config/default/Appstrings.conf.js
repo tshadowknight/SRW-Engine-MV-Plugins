@@ -35,6 +35,8 @@ APPSTRINGS.GENERAL = {
 	label_mastery_locked: "Unobtainable after Game Over on this stage.",
 	label_mastery_completed: "Completed!",
 	label_mastery_completed_message: "Mastery Condition completed!",
+	label_box_pickup: "Collected: {ITEMS}!",
+	label_box_stolen: "The item box was taken!",
 	label_enemy_phase: "Enemy Phase",
 	label_ally_phase: "Ally Phase",
 	label_yes: "YES",

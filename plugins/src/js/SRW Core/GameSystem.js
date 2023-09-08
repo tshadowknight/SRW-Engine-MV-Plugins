@@ -356,8 +356,8 @@
 				}
 			}	
 			
-			_this._pilotFallbackInfo = {};
-			_this._mechFallbackInfo = {};
+			//_this._pilotFallbackInfo = {};
+			//_this._mechFallbackInfo = {};
 		}
 		
 		Game_System.prototype.startIntermission = function(){
@@ -782,6 +782,8 @@
 			var _this = this;
 			actor_unit.event = event;
 			event._lastModsPosition = null;
+			event.isDropBox = false;
+			delete event.dropBoxItems;
 			_this.pushSrpgAllActors(event.eventId());
 			event.isDeployed = true;
 			event.isScriptedDeploy = isScriptedDeploy ? true : false;
@@ -843,6 +845,26 @@
 			ImageManager.loadCharacter(parts[0]);
 			
 			$statCalc.applyRelativeTransforms();
+			
+			event.isShip = $statCalc.isShip(actor_unit);
+		}
+		
+		Game_System.prototype.deployItemBox = function(event, items) {
+			var _this = this;
+			//
+			event.isDropBox = true;
+			event.setType("");
+			event.dropBoxItems = items;			
+			event.setImage(ENGINE_SETTINGS.ITEM_BOX_SPRITE.characterName, ENGINE_SETTINGS.ITEM_BOX_SPRITE.characterIndex);
+			event.appear();				
+		}
+		
+		Game_System.prototype.finalizeItemBox = function(event){
+			if(event.isDropBox){
+				this.clearEventToUnit(event.eventId());
+				event.visible = true;
+				event.appear();	
+			}
 		}
 		
 		Game_System.prototype.getEventDeploySlot = function(event) {

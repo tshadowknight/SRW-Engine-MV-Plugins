@@ -100,6 +100,7 @@ function GameStateManager(){
 		await_actor_float: "GameState_await_actor_float",
 		stage_conditions: "GameState_stage_conditions",
 		popup_anim: "GameState_popup_anim",
+		check_item_pickup: "GameState_check_item_pickup",
 	};
 	this._stateObjMapping = {};
 	Object.keys(_this._stateClassMapping).forEach(function(stateId){
@@ -2702,6 +2703,67 @@ GameState_popup_anim.prototype.update = function(scene){
 		$gameTemp.animCharacter = null;
 		$gameSystem.setSubBattlePhase($gameTemp.contextState);	
 	}	
+	return true;
+}
+
+function GameState_check_item_pickup(){
+	GameState.call(this);
+}
+
+GameState_check_item_pickup.prototype = Object.create(GameState.prototype);
+GameState_check_item_pickup.prototype.constructor = GameState_check_item_pickup;
+
+GameState_check_item_pickup.prototype.update = function(scene){
+	let targetEvent;
+	if(!$gameTemp.activeEvent().isErased()){
+		$gameMap.eventsXy($gameTemp.activeEvent().posX(), $gameTemp.activeEvent().posY()).forEach(function(event) {
+			if (!event.isErased() && event.isDropBox) {
+				targetEvent = event;
+				event.isDropBox = false;
+			}
+		});
+	}
+	
+	if(targetEvent){
+		var battlerArray = $gameSystem.EventToUnit($gameTemp.activeEvent().eventId());
+		if(battlerArray){
+			if($gameSystem.isFriendly(battlerArray[1], "player")){
+				$gameMessage.setFaceImage("", "");
+				$gameMessage.setBackground(1);
+				$gameMessage.setPositionType(1);
+				let names = targetEvent.dropBoxItems.map((itemId) => $itemEffectManager.getAbilityDisplayInfo(itemId).name);
+				$gameMessage.add("\\TA[1]\n" + APPSTRINGS.GENERAL.label_box_pickup.replace("{ITEMS}", names.join(", ")));
+			} else {
+				$gameMessage.setFaceImage("", "");
+				$gameMessage.setBackground(1);
+				$gameMessage.setPositionType(1);
+				$gameMessage.add("\\TA[1]\n" + APPSTRINGS.GENERAL.label_box_stolen);
+			}			
+		}
+		targetEvent.erase();
+		for(let item of targetEvent.dropBoxItems){
+			$inventoryManager.addItem(item);
+		}
+		$gameMap._interpreter.setWaitMode('message');
+	} else if (!$gameMessage.isBusy()) {
+		scene.eventAfterAction();
+        if ($gameSystem.isBattlePhase() === 'actor_phase') {
+            scene.eventUnitEvent();
+        }
+        $gameTemp.clearActiveEvent();
+        if ($gameSystem.isBattlePhase() === 'actor_phase') {
+            if (scene.isSrpgActorTurnEnd()) {
+                $gameSystem.srpgStartEnemyTurn(0); //自動行動のアクターが行動する
+            } else {
+                $gameSystem.setSubBattlePhase('event_after_actor_action');
+            }
+        } else if ($gameSystem.isBattlePhase() === 'auto_actor_phase') {
+            $gameSystem.setSubBattlePhase('auto_actor_command');
+        } else if ($gameSystem.isBattlePhase() === 'AI_phase') {
+            $gameSystem.setSubBattlePhase('enemy_command');
+        }
+	}
+
 	return true;
 }
 

@@ -29,6 +29,10 @@ var ENGINE_SETTINGS = {
 	LEVEL_CAP: 99,
 	SP_CAP: -1,
 	SHOW_NEW_MOVE_INDICATOR: true,
+	ITEM_BOX_SPRITE: {
+		characterName: "!Chest",
+		characterIndex: 0
+	},
 	DEFAULT_AI_FLAGS: {
 		terrain: 1,   //if 1 the unit will prefer to move onto tile that grant terrain bonuses
 		formation: 1, //if 1 the unit will prefer to move adjacent to allies that provide support attack/defend

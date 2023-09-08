@@ -95,7 +95,21 @@
 						post.push(child);
 					}					
 				});
-				sorted = sorted.sort(function(a, b){return a._character.posY() - b._character.posY()});
+				sorted = sorted.sort(function(a, b){				
+					if(a._character.isDropBox){
+						return -1;
+					}
+					if(b._character.isDropBox){
+						return 1;
+					}
+					if(a._character.isActiveShip){
+						return -1;
+					}
+					if(b._character.isActiveShip){
+						return 1;
+					}				
+					return a._character.posY() - b._character.posY();						
+				});
 	
 				this.children[0].children = pre.concat(sorted).concat(post);
 			}
@@ -578,10 +592,6 @@
 			}
 		};
 		
-		//Character sprites are split into two a bottom and top part to improve overlap for units whose map icon goes outside their current tiles.
-		//This can happen for flying units for example.
-		//The base sprite is normally hidden, but is still available.
-		
 		Sprite_Character.prototype.allBodyPartsAvailable = function(character) {
 			return this._upperBody && this._lowerBody && this._upperBodyTop && this._upperBodyOverlay && this._lowerBodyOverlay;
 		}
@@ -600,123 +610,83 @@
 			if (this._character.isEvent() == true) {
 				var battlerArray = $gameSystem.EventToUnit(this._character.eventId());
 				if (battlerArray) {
-					if ($gameSystem.isEnemy(battlerArray[1]) && !ENGINE_SETTINGS.KEEP_ENEMY_SPRITE_ORIENTATION) {
-						this.scale.x = -1;			
-						if(this.allBodyPartsAvailable()){	
-							this._upperBody.scale.x = -1;
-							this._upperBodyOverlay.scale.x = -1;
-							this._upperBodyTop.scale.x = -1;
-							this._lowerBody.scale.x = -1;
-							this._lowerBodyOverlay.scale.x = -1;
-						}	
+					if($gameSystem.isEnemy(battlerArray[1]) && !ENGINE_SETTINGS.KEEP_ENEMY_SPRITE_ORIENTATION) {
+						this.scale.x = -1;							
 					} else {
 						this.scale.x = 1;				
-						if(this.allBodyPartsAvailable()){	
-							this._upperBody.scale.x = 1;
-							this._upperBodyOverlay.scale.x = 1;
-							this._upperBodyTop.scale.x = 1;
-							this._lowerBody.scale.x = 1;
-							this._lowerBodyOverlay.scale.x = 1;
-						}
+						
 					}
-					if(this.allBodyPartsAvailable()){	
-						if(battlerArray[0] === 'actor' && $gameTemp.doingManualDeploy){
-							this._frameCount+=2;
-							this._frameCount %= 200;
-							if(this._frameCount < 100){
-								this._upperBody.opacity = this._frameCount + 80;
-								this._upperBodyTop.opacity = this._frameCount + 80;
-								this._lowerBody.opacity = this._frameCount + 80;
-								this.opacity = this._frameCount + 80;
-							} else {
-								this._upperBody.opacity = 200 + 80 - this._frameCount;
-								this._upperBodyTop.opacity = 200 + 80 - this._frameCount;
-								this._lowerBody.opacity = 200 + 80 - this._frameCount;
-								this.opacity = 200 + 80 - this._frameCount;
-							}
+					
+					if(battlerArray[0] === 'actor' && $gameTemp.doingManualDeploy){
+						this._frameCount+=2;
+						this._frameCount %= 200;
+						if(this._frameCount < 100){						
+							this.opacity = this._frameCount + 80;
 						} else {
-							this._upperBody.opacity = 255;
-							this._upperBodyTop.opacity = 255;
-							this._lowerBody.opacity = 255;
-							this.opacity = 255;
+							this.opacity = 200 + 80 - this._frameCount;
 						}
-						
-						this._upperBodyOverlay.opacity = 0;
-						this._lowerBodyOverlay.opacity = 0;
-						
-						var refX;
-						var refY;
-						if(this._character._x != this._character._realX || this._character._y != this._character._realY){
-							if($gameMap.hasStarTile(this._character._x,  this._character._y) || $gameMap.hasStarTile(this._character._prevX,  this._character._prevY)){
-								this._upperBodyTop.opacity = 0;
-								
-								if($gameSystem.foregroundSpriteToggleState == 0){
-									this._upperBodyOverlay.opacity = 0;
-									this._lowerBodyOverlay.opacity = 0;
-									this.opacity = 0;
-								} else if($gameSystem.foregroundSpriteToggleState == 1){
-									this._upperBodyOverlay.opacity = 128;
-									this._lowerBodyOverlay.opacity = 128;
-									this.opacity = 128;
-								} else if($gameSystem.foregroundSpriteToggleState == 2){
-									this._upperBodyOverlay.opacity = 255;
-									this._lowerBodyOverlay.opacity = 255;
-									this.opacity = 255;
-								}
+					} else {
+						this.opacity = 255;
+					}
+					
+					var refX;
+					var refY;
+					if(this._character._x != this._character._realX || this._character._y != this._character._realY){
+						if($gameMap.hasStarTile(this._character._x,  this._character._y) || $gameMap.hasStarTile(this._character._prevX,  this._character._prevY)){
+							//this._upperBodyTop.opacity = 0;
+							
+							if($gameSystem.foregroundSpriteToggleState == 0){
+								//this._upperBodyOverlay.opacity = 0;
+								//this._lowerBodyOverlay.opacity = 0;
+								this.opacity = 0;
+							} else if($gameSystem.foregroundSpriteToggleState == 1){
 								//this._upperBodyOverlay.opacity = 128;
 								//this._lowerBodyOverlay.opacity = 128;
-							} else {
-								this._upperBodyTop.opacity = 255;
-								this._upperBody.opacity = 0;
-							}
-						} else {
-							if($gameMap.hasStarTile(this._character._x,  this._character._y)){
-								this._upperBodyTop.opacity = 0;
-								if($gameSystem.foregroundSpriteToggleState == 0){
-									this._upperBodyOverlay.opacity = 0;
-									this._lowerBodyOverlay.opacity = 0;
-									this.opacity = 0;
-								} else if($gameSystem.foregroundSpriteToggleState == 1){
-									this._upperBodyOverlay.opacity = 128;
-									this._lowerBodyOverlay.opacity = 128;
-									this.opacity = 128;
-								} else if($gameSystem.foregroundSpriteToggleState == 2){
-									this._upperBodyOverlay.opacity = 255;
-									this._lowerBodyOverlay.opacity = 255;
-									this.opacity = 255;
-								}
-								//this._upperBodyOverlay.opacity = 128;
-								//this._lowerBodyOverlay.opacity = 128;
-							} else {
-								this._upperBodyTop.opacity = 255;
+								this.opacity = 128;
+							} else if($gameSystem.foregroundSpriteToggleState == 2){
+								//this._upperBodyOverlay.opacity = 255;
+								//this._lowerBodyOverlay.opacity = 255;
 								this.opacity = 255;
-								this._upperBody.opacity = 0;
 							}
-						}	
-						if(//$gameTemp.activeEvent() == this._character || 
-							$gameTemp._TargetEvent == this._character ||
-							($gameSystem.isSubBattlePhase() == "actor_move" && $gameTemp.activeEvent() == this._character) || 
-							($gameSystem.isSubBattlePhase()== "enemy_move" && $gameTemp.activeEvent() == this._character) || 
-							$gameSystem.isSubBattlePhase()== "actor_target" || 
-							$gameSystem.isSubBattlePhase() == "enemy_targeting_display" ||
-							$gameSystem.isSubBattlePhase() == "post_move_command_window" ||
-							$gameSystem.isSubBattlePhase() == "rearrange_deploys" ||
-							$gameSystem.isSubBattlePhase() == "hover_deploy_btn"							
-						){
-							this._upperBodyOverlay.opacity = 255;
-							this._lowerBodyOverlay.opacity = 255;
+							//this._upperBodyOverlay.opacity = 128;
+							//this._lowerBodyOverlay.opacity = 128;
+						} else {
+							//this._upperBodyTop.opacity = 255;
+							//this._upperBody.opacity = 0;
 							this.opacity = 255;
 						}
-						let currentTerrain = $statCalc.getCurrentTerrainIdx(battlerArray[1]);
-						let terrainDef = $terrainTypeManager.getTerrainDefinition(currentTerrain);
-						if(terrainDef.opacityMod){
-							this._upperBody.opacity+=terrainDef.opacityMod;
-							this._upperBodyOverlay.opacity+=terrainDef.opacityMod;
-							this._upperBodyTop.opacity+=terrainDef.opacityMod;
-							this._lowerBody.opacity+=terrainDef.opacityMod;
-							this._lowerBodyOverlay.opacity+=terrainDef.opacityMod;
-						}	
+					} else {
+						if($gameMap.hasStarTile(this._character._x,  this._character._y)){
+							this._upperBodyTop.opacity = 0;
+							if($gameSystem.foregroundSpriteToggleState == 0){
+								this.opacity = 0;
+							} else if($gameSystem.foregroundSpriteToggleState == 1){
+								this.opacity = 128;
+							} else if($gameSystem.foregroundSpriteToggleState == 2){
+								this.opacity = 255;
+							}
+						} else {
+							this.opacity = 255;
+						}
+					}	
+					if(//$gameTemp.activeEvent() == this._character || 
+						$gameTemp._TargetEvent == this._character ||
+						($gameSystem.isSubBattlePhase() == "actor_move" && $gameTemp.activeEvent() == this._character) || 
+						($gameSystem.isSubBattlePhase()== "enemy_move" && $gameTemp.activeEvent() == this._character) || 
+						$gameSystem.isSubBattlePhase()== "actor_target" || 
+						$gameSystem.isSubBattlePhase() == "enemy_targeting_display" ||
+						$gameSystem.isSubBattlePhase() == "post_move_command_window" ||
+						$gameSystem.isSubBattlePhase() == "rearrange_deploys" ||
+						$gameSystem.isSubBattlePhase() == "hover_deploy_btn"							
+					){
+						this.opacity = 255;
 					}
+					let currentTerrain = $statCalc.getCurrentTerrainIdx(battlerArray[1]);
+					let terrainDef = $terrainTypeManager.getTerrainDefinition(currentTerrain);
+					if(terrainDef.opacityMod){
+						this.opacity+=terrainDef.opacityMod;
+					}	
+					
 				}			
 			}		
 		}
@@ -744,35 +714,6 @@
 			this._frameCount = 0;
 		
 		};
-		Sprite_Character.prototype.setUpperBodyTop = function(sprite) {
-			this._upperBodyTop = sprite;
-			this._upperBodyTop.anchor.x = 0.5;
-			this._upperBodyTop.anchor.y = 2;
-		}
-		
-		Sprite_Character.prototype.setUpperBody = function(sprite) {
-			this._upperBody = sprite;
-			this._upperBody.anchor.x = 0.5;
-			this._upperBody.anchor.y = 2;
-		}
-
-		Sprite_Character.prototype.setLowerBody = function(sprite) {
-			this._lowerBody = sprite;
-			this._lowerBody.anchor.x = 0.5;
-			this._lowerBody.anchor.y = 2;
-		}
-		
-		Sprite_Character.prototype.setUpperBodyOverlay = function(sprite) {
-			this._upperBodyOverlay = sprite;
-			this._upperBodyOverlay.anchor.x = 0.5;
-			this._upperBodyOverlay.anchor.y = 2;
-		}
-
-		Sprite_Character.prototype.setLowerBodyOverlay = function(sprite) {
-			this._lowerBodyOverlay = sprite;
-			this._lowerBodyOverlay.anchor.x = 0.5;
-			this._lowerBodyOverlay.anchor.y = 2;
-		}
 		
 		Sprite_Character.prototype.setTurnEnd = function(sprite) {
 			this._turnEndSprite = sprite;
@@ -781,49 +722,11 @@
 		}
 
 		
-		Sprite_Character.prototype.updateHalfBodySprites = function() {   
-			if(this.allBodyPartsAvailable()){		
-				this._upperBody.bitmap = this.bitmap;
-				this._upperBody.visible = true;
-				this._upperBodyTop.bitmap = this.bitmap;
-				this._upperBodyTop.visible = true;
-				this._lowerBody.bitmap = this.bitmap;
-				this._lowerBody.visible = true;	
-				this._upperBodyOverlay.bitmap = this.bitmap;
-				this._upperBodyOverlay.visible = true;
-				this._lowerBodyOverlay.bitmap = this.bitmap;
-				this._lowerBodyOverlay.visible = true;	
-			}
-		};
-		
 		Sprite_Character.prototype.updatePosition = function() {
 			this.x = this._character.screenX();
 			this.y = this._character.screenY();
 			this.z = this._character.screenZ();
 			
-			if(this.allBodyPartsAvailable()){
-				this._upperBody.x = this.x;
-				this._upperBody.y = this.y;
-				this._upperBody.z = this.z + 1;
-				
-				this._upperBodyOverlay.x = this.x;
-				this._upperBodyOverlay.y = this.y;
-				this._upperBodyOverlay.z = this.z + 1;
-				
-				this._upperBodyTop.x = this.x;
-				this._upperBodyTop.y = this.y;
-				this._upperBodyTop.z = this.z + 1;
-				
-				this._lowerBody.x = this.x;
-				this._lowerBody.y = this.y + 24;
-				this._lowerBody.z = this.z;
-				
-				this._lowerBodyOverlay.x = this.x;
-				this._lowerBodyOverlay.y = this.y + 24;
-				this._lowerBodyOverlay.z = this.z;
-				
-				
-			}
 			if(this._turnEndSprite){
 				this._turnEndSprite.x = this.x - 20;
 				this._turnEndSprite.y = this.y - this._character._floatOffset;
@@ -850,213 +753,89 @@
 				return;
 			}
 			
-			if(isMode7 && $gameSystem.isSRPGMode() == true && this._character.isEvent() == true){
-				this.setFrame(sx, sy, pw, ph);
-				if($gameSystem.isSubBattlePhase() === 'actor_map_target_confirm' || $gameSystem.isSubBattlePhase() == 'actor_target_spirit'){
-					if(($gameSystem.isSubBattlePhase() !== 'actor_map_target_confirm' || $gameTemp.isMapTarget(this._character.eventId())) &&
-						($gameSystem.isSubBattlePhase() !== 'actor_target_spirit' || $gameTemp.isSpiritTarget(this._character.eventId()))
-					){				
+			
+			this.setFrame(sx, sy, pw, ph);
+			if($gameSystem.isSubBattlePhase() === 'actor_map_target_confirm' || $gameSystem.isSubBattlePhase() == 'actor_target_spirit'){
+				if(($gameSystem.isSubBattlePhase() !== 'actor_map_target_confirm' || $gameTemp.isMapTarget(this._character.eventId())) &&
+					($gameSystem.isSubBattlePhase() !== 'actor_target_spirit' || $gameTemp.isSpiritTarget(this._character.eventId()))
+				){				
+					this._currentColorState = ""
+					this.filters = [];
+										
+					
+				} else {						
+					this.setBlendColor([64, 64, 64, 128]);	
+											
+				}		
+				
+			} else {
+				this.setBlendColor([0, 0, 0, 0]);	
+				
+				if(this.isTurnEndUnit()){
+
+					if(this._currentColorState != "grayed_out"){
+						this._currentColorState = "grayed_out"
+						let colorMatrix = new PIXI.filters.ColorMatrixFilter();
+						colorMatrix.greyscale(0.3);
+						this.filters = [colorMatrix];
+					}
+				} else {
+					if(this._currentColorState == "grayed_out"){
 						this._currentColorState = ""
 						this.filters = [];
-											
-						
-					} else {						
-						this.setBlendColor([64, 64, 64, 128]);	
-												
-					}		
-					
-				} else {
-					this.setBlendColor([0, 0, 0, 0]);	
-					
-					if(this.isTurnEndUnit()){
-
-						if(this._currentColorState != "grayed_out"){
-							this._currentColorState = "grayed_out"
-							let colorMatrix = new PIXI.filters.ColorMatrixFilter();
-							colorMatrix.greyscale(0.3);
-							this.filters = [colorMatrix];
-						}
-					} else {
-						if(this._currentColorState == "grayed_out"){
-							this._currentColorState = ""
-							this.filters = [];
-						}
-					}
-					//return;
-				}				
-				/*
-				this.visible = false;
-				
-				//hack to ensure there's no weird overlap issues when deploying an actor from a ship
-				if($gameTemp.activeShip && $gameTemp.activeShip.event.eventId() != this._character.eventId()){
-					if(this._character.posX() == $gameTemp.activeShip.position.x && this._character.posY() == $gameTemp.activeShip.position.y){
-						this.visible = true;
-						this.setFrame(sx, sy, pw, ph);
-					}				
-				}		
-				this.setFrame(sx, sy, pw, ph);*/
-				//this.visible = false;
-				if ($gameSystem.isSRPGMode() == true && this._character.isEvent() == true) {
-					var battlerArray = $gameSystem.EventToUnit(this._character.eventId());
-					if (battlerArray) {				
-						var pw = this._turnEndBitmap.width / 12;
-						var ph = this._turnEndBitmap.height / 8;
-						if ((battlerArray[0] === 'actor' || battlerArray[0] === 'enemy') &&
-							battlerArray[1].isAlive() && !this._character.isErased()) {
-							if (battlerArray[1].isRestricted()) {
-								var sx = (6 + this.characterPatternX()) * pw;
-								var sy = (0 + this.characterPatternY()) * ph;
-								this.createTurnEndSprites();
-								this._turnEndSprite.bitmap = this._turnEndBitmap;
-								this._turnEndSprite.visible = true;
-								this._turnEndSprite.setFrame(sx, sy, pw, ph);
-							} else if (this.isTurnEndUnit() == true) {							
-								var sx = (3 + this.characterPatternX()) * pw;
-								var sy = (0 + this.characterPatternY()) * ph;
-								this.createTurnEndSprites();
-								this._turnEndSprite.bitmap = this._turnEndBitmap;
-								this._turnEndSprite.visible = true;
-								this._turnEndSprite.setFrame(sx, sy, pw, ph);
-							} else if (battlerArray[1].isAutoBattle()) {
-								var sx = (9 + this.characterPatternX()) * pw;
-								var sy = (0 + this.characterPatternY()) * ph;
-								this.createTurnEndSprites();
-								this._turnEndSprite.bitmap = this._turnEndBitmap;
-								this._turnEndSprite.visible = true;
-								this._turnEndSprite.setFrame(sx, sy, pw, ph);
-							} else if (this._turnEndSprite) {
-								this._turnEndSprite.visible = false;
-							}
-						} else if (this._turnEndSprite) {
-							this._turnEndSprite.visible = false;
-						}
 					}
 				}
-				
-				return;
-			}
+				//return;
+			}				
+			/*
+			this.visible = false;
 			
-			
-			if(this.allBodyPartsAvailable()  && this._character.isEvent() == true){	
+			//hack to ensure there's no weird overlap issues when deploying an actor from a ship
+			if($gameTemp.activeShip && $gameTemp.activeShip.event.eventId() != this._character.eventId()){
+				if(this._character.posX() == $gameTemp.activeShip.position.x && this._character.posY() == $gameTemp.activeShip.position.y){
+					this.visible = true;
+					this.setFrame(sx, sy, pw, ph);
+				}				
+			}		
+			this.setFrame(sx, sy, pw, ph);*/
+			//this.visible = false;
+			if ($gameSystem.isSRPGMode() == true && this._character.isEvent() == true) {
 				var battlerArray = $gameSystem.EventToUnit(this._character.eventId());
-				
-				this.updateHalfBodySprites();
-			
-				var d = 24;
-				this._upperBody.setFrame(sx, sy, pw, ph - d);
-				this._upperBodyTop.setFrame(sx, sy, pw, ph - d);
-				this._upperBodyOverlay.setFrame(sx, sy, pw, ph - d);
-				this._lowerBody.setFrame(sx, sy + ph - d, pw, d);	
-				this._lowerBodyOverlay.setFrame(sx, sy + ph - d, pw, d);	
-				
-				
-				if($gameSystem.isSubBattlePhase() === 'actor_map_target_confirm' || $gameSystem.isSubBattlePhase() == 'actor_target_spirit'){
-					if(($gameSystem.isSubBattlePhase() !== 'actor_map_target_confirm' || $gameTemp.isMapTarget(this._character.eventId())) &&
-						($gameSystem.isSubBattlePhase() !== 'actor_target_spirit' || $gameTemp.isSpiritTarget(this._character.eventId()))
-					){				
-						this._currentColorState = ""
-						this._upperBodyOverlay.filters = [];
-						this._upperBody.filters = [];
-						this._upperBodyTop.filters = [];
-						this._lowerBody.filters = [];
-						this._lowerBodyOverlay.filters = [];
-											
-						
-					} else {						
-						this._upperBody.setBlendColor([64, 64, 64, 128]);	
-						this._upperBodyOverlay.setBlendColor([64, 64, 64, 128]);	
-						this._upperBodyTop.setBlendColor([64, 64, 64, 128]);	
-						this._lowerBody.setBlendColor([64, 64, 64, 128]);
-						this._lowerBodyOverlay.setBlendColor([64, 64, 64, 128]);
-												
-					}		
-					
-				} else {
-					this._upperBody.setBlendColor([0, 0, 0, 0]);	
-					this._upperBodyOverlay.setBlendColor([0, 0, 0, 0]);	
-					this._upperBodyTop.setBlendColor([0, 0, 0, 0]);
-					this._lowerBody.setBlendColor([0, 0, 0, 0]);
-					this._lowerBodyOverlay.setBlendColor([0, 0, 0, 0]);
-					
-					if(this.isTurnEndUnit()){
-					
-						/*this._upperBody.setBlendColor([21, 87, 255, 64]);	
-						this._upperBodyOverlay.setBlendColor([21, 87, 255, 64]);	
-						this._upperBodyTop.setBlendColor([21, 87, 255, 64]);	
-						this._lowerBody.setBlendColor([21, 87, 255, 64]);
-						this._lowerBodyOverlay.setBlendColor([21, 87, 255, 64]);*/
-						if(this._currentColorState != "grayed_out"){
-							this._currentColorState = "grayed_out"
-							let colorMatrix = new PIXI.filters.ColorMatrixFilter();
-							colorMatrix.greyscale(0.3);
-							this._upperBodyOverlay.filters = [colorMatrix];
-							this._upperBody.filters = [colorMatrix];
-							this._upperBodyTop.filters = [colorMatrix];
-							this._lowerBody.filters = [colorMatrix];
-							this._lowerBodyOverlay.filters = [colorMatrix];	
-						}
-					} else {
-						if(this._currentColorState == "grayed_out"){
-							this._currentColorState = ""
-							this._upperBodyOverlay.filters = [];
-							this._upperBody.filters = [];
-							this._upperBodyTop.filters = [];
-							this._lowerBody.filters = [];
-							this._lowerBodyOverlay.filters = [];
-						}
-					}
-				}				
-				
-				this.visible = false;
-				
-				//hack to ensure there's no weird overlap issues when deploying an actor from a ship
-				if($gameTemp.activeShip && $gameTemp.activeShip.event.eventId() != this._character.eventId()){
-					if(this._character.posX() == $gameTemp.activeShip.position.x && this._character.posY() == $gameTemp.activeShip.position.y){
-						this.visible = true;
-						this.setFrame(sx, sy, pw, ph);
-					}				
-				}		
-				this.setFrame(sx, sy, pw, ph);
-				//this.visible = false;
-				if ($gameSystem.isSRPGMode() == true && this._character.isEvent() == true) {
-					var battlerArray = $gameSystem.EventToUnit(this._character.eventId());
-					if (battlerArray) {				
-						var pw = this._turnEndBitmap.width / 12;
-						var ph = this._turnEndBitmap.height / 8;
-						if ((battlerArray[0] === 'actor' || battlerArray[0] === 'enemy') &&
-							battlerArray[1].isAlive() && !this._character.isErased()) {
-							if (battlerArray[1].isRestricted()) {
-								var sx = (6 + this.characterPatternX()) * pw;
-								var sy = (0 + this.characterPatternY()) * ph;
-								this.createTurnEndSprites();
-								this._turnEndSprite.bitmap = this._turnEndBitmap;
-								this._turnEndSprite.visible = true;
-								this._turnEndSprite.setFrame(sx, sy, pw, ph);
-							} else if (this.isTurnEndUnit() == true) {							
-								var sx = (3 + this.characterPatternX()) * pw;
-								var sy = (0 + this.characterPatternY()) * ph;
-								this.createTurnEndSprites();
-								this._turnEndSprite.bitmap = this._turnEndBitmap;
-								this._turnEndSprite.visible = true;
-								this._turnEndSprite.setFrame(sx, sy, pw, ph);
-							} else if (battlerArray[1].isAutoBattle()) {
-								var sx = (9 + this.characterPatternX()) * pw;
-								var sy = (0 + this.characterPatternY()) * ph;
-								this.createTurnEndSprites();
-								this._turnEndSprite.bitmap = this._turnEndBitmap;
-								this._turnEndSprite.visible = true;
-								this._turnEndSprite.setFrame(sx, sy, pw, ph);
-							} else if (this._turnEndSprite) {
-								this._turnEndSprite.visible = false;
-							}
+				if (battlerArray) {				
+					var pw = this._turnEndBitmap.width / 12;
+					var ph = this._turnEndBitmap.height / 8;
+					if ((battlerArray[0] === 'actor' || battlerArray[0] === 'enemy') &&
+						battlerArray[1].isAlive() && !this._character.isErased()) {
+						if (battlerArray[1].isRestricted()) {
+							var sx = (6 + this.characterPatternX()) * pw;
+							var sy = (0 + this.characterPatternY()) * ph;
+							this.createTurnEndSprites();
+							this._turnEndSprite.bitmap = this._turnEndBitmap;
+							this._turnEndSprite.visible = true;
+							this._turnEndSprite.setFrame(sx, sy, pw, ph);
+						} else if (this.isTurnEndUnit() == true) {							
+							var sx = (3 + this.characterPatternX()) * pw;
+							var sy = (0 + this.characterPatternY()) * ph;
+							this.createTurnEndSprites();
+							this._turnEndSprite.bitmap = this._turnEndBitmap;
+							this._turnEndSprite.visible = true;
+							this._turnEndSprite.setFrame(sx, sy, pw, ph);
+						} else if (battlerArray[1].isAutoBattle()) {
+							var sx = (9 + this.characterPatternX()) * pw;
+							var sy = (0 + this.characterPatternY()) * ph;
+							this.createTurnEndSprites();
+							this._turnEndSprite.bitmap = this._turnEndBitmap;
+							this._turnEndSprite.visible = true;
+							this._turnEndSprite.setFrame(sx, sy, pw, ph);
 						} else if (this._turnEndSprite) {
 							this._turnEndSprite.visible = false;
 						}
+					} else if (this._turnEndSprite) {
+						this._turnEndSprite.visible = false;
 					}
 				}
-			} else {
-				this.setFrame(sx, sy, pw, ph);
 			}
+			
 		};
 		
 
@@ -1713,6 +1492,7 @@
 			this._character.isDoingDeathAnim = false;
 			this._processedDeath = false;
 			this._animationFrame = 0;
+			$gameSystem.finalizeItemBox(this._character);
 		} else {
 			var eventId = this._character.eventId();
 			var battlerArray = $gameSystem.EventToUnit(eventId);
@@ -1730,7 +1510,11 @@
 					//battlerArray[1].subTwin.isSubTwin = false;
 					//battlerArray[1].subTwin = null;
 				} else {	
-					this._character.erase();	
+					if(battlerArray[1].SRWStats.dropBoxItems && battlerArray[1].SRWStats.dropBoxItems.length){
+						$gameSystem.deployItemBox(this._character, battlerArray[1].SRWStats.dropBoxItems);
+					} else {
+						this._character.erase();	
+					}
 				}							
 			}				
 			this.x = this._character.screenX();

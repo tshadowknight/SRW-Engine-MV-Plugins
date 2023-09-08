@@ -1271,12 +1271,20 @@ StatCalc.prototype.softRefreshUnits = function(){
 				itemsIds.push(item.idx);
 			}			
 		});
+		var dropBoxItems = [];
+		actor.SRWStats.dropBoxItems.forEach(function(item){
+			if(!item){
+				dropBoxItems.push(null);
+			} else {
+				dropBoxItems.push(item);
+			}			
+		});
 		actor.SRWStats.pilot.abilities = null;//ensure reload
 		//ensure dummy events are expanded after loading an intermission save
 		if(event._dummyId != null){
 			_this.attachDummyEvent(actor, event._dummyId);
 		}
-		_this.initSRWStats(actor, _this.getCurrentLevel(actor), itemsIds, true);				
+		_this.initSRWStats(actor, _this.getCurrentLevel(actor), itemsIds, true, false, dropBoxItems);				
 	});
 	this.invalidateAbilityCache();
 }
@@ -1422,7 +1430,7 @@ StatCalc.prototype.reloadSRWStats = function(actor, lockAbilityCache, reloadMech
 	}
 }
 
-StatCalc.prototype.initSRWStats = function(actor, level, itemIds, preserveVolatile, isReload){
+StatCalc.prototype.initSRWStats = function(actor, level, itemIds, preserveVolatile, isReload, boxDropIds){
 	var _this = this;
 	if(!level){
 		level = 1;
@@ -1558,6 +1566,7 @@ StatCalc.prototype.initSRWStats = function(actor, level, itemIds, preserveVolati
 			}			
 		}
 		actor.SRWStats.mech = this.getMechData(mech, isForActor, items, previousWeapons);
+		actor.SRWStats.dropBoxItems = boxDropIds || [];
 		if(!isForActor && $gameSystem.enemyUpgradeLevel){
 			var levels = actor.SRWStats.mech.stats.upgradeLevels;
 			levels.maxHP = $gameSystem.enemyUpgradeLevel;
@@ -7630,7 +7639,7 @@ StatCalc.prototype.applyDeployActions = function(actorId, mechId, overwriteFallb
 					actor._classId = 0;
 					$statCalc.reloadSRWStats(actor, false, true);	
 				});		
-					
+				var targetMech = $statCalc.getMechData($dataClasses[targetMechId], true);
 				actions.forEach(function(action){
 					var targetDef = action.target;
 					var sourceDef = action.source;
@@ -7643,7 +7652,7 @@ StatCalc.prototype.applyDeployActions = function(actorId, mechId, overwriteFallb
 							$gameSystem.registerPilotFallbackInfo(targetPilot);								
 							targetPilot._classId = targetMechId;
 							
-							var targetMech = $statCalc.getMechData($dataClasses[targetMechId], true);
+							
 							if(targetDef.type == "main"){								
 								targetPilot.isSubPilot = false;//set to false for unit reload
 								$statCalc.reloadSRWStats(targetPilot, false, true);
@@ -7663,12 +7672,14 @@ StatCalc.prototype.applyDeployActions = function(actorId, mechId, overwriteFallb
 								
 							}	
 							if(overwriteFallbackInfo){
-								$gameSystem.overwritePilotFallbackInfo(targetPilot);
-								$gameSystem.overwriteMechFallbackInfo(targetMechId, JSON.parse(JSON.stringify(targetMech.subPilots)));		
+								$gameSystem.overwritePilotFallbackInfo(targetPilot);								
 							}	
 						}					
 					}
 				});
+				if(overwriteFallbackInfo){
+					$gameSystem.overwriteMechFallbackInfo(targetMechId, JSON.parse(JSON.stringify(targetMech.subPilots)));		
+				}
 			}
 		});	
 					

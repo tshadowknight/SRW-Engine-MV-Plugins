@@ -2173,22 +2173,8 @@ SceneManager.isInSaveScene = function(){
         $gameParty.clearSrpgBattleActors();
         $gameTroop.clearSrpgBattleEnemys();
 		$gameTemp.battleEffectCache = null;
-        this.eventAfterAction();
-        if ($gameSystem.isBattlePhase() === 'actor_phase') {
-            this.eventUnitEvent();
-        }
-        $gameTemp.clearActiveEvent();
-        if ($gameSystem.isBattlePhase() === 'actor_phase') {
-            if (this.isSrpgActorTurnEnd()) {
-                $gameSystem.srpgStartEnemyTurn(0); //自動行動のアクターが行動する
-            } else {
-                $gameSystem.setSubBattlePhase('event_after_actor_action');
-            }
-        } else if ($gameSystem.isBattlePhase() === 'auto_actor_phase') {
-            $gameSystem.setSubBattlePhase('auto_actor_command');
-        } else if ($gameSystem.isBattlePhase() === 'AI_phase') {
-            $gameSystem.setSubBattlePhase('enemy_command');
-        }
+       
+	   $gameSystem.setSubBattlePhase('check_item_pickup');	
     };
 
     //ユニットイベントの実行
@@ -2394,7 +2380,7 @@ SceneManager.isInSaveScene = function(){
 		$gameTemp.deployWindowCallback = function(deployed){
 			var shipEvent = $gameTemp.activeEvent();
 			$gameTemp.activeShip = {position: {x: shipEvent.posX(), y: shipEvent.posY()}, actor: $gameSystem.EventToUnit(shipEvent.eventId())[1], event: $gameTemp.activeEvent()};
-			
+			$gameTemp.activeEvent().isActiveShip = true;
 			$statCalc.removeBoardedUnit(deployed.actor, $gameTemp.activeShip.actor);				
 			var event = deployed.actor.event;
 			event.locate($gameTemp.activeEvent().posX(), $gameTemp.activeEvent().posY());
@@ -2659,7 +2645,7 @@ SceneManager.isInSaveScene = function(){
 			$gameTemp.forceActorMenuRefresh = true;
 			$gameSystem.setSrpgActorCommandWindowNeedRefresh($gameSystem.EventToUnit($gameTemp.activeEvent().eventId()));
 				
-			$gameTemp.activeShip = null;
+			$gameTemp.clearActiveShip();
 		} else if($gameSystem.isSubBattlePhase() == "confirm_boarding"){
 			$gameSystem.setSubBattlePhase('actor_move');
 		} else if($gameTemp.isPostMove){
@@ -3366,8 +3352,15 @@ SceneManager.isInSaveScene = function(){
 			}					
 		} 
 		
+		if(enemy.targetBox != -1 && enemy.targetBox != null){
+			const targetBoxEvent = $gameMap.event(enemy.targetBox);
+			if(targetBoxEvent && targetBoxEvent.isDropBox){
+				optimalPos = this.srpgSearchOptimalPos({x: targetBoxEvent.posX(), y: targetBoxEvent.posY()}, enemy, type, -1, 0);
+			}
+		}
+		
 		//if the priority target is in range, target it
-		if(priorityTargetInRange || (!AIFlags.preferTarget && optimalPosStanding)){
+		if(!optimalPos && (priorityTargetInRange || (!AIFlags.preferTarget && optimalPosStanding))){
 			optimalPos = optimalPosStanding;
 		}
 		

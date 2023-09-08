@@ -410,5 +410,12 @@
 					this.lowerPlayerSprite.show();
 				}
 			}
-	}
+		}
+		
+		Game_Temp.prototype.clearActiveShip = function() {
+			if(this.activeShip){
+				delete this.activeShip.event.isActiveShip;
+			}
+			this.activeShip = null;
+		}
 	}

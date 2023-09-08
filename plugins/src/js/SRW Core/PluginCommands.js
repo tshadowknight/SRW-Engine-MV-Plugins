@@ -1226,6 +1226,11 @@
 					var targetMech = $statCalc.getMechData($dataClasses[args[0] * 1], true);
 					targetMech.subPilots[args[1] * 1] = args[2] * 1;
 					$statCalc.storeMechData(targetMech);
+					$gameSystem.overwriteMechFallbackInfo(args[0] * 1, targetMech.subPilots);
+					let actor = $gameActors.actor(args[2] * 1)
+					actor.isSubPilot = true;
+					//actor._intermissionClassId = args[1] * 1; 
+					$gameSystem.overwritePilotFallbackInfo(actor);
 				}	
 				
 				if (command === 'setPortraitOverlay') {		
@@ -1284,6 +1289,10 @@
 				
 				if (command === 'awardFavPoints') {					
 					$gameSystem.awardFavPoints(args[0]);
+				}
+				
+				if (command === 'deployItemBox') {					
+					$gameSystem.deployItemBox($gameMap.event(args[0] * 1), JSON.parse(args[1] || "[]"))
 				}
 							
 			} catch(e){
