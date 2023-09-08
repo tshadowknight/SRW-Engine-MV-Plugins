@@ -540,19 +540,19 @@
 			
 			
 			//.concat(shipTurnEndSprites) .concat(actorTurnEndSprites)
-			//$gameMap.vehicles().forEach(function(vehicle) {
-			//	this._characterSprites.push(new Sprite_Character(vehicle));
-			//}, this);
-			//$gamePlayer.followers().reverseEach(function(follower) {
-			//	this._characterSprites.push(new Sprite_Character(follower));
-			//}, this);
-			//var sprite = new Sprite_Player($gamePlayer);
-			//$gameTemp.lowerPlayerSprite = sprite;
-			//this.addCharacterToBaseSprite(sprite);  		 
+			$gameMap.vehicles().forEach(function(vehicle) {
+				this._characterSprites.push(new Sprite_Character(vehicle));
+			}, this);
+			$gamePlayer.followers().reverseEach(function(follower) {
+				this._characterSprites.push(new Sprite_Character(follower));
+			}, this);
+			var sprite = new Sprite_Player($gamePlayer);
+			$gameTemp.lowerPlayerSprite = sprite;
+			this.addCharacterToBaseSprite(sprite);  		 
 			
-			//for (var i = 0; i < this._characterSprites.length; i++) {
-			//	this.addCharacterToBaseSprite(this._characterSprites[i]);
-			//}		   	
+			for (var i = 0; i < this._characterSprites.length; i++) {
+				this.addCharacterToBaseSprite(this._characterSprites[i]);
+			}		   	
 		};
 		
 		Spriteset_Map.prototype.createExplosionSprite = function(id,character) {
