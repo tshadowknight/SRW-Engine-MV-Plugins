@@ -1271,6 +1271,9 @@ StatCalc.prototype.softRefreshUnits = function(){
 				itemsIds.push(item.idx);
 			}			
 		});
+		if(!actor.SRWStats.dropBoxItems){
+			actor.SRWStats.dropBoxItems = [];
+		}
 		var dropBoxItems = [];
 		actor.SRWStats.dropBoxItems.forEach(function(item){
 			if(!item){
