@@ -769,7 +769,7 @@
 				}		
 				
 			} else {
-				this.setBlendColor([0, 0, 0, 0]);	
+				//this.setBlendColor([0, 0, 0, 0]);	
 				
 				if(this.isTurnEndUnit()){
 
