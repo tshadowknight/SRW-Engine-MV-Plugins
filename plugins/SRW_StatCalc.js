@@ -4171,6 +4171,9 @@ StatCalc.prototype.getAvailableSuperStateTransitions = function(actor, position,
 		if(fromBaseTerrain){//for checking if a super state is valid for a unit on the current terrain, ignoring its current super state
 			currentSuperState = -1;
 		}
+		if(currentTerrain == currentSuperState){
+			currentSuperState = -1;
+		}
 		let rules = terrainDef.superStateRules || [];
 		let currentSupersedingPriority = 0;
 		for(let rule of rules){
@@ -4243,6 +4246,8 @@ StatCalc.prototype.resolveTerrainRules = function(actor, rules){
 				result = this.canBeOnTerrain(actor, rule.value);
 			} else if(rule.type == "superState"){
 				result = this.isTerrainSuperState(actor, rule.value);
+			} else if(rule.type == "state"){
+				result = this.getCurrentTerrainIdx(actor) == rule.value;
 			}
 			innerCtr++;
 		}
