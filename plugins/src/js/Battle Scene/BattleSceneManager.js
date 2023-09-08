@@ -4775,8 +4775,10 @@ BattleSceneManager.prototype.executeAnimation = function(animation, startTick){
 			_this._bgsHidden = false;
 			
 			_this._bgs.forEach(function(bg){
-				bg.isVisible = true;
-				bg.visibility = 1;
+				if(!bg.inactive){
+					bg.isVisible = true;
+					bg.visibility = 1;
+				}				
 			});
 			
 			_this._fixedBgs.forEach(function(bg){
@@ -5964,7 +5966,12 @@ BattleSceneManager.prototype.showEnvironment = function(ref, all){
 		bgId = $gameSystem.getUnitSceneBgId(ref);
 	}
 	this._bgs.forEach(function(bg){	
-		bg.visibility = all || bg.bgId == bgId;		
+		bg.visibility = all || bg.bgId == bgId;
+		if(bg.bgId != bgId) {
+			bg.inactive = true;
+		} else {
+			bg.inactive = false;
+		}
 	});	
 	this._fixedBgs.forEach(function(bg){	
 		bg.dispose();
