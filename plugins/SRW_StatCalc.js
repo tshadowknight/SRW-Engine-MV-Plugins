@@ -4287,10 +4287,10 @@ StatCalc.prototype.isRegionBlocked = function(actor, region){
 StatCalc.prototype.getFlyingAnimInfo = function(actor){
 	if(this.isActorSRWInitialized(actor)){
 		let currentTerrain = this.getCurrentTerrainIdx(actor);
-		if(this.canBeOnTerrain(actor, currentTerrain)){
+		//if(this.canBeOnTerrain(actor, currentTerrain)){
 			let terrainDef = $terrainTypeManager.getTerrainDefinition(currentTerrain);		
 			return terrainDef.displaysFlying;
-		}		
+		//}		
 	}
 	return false;	
 }

@@ -1060,49 +1060,53 @@
 			} else {
 				this.bitmap = ImageManager.loadSystem('WillIndicator');
 			}
-		}		
+			
+			this.anchor.x = 0.5;
+			this.anchor.y = 1;
+			
+			 
+			if(this._isEnemy){
+				this.text.anchor.set(0); 
+				this.text.x = -23; 
+				this.text.y = -49.5	;
+			} else {
+				this.text.anchor.set(1); 
+				this.text.x = 23; 
+				this.text.y = -33.5	;
+			}
+		}				
 		
-		this.anchor.x = 0.5;
-		this.anchor.y = 1;
-		
-		 
-		if(this._isEnemy){
-			this.text.anchor.set(0); 
-			this.text.x = -23; 
-			this.text.y = -49.5	;
-		} else {
-			this.text.anchor.set(1); 
-			this.text.x = 23; 
-			this.text.y = -33.5	;
-		}	
-		
-		this.x = this._character.screenX();
-		this.y = this._character.screenY();
 		//this.z = this._character.screenZ() - 1;
-		var eventId = this._character.eventId();
-		var battlerArray = $gameSystem.EventToUnit(eventId);
-		if($gameSystem.showWillIndicator && battlerArray){
-			var unit = battlerArray[1];
-			if(unit && !this._character.isErased()){
-				this.opacity = 255;
-				var maxWill = $statCalc.getMaxWill(unit);
-				var will = $statCalc.getCurrentWill(unit);
-				//this.drawText(will, 0, 0, 20);
-				this.text.text = will;
-				var color = "#ffffff";				
-				if(will < 100){
-					color = "#f1de55";
-				} 
-				if(will <= 50){
-					color = "#ff2222";
+		if($gameSystem.showWillIndicator){	
+			var eventId = this._character.eventId();
+			var battlerArray = $gameSystem.EventToUnit(eventId);
+			if(battlerArray){
+				var unit = battlerArray[1];
+				if(unit && !this._character.isErased()){
+					this.x = this._character.screenX();
+					this.y = this._character.screenY();
+					this.opacity = 255;
+					var maxWill = $statCalc.getMaxWill(unit);
+					var will = $statCalc.getCurrentWill(unit);
+					//this.drawText(will, 0, 0, 20);
+					this.text.text = will;
+					var color = "#ffffff";				
+					if(will < 100){
+						color = "#f1de55";
+					} 
+					if(will <= 50){
+						color = "#ff2222";
+					}
+					if(will == maxWill){
+						color = "#00f1ff";
+					}
+					this.text.style.fill = color;
+				} else {
+					this.opacity = 0;
 				}
-				if(will == maxWill){
-					color = "#00f1ff";
-				}
-				this.text.style.fill = color;
 			} else {
 				this.opacity = 0;
-			}
+			}	
 		} else {
 			this.opacity = 0;
 		}		
@@ -1234,14 +1238,14 @@
 	};
 
 	Sprite_DefendIndicator.prototype.update = function() {
-		this.x = this._character.screenX();
 		
-		this.y = this._character.screenY() - 2;
 		//this.z = this._character.screenZ() - 1;
 		var eventId = this._character.eventId();
 		var battlerArray = $gameSystem.EventToUnit(eventId);
 		
-		if(battlerArray){
+		if(battlerArray && !this._character.isErased()){
+			this.x = this._character.screenX();		
+			this.y = this._character.screenY() - 2;
 			var unit = battlerArray[1];
 			var isShown = true;
 			if(!$gameSystem.isEnemy(unit)){
@@ -1318,14 +1322,15 @@
 	};
 
 	Sprite_AttackIndicator.prototype.update = function() {
-		this.x = this._character.screenX();
 		
-		this.y = this._character.screenY() - 2;
 		//this.z = this._character.screenZ() - 1;
 		var eventId = this._character.eventId();
 		var battlerArray = $gameSystem.EventToUnit(eventId);
 		
-		if(battlerArray){
+		if(battlerArray && !this._character.isErased()){
+			this.x = this._character.screenX();		
+			this.y = this._character.screenY() - 2;	
+			
 			var unit = battlerArray[1];
 			var isShown = true;
 			if(!$gameSystem.isEnemy(unit)){
@@ -1469,7 +1474,7 @@
 	}
 
 	Sprite_Destroyed.prototype.update = function() {
-		if(this._character.manuallyErased){
+		if(this._character.manuallyErased || !this._character.isDoingDeathAnim){
 			return;
 		}
 		var eventId = this._character.eventId();
@@ -1598,6 +1603,9 @@
 
 	Sprite_Appear.prototype.update = function() {
 		var eventId = this._character.eventId();
+		if(!this._character.isDoingAppearAnim){
+			return;
+		}
 		var battlerArray = $gameSystem.EventToUnit(eventId);
 		if((!this._character._appearSpriteInitialized || !this._initialized) && battlerArray && battlerArray[1]){
 			this._character._appearSpriteInitialized = true;
@@ -1689,6 +1697,9 @@
 	}
 
 	Sprite_Disappear.prototype.update = function() {
+		if(!this._character.isDoingDisappearAnim){
+			return;
+		}
 		if(this._animationFrame > this._frames){
 			this.visible = false;
 			this._character.isDoingDisappearAnim = false;
