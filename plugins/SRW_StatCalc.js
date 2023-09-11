@@ -5585,9 +5585,15 @@ StatCalc.prototype.modifyAllWill = function(type, increment){
 	});
 }
 
-StatCalc.prototype.setWill = function(actor, amount){
+StatCalc.prototype.setWill = function(actor, amount, includeSubpilots){
 	if(this.isActorSRWInitialized(actor)){
 		actor.SRWStats.pilot.will = amount;
+		if(includeSubpilots){
+			const subPilots = this.getSubPilots(actor);
+			for(let pilotId of subPilots){
+				this.setWill($gameActors.actor(pilotId), amount);
+			}
+		}
 	}
 }
 

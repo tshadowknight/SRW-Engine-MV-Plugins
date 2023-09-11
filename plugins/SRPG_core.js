@@ -2740,8 +2740,11 @@ SceneManager.isInSaveScene = function(){
         var item = this._swapPilotWindow.item();		
 		$statCalc.swapPilot(actor, item);
 		$gameSystem.clearSrpgActorCommandWindowNeedRefresh();
-		$gameSystem.setSubBattlePhase('normal')
+		//$gameSystem.setSubBattlePhase('normal')
 		this._swapPilotWindow.hide();
+		
+		actor.onAllActionsEnd();
+		this.srpgAfterAction();	
     };	
 	
 	Scene_Map.prototype.onAbilityCancel = function() {
