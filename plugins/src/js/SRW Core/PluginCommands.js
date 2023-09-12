@@ -51,6 +51,12 @@
 				
 				if (command === 'assignUnit') {
 					const actor = $gameActors.actor(args[0]);
+					if(!actor){
+						throw "Invalid actor "+args[0]+" for assignUnit command.";
+					}
+					if(isNaN(args[1] * 1) || args[1] * 1 < 0){
+						throw "Invalid mech "+args[1]+" for assignUnit command.";
+					}
 					actor._classId = args[1] * 1;
 					actor.isSubPilot = !!(args[2] * 1);
 					//actor._intermissionClassId = args[1] * 1; 

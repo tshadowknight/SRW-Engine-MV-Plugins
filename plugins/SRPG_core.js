@@ -3939,6 +3939,10 @@ SceneManager.isInSaveScene = function(){
 			var deltaY = Math.abs(targetCoords.y - node.y);
 			var dist = deltaX + deltaY;
 			
+			var srcDeltaX = Math.abs(battler.event.posX() - node.x);
+			var srcDeltaY = Math.abs(battler.event.posY() - node.y);
+			
+			
 			var environmentScore = 0;
 			
 			if(AIFlags.terrain){			
@@ -3986,7 +3990,9 @@ SceneManager.isInSaveScene = function(){
 				distanceOK: distanceOK,
 				dist: dist,
 				travelDistToTarget: travelDistToTarget,
-				environment: environmentScore
+				environment: environmentScore,
+				srcDeltaX: srcDeltaX,
+				srcDeltaY: srcDeltaY
 			});
 		});
 		
@@ -4003,6 +4009,13 @@ SceneManager.isInSaveScene = function(){
 				return 1;
 			} else if(a.travelDistToTarget != b.travelDistToTarget){
 				return a.travelDistToTarget - b.travelDistToTarget;
+			} else if(b.pathLength == a.pathLength){
+				return [
+					{retVal: -1, refVal: a.srcDeltaX},
+					{retVal: -1, refVal: a.srcDeltaY},
+					{retVal: 1, refVal: b.srcDeltaX},
+					{retVal: 1, refVal: b.srcDeltaY}
+				].sort((a, b) => b.refVal - a.refVal)[0].retVal;
 			} else {
 				return b.pathLength - a.pathLength;
 			}				

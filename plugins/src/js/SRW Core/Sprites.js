@@ -755,7 +755,7 @@
 			
 			
 			this.setFrame(sx, sy, pw, ph);
-			if($gameSystem.isSubBattlePhase() === 'actor_map_target_confirm' || $gameSystem.isSubBattlePhase() == 'actor_target_spirit'){
+			if(($gameSystem.isSubBattlePhase() === 'actor_map_target_confirm' || $gameSystem.isSubBattlePhase() == 'actor_target_spirit') && this._character.eventId){
 				if(($gameSystem.isSubBattlePhase() !== 'actor_map_target_confirm' || $gameTemp.isMapTarget(this._character.eventId())) &&
 					($gameSystem.isSubBattlePhase() !== 'actor_target_spirit' || $gameTemp.isSpiritTarget(this._character.eventId()))
 				){				
