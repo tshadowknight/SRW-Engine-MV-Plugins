@@ -46,6 +46,33 @@ EnemyPilotUI.prototype.initPropertyHandlers = function(){
 			});
 		}			
 	}
+	_this._propertyHandlers.text_alias = {
+		createControls(){
+
+			var content = "";
+			content+="<div class='row'>";
+			content+="<div class='cell'>";
+			content+=EDITORSTRINGS.PILOT.label_text_alias;
+			content+="</div>";
+			content+="<div class='cell'>";
+			content+="<select id='prop_text_alias'>";
+			const value = _this.getMetaValue("pilotTextAlias");
+			content+="<option "+(value == -1 ? "selected" : "")+" value='-1'>None</option>";
+			for(var i = 1; i < $dataEnemies.length; i++){
+				content+="<option "+(i == value ? "selected" : "")+" value='"+i+"'>"+(String(i).padStart(4, 0))+" "+$dataEnemies[i].name+"</option>";
+			}
+			content+="</select>";
+			content+="</div>";
+			content+="</div>";
+			return content;
+		},
+		hook(){
+			containerNode.querySelector("#prop_text_alias").addEventListener("change", function(){
+				_this.setMetaValue("pilotTextAlias", this.value);
+				_this._mainUIHandler.setModified();
+			});
+		}
+	}
 	delete _this._propertyHandlers.relationships;
 }
 

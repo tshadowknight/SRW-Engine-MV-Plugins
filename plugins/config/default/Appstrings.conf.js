@@ -57,6 +57,10 @@ APPSTRINGS.GENERAL = {
 	label_SPC: "SPC",
 	label_MP: "MP",
 	label_EN: "EN",
+	label_will: "Will",
+	label_level: "Lv",
+	label_HP: "HP",
+	label_EN: "EN"
 }
 
 APPSTRINGS.MAINMENU = {
@@ -331,6 +335,7 @@ APPSTRINGS.ATTACKLIST = {
 	label_target_both: "All",
 	label_target_enemies: "Enemy",
 	label_target_allies: "Ally",
+	title: "Select Attack",
 }
 
 APPSTRINGS.REWARDS = {
@@ -433,7 +438,20 @@ APPSTRINGS.BASIC_BATTLE = {
 }
 
 APPSTRINGS.BEFORE_BATTLE = {
-	label_new_move: "NEW"
+	label_new_move: "NEW",
+	label_support: "Support",
+	label_defending: "Defending",
+	label_attacking: "Attacking",
+	label_attack: "Attack",
+	label_defend: "Defend",
+	label_evade: "Evade",
+	
+	label_start_battle: "Start Battle",
+	label_demo_off: "DEMO: OFF",
+	label_demo_on: "DEMO:  ON",
+	label_select_assist: "Select Assist",
+	label_select_action: "Select Action",
+	label_sprits: "Spirits",
 }
 
 APPSTRINGS.ZONE_STATUS = {

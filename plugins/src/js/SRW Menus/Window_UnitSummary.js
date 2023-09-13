@@ -78,7 +78,7 @@ Window_UnitSummary.prototype.redraw = function() {
 			content+="<div class='pilot_stats scaled_text'>";	
 			content+="<div class='level scaled_width'>";
 			content+="<div class='label'>";
-			content+="Lv";
+			content+=APPSTRINGS.GENERAL.label_level;
 			content+="</div>";
 			content+="<div class='value'>";
 			content+=$statCalc.getCurrentLevel(actor);
@@ -86,7 +86,7 @@ Window_UnitSummary.prototype.redraw = function() {
 			content+="</div>";
 			content+="<div class='will scaled_width'>";
 			content+="<div class='label'>";
-			content+="Will";
+			content+=APPSTRINGS.GENERAL.label_will;
 			content+="</div>";
 			content+="<div class='value'>";
 			content+=$statCalc.getCurrentWill(actor);

@@ -267,7 +267,7 @@ Window_BeforebattleTwin.prototype.createComponents = function() {
 	
 	this._btn_start = document.createElement("div");
 	this._btn_start.id = this.createId("btn_start");
-	this._btn_start.innerHTML = "Start Battle";
+	this._btn_start.innerHTML = APPSTRINGS.BEFORE_BATTLE.label_start_battle;
 	this._btn_start.classList.add("action_btn");
 	this._btn_start.classList.add("scaled_text");
 	this._btn_start.setAttribute("action_id", 0);
@@ -284,7 +284,7 @@ Window_BeforebattleTwin.prototype.createComponents = function() {
 	
 	this._btn_demo = document.createElement("div");
 	this._btn_demo.id = this.createId("btn_demo");
-	this._btn_demo.innerHTML = "DEMO: OFF";
+	this._btn_demo.innerHTML = APPSTRINGS.BEFORE_BATTLE.label_demo_off;
 	this._btn_demo.classList.add("action_btn");
 	this._btn_demo.classList.add("scaled_text");
 	this._btn_demo.setAttribute("action_id", 1);
@@ -301,7 +301,7 @@ Window_BeforebattleTwin.prototype.createComponents = function() {
 	
 	this._btn_assist = document.createElement("div");
 	this._btn_assist.id = this.createId("btn_asssist");
-	this._btn_assist.innerHTML = "Select Assist";
+	this._btn_assist.innerHTML = APPSTRINGS.BEFORE_BATTLE.label_select_assist;
 	this._btn_assist.classList.add("action_btn");
 	this._btn_assist.classList.add("scaled_text");
 	this._btn_assist.setAttribute("action_id", 2);
@@ -318,7 +318,7 @@ Window_BeforebattleTwin.prototype.createComponents = function() {
 	
 	this._btn_action = document.createElement("div");
 	this._btn_action.id = this.createId("btn_action");
-	this._btn_action.innerHTML = "Select Action";
+	this._btn_action.innerHTML = APPSTRINGS.BEFORE_BATTLE.label_select_action;
 	this._btn_action.classList.add("action_btn");
 	this._btn_action.classList.add("scaled_text");
 	this._btn_action.setAttribute("action_id", 3);
@@ -335,7 +335,7 @@ Window_BeforebattleTwin.prototype.createComponents = function() {
 	
 	this._btn_spirit = document.createElement("div");
 	this._btn_spirit.id = this.createId("btn_spirit");
-	this._btn_spirit.innerHTML = "Spirits";
+	this._btn_spirit.innerHTML = APPSTRINGS.BEFORE_BATTLE.label_sprits;
 	this._btn_spirit.classList.add("action_btn");
 	this._btn_spirit.classList.add("scaled_text");
 	this._btn_spirit.setAttribute("action_id", 4);
@@ -1221,26 +1221,26 @@ Window_BeforebattleTwin.prototype.createParticipantBlock = function(ref, action,
 	} else {
 		if(!isSupport){
 			if(action.type == "attack"){
-				content+="Attack";
+				content+=APPSTRINGS.BEFORE_BATTLE.label_attack;
 			}
 			if(action.type == "evade"){
-				content+="Evade";
+				content+=APPSTRINGS.BEFORE_BATTLE.label_evade;
 			}
 			if(action.type == "defend"){
-				content+="Defend";
+				content+=APPSTRINGS.BEFORE_BATTLE.label_defend;
 			}
 			if(action.type == "none"){
 				content+="---";
 			}
 		} else {
 			if(action.type == "attack"){
-				content+="Attack";
+				content+=APPSTRINGS.BEFORE_BATTLE.label_attack;
 			}
 			if(action.type == "evade"){
 				content+="---";
 			}
 			if(action.type == "defend"){
-				content+="Defend";
+				content+=APPSTRINGS.BEFORE_BATTLE.label_defend;
 			}
 			if(action.type == "none"){
 				content+="---";
@@ -1281,7 +1281,7 @@ Window_BeforebattleTwin.prototype.createParticipantBlock = function(ref, action,
 		content+="<div class='pilot_stats scaled_text'>";	
 		content+="<div class='level scaled_width'>";
 		content+="<div class='label'>";
-		content+="Lv";
+		content+=APPSTRINGS.GENERAL.label_level;
 		content+="</div>";
 		content+="<div class='value'>";
 		content+=$statCalc.getCurrentLevel(ref);
@@ -1289,7 +1289,7 @@ Window_BeforebattleTwin.prototype.createParticipantBlock = function(ref, action,
 		content+="</div>";
 		content+="<div class='will scaled_width'>";
 		content+="<div class='label'>";
-		content+="Will";
+		content+=APPSTRINGS.GENERAL.label_will;
 		content+="</div>";
 		content+="<div class='value'>";
 		content+=$statCalc.getCurrentWill(ref);
@@ -1300,8 +1300,8 @@ Window_BeforebattleTwin.prototype.createParticipantBlock = function(ref, action,
 		var calculatedStats = $statCalc.getCalculatedMechStats(ref);
 		
 		content+="<div class='mech_hp_en_container scaled_text'>";
-		content+="<div class='hp_label scaled_text'>HP</div>";
-		content+="<div class='en_label scaled_text'>EN</div>";
+		content+="<div class='hp_label scaled_text'>"+APPSTRINGS.GENERAL.label_HP+"</div>";
+		content+="<div class='en_label scaled_text'>"+APPSTRINGS.GENERAL.label_EN+"</div>";
 
 		content+="<div class='hp_display'>";
 		content+="<div class='current_hp scaled_text'>"+$statCalc.getCurrentHPDisplay(ref)+"</div>";
@@ -1661,21 +1661,17 @@ Window_BeforebattleTwin.prototype.redraw = function() {
 	}
 	
 	if(this.isBuffingAttack()){
-		this._enemy_label.innerHTML = "Support";
-		this._ally_label.innerHTML = "Support";
+		this._enemy_label.innerHTML = APPSTRINGS.BEFORE_BATTLE.label_support;
+		this._ally_label.innerHTML = APPSTRINGS.BEFORE_BATTLE.label_support;
 	} else {
 		if(!$gameTemp.isEnemyAttack){
-			this._enemy_label.innerHTML = "Defending";
-			this._ally_label.innerHTML = "Attacking";
+			this._enemy_label.innerHTML = APPSTRINGS.BEFORE_BATTLE.label_defending;
+			this._ally_label.innerHTML = APPSTRINGS.BEFORE_BATTLE.label_attacking;
 		} else {
-			this._enemy_label.innerHTML = "Attacking";
-			this._ally_label.innerHTML = "Defending";
+			this._enemy_label.innerHTML = APPSTRINGS.BEFORE_BATTLE.label_attacking;
+			this._ally_label.innerHTML = APPSTRINGS.BEFORE_BATTLE.label_defending;
 		}
-	}
-	
-	
-	
-	
+	}	
 	
 	var spiritEntries = this.getWindowNode().querySelectorAll(".spirit_entry");
 	spiritEntries.forEach(function(spiritEntry){
@@ -1713,9 +1709,9 @@ Window_BeforebattleTwin.prototype.redraw = function() {
 	});	
 	
 	if($gameSystem.demoSetting){
-		_this._btn_demo.innerHTML = "DEMO: ON";
+		_this._btn_demo.innerHTML = APPSTRINGS.BEFORE_BATTLE.label_demo_on;
 	} else {
-		_this._btn_demo.innerHTML = "DEMO: OFF";
+		_this._btn_demo.innerHTML = APPSTRINGS.BEFORE_BATTLE.label_demo_off;
 	}
 	
 	/*if(!$gameTemp.currentBattleActor.isActor() || $statCalc.isAI($gameTemp.currentBattleActor)){

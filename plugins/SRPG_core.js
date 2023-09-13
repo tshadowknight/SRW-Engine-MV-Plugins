@@ -2695,7 +2695,7 @@ SceneManager.isInSaveScene = function(){
 		var actor = $gameSystem.EventToUnit($gameTemp.activeEvent().eventId())[1];
 		if(itemDef && itemDef.isActiveHandler(actor)){			
 			var useInfo = $abilityCommandManger.getUseInfo(actor, item);
-			if(useInfo.type == "ammo"){
+			if(useInfo.type == "ammo" || useInfo.type == null){
 				$statCalc.setAbilityUsed(actor, item);
 			} else if(useInfo.type == "EN"){
 				var ENCost = useInfo.cost;										

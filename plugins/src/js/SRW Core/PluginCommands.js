@@ -60,7 +60,14 @@
 					actor._classId = args[1] * 1;
 					actor.isSubPilot = !!(args[2] * 1);
 					//actor._intermissionClassId = args[1] * 1; 
-					$gameSystem.overwritePilotFallbackInfo(actor);
+					if(actor.isSubPilot){
+						$gameSystem.overwritePilotFallbackInfo(actor);
+					} else {
+						let actionsResult = $statCalc.applyDeployActions(args[0], args[1], true);
+						if(!actionsResult){
+							$gameSystem.overwritePilotFallbackInfo(actor);
+						}
+					}					
 				}
 				
 				if (command === 'UnlockUnit') {

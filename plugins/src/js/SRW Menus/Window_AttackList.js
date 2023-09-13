@@ -49,7 +49,7 @@ Window_AttackList.prototype.createComponents = function() {
 	this._header.classList.add("menu_header");	
 	this._header.classList.add("scaled_text");
 	this._headerText = document.createElement("div");
-	this._headerText.innerHTML = "Select Attack";	
+	this._headerText.innerHTML = APPSTRINGS.ATTACKLIST.title;	
 	this._header.appendChild(this._headerText);
 	windowNode.appendChild(this._header);
 	
