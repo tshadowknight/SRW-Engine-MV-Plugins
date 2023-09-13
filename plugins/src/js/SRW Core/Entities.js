@@ -1192,7 +1192,7 @@
 				}
 			}
 			let visitedNodes = {};
-			return this.makeMoveTableRecursive(x, y, moveBudget, visitedNodes, actor);
+			return this.makeMoveTableRecursive(x, y, moveBudget, visitedNodes, actor, {});
 		}
 		
 		Game_CharacterBase.prototype.updateMoveBudget = function(moveBudget, cost, fromTerrain) {
@@ -1225,7 +1225,7 @@
 		}
 		
 		//移動範囲の計算
-		Game_CharacterBase.prototype.makeMoveTableRecursive = function(x, y, moveBudget, visitedNodes, actor) {
+		Game_CharacterBase.prototype.makeMoveTableRecursive = function(x, y, moveBudget, visitedNodes, actor, pushedNodes) {
 			var _this = this;
 			function isPassableTile(currentX, currentY, x, y, actor){
 				if(ENGINE_SETTINGS.USE_TILE_PASSAGE && !$statCalc.ignoresTerrainCollision(actor, $gameMap.regionId(x, y) % 8)){
@@ -1291,8 +1291,13 @@
 			if (!_this.hasMoveBudgetRemaining(moveBudget)) {
 				return;
 			}
-			$gameTemp.pushMoveList([x, y, false]);
-			
+			if(!(pushedNodes[x] && pushedNodes[x][y])){
+				if(!pushedNodes[x]){
+					pushedNodes[x] = {};
+				}
+				pushedNodes[x][y] = true;
+				$gameTemp.pushMoveList([x, y, false]);
+			}		
 			
 			let extraBudgetRefTerrain = $statCalc.getSuperState(actor);
 			if(extraBudgetRefTerrain == -1){
@@ -1330,7 +1335,7 @@
 					}
 					if(isUpgrade){
 						visitedNodes[newX][newY] = nextStepBudget;
-						this.makeMoveTableRecursive(newX, newY, remainingBudget, visitedNodes, actor);
+						this.makeMoveTableRecursive(newX, newY, remainingBudget, visitedNodes, actor, pushedNodes);
 					}					
 				}
 			}
