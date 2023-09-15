@@ -768,8 +768,8 @@
 											
 				}		
 				
-			} else {
-				//this.setBlendColor([0, 0, 0, 0]);	
+			} else if (this._character.isEvent() == true) {
+				this.setBlendColor([0, 0, 0, 0]);	
 				
 				if(this.isTurnEndUnit()){
 

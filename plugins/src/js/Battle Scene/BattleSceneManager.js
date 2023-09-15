@@ -4313,11 +4313,11 @@ BattleSceneManager.prototype.executeAnimation = function(animation, startTick){
 				}
 				if(params.parent){
 					var parentObj = getTargetObject(params.parent)
-					if(parentObj.parent_handle){
-						parentObj = parentObj.parent_handle;
-					}
-					if(parentObj.pivothelper){
+					
+					if(params.isBarrier * 1 && parentObj.pivothelper){
 						parentObj = parentObj.pivothelper;
+					} else if(parentObj.parent_handle){
+						parentObj = parentObj.parent_handle;
 					}
 					
 					if(parentObj){
