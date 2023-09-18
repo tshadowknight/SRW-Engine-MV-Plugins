@@ -477,7 +477,7 @@
 
 
 #detail_pages .upgrade_mech_name_value{
-	width: 80%;
+	width: 55%;
 }
 
 #detail_pages .attribute_display {
@@ -553,4 +553,18 @@
 
 #detail_pages_map_preview.active {
 	display: block;
+}
+#detail_pages .attribute_indicator{
+    color: var(--text-color-highlight2);
+    display: flex;
+    align-items: center;
+	position: absolute;
+	top: 8%;
+    width: 17%;
+    left: 74%;
+}
+
+#detail_pages .attribute_indicator img {
+	width: 21%;
+    margin: 2%;
 }

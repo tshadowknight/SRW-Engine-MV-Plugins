@@ -1461,7 +1461,9 @@ GameState_map_attack_animation.prototype.update = function(scene){
 					activeEvent = $gameTemp.activeEvent();
 					options.direction = $gameTemp.mapTargetDirection;
 				} else {
-					activeEvent = $gamePlayer;
+					activeEvent = $gameMap.requestDynamicEvent();
+					activeEvent.isMAPAttackEvent = true;
+					activeEvent.locate($gamePlayer._x, $gamePlayer._y);
 					//options.direction = "up";
 					//options.offset = {x: 0, y: 0};
 				}				
@@ -1473,6 +1475,10 @@ GameState_map_attack_animation.prototype.update = function(scene){
 				if(!$gameTemp.animCharacter.isAnimationPlaying()){
 					$gameTemp.afterMapAttackAnimationDelay = 30;
 					$gameTemp.awaitingMapAttackAnim = true;
+					if($gameTemp.animCharacter.isMAPAttackEvent){
+						delete $gameTemp.animCharacter.isMAPAttackEvent;
+						$gameTemp.animCharacter.isUnused = true;	
+					}					
 				}
 			}					
 		}				

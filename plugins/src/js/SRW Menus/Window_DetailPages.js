@@ -470,6 +470,15 @@ Window_DetailPages.prototype.drawPilotStats1 = function() {
 	var currentLevel = $statCalc.getCurrentLevel(actor);
 	
 	detailContent+="<div class='bar_pilot_stats details'>";
+	let attr1 = $statCalc.getParticipantAttribute(this.getCurrentSelection().actor, "attribute1");
+	if(attr1){
+		let attrInfo = ENGINE_SETTINGS.ATTRIBUTE_DISPLAY_NAMES[attr1] || {};
+		detailContent+="<div class='attribute_indicator scaled_text fitted_text'>";		
+		detailContent+="<img src='img/system/attribute_"+attr1+".png'>";		
+		detailContent+=attrInfo.name || attr1;
+		detailContent+="</div>";
+	}
+	
 	detailContent+="<div class='twin_type scaled_text fitted_text type_indicator'>";
 	var referenceActor = actor;
 	if(actor.isSubPilot){

@@ -761,7 +761,7 @@
 				){				
 					this._currentColorState = ""
 					this.filters = [];
-										
+					this.setBlendColor([0, 0, 0, 0]);						
 					
 				} else {						
 					this.setBlendColor([64, 64, 64, 128]);	

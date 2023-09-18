@@ -540,24 +540,24 @@ MapAttackUI.prototype.hook = function(){
 		control.addEventListener("click", function(){
 			var column = this.getAttribute("data-column") * 1;
 			var row = this.getAttribute("data-row") * 1;
-			if(row != 0 || column != 0){
-				if(_this._chooseCenter){
-					_this._currentEntry.retargetInfo.center = {x: column, y: row};
-					_this._currentEntry.retargetInfo.initialPosition = {x: column, y: row};
-					_this._chooseCenter = false;
+			
+			if(_this._chooseCenter){
+				_this._currentEntry.retargetInfo.center = {x: column, y: row};
+				_this._currentEntry.retargetInfo.initialPosition = {x: column, y: row};
+				_this._chooseCenter = false;
+			} else {
+				if(_this._currentRetargetShapeLookup[column] && _this._currentRetargetShapeLookup[column][row]){
+					delete _this._currentRetargetShapeLookup[column][row];
 				} else {
-					if(_this._currentRetargetShapeLookup[column] && _this._currentRetargetShapeLookup[column][row]){
-						delete _this._currentRetargetShapeLookup[column][row];
-					} else {
-						if(!_this._currentRetargetShapeLookup[column]){
-							_this._currentRetargetShapeLookup[column] = {};
-						}
-						_this._currentRetargetShapeLookup[column][row] = true;
+					if(!_this._currentRetargetShapeLookup[column]){
+						_this._currentRetargetShapeLookup[column] = {};
 					}
-					_this.packRetargetShape();					
-				}		
-				_this.show();				
-			}			
+					_this._currentRetargetShapeLookup[column][row] = true;
+				}
+				_this.packRetargetShape();					
+			}		
+			_this.show();				
+						
 		});
 	});
 	
