@@ -78,6 +78,8 @@ export default function BattleSceneManager(){
 	this._bgAnimationCounter = 0;
 	this._fadeAnimations = {};
 	this._fadeAnimationCtr = 0;
+	this._effekserDynParamAnimations = {};
+	this._effekserDynParamAnimationCtr = 0;
 	this._bgScrolls = {};
 	this._bgScrollCounter = 0;
 	
@@ -2177,6 +2179,35 @@ BattleSceneManager.prototype.hookBeforeRender = function(){
 			}
 		});	
 		
+		Object.keys(_this._effekserDynParamAnimations).forEach(function(animationId){			
+			var animation = _this._effekserDynParamAnimations[animationId];
+			var targetObj = animation.targetObj;
+			if(targetObj && targetObj.handle){			
+				var duration = animation.duration * _this.getTickDuration();
+				if(animation.accumulator == null){
+					animation.accumulator = 0;
+				}
+				animation.accumulator+=deltaTime;
+				var t = animation.accumulator / duration;	
+					
+				if(t < 1){
+					if(animation.easingFunction){
+						t = animation.easingFunction.ease(t);
+					}
+					var startVector = new BABYLON.Vector3(animation.startValue * 1, 0, 0);
+					var endVector = new BABYLON.Vector3(animation.endValue * 1, 0, 0);
+					var interpVector = BABYLON.Vector3.Lerp(startVector, endVector, t);
+					//console.log(interpVector);					
+					
+					targetObj.handle.setDynamicInput(animation.inputId, interpVector.x);
+					
+				} else {					
+					targetObj.handle.setDynamicInput(animation.inputId, animation.endValue * 1);
+					delete _this._effekserDynParamAnimations[animationId];
+				}
+			}
+		});
+		
 		
 		Object.keys(_this._bgAnimations).forEach(function(animationId){			
 			var animation = _this._bgAnimations[animationId];
@@ -2488,6 +2519,17 @@ BattleSceneManager.prototype.startScene = function(){
 		}
 		ratio*=_this._animRatio;
 		
+		let checkedObjects = ["active_main", "active_twin", "active_target"];
+		for(let obj of checkedObjects){
+			let parentObj = _this.getTargetObject(obj);
+			if(parentObj){
+				let barrierObj = _this.getTargetObject(obj+"sys_barrier");
+				if(barrierObj){
+					barrierObj.handle.setShown(parentObj.isEnabled());					
+				}
+			}
+		}		
+		
 		//console.log("_effksContext.update");
 
 	})
@@ -2761,6 +2803,20 @@ BattleSceneManager.prototype.registerFadeAnimation = function(targetObj, startFa
 	};
 }
 
+BattleSceneManager.prototype.registerEffekseerDynamicParamAnimation = function(targetObj, paramId, startValue, endValue, startTick, duration, easingFunction, easingMode){	
+	if(easingFunction && easingMode){
+		easingFunction.setEasingMode(easingMode);
+	}
+	this._effekserDynParamAnimations[this._effekserDynParamAnimationCtr++] = {
+		targetObj: targetObj,
+		startValue: startValue,
+		endValue: endValue,
+		startTick: startTick,
+		duration: duration,
+		easingFunction: easingFunction,
+		paramId: paramId
+	};
+}
 	
 BattleSceneManager.prototype.registerShakeAnimation = function(targetObj, magnitude_x, speed_x, magnitude_y, speed_y, startTick, duration, fadeInTicks, fadeOutTicks){	
 	this._shakeAnimations[this._shakeAnimationCtr++] = {		
@@ -4468,6 +4524,22 @@ BattleSceneManager.prototype.executeAnimation = function(animation, startTick){
 				targetObj.sendTrigger(params.id * 1);
 			}
 		}, 
+		animate_effekseer_input: function(target, params){
+			var targetObj;
+			var ctr = 0;
+			
+			_this.registerEffekseerDynamicParamAnimation(
+				getTargetObject(target),
+				params.paramId * 1,
+				params.startValue * 1,
+				params.endValue * 1,
+				startTick,
+				params.duration, 
+				params.easingFunction, 
+				params.easingMode
+			);
+		}, 
+		
 		set_effekseer_attract_point: function(target, params){
 			var targetObj;
 			var ctr = 0;
@@ -4573,6 +4645,22 @@ BattleSceneManager.prototype.executeAnimation = function(animation, startTick){
 					} else if(battleEffect.damageInflicted == 0){						
 						params.name = "main";												
 					}
+				}
+				
+				if(params.name == "hurt" && ((action.attacked.barrierBroken && _this._debugBarriers == 0) || _this._debugBarriers == 2)){					
+					var additions = [];					
+					additions[startTick + 1] = [									
+						//{type: "send_effekseer_trigger", target: target+"sys_barrier", params:{id: 0}},
+						//{type: "send_effekseer_trigger", target: target+"sys_barrier", params:{id: 2}}
+						{type: "animate_effekseer_input", target: target+"sys_barrier", params:{
+							paramId: 0,
+							startValue: 1,
+							endValue: 0,
+							duration: 30
+						}}
+						
+					];												
+					_this.mergeAnimList(additions);				
 				}
 				
 				targetObj.lastAnimation = params.name;
@@ -4932,6 +5020,20 @@ BattleSceneManager.prototype.executeAnimation = function(animation, startTick){
 					
 				}
 				
+				if(!action.attacked.barrierBroken && _this._debugBarriers != 2){
+					additions[startTick + params.duration] = [									
+						//{type: "send_effekseer_trigger", target: target+"sys_barrier", params:{id: 1}},
+						//{type: "send_effekseer_trigger", target: target+"sys_barrier", params:{id: 0}}
+						{type: "animate_effekseer_input", target: target+"sys_barrier", params:{
+							paramId: 0,
+							startValue: 1,
+							endValue: 0,
+							duration: 30
+						}}
+					];	
+				}									
+	
+				
 				
 				var action = _this.getTargetAction(target);
 			
@@ -4964,17 +5066,17 @@ BattleSceneManager.prototype.executeAnimation = function(animation, startTick){
 			var targetObj = getTargetObject(target);
 			var action = _this._currentAnimatedAction;
 			var additions = [];
-			if((action.attacked && action.attacked.hasBarrier) || _this._debugBarriers > 0){
-				if(action.attacked.barrierBroken || _this._debugBarriers > 1){
-					additions[startTick + 1] = [
-						{type: "play_effekseer", target: target+"sys_barrier", params:{path: "sys_barrier_broken", parent: target, scale: 3.5, isBarrier: true}}
-					];
-				} else {
-					targetObj.lastAnimation = "block";
-					additions[startTick + 1] = [									
-						{type: "play_effekseer", target: target+"sys_barrier", params:{path: "sys_barrier", parent: target, scale: 3.5, isBarrier: true}}
-					];
-				}				
+			if((action.attacked && action.attacked.hasBarrier) || _this._debugBarriers > 0){				
+				targetObj.lastAnimation = "block";
+				additions[startTick + 1] = [									
+					{type: "play_effekseer", target: target+"sys_barrier", params:{path: "sys_barrier", parent: target, scale: 3.5, isBarrier: true}},
+					{type: "animate_effekseer_input", target: target+"sys_barrier", params:{
+						paramId: 0,
+						startValue: 0,
+						endValue: 1,
+						duration: 30
+					}}
+				];							
 			}
 			_this.mergeAnimList(additions);	
 		},

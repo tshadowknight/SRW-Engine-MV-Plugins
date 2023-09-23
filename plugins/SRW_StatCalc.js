@@ -4371,7 +4371,7 @@ StatCalc.prototype.setSuperState = function(actor, newVal, noSE, seName){
 		if(this.canBeOnTerrain(actor, newVal) || newVal == -1){
 			actor.SRWStats.mech.enabledTerrainSuperState = newVal || -1;//force false values to -1
 			if(!noSE){
-				if(se){
+				if(seName){
 					var se = {};
 					se.name = seName;
 					se.pan = 0;
@@ -5585,19 +5585,19 @@ StatCalc.prototype.modifyAllWill = function(type, increment){
 	});
 }
 
-StatCalc.prototype.setWill = function(actor, amount, includeSubpilots){
+StatCalc.prototype.setWill = function(actor, amount, noSubPilots){
 	if(this.isActorSRWInitialized(actor)){
 		actor.SRWStats.pilot.will = amount;
-		if(includeSubpilots){
+		if(!noSubPilots && actor.isActor()){
 			const subPilots = this.getSubPilots(actor);
 			for(let pilotId of subPilots){
-				this.setWill($gameActors.actor(pilotId), amount);
+				this.setWill($gameActors.actor(pilotId), amount, true);
 			}
 		}
 	}
 }
 
-StatCalc.prototype.modifyWill = function(actor, increment, preserveCache){
+StatCalc.prototype.modifyWill = function(actor, increment, preserveCache, noSubPilots){
 	if(this.isActorSRWInitialized(actor)){
 		var maxWill = this.getMaxWill(actor);
 		actor.SRWStats.pilot.will+=increment;
@@ -5606,6 +5606,12 @@ StatCalc.prototype.modifyWill = function(actor, increment, preserveCache){
 		}
 		if(actor.SRWStats.pilot.will < 50){
 			actor.SRWStats.pilot.will = 50;
+		}
+		if(!noSubPilots && actor.isActor()){
+			const subPilots = this.getSubPilots(actor);
+			for(let pilotId of subPilots){
+				this.modifyWill($gameActors.actor(pilotId), increment, preserveCache, true);
+			}
 		}
 	} 	
 	if(!preserveCache){

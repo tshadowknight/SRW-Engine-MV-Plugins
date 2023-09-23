@@ -494,11 +494,14 @@
 		StorageManager.localFileDirectoryPath = function() {
 			var path = require('path');
 
-			var base = path.dirname(process.mainModule.filename);
+		
 			if(process.versions["nw-flavor"] === "sdk"){
+				var base = path.dirname(process.mainModule.filename);	
 				return path.join(base, 'save/');
 			} else {
+				var base = path.dirname(process.execPath);
 				return path.join(base, '/../save/');
+				
 			}			
 		};
 		

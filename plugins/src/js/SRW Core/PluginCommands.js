@@ -887,12 +887,12 @@
 				
 				if (command === 'setEventWill') {	
 					var actor = $gameSystem.EventToUnit(args[0])[1];
-					$statCalc.setWill(actor, args[1] * 1, true);
+					$statCalc.setWill(actor, args[1] * 1);
 				}
 				
 				if (command === 'setActorWill') {	
 					var actor = $gameActors.actor(args[0]);
-					$statCalc.setWill(actor, args[1] * 1, true);
+					$statCalc.setWill(actor, args[1] * 1);
 				}
 				
 				if (command === 'makeActorAI') {	
