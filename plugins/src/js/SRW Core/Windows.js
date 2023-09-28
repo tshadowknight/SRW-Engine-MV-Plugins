@@ -944,14 +944,18 @@
 		}        
     };
 	
-	Window_SRWPilotSelection.prototype.refresh = function(){
-		this._parent.refresh.call(this);
+	
+	Window_SRWPilotSelection.prototype.refresh = function(){		
+		this.makeItemList();
+		this.height = this.windowHeight();
+		this.createContents();
+		this.drawAllItems();
 	}
 	
 	Window_SRWPilotSelection.prototype.drawItem = function(index) {
 		var item = this._data[index];
 		if (item != null) {
-			item = $dataActors[item];
+			item = $gameActors.actor(item);
 			var numberWidth = 0;//this.numberWidth();
 			var rect = this.itemRect(index);
 			//rect.width -= this.textPadding();
@@ -960,10 +964,19 @@
 	};
 	
 	Window_SRWPilotSelection.prototype.drawItemName = function(item, x, y, width) {
+		const _this = this;
 		width = width || 312;
 		if (item) {
 			this.resetTextColor();
-			this.drawText(item.name, x + 10, y, width - 20);
+			this.drawText(item.name(), x + 10, y, width - 60);
+			let attr1 = $statCalc.getParticipantAttribute(item, "attribute1");
+			if(attr1){
+				let attrInfo = ENGINE_SETTINGS.ATTRIBUTE_DISPLAY_NAMES[attr1] || {};
+				var bitmap = ImageManager.loadSystem("attribute_"+attr1);
+				bitmap.addLoadListener(function(){
+					_this.contents.blt(bitmap, 0, 0, 32, 32, x + width - 42, y+2);
+				});				
+			}
 		}
 	};
 	

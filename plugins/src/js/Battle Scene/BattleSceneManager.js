@@ -5020,7 +5020,7 @@ BattleSceneManager.prototype.executeAnimation = function(animation, startTick){
 					
 				}
 				
-				if(!action.attacked.barrierBroken && _this._debugBarriers != 2){
+				if(!action.barrierBroken && _this._debugBarriers != 2){
 					additions[startTick + params.duration] = [									
 						//{type: "send_effekseer_trigger", target: target+"sys_barrier", params:{id: 1}},
 						//{type: "send_effekseer_trigger", target: target+"sys_barrier", params:{id: 0}}

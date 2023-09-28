@@ -853,7 +853,7 @@ Window_DeploymentTwin.prototype.redraw = function() {
 	pilotInfoContent+="</div>";	
 	pilotInfoContent+="<div class='value'>";
 	if(pilotData){
-		pilotInfoContent+=$statCalc.getCurrentSP(pilotData);
+		pilotInfoContent+=$statCalc.getMaxSP(pilotData);
 	} else {
 		pilotInfoContent+="---";
 	}

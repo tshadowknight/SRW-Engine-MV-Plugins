@@ -3837,6 +3837,14 @@ StatCalc.prototype.getCurrentSP = function(actor){
 	}	
 }
 
+StatCalc.prototype.getMaxSP = function(actor){
+	if(this.isActorSRWInitialized(actor)){
+		return actor.SRWStats.pilot.stats.calculated.SP;
+	} else {
+		return 0;
+	}	
+}
+
 StatCalc.prototype.getCurrentMP = function(actor){
 	if(this.isActorSRWInitialized(actor)){
 		return actor.SRWStats.pilot.stats.calculated.currentMP;
