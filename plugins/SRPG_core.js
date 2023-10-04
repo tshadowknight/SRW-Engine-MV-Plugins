@@ -4796,3 +4796,23 @@ function logSafe(type, msg){
 		console.log(msg);
 	}
 }
+
+
+Game_Actors.prototype.actor = function(actorId) {
+	if(actorId == null){
+		return null;
+	}
+	//resolve indirect actor id. if the pattern <x> is matched, the actor id is the value of game variable x
+	var parts = String(actorId).match(/\<(.*)\>/);	
+	if(parts && parts.length > 1){
+		actorId = $gameVariables.value(parts[1]);
+	}
+	
+    if ($dataActors[actorId]) {
+        if (!this._data[actorId]) {
+            this._data[actorId] = new Game_Actor(actorId);
+        }
+        return this._data[actorId];
+    }
+    return null;
+};

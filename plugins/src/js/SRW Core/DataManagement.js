@@ -13,6 +13,7 @@
 		// Save Management
 		//====================================================================	
 		
+
 		
 		Scene_Boot.prototype.create = function() {
 			Scene_Base.prototype.create.call(this);
@@ -170,7 +171,7 @@
 			var _this = this;
 			//const fs = require('fs');		
 			
-		
+			
 			
 			function loadConfigFromFile(url){
 				return new Promise(function(resolve, reject){
@@ -281,6 +282,8 @@
 				"TerrainTypes"
 			];
 			
+			
+			
 			var defs = [];
 			configs.forEach(function(config){
 				defs.push(loadActiveConfig(config));
@@ -356,6 +359,11 @@
 					$SRWStageInfoManager.initDefinitions();
 					$abilityZoneManager.initDefinitions();
 					$terrainTypeManager.initDefinitions();
+					
+					if(ENGINE_SETTINGS.CUSTOM_TITLE_SCREEN){
+						 await loadConfigFile('js/plugins/'+ENGINE_SETTINGS.CUSTOM_TITLE_SCREEN+".js");
+					}
+					
 					_this._configLoaded = true;
 				}
 			});
