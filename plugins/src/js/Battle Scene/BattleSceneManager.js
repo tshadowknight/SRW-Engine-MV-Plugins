@@ -2006,11 +2006,14 @@ BattleSceneManager.prototype.hookBeforeRender = function(){
 						info.savedSpeed = info.handle.speed;
 						info.handle.setSpeed(0);
 					}
-					//let oldSpeed = targetObj.handle.speed;
-					//targetObj.handle.setSpeed(0);
 					targetObj.context.update();
-					//targetObj.handle.setSpeed(oldSpeed);
 					for(let info of _this._effekseerInfo){
+						//force reapply active triggers because sometimes they get lost during the update process
+						if(info.handle.activeTriggers){
+							for(let trigger of info.handle.activeTriggers){
+								info.handle.sendTrigger(trigger);
+							}
+						}
 						info.handle.setSpeed(info.savedSpeed);
 						delete info.savedSpeed;
 					}
@@ -2502,7 +2505,7 @@ BattleSceneManager.prototype.startScene = function(){
 		});
 			
 		
-
+		
 		if(!_this._animsPaused){
 			_this._effksContext.update(60 / _this._engine.getFps() * ratio);
 			_this._effksContextMirror.update(60 / _this._engine.getFps() * ratio);
@@ -4522,6 +4525,10 @@ BattleSceneManager.prototype.executeAnimation = function(animation, startTick){
 			}
 			if(targetObj){
 				targetObj.sendTrigger(params.id * 1);
+				if(!targetObj.activeTriggers){
+					targetObj.activeTriggers = [];
+				}
+				targetObj.activeTriggers.push(params.id * 1);
 			}
 		}, 
 		animate_effekseer_input: function(target, params){
