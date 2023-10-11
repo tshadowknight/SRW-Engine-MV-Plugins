@@ -433,7 +433,7 @@ Window_UpgradeMech.prototype.redraw = function() {
 	this.updateScaledDiv(this._actorBattleImg);
 	
 	var menuImagePath = $statCalc.getMenuImagePath(refData);
-	this._actorBattleImg.innerHTML = "<img src='img/"+menuImagePath+"'>";
+	this._actorBattleImg.innerHTML = "<img data-img='img/"+menuImagePath+"'>";
 	
 	var windowNode = this.getWindowNode();
 	var entries = windowNode.querySelectorAll(".upgrade_bar_part");
@@ -489,6 +489,6 @@ Window_UpgradeMech.prototype.redraw = function() {
 	});
 	
 	
-	
+	this.loadImages();
 	Graphics._updateCanvas();
 }

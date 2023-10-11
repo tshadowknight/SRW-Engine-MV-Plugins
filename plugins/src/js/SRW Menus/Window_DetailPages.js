@@ -474,7 +474,7 @@ Window_DetailPages.prototype.drawPilotStats1 = function() {
 	if(attr1){
 		let attrInfo = ENGINE_SETTINGS.ATTRIBUTE_DISPLAY_NAMES[attr1] || {};
 		detailContent+="<div class='attribute_indicator scaled_text fitted_text'>";		
-		detailContent+="<img src='img/system/attribute_"+attr1+".png'>";		
+		detailContent+="<img data-img='img/system/attribute_"+attr1+".png'>";		
 		detailContent+=attrInfo.name || attr1;
 		detailContent+="</div>";
 	}
@@ -1109,7 +1109,7 @@ Window_DetailPages.prototype.redraw = function() {
 	
 	if(this.getCurrentSelection().mech.id != -1){	
 		var menuImagePath = $statCalc.getMenuImagePath(this.getCurrentSelection().actor);
-		this._actorBattleImg.innerHTML = "<img src='img/"+menuImagePath+"'>";	
+		this._actorBattleImg.innerHTML = "<img data-img='img/"+menuImagePath+"'>";	
 	}
 	
 	
@@ -1164,7 +1164,7 @@ Window_DetailPages.prototype.redraw = function() {
 		content+=APPSTRINGS.DETAILPAGES.label_attribute_1;
 		content+="</div>";		
 		content+="<div class='value scaled_text fitted_text primary'>";		
-		content+="<img src='img/system/attribute_"+attr1+".png'>";		
+		content+="<img data-img='img/system/attribute_"+attr1+".png'>";		
 		content+=attrInfo.name || attr1;
 		content+="</div>";
 		if(attrInfo.effects){
@@ -1191,6 +1191,6 @@ Window_DetailPages.prototype.redraw = function() {
 		this._attribute2Display.innerHTML = content;
 		this._attribute2Display.style.display = "block";		
 	}
-	
+	this.loadImages();
 	Graphics._updateCanvas();
 }

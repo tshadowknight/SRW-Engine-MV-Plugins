@@ -693,7 +693,7 @@ Window_DeploymentTwin.prototype.redraw = function() {
 		if(actorId != null && !listedUnits[actorId] && $statCalc.isValidForDeploy($gameActors.actor(actorId))){
 			listedUnits[actorId] = true;
 			var menuImagePath = $statCalc.getMenuImagePath($gameActors.actor(actorId));
-			content+="<img class='actor_img' src='img/"+menuImagePath+"'>";
+			content+="<img class='actor_img' data-img='img/"+menuImagePath+"'>";
 			
 
 				
@@ -741,7 +741,7 @@ Window_DeploymentTwin.prototype.redraw = function() {
 		if(subActorId != null && !listedUnits[subActorId] && $statCalc.isValidForDeploy($gameActors.actor(subActorId))){
 			listedUnits[subActorId] = true;
 			var menuImagePath = $statCalc.getMenuImagePath($gameActors.actor(subActorId));
-			content+="<img class='actor_img sub' src='img/"+menuImagePath+"'>";
+			content+="<img class='actor_img sub' data-img='img/"+menuImagePath+"'>";
 		}
 		content+="</div>";	 
 		
@@ -927,7 +927,7 @@ Window_DeploymentTwin.prototype.redraw = function() {
 			_this._touchMenu = true;
 		});
 	}
-	
+	this.loadImages();
 	Graphics._updateCanvas();
 	
 	if(activeElem){

@@ -746,31 +746,32 @@ BattleSceneUILayer.prototype.updateUnitIcons = function(){
 	var _this = this;
 	if(_this._currentActor){
 		var menuImagePath = $statCalc.getMenuImagePath(_this._currentActor.ref);
-		this._container.querySelector("#actor_icon").innerHTML = "<img src='img/"+menuImagePath+"'>";
+		this._container.querySelector("#actor_icon").innerHTML = "<img data-img='img/"+menuImagePath+"'>";
 	} else {		
 		this._container.querySelector("#actor_icon").innerHTML = "";
 	}
 	
 	if(_this._currentTwinActor){
 		var menuImagePath = $statCalc.getMenuImagePath(_this._currentTwinActor.ref);
-		this._container.querySelector("#actor_icon_twin").innerHTML = "<img src='img/"+menuImagePath+"'>";
+		this._container.querySelector("#actor_icon_twin").innerHTML = "<img data-img='img/"+menuImagePath+"'>";
 	} else {		
 		this._container.querySelector("#actor_icon_twin").innerHTML = "";
 	}
 	
 	if(_this._currentEnemy){
 		var menuImagePath = $statCalc.getMenuImagePath(_this._currentEnemy.ref);
-		this._container.querySelector("#enemy_icon").innerHTML = "<img src='img/"+menuImagePath+"'>";
+		this._container.querySelector("#enemy_icon").innerHTML = "<img data-img='img/"+menuImagePath+"'>";
 	} else {		
 		this._container.querySelector("#enemy_icon").innerHTML = "";
 	}
 	
 	if(_this._currentTwinEnemy){
 		var menuImagePath = $statCalc.getMenuImagePath(_this._currentTwinEnemy.ref);
-		this._container.querySelector("#enemy_icon_twin").innerHTML = "<img src='img/"+menuImagePath+"'>";
+		this._container.querySelector("#enemy_icon_twin").innerHTML = "<img data-img='img/"+menuImagePath+"'>";
 	} else {		
 		this._container.querySelector("#enemy_icon_twin").innerHTML = "";
 	}
+	this.loadImages();
 }
 
 BattleSceneUILayer.prototype.hideNoise = function() {

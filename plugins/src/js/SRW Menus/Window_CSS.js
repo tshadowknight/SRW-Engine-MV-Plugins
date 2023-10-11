@@ -84,6 +84,39 @@ Window_CSS.prototype.createComponents = function() {
 	windowNode.appendChild(this._bgFadeContainer);
 }
 
+Window_CSS.prototype.loadImages = async function() {	
+	const windowNode = this.getWindowNode();
+	
+	let images = windowNode.querySelectorAll("img");
+	
+	let promises = [];
+	let imgNameLookup = {};
+	let ctr = 0;
+	for(let img of images){
+		let imgPath = img.getAttribute("data-img");
+		if(imgPath){
+			if(imgNameLookup[imgPath] == null){
+				imgNameLookup[imgPath] = ctr++;
+				promises.push(ImageManager.loadBitmapPromise("", imgPath));
+			}	
+		}				
+	}
+	
+	await Promise.all(promises);
+	
+	let bitmaps = [];
+	for(let promise of promises){
+		bitmaps.push(await promise);
+	}
+	
+	for(let img of images){
+		let imgPath = img.getAttribute("data-img");
+		if(imgNameLookup[imgPath] != null){
+			img.setAttribute("src", bitmaps[imgNameLookup[imgPath]].canvas.toDataURL());
+		}	
+	}	
+}
+
 Window_CSS.prototype.createEntryList = function(node, listInfo, id) {	
 	node.innerHTML = "";
 	node.id = this.createId(id);

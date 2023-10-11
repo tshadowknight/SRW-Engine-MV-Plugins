@@ -157,7 +157,7 @@ Window_BattleBasic.prototype.createParticipantComponents = function(componentId,
 	
 	var barrier = document.createElement("img");
 	barrier.classList.add("barrier");
-	barrier.setAttribute("src", this.makeImageURL("barrier"));
+	barrier.setAttribute("data-img", this.makeImageURL("barrier"));
 	container.appendChild(barrier);
 	component.barrier = barrier;
 	
@@ -168,7 +168,7 @@ Window_BattleBasic.prototype.createParticipantComponents = function(componentId,
 	
 	var destroyed = document.createElement("img");
 	destroyed.classList.add("destroyed_anim");
-	destroyed.setAttribute("src", this.makeImageURL("destroyed"));
+	destroyed.setAttribute("data-img", this.makeImageURL("destroyed"));
 	destroyedContainer.appendChild(destroyed);
 	component.destroyed = destroyed;
 	
@@ -179,7 +179,7 @@ Window_BattleBasic.prototype.createParticipantComponents = function(componentId,
 	
 	var damage = document.createElement("img");
 	damage.classList.add("damage_anim");
-	damage.setAttribute("src", this.makeImageURL("damage"));
+	damage.setAttribute("data-img", this.makeImageURL("damage"));
 	damageContainer.appendChild(damage);
 	component.damage = damage;
 	
@@ -190,7 +190,7 @@ Window_BattleBasic.prototype.createParticipantComponents = function(componentId,
 	
 	var buff = document.createElement("img");
 	buff.classList.add("buff_anim");
-	buff.setAttribute("src", this.makeImageURL("buff"));
+	buff.setAttribute("data-img", this.makeImageURL("buff"));
 	buffContainer.appendChild(buff);
 	component.buff = buff;
 	
@@ -262,12 +262,12 @@ Window_BattleBasic.prototype.loadRequiredImages = function(){
 		Object.keys(_this._participantInfo).forEach(function(type){
 			var participant = _this._participantInfo[type];
 			if(participant.participating){
-				promises.push(_this.loadImage(_this.makeImageURL(participant.img)));
+				promises.push(ImageManager.loadBitmapPromise(_this.makeImageURL(participant.img)));
 			}			
 		});
-		promises.push(_this.loadImage(_this.makeImageURL("destroyed")));
-		promises.push(_this.loadImage(_this.makeImageURL("damage")));
-		promises.push(_this.loadImage(_this.makeImageURL("barrier")));
+		promises.push(ImageManager.loadBitmapPromise(_this.makeImageURL("destroyed")));
+		promises.push(ImageManager.loadBitmapPromise(_this.makeImageURL("damage")));
+		promises.push(ImageManager.loadBitmapPromise(_this.makeImageURL("barrier")));
 		Promise.all(promises).then(function(){
 			resolve();
 		});
@@ -1012,15 +1012,23 @@ Window_BattleBasic.prototype.makeImageURL = function(name) {
 	return "img/basic_battle/"+name+".png";
 }
 
-Window_BattleBasic.prototype.redraw = function() {	
+Window_BattleBasic.prototype.redraw = async function() {	
 	var _this = this;
+	
 	Object.keys(_this._participantInfo).forEach(function(type){
 		var participant = _this._participantInfo[type];
 		if(participant.participating && _this._participantComponents[type]){
-			//participant.imgElem.setAttribute("src", _this.makeImageURL(participant.img));
-			//_this.updateScaledImage(participant.imgElem);
 			var containerInfo = _this._participantComponents[type];
-			containerInfo.image.setAttribute("src", _this.makeImageURL(participant.img));
+			containerInfo.image.setAttribute("data-img", _this.makeImageURL(participant.img));
+		}
+	});
+	
+	await this.loadImages();
+	
+	Object.keys(_this._participantInfo).forEach(function(type){
+		var participant = _this._participantInfo[type];
+		if(participant.participating && _this._participantComponents[type]){
+			var containerInfo = _this._participantComponents[type];
 			_this.updateScaledDiv(containerInfo.container);
 			_this.updateScaledDiv(containerInfo.HP);
 			_this.updateScaledDiv(containerInfo.destroyedContainer);
@@ -1032,7 +1040,7 @@ Window_BattleBasic.prototype.redraw = function() {
 			_this.updateScaledImage(containerInfo.barrier);
 		}			
 	});	
-		
+	
 	var windowNode = this.getWindowNode();	
 	windowNode.addEventListener("mousedown", function(){
 		_this._touchDoubleSpeed = true;

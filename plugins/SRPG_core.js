@@ -304,10 +304,21 @@ var _defaultPlayerSpeed = parameters['defaultPlayerSpeed'] || 4;
 		filename = this.getTranslationInfo(filename); 
 		return this.reserveBitmap('img/faces/', filename, hue, true, reservationId);
 	};
-    	
 
-
-
+	ImageManager.loadBitmapPromise = async function(folder, filename, hue, smooth) {
+		return new Promise((resolve, reject) => {
+			if (filename) {
+				var path = folder + encodeURIComponent(filename);
+				var bitmap = this.loadNormalBitmap(path, hue || 0);
+				bitmap.smooth = smooth;
+				bitmap.addLoadListener(() => {
+					resolve(bitmap);
+				});
+			} else {
+				resolve(this.loadEmptyBitmap());
+			}	
+		});		
+	};	
 	
 	
 //====================================================================

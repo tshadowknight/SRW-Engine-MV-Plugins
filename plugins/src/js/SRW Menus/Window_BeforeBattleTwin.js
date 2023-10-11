@@ -382,22 +382,22 @@ Window_BeforebattleTwin.prototype.createComponents = function() {
 	
 	this._targeting_arrows_1 = document.createElement("img");
 	this._targeting_arrows_1.id = this.createId("targeting_arrows_1");
-	this._targeting_arrows_1.setAttribute("src", "img/system/targeting1.png");
+	this._targeting_arrows_1.setAttribute("data-img", "img/system/targeting1.png");
 	windowNode.appendChild(this._targeting_arrows_1);	
 	
 	this._targeting_arrows_2 = document.createElement("img");
 	this._targeting_arrows_2.id = this.createId("targeting_arrows_2");
-	this._targeting_arrows_2.setAttribute("src", "img/system/targeting1.png");
+	this._targeting_arrows_2.setAttribute("data-img", "img/system/targeting1.png");
 	windowNode.appendChild(this._targeting_arrows_2);	
 	
 	this._targeting_arrows_enemy_1 = document.createElement("img");
 	this._targeting_arrows_enemy_1.id = this.createId("targeting_arrows_enemy_1");
-	this._targeting_arrows_enemy_1.setAttribute("src", "img/system/targeting1.png");
+	this._targeting_arrows_enemy_1.setAttribute("data-img", "img/system/targeting1.png");
 	windowNode.appendChild(this._targeting_arrows_enemy_1);	
 	
 	this._targeting_arrows_enemy_2 = document.createElement("img");
 	this._targeting_arrows_enemy_2.id = this.createId("targeting_arrows_enemy_2");
-	this._targeting_arrows_enemy_2.setAttribute("src", "img/system/targeting1.png");
+	this._targeting_arrows_enemy_2.setAttribute("data-img", "img/system/targeting1.png");
 	windowNode.appendChild(this._targeting_arrows_enemy_2);	
 	
 	this.new_attack_inidicator = document.createElement("div");
@@ -1114,24 +1114,24 @@ Window_BeforebattleTwin.prototype.createPercentIndicator = function(allyOrEnemy,
 	
 	if(targetType == "all"){		
 		if(realIdx > 1){//if there are actually two targets
-			content+="<img class='target_arrow main' src='img/system/targeting1.png'>";
-			content+="<img class='target_arrow twin' src='img/system/targeting2.png'>";
+			content+="<img class='target_arrow main' data-img='img/system/targeting1.png'>";
+			content+="<img class='target_arrow twin' data-img='img/system/targeting2.png'>";
 		} else if(ref.isSubTwin){
-			content+="<img class='target_arrow twin' src='img/system/targeting2.png'>";
+			content+="<img class='target_arrow twin' data-img='img/system/targeting2.png'>";
 		} else {
-			content+="<img class='target_arrow main' src='img/system/targeting1.png'>";
+			content+="<img class='target_arrow main' data-img='img/system/targeting1.png'>";
 		}		
 	} else if(targetType == "main"){
 		if(ref.isSubTwin){
-			content+="<img class='target_arrow main' src='img/system/targeting2.png'>";
+			content+="<img class='target_arrow main' data-img='img/system/targeting2.png'>";
 		} else {
-			content+="<img class='target_arrow main' src='img/system/targeting1.png'>";
+			content+="<img class='target_arrow main' data-img='img/system/targeting1.png'>";
 		}		
 	} else{		
 		if(ref.isSubTwin){
-			content+="<img class='target_arrow main' src='img/system/targeting1.png'>";
+			content+="<img class='target_arrow main' data-img='img/system/targeting1.png'>";
 		} else {
-			content+="<img class='target_arrow twin' src='img/system/targeting2.png'>";
+			content+="<img class='target_arrow twin' data-img='img/system/targeting2.png'>";
 		}	
 	}
 	
@@ -2052,7 +2052,7 @@ Window_BeforebattleTwin.prototype.redraw = function() {
 		
 		if(actor){
 			var menuImagePath = $statCalc.getMenuImagePath(actor);
-			icon.innerHTML = "<img src='img/"+menuImagePath+"'>";
+			icon.innerHTML = "<img data-img='img/"+menuImagePath+"'>";
 			icon.display = "";
 		} else {
 			icon.display = "none";
@@ -2079,7 +2079,7 @@ Window_BeforebattleTwin.prototype.redraw = function() {
 		
 		if(actor){
 			var menuImagePath = $statCalc.getMenuImagePath(actor);
-			icon.innerHTML = "<img src='img/"+menuImagePath+"'>";
+			icon.innerHTML = "<img data-img='img/"+menuImagePath+"'>";
 			icon.display = "";
 		} else {
 			icon.display = "none";
@@ -2108,6 +2108,6 @@ Window_BeforebattleTwin.prototype.redraw = function() {
 	percentIndicators.forEach(function(percentIndicator){
 		_this.updateScaledDiv(percentIndicator);
 	});
-	
+	this.loadImages();
 	Graphics._updateCanvas();
 }

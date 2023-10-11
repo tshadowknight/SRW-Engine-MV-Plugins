@@ -130,7 +130,7 @@ AttackList.prototype.createAttributeBlock = function(attack) {
 		content+="<div class='attribute_block_entry scaled_width scaled_height scaled_text effectiveness'>";
 		let attr1 = $statCalc.getParticipantAttribute($gameTemp.currentMenuUnit.actor, "attribute1", attack);
 		if(attr1){
-			content+="<img src='img/system/attribute_"+attr1+".png'>";	
+			content+="<img data-img='img/system/attribute_"+attr1+".png'>";	
 		}			
 		content+="</div>";
 	}
@@ -388,6 +388,8 @@ AttackList.prototype.redraw = function(softRefresh) {
 	content+=(this._currentPage + 1)+"/"+maxPage;
 	content+="<img id='next_page' src=svg/chevron_right.svg>";
 	this._pageDiv.innerHTML = content;
+	
+	this.loadImages();
 	
 	var windowNode = this.getWindowNode();
 	var entries = windowNode.querySelectorAll(".attack_list_row");

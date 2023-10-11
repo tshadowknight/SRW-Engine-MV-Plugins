@@ -46,8 +46,8 @@ Window_SpiritActivation.prototype.initialize = function() {
 		var spiritAnimInfo = $spiritManager.getSpiritDisplayInfo(id).animInfo;		
 		if(spiritAnimInfo.name){
 			ImageManager.loadNormalBitmap('img/SRWMapEffects/'+spiritAnimInfo.name+".png");
-		} else {
-			_this.loadImage(_this.makeSpiritAnimationURL(spiritAnimInfo.src));
+		} else if(spiritAnimInfo.src){
+			ImageManager.loadBitmapPromise(_this.makeSpiritAnimationURL(spiritAnimInfo.src));
 		}
 	});
 }
@@ -99,7 +99,6 @@ Window_SpiritActivation.prototype.createComponents = function() {
 	this._spiritAnimImageContainer.classList.add("spirit_anim_container");
 	this._spiritAnimImage = document.createElement("img");
 	this._spiritAnimImage.classList.add("spirit_anim");
-	//this._spiritAnimImage.setAttribute("src", this.makeImageURL("destroyed"));
 	this._spiritAnimImageContainer.appendChild(this._spiritAnimImage);
 	this._spiritAnim.appendChild(this._spiritAnimImageContainer);
 	
@@ -129,7 +128,7 @@ Window_SpiritActivation.prototype.loadRequiredImages = function(){
 		var promises = [];
 		Object.keys(_this._participantInfo).forEach(function(type){
 			var participant = _this._participantInfo[type];			
-			promises.push(_this.loadImage(_this.makeImageURL(participant.img)));					
+			promises.push(ImageManager.loadBitmapPromise(_this.makeImageURL(participant.img)));					
 		});
 		_this._actionQueue.forEach(function(effectDef){
 			if(effectDef.type == "spirit"){
@@ -138,10 +137,10 @@ Window_SpiritActivation.prototype.loadRequiredImages = function(){
 				if(spiritAnimInfo.name){
 					ImageManager.loadNormalBitmap('img/SRWMapEffects/'+spiritAnimInfo.name+".png");
 				} else if(spiritAnimInfo.src){
-					promises.push(_this.loadImage(_this.makeSpiritAnimationURL(spiritAnimInfo.src)));
+					promises.push(ImageManager.loadBitmapPromise(_this.makeSpiritAnimationURL(spiritAnimInfo.src)));
 				}
 			} else if(effectDef.type == "repair"){
-				promises.push(_this.loadImage(_this.makeSpiritAnimationURL(effectDef.parameters.animId)));
+				promises.push(ImageManager.loadBitmapPromise(_this.makeSpiritAnimationURL(effectDef.parameters.animId)));
 			}		
 		});
 		
@@ -259,7 +258,7 @@ Window_SpiritActivation.prototype.hide = function() {
 	this.refresh();
 };
 
-Window_SpiritActivation.prototype.update = function() {
+Window_SpiritActivation.prototype.update = async function() {
 	var _this = this;
 	Window_Base.prototype.update.call(this);
 	
@@ -312,7 +311,7 @@ Window_SpiritActivation.prototype.update = function() {
 						this._processingAnimation = true;			
 						var spiritAnimInfo = $spiritManager.getSpiritDisplayInfo(spiritId).animInfo;
 						this._spiritAnimImage.style.display = "block";
-						this._spiritAnimImage.src = this.makeSpiritAnimationURL(spiritAnimInfo.src);
+						this._spiritAnimImage.setAttribute("data-img", this.makeSpiritAnimationURL(spiritAnimInfo.src));
 						this._spiritAnimImage.style["animation-duration"] = "";
 						//console.log("Showing Spirit Image: "+this._spiritAnimImage.src);
 						this.applyDoubleTime(this._spiritAnimImage);
@@ -401,7 +400,7 @@ Window_SpiritActivation.prototype.update = function() {
 						this._processingAnimation = true;			
 						
 						this._spiritAnimImage.style.display = "block";
-						this._spiritAnimImage.src = this.makeSpiritAnimationURL(effectDef.parameters.animId);
+						this._spiritAnimImage.setAttribute("data-img", this.makeSpiritAnimationURL(effectDef.parameters.animId));
 						this._spiritAnimImage.style["animation-duration"] = "";
 						this.applyDoubleTime(this._spiritAnimImage);
 											
@@ -437,6 +436,7 @@ Window_SpiritActivation.prototype.update = function() {
 						se.volume = 90;
 						AudioManager.playSe(se);
 					}			
+					//await this.loadImages();
 					Graphics._updateCanvas();		
 				} else {
 					this._processingAction = false;
@@ -507,16 +507,22 @@ Window_SpiritActivation.prototype.makeSpiritAnimationURL = function(name) {
 	return "img/animations/spirits/"+name+".png";
 }
 
-Window_SpiritActivation.prototype.redraw = function() {	
+Window_SpiritActivation.prototype.redraw = async function() {	
 	var _this = this;
+	
 	//console.log("Redrawing spirit animation window");
 	Object.keys(_this._participantInfo).forEach(function(type){
 		var participant = _this._participantInfo[type];
 		
-		participant.imgElem.setAttribute("src", _this.makeImageURL(participant.img));
+		if(participant.img){
+			participant.imgElem.setAttribute("data-img", _this.makeImageURL(participant.img));
+		}		
 		//_this.updateScaledImage(participant.imgElem);
 					
 	});	
+	
+	await this.loadImages();
+	
 	_this.updateScaledDiv(_this._bgFadeContainer);	
 	if(!_this.updateScaledImage(_this._spiritAnimImage)){
 		//console.log("Attempted to set image scale on an unintialized image!");

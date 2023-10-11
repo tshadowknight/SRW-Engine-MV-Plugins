@@ -210,7 +210,7 @@ Window_UnitSummary.prototype.redraw = function() {
 			var actor = actors[icon.getAttribute("data-idx")];
 			
 			var menuImagePath = $statCalc.getMenuImagePath(actor);
-			icon.innerHTML = "<img src='img/"+menuImagePath+"'>";
+			icon.innerHTML = "<img data-img='img/"+menuImagePath+"'>";
 		});
 		
 		var summaries = _this._bgFadeContainer.querySelectorAll(".summary_mech");
@@ -246,7 +246,7 @@ Window_UnitSummary.prototype.redraw = function() {
 		//_this.assignFactionColorClass(_this._bgFadeContainer.querySelector(".background"), actors[0]);
 		//_this.updateScaledDiv(_this._bgFadeContainer.querySelector(".background"));
 	}
-	
+	this.loadImages();
 	Graphics._updateCanvas(this._layoutId);
 }
 
