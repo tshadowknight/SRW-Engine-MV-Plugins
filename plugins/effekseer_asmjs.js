@@ -670,7 +670,7 @@ var effekseer = function () {
     xhr.send(null);
   };
 
-  var _loadResource = function _loadResource(path, onload, onerror) {
+  var _loadResource = async function _loadResource(path, onload, onerror) {
 
     splitted_path = path.split('?');
     var ext_path = path;
@@ -681,6 +681,7 @@ var effekseer = function () {
     var extindex = ext_path.lastIndexOf(".");
     var ext = extindex >= 0 ? ext_path.slice(extindex) : "";
     if (ext == ".png" || ext == ".jpg") {
+	  let bitmap = await ImageManager.loadBitmapPromise("", path);
       var image = new Image();
       image.onload = function () {
         var converted_image = _convertPowerOfTwoImage(image);
@@ -691,7 +692,9 @@ var effekseer = function () {
       };
 
       image.crossOrigin = _imageCrossOrigin;
-      image.src = path;
+      //image.src = path;
+	  image.src = bitmap.canvas.toDataURL();	  
+	  
     } else if (ext == ".tga") {
       if (!(typeof onerror === "undefined")) onerror('not supported', path);
     } else {

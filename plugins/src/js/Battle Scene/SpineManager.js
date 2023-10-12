@@ -4,6 +4,48 @@ export default function SpineManager(){
 
 }
 
+spine.AssetManager.prototype.loadTexture = async function(path, success = () => { }, error = () => { }){
+	path = this.start(path);
+	/*let isBrowser = !!(typeof window !== 'undefined' && typeof navigator !== 'undefined' && window.document);
+	let isWebWorker = !isBrowser; // && typeof importScripts !== 'undefined';
+	if (isWebWorker) {
+		fetch(path, { mode: "cors" }).then((response) => {
+			if (response.ok)
+				return response.blob();
+			this.error(error, path, `Couldn't load image: ${path}`);
+			return null;
+		}).then((blob) => {
+			return blob ? createImageBitmap(blob, { premultiplyAlpha: "none", colorSpaceConversion: "none" }) : null;
+		}).then((bitmap) => {
+			if (bitmap)
+				this.success(success, path, this.textureLoader(bitmap));
+		});
+	}
+	else {
+		let image = new Image();
+		image.crossOrigin = "anonymous";
+		image.onload = () => {
+			this.success(success, path, this.textureLoader(image));
+		};
+		image.onerror = () => {
+			this.error(error, path, `Couldn't load image: ${path}`);
+		};
+		if (this.downloader.rawDataUris[path])
+			path = this.downloader.rawDataUris[path];
+		image.src = path;
+	}*/
+	let bitmap = await ImageManager.loadBitmapPromise("", path);
+	let image = new Image();
+	image.crossOrigin = "anonymous";
+	image.onload = () => {
+		this.success(success, path, this.textureLoader(image));
+	};
+	image.onerror = () => {
+		this.error(error, path, `Couldn't load image: ${path}`);
+	};
+	image.src = bitmap.canvas.toDataURL();	  
+}
+
 SpineManager.prototype.startAnimation = function(animationContext, path, animKey, force){	
 	//this._glContext = this._canvas.getContext("webgl");	
 	if(this._anim_key != animKey || force){
