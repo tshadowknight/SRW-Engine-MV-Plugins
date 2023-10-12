@@ -4771,9 +4771,9 @@ Scene_Disclaimer.prototype.createForeground = function() {
 	var text = ENGINE_SETTINGS.DISCLAIMER_TEXT;
 	var lines = text.split("\n");
 	var ctr = 0;
-	this._disclaimerSprite.bitmap.fontSize = 24;
+	this._disclaimerSprite.bitmap.fontSize = ENGINE_SETTINGS.FONT_SIZE || 24;
 	for(line of lines){		
-		this._disclaimerSprite.bitmap.drawText(line, x, y + 28 * ctr++, maxWidth, 28 , "left");
+		this._disclaimerSprite.bitmap.drawText(line, x, y + 28 * ctr++, maxWidth, ENGINE_SETTINGS.LINE_HEIGHT || 28, "left");
 	}	
 };
 

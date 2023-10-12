@@ -1,6 +1,12 @@
 var ENGINE_SETTINGS = {
 	GAMEID: "SRWMV",
 	CUSTOM_TITLE_SCREEN: "",
+	FONT_SCALE: 1,//used to scale the text in CSS menus.
+	FONT_LINE_HEIGHT_SCALE: 0,//used to offset text in CSS menus.
+	FONT_SIZE: 28,//font size in RPG Maker text boxes. Also affects the line height in the message window.
+	LINE_HEIGHT: 36,//line height in RPG Maker text boxes.
+	LINE_OFFSET: 0,//offsets all drawn text in RPG Maker text boxes on its line(in pixels)
+	MSG_LINE_HEIGHT_SCALE: 1,//scaling factor for the line height of lines in the message window. Use this to adjust if you are not using the default FONT_SIZE
 	DISABLE_TOUCH: false,
 	PRELOAD_AUDIO: true,
 	RPG_MAKER_INV_LIMIT: 1,

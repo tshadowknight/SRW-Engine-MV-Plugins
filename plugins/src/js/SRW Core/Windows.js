@@ -667,6 +667,58 @@
     };
 	
 	
+	Window_Base.prototype.standardFontSize = function() {
+		return ENGINE_SETTINGS.FONT_SIZE || 28;
+	};
+	
+	Window_Base.prototype.lineHeight = function() {
+		return ENGINE_SETTINGS.LINE_HEIGHT || 36;
+	};
+	
+	Window_Base.prototype.calcTextHeight = function(textState, all) {
+		var lastFontSize = this.contents.fontSize;
+		var textHeight = 0;
+		var lines = textState.text.slice(textState.index).split('\n');
+		var maxLines = all ? lines.length : 1;
+
+		for (var i = 0; i < maxLines; i++) {
+			var maxFontSize = this.contents.fontSize;
+			var regExp = /\x1b[\{\}]/g;
+			for (;;) {
+				var array = regExp.exec(lines[i]);
+				if (array) {
+					if (array[0] === '\x1b{') {
+						this.makeFontBigger();
+					}
+					if (array[0] === '\x1b}') {
+						this.makeFontSmaller();
+					}
+					if (maxFontSize < this.contents.fontSize) {
+						maxFontSize = this.contents.fontSize;
+					}
+				} else {
+					break;
+				}
+			}
+			textHeight += maxFontSize + 8;
+		}
+
+		this.contents.fontSize = lastFontSize;
+		return textHeight * (ENGINE_SETTINGS.MSG_LINE_HEIGHT_SCALE);
+	};
+	
+	
+	Window_Base.prototype.drawText = function(text, x, y, maxWidth, align) {
+		this.contents.drawText(text, x, y + (ENGINE_SETTINGS.LINE_OFFSET || 0), maxWidth, this.lineHeight(), align);
+	};
+	
+	Window_Base.prototype.processNormalCharacter = function(textState) {
+		var c = textState.text[textState.index++];
+		var w = this.textWidth(c);
+		this.contents.drawText(c, textState.x, textState.y + (ENGINE_SETTINGS.LINE_OFFSET || 0), w * 2, textState.height);
+		textState.x += w;
+	};
+
 	
 	function Window_SRWItemBattle() {
 		this._parent = Window_BattleItem.prototype;

@@ -30,7 +30,10 @@ CSSUIManager.prototype.updateScaledText = function(windowId){
 				textElement.setAttribute("data-font-percent", fontPercent);
 			}
 			
-			textElement.style.fontSize = Math.floor(referenceWidth/100 * fontPercent) + "px";
+			textElement.style.fontSize = Math.floor(referenceWidth/100 * fontPercent) * (ENGINE_SETTINGS.FONT_SCALE || 1) + "px";
+			if(ENGINE_SETTINGS.FONT_LINE_HEIGHT_SCALE){
+				textElement.style.lineHeight = Math.floor(referenceWidth/100 * fontPercent) * (ENGINE_SETTINGS.FONT_SCALE || 1) * ENGINE_SETTINGS.FONT_LINE_HEIGHT_SCALE + "px";
+			}
 		});
 		var scaledWidthElements = sourceContainer.querySelectorAll(".scaled_width");	
 		scaledWidthElements.forEach(function(scaledElement){

@@ -612,7 +612,7 @@ Window_CSS.prototype.createAttributeEffectivenessBlock = function(actor, attribu
 	let attr = $statCalc.getParticipantAttribute(actor, attribute, attack);
 	if(attr){
 		
-		content+="<img class='effectiveness_icon' src='img/system/attribute_"+attr+".png'>";	
+		content+="<img class='effectiveness_icon' data-img='img/system/attribute_"+attr+".png'>";	
 		content+="<div class='effectiveness_indicator glowing_elem'></div>";	
 	}			
 	content+="</div>";
