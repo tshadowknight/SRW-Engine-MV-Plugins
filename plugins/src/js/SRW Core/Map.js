@@ -423,23 +423,35 @@
 			
 			var cloudScrollSize = 20;
 			var cloudScrollFrequency = 1;
-			
-			let rowHead;
-			for(var j = cloudScrollFrequency * -1; j < $gameMap.height() + 10; j+=cloudScrollFrequency){		//$				
-				var sprite = new Sprite_CloudScroll(Math.floor($gameMap.width() / 2) * -1 + ((j%2) * Math.floor($gameMap.width() / 4)), j + cloudScrollFrequency);
-				rowHead = sprite;							
-				
-				sprite.move(0, 0, Math.floor(($gameMap.width() * 2)) * $gameMap.tileWidth(), 10 * $gameMap.tileHeight());
-				this.addCharacterToBaseSprite(sprite);   								
-			}						
+			if((typeof UltraMode7 != "undefined") && UltraMode7.isActive()){	
+				let rowHead;
+				for(var j = cloudScrollFrequency * -1; j < $gameMap.height() + 10; j+=cloudScrollFrequency){		//$				
+					var sprite = new Sprite_CloudScroll(Math.floor($gameMap.width() / 2) * -1 + ((j%2) * Math.floor($gameMap.width() / 4)), j + cloudScrollFrequency);
+					rowHead = sprite;							
+					
+					sprite.move(0, 0, Math.floor(($gameMap.width() * 2)) * $gameMap.tileWidth(), 10 * $gameMap.tileHeight());
+					this.addCharacterToBaseSprite(sprite);   								
+				}						
+			} else {
+				let rowHead;
+				for(var i = 0; i < $gameMap.width() + cloudScrollSize; i+=cloudScrollSize){		//$				
+					for(var j = 0; j < $gameMap.height() + cloudScrollSize; j+=cloudScrollSize){		//$				
+						var sprite = new Sprite_CloudScroll(i, j);
+						rowHead = sprite;							
+
+						sprite.move(0, 0, cloudScrollSize * $gameMap.tileHeight(), cloudScrollSize * $gameMap.tileHeight());
+						this.addCharacterToBaseSprite(sprite);   								
+					}	
+				}
+			}
 			this.createPictures();
 			this.createTimer();
 			this.createScreenSprites();				
 								
 		
 			if(!(typeof UltraMode7 != "undefined") || !UltraMode7.isActive()){
-				this.addCharacterToBaseSprite(new Sprite_MapBorder(0, $gameMap.height(), $gameMap.width() * $gameMap.tileWidth(), 480));	
-				this.addCharacterToBaseSprite(new Sprite_MapBorder($gameMap.width(), 0, 480, $gameMap.height() * $gameMap.tileHeight()));		
+				this.addCharacterToBaseSprite(new Sprite_MapBorder(0, $gameMap.height(), ($gameMap.width() + 10) * $gameMap.tileWidth(), 480));	
+				this.addCharacterToBaseSprite(new Sprite_MapBorder($gameMap.width(), 0, 480, ($gameMap.height() + 10) * $gameMap.tileHeight()));		
 			}
 
 			$gameTemp.updatePlayerSpriteVisibility();

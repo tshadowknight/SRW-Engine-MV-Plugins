@@ -656,8 +656,8 @@
 							this.opacity = 255;
 						}
 					} else {
-						if($gameMap.hasStarTile(this._character._x,  this._character._y)){
-							this._upperBodyTop.opacity = 0;
+						/*if($gameMap.hasStarTile(this._character._x,  this._character._y)){
+							
 							if($gameSystem.foregroundSpriteToggleState == 0){
 								this.opacity = 0;
 							} else if($gameSystem.foregroundSpriteToggleState == 1){
@@ -667,7 +667,7 @@
 							}
 						} else {
 							this.opacity = 255;
-						}
+						}*/
 					}	
 					if(//$gameTemp.activeEvent() == this._character || 
 						$gameTemp._TargetEvent == this._character ||
