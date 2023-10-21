@@ -1982,7 +1982,7 @@ StatCalc.prototype.getMechData = function(mech, forActor, items, previousWeapons
 		}
 		
 		
-		result.carryingCapacity = (mechProperties.mechCarryingCapacity || ENGINE_SETTINGS.DEFAULT_CARRING_CAPACITY) * 1;
+		result.carryingCapacity = (mechProperties.mechCarryingCapacity || ENGINE_SETTINGS.DEFAULT_CARRYING_CAPACITY) * 1;
 		
 		
 		//result.transformedActor = mechProperties.mechTransformedActor;
