@@ -845,6 +845,22 @@ $SRWConfig.mechAbilties = function(){
 		}
 	);
 	
+	this.addDefinition(
+		55, 
+		"Large Backpack", 
+		"Carrying capacity +100.", 
+		false,
+		false,
+		function(actor, level){
+			return [{type: "carrying_capacity", modType: "addFlat", value: 100}];
+		},
+		function(actor, level){
+			return true;
+		}
+	);
+	
+	
+	
 	/*Insert new ability here*/
 	
 

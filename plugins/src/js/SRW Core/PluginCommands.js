@@ -120,6 +120,17 @@
 				if (command === 'removeItemFromHolder') {
 					$inventoryManager.removeItemHolder(args[0], args[1]);
 				}
+				
+				if (command === 'addEquipable') {
+					$equipablesManager.addItem(args[0]);
+				}			
+				if (command === 'addEquipableToHolder') {
+					$equipablesManager.addItemHolder(args[0], args[1], args[2]);
+				}
+				if (command === 'removeEquipableFromHolder') {
+					$equipablesManager.removeItemHolder(args[0], args[1]);
+				}
+				
 				if (command === 'setFreeEventCam') {
 					$gameTemp.freeEventCam = true;
 				}

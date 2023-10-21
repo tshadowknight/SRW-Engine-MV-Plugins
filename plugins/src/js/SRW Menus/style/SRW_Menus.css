@@ -495,3 +495,19 @@ body {
   100% { opacity: 1;}
 }
 
+.break {
+	flex-basis: 100%;
+	height: 0;
+}
+
+.ability_block_row.weapon_terrain_string .pilot_stat_container {
+	--fontsize: 1.8px;
+	width: 90%;
+	margin-left: auto;
+	margin-right: auto;
+	display: flex;
+	justify-content: center;
+	align-items: center;
+	padding-left: 2%;
+	padding-right: 2%;
+}

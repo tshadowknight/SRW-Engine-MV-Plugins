@@ -618,3 +618,67 @@ Window_CSS.prototype.createAttributeEffectivenessBlock = function(actor, attribu
 	content+="</div>";
 	return content;
 }
+
+
+Window_CSS.prototype.createAttributeBlock = function(attack) {
+	var content = "";
+	content+="<div class='attribute_block'>";
+	
+	if(ENGINE_SETTINGS.USE_WEAPON_ATTRIBUTE){
+		content+="<div class='attribute_block_entry scaled_width scaled_height scaled_text effectiveness'>";
+		let attr1 = $statCalc.getParticipantAttribute($gameTemp.currentMenuUnit.actor, "attribute1", attack);
+		if(attr1){
+			content+="<img data-img='img/system/attribute_"+attr1+".png'>";	
+		}			
+		content+="</div>";
+	}
+	
+	content+="<div class='attribute_block_entry scaled_width scaled_height scaled_text'>";
+	if(attack.effects.length){
+		content+="S";
+	} 
+	content+="</div>";
+	content+="<div class='attribute_block_entry scaled_width scaled_height scaled_text'>";
+	if(attack.postMoveEnabled){
+		content+="P";
+	} 
+	content+="</div>";
+	content+="<div class='attribute_block_entry scaled_width scaled_height scaled_text'>";
+	if(attack.isCounter){
+		content+="C";
+	} 
+	content+="</div>";
+	content+="<div class='attribute_block_entry scaled_width scaled_height scaled_text'>";
+	/*if(attack.particleType == "missile"){
+		content+="Mi";	
+	}
+	if(attack.particleType == "physical"){
+		content+="Ph";	
+	}
+	if(attack.particleType == "funnel"){
+		content+="Fu";	
+	}
+	if(attack.particleType == "beam"){
+		content+="Be";	
+	}
+	if(attack.particleType == "gravity"){
+		content+="Gr";	
+	}*/
+	if(attack.particleType != "" && attack.particleType != null){
+		var typeIndicator = attack.particleType.substring(0, 2);
+		content+=typeIndicator.charAt(0).toUpperCase() + typeIndicator.slice(1);
+	}
+	content+="</div>";
+	
+	if(ENGINE_SETTINGS.ENABLE_TWIN_SYSTEM){
+		content+="<div class='attribute_block_entry all scaled_width scaled_height scaled_text fitted_text'>";
+		if(attack.isAll){
+			content+="ALL";
+		} 
+		content+="</div>";
+	}
+	
+	
+	content+="</div>";
+	return content;
+}

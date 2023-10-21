@@ -127,6 +127,9 @@ CSSUIManager.prototype.initAllWindows = function(){
 	this.initWindow("upgrade_pilot");	
 	this.initWindow("equip_item_select");
 	this.initWindow("equip_item");
+	this.initWindow("equip_weapon_select");
+	this.initWindow("upgrade_equip_weapon");
+	this.initWindow("equip_weapon");
 	this.initWindow("sell_item");
 	this.initWindow("battle_basic");
 	this.initWindow("spirit_activation");

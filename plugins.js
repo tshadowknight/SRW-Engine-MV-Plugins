@@ -28,6 +28,7 @@ var $plugins =
 {"name":"TerrainTypeManager","status":true,"description":"","parameters":{}},
 {"name":"SRW_BattleScene","status":true,"description":"","parameters":{}},
 {"name":"SRW_InventoryManager","status":true,"description":"","parameters":{}},
+{"name":"SRW_EquipablesManager","status":true,"description":"","parameters":{}},
 {"name":"SRW_Menus","status":true,"description":"","parameters":{}},
 {"name":"SRW_SaveManager","status":true,"description":"","parameters":{}},
 {"name":"SRW_BattleCalc","status":true,"description":"","parameters":{}},

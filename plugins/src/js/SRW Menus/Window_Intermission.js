@@ -69,8 +69,8 @@ Window_Intermission.prototype.initialize = function() {
 		{name: APPSTRINGS.INTERMISSION.mech_label, key: "mech", enabled: validateMechMenu, subCommands: [
 			{name: APPSTRINGS.INTERMISSION.list_label, key: "mech_list"},
 			{name: APPSTRINGS.INTERMISSION.upgrade_label, key: "mech_upgrade"},
-			{name: APPSTRINGS.INTERMISSION.equip_parts, key: "mech_parts"},
-			{name: APPSTRINGS.INTERMISSION.sell_parts, key: "sell_parts"},
+			{name: APPSTRINGS.INTERMISSION.equip_parts, key: "mech_parts"},			
+			{name: APPSTRINGS.INTERMISSION.sell_parts, key: "sell_parts"},			
 			//{name: "Sell Parts", key: "mech_parts_sell"},
 			//{name: "Search", key: "mech_search"}
 		]},
@@ -93,6 +93,10 @@ Window_Intermission.prototype.initialize = function() {
 		const enabledCategories = ENGINE_SETTINGS.INTERMISSION_CATEGORIES;
 		this._commands = this._commands.filter((item) => {return enabledCategories[item.key]});	
 	}	
+	if(ENGINE_SETTINGS.ENABLE_EQUIPABLES){
+		this._commands[0].subCommands.push({name: APPSTRINGS.INTERMISSION.equip_weapons, key: "equip_weapons"});
+		this._commands[0].subCommands.push({name: APPSTRINGS.INTERMISSION.upgrade_equip_weapon, key: "upgrade_equip_weapon"});
+	}
 	
 	this._tooltips = APPSTRINGS.INTERMISSION.tool_tips;
 	this._menuLevels = [0];
@@ -163,6 +167,13 @@ Window_Intermission.prototype.initialize = function() {
 		"mech_parts": function(){
 			$gameTemp.pushMenu = "equip_item_select";
 		}, 
+		"equip_weapons": function(){
+			$gameTemp.pushMenu = "equip_weapon_select";
+		}, 
+		"upgrade_equip_weapon": function(){
+			$gameTemp.pushMenu = "upgrade_equip_weapon";
+		}, 
+		
 		"sell_parts": function(){
 			$gameTemp.pushMenu = "sell_item";
 		}, 

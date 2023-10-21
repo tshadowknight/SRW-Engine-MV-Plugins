@@ -136,13 +136,24 @@ SRWSaveManager.prototype.refundPilotPP = function(pilotId){
 
 SRWSaveManager.prototype.getInventoryData = function(){
 	if(!$gameSystem.inventoryData){
-		$gameSystem.inventoryData = {};
+		$gameSystem.inventoryData = [];
 	}	
 	return JSON.parse(JSON.stringify($gameSystem.inventoryData));
 }
 
 SRWSaveManager.prototype.setInventoryData = function(data){	
 	$gameSystem.inventoryData = data;	
+}
+
+SRWSaveManager.prototype.getEquipablesData = function(){
+	if(!$gameSystem.equipablesData){
+		$gameSystem.equipablesData = {};
+	}	
+	return JSON.parse(JSON.stringify($gameSystem.equipablesData));
+}
+
+SRWSaveManager.prototype.setEquipablesData = function(data){	
+	$gameSystem.equipablesData = data;	
 }
 
 SRWSaveManager.prototype.storeActorData = function(actorId, data){

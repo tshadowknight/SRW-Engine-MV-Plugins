@@ -1,0 +1,578 @@
+#upgrade_equip_weapon .upgrade_controls {
+	position: absolute;
+    height: 59%;
+    top: 27%;
+    border: 0.1vw solid #FFFFFF;
+    border-radius: 1vw;
+    left: 26%;
+    width: 69%;
+    background-color: var(--section-bg-color);
+}
+
+#upgrade_equip_weapon .item_list_container {
+	position: absolute;
+    width: 45%;
+    height: 48%;
+    top: 18%;
+    left: 50%;
+    opacity: 0.5;
+    background-color: rgba(0,0,0,0);
+}
+
+#upgrade_equip_weapon .item_list_container.active {
+	opacity: 1;
+}
+
+#upgrade_equip_weapon .item_list_container.active .item_list_row.selected{
+	background-color: var(--selected-color);
+}
+
+#upgrade_equip_weapon .upgrade_controls.inactive {
+	opacity: 0.5;
+}
+
+#upgrade_equip_weapon .tool_tip{
+	border: 0.1vw solid #FFFFFF;
+    border-radius: 1vw;
+    top: 64%;
+    left: 4%;
+    padding: 0%;
+    width: 91%;
+    height: 32%;
+    position: absolute;
+    background-color: var(--section-bg-color);
+    color: #FFFFFF;
+    display: flex;
+    white-space: nowrap;
+    flex-wrap: wrap;
+}
+
+#upgrade_equip_weapon .weapon_upgrade_container {
+	margin: 1%;
+	width: 98%;
+	height: 15%;
+	border: 0.1vw solid var(--underline-color);
+}
+
+#upgrade_equip_weapon .stat_upgrade_container {
+	margin: 1%;
+	width: 98%;
+	height: 73%;
+	border: 0.1vw solid var(--underline-color);
+}
+
+#upgrade_equip_weapon .upgrade_entry {
+	display: flex;
+	align-items: center;
+	position: relative;
+}
+
+#upgrade_equip_weapon .upgrade_entry.selected {
+	background-color: var(--selected-color);
+}
+
+#upgrade_equip_weapon .upgrade_entry_label {
+	--fontsize: 2px;
+	color: var(--text-color-highlight);
+	margin-left: 3%;
+}
+
+#upgrade_equip_weapon .upgrade_entry_current {
+	--fontsize: 2px;
+	color: #FFFFFF;
+	margin-left: auto;
+
+}
+
+
+#upgrade_equip_weapon .upgrade_entry_new {
+	--fontsize: 2px;
+	color: #FFFFFF;
+	width: 12%;
+	margin-right: 30%;
+	text-align: right;
+}
+
+#upgrade_equip_weapon .upgrade_entry_bar .upgrade_bar {
+	position: absolute;
+    width: 20%;
+    height: 50%;
+    right: 5%;
+    top: 21%;
+	padding: 0.2%;
+}
+
+#upgrade_equip_weapon .fund_display {
+	position: absolute;
+    height: 20%;
+    top: 66%;
+    border: 0.1vw solid #FFFFFF;
+    border-radius: 1vw;
+    width: 20%;
+    left: 5%;
+	background-color: var(--section-bg-color);
+}
+
+#upgrade_equip_weapon .fund_entries {
+	height: 90%;
+}
+
+#upgrade_equip_weapon .fund_entry {
+	display: flex;
+	align-items: flex-end;
+	width: 90%;
+	margin-left: 5%;
+	border-bottom: 0.1vw solid var(--underline-color);
+	height: 33%;
+}
+
+#upgrade_equip_weapon .fund_entry:first {
+	
+}
+
+#upgrade_equip_weapon .fund_entry_label {
+	color: var(--text-color-highlight);
+}
+
+#upgrade_equip_weapon .fund_entry_value {
+	color: #FFFFFF;
+	margin-left: auto;
+}
+
+#upgrade_equip_weapon .fund_entry_value.underflow {
+	color: #FF0000;
+}
+
+#upgrade_equip_weapon .upgrade_level_display {
+	position: absolute;
+    display: flex;
+    left: 73%;
+    top: 47.5%;
+    width: 20%;
+    height: 2%;
+    background-color: var(--section-bg-color);
+    border-radius: 999px;
+    padding: 1%;
+    align-items: center;
+	border: 0.1vw solid #FFFFFF;
+}
+
+#upgrade_equip_weapon .upgrade_level_label {
+	color: var(--text-color-highlight);
+}
+
+#upgrade_equip_weapon .upgrade_level_value {
+	color: #FFFFFF;
+	margin-left: auto;
+}
+
+#upgrade_equip_weapon .upgrade_mech_name {
+	position: absolute;
+    left: 5%;
+    top: 17%;
+    width: 40%;
+    height: 0.5%;
+    display: flex;
+    z-index: 1;
+    align-items: flex-end;
+    padding-left: 2%;
+    background: -moz-linear-gradient(left,  rgba(148,211,252,1) 45%, rgba(134,198,241,1) 66%, rgba(112,176,224,0) 100%);
+	background: -webkit-linear-gradient(left,  rgba(148,211,252,1) 45%,rgba(134,198,241,1) 66%,rgba(112,176,224,0) 100%);
+	background: linear-gradient(to right,  rgba(148,211,252,1) 45%,rgba(134,198,241,1) 66%,rgba(112,176,224,0) 100%);
+	filter: progid:DXImageTransform.Microsoft.gradient( startColorstr='#94d3fc', endColorstr='#0070b0e0',GradientType=1 );
+}
+
+#upgrade_equip_weapon #upgrade_name_icon {
+	width: 10%;
+}
+
+#upgrade_equip_weapon .upgrade_mech_name_value {
+	color: #FFFFFF;
+	margin-left: 5%;
+}
+
+#upgrade_equip_weapon .attack_list_container {
+	position: absolute;	
+	left: 5%;
+    top: 18.5%;
+    width: 90%;
+    height: 34%;
+}
+
+#upgrade_equip_weapon .pilot_info {
+	position: absolute;
+	border: 0.1vw solid #FFFFFF;
+	height: 52%;
+    width: 20%;
+    top: 13%;
+    left: 5%;
+	background-color: var(--section-bg-color);
+	border-radius: 1vw;
+}
+
+#upgrade_equip_weapon_icon {
+	background-color: rgba(85, 164, 255, 0.5);
+	border: 0.1vw solid #99e3ff;
+	width: 70%;
+    margin-left: 15%;
+    margin-top: 15%;
+}
+
+.pilot_basic_info {
+	--fontsize: 2px;
+	border: 0.1vw solid rgba(200,200,200,0.5);
+	height: 25%;
+    width: 90%;
+    margin-left: auto;
+    margin-right: auto;
+    margin-top: 15%;
+}
+
+.pilot_basic_info .pilot_name {
+	width: 100%;
+	text-align: center;
+	color: #FFFFFF;
+}
+
+.pilot_lv_sp {
+	display: flex;
+}
+
+.pilot_lv {
+	display: inline-flex;
+	width: 40%;
+	margin-left: 7%;
+	border-bottom: 0.1vw solid var(--underline-color);
+}
+
+.pilot_sp {
+	display: inline-flex;
+	width: 40%;
+	margin-left: 7%;
+	border-bottom: 0.1vw solid var(--underline-color);
+}
+
+.pilot_basic_info .pilot_lv_sp .label {
+	display: flex;
+	color: var(--text-color-highlight);
+}
+
+.pilot_basic_info .pilot_lv_sp .value {
+	display: flex;
+	margin-left: auto;
+	color: #FFFFFF;
+}
+
+.upgrade_control_row {
+	display: flex;
+	width: 90%;
+	margin-left: auto;
+	margin-right: auto;
+	border-bottom: 0.1vw solid var(--underline-color);
+	--fontsize: 1.9px;
+}
+
+.upgrade_control_row.selected{
+	background-color: var(--selected-color);
+}
+
+.upgrade_control_row.header {
+	border-bottom: 0.1vw solid rgba(0,0,0,0);
+}
+
+.upgrade_control_row.header .upgrade_control_block{
+	color: var(--text-color-highlight);
+}
+
+.upgrade_control_block {
+	color: #FFFFFF;
+	display: inline-flex;
+	align-items: center;
+}
+
+.upgrade_control_block .stat_label {
+	color: var(--text-color-highlight2);
+	width: 40%;
+}
+
+.upgrade_control_block .stat_value {
+	margin-left: 5%;
+}
+
+.upgrade_control_block .stat_value_upgraded {
+	margin-right: 10%;
+}
+
+.upgrade_control_block .chevron_right {
+	margin-left: 20%;
+}
+
+.upgrade_control_block:nth-child(1) {
+	width: 40%;
+}
+
+.upgrade_control_block:nth-child(2) {
+	width: 40%;
+}
+
+.upgrade_control_block:nth-child(3) {
+	width: 20%;	
+	justify-content: center;
+}
+
+.tab_button {
+	position: absolute;
+	color: #AAAAAA;
+	border: 0.1vw solid #AAAAAA;
+	display: flex;
+	align-items: center;
+	justify-content: center;
+	top: 5%;
+	padding: 0.4%;
+	border-radius: 999px;
+	width: 20%;
+}
+
+.tab_button.selected {
+	color: #FFFFFF;
+	border: 0.1vw solid #FFFFFF;
+}
+
+.pilot_stats_button {	
+    left: 38%;   
+}
+
+.abilities_button {	
+    left: 60%;   
+}
+
+.current_abilities {
+	position: absolute;
+    height: 59%;
+    top: 27%;
+    border: 0.1vw solid #FFFFFF;
+    border-radius: 1vw;
+    left: 26%;
+    width: 20%;
+    background-color: var(--section-bg-color);
+}
+
+.current_abilities.inactive {
+	opacity: 0.5;
+}
+
+#upgrade_equip_weapon .abilities_label {
+	color: var(--text-color-highlight);
+	height: 10%;
+	padding-left: 5%;
+	--fontsize: 2px;
+}
+
+
+#upgrade_equip_weapon .pilot_stat_container.selected {
+	color: #FFFFFF;
+	background-color: var(--selected-color);
+}
+
+#upgrade_equip_weapon .stat_value {
+	margin-left: 0;
+}
+
+.unique_skill_mark {
+	width: 1px;
+}
+
+
+#upgrade_equip_weapon .ability_list_container.inactive {
+	opacity: 0.5;
+}
+
+#upgrade_equip_weapon .slot_selection {
+	border: 0.1vw solid #FFFFFF;
+    border-radius: 1vw;
+    top: 21%;
+    left: 4%;
+    padding: 0.5%;
+    width: 44.4%;
+    height: 39%;
+    position: absolute;
+    background-color: var(--section-bg-color);
+    color: #FFFFFF;
+	opacity: 0.5;
+}
+
+#upgrade_equip_weapon .slot_selection.active {
+	opacity: 1;
+}
+
+#upgrade_equip_weapon .item_slot {
+	border: 0.1vw solid #FFFFFF;
+    margin-top: 1%;
+	width: 50%;
+	margin-left: auto;
+	margin-right: auto;
+	height: 17%;
+	display: flex;
+	justify-content: center;
+	align-items: center;
+}
+
+#upgrade_equip_weapon .item_slot.selected {
+	background-color: var(--selected-color);
+    color: #FFFFFF;
+}
+
+#upgrade_equip_weapon .transfer_selection{
+	border: 0.1vw solid #FFFFFF;
+    border-radius: 1vw;
+    background-color: var(--section-bg-color);	
+	position: absolute;
+    width: 45%;
+    height: 38%;
+    top: 18%;
+    left: 50%;
+	display: flex;
+}
+
+#upgrade_equip_weapon .transfer_selection .item_slot{
+	height: 17%;
+	width: 90%;
+	color: #FFFFFF;
+}
+
+#upgrade_equip_weapon .transfer_selection .item_slot .mech_pic_container{
+	width: 65%;
+}
+
+#upgrade_equip_weapon .transfer_column {
+	width: 50%;
+	padding-top: 2%;
+}
+
+#upgrade_equip_weapon .upgrade_mech_name {
+	position: absolute;
+    left: 5%;
+    top: 17%;
+    width: 40%;
+    height: 0.5%;
+    display: flex;
+    z-index: 1;
+    align-items: flex-end;
+    padding-left: 2%;
+    background: -moz-linear-gradient(left,  rgba(148,211,252,1) 45%, rgba(134,198,241,1) 66%, rgba(112,176,224,0) 100%);
+	background: -webkit-linear-gradient(left,  rgba(148,211,252,1) 45%,rgba(134,198,241,1) 66%,rgba(112,176,224,0) 100%);
+	background: linear-gradient(to right,  rgba(148,211,252,1) 45%,rgba(134,198,241,1) 66%,rgba(112,176,224,0) 100%);
+	filter: progid:DXImageTransform.Microsoft.gradient( startColorstr='#94d3fc', endColorstr='#0070b0e0',GradientType=1 );
+}
+
+#upgrade_equip_weapon_upgrade_name_icon {
+	width: 10%;
+}
+
+.basic_info_container {
+	width: 100%;
+}
+
+.basic_detail {
+	width: 100%;
+    display: flex;
+    align-items: center;
+}
+
+#upgrade_equip_weapon .item_list_container {
+	height: 44%;
+}
+
+#upgrade_equip_weapon #item_list_control {
+	height: 100%;
+}
+
+#upgrade_equip_weapon .summary_row {
+	height: 14%;
+}
+
+
+
+#upgrade_equip_weapon .weapon_entry_content .weapon_upgrades {
+	--widthpixels: 120;
+	--heightpixels: 14;
+}
+
+#upgrade_equip_weapon .weapon_entry_content .weapon_upgrades.active .upgrade_bar{
+	border: 0.1vw solid var(--text-color-highlight2);
+}
+
+#upgrade_equip_weapon .weapon_entry_content .weapon_upgrades .upgrade_bar{
+	height: 100%;
+}
+
+#upgrade_equip_weapon .item_list_row .item_list_block:nth-child(1) {
+	width: 100%;
+
+}
+#upgrade_equip_weapon .weapon_entry_content .weapon_name {
+	width: 59%;
+}
+
+#upgrade_equip_weapon .fund_display {
+	position: absolute;
+    height: 44%;
+    top: 18%;
+    border: 0.1vw solid #FFFFFF;
+    border-radius: 1vw;
+    width: 45%;
+    left: 4%;
+    background-color: var(--section-bg-color);
+}
+
+
+#upgrade_equip_weapon .fund_entries {
+	height: 90%;
+}
+
+#upgrade_equip_weapon #btn_apply {
+	width: 33%;
+    color: #FFFFFF;
+    border: 0.1vw solid #FFFFFF;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    top: 5%;
+    padding: 0.4%;
+    border-radius: 999px;
+    margin-left: auto;
+    margin-right: auto;
+    margin-top: 4.5%;
+    --fontsize: 2.4px;
+}
+
+#upgrade_equip_weapon #btn_apply.disabled {
+	color: #888888;
+	border: 0.1vw solid #FFFFFF;
+}
+
+#upgrade_equip_weapon .fund_entry {
+	display: flex;
+	align-items: flex-end;
+	width: 90%;
+	margin-left: 5%;
+	border-bottom: 0.1vw solid var(--underline-color);
+	height: 25%;
+}
+
+#upgrade_equip_weapon .fund_entry:first {
+	
+}
+
+#upgrade_equip_weapon .fund_entry_label {
+	color: var(--text-color-highlight);
+}
+
+#upgrade_equip_weapon .fund_entry_value {
+	color: #FFFFFF;
+	margin-left: auto;
+}
+
+#upgrade_equip_weapon .fund_entry_value.underflow {
+	color: #FF0000;
+}

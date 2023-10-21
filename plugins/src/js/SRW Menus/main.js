@@ -111,8 +111,16 @@ import Window_ZoneStatus from "./Window_ZoneStatus.js";
 window.Window_ZoneStatus = Window_ZoneStatus;
 
 import Window_ZoneSummary from "./Window_ZoneSummary.js";
-window.Window_ZoneSummary = Window_ZoneSummary;
+window.Window_ZoneSummary = Window_ZoneSummary;	
 
+import Window_EquipWeaponSelection from "./Window_EquipWeaponSelection.js";
+window.Window_EquipWeaponSelection = Window_EquipWeaponSelection;
+
+import Window_EquipWeapon from "./Window_EquipWeapon.js";
+window.Window_EquipWeapon= Window_EquipWeapon;
+
+import Window_UpgradeEquipWeapon from "./Window_UpgradeEquipWeapon.js";
+window.Window_UpgradeEquipWeapon= Window_UpgradeEquipWeapon;
 
 import "./style/SRW_Menus.css";
 

@@ -1,10 +1,11 @@
 import Window_CSS from "./Window_CSS.js";
 import "./style/AttackList.css";
 
-export default function DetailBarAttackSummary(container, selectionProvider){
+export default function DetailBarAttackSummary(container, selectionProvider, includeBasicInfo){
 	this._container = container;
 	this._selectionProvider = selectionProvider;
 	this._attackValidator;
+	this._includeBasicInfo = includeBasicInfo;
 }
 
 DetailBarAttackSummary.prototype = Object.create(Window_CSS.prototype);
@@ -28,7 +29,30 @@ DetailBarAttackSummary.prototype.padCostValue = function(value){
 
 DetailBarAttackSummary.prototype.redraw = function(){
 	var detailContent = "";
-	var attackData = this.getCurrentSelection() || {totalAmmo: -1, ENCost: -1, willRequired: -1, effects: [], MPCost: -1};
+	if(!$gameTemp.currentMenuUnit){	
+		let refUnit = {
+			SRWInitialized: false,
+			SRWStats: {
+				pilot: {
+					
+				},
+				mech: {
+					id: -1,
+					stats: {
+						calculated: {
+							currentEN: "---"
+						},
+						upgradeLevels: {}
+					}
+				}
+			}
+		};
+		$gameTemp.currentMenuUnit = {
+			actor: refUnit,
+			mech: refUnit.SRWStats.mech
+		};
+	}
+	var attackData = this.getCurrentSelection() || {totalAmmo: -1, ENCost: -1, willRequired: -1, effects: [], MPCost: -1, isEmpty: true};
 	var mechData = $gameTemp.currentMenuUnit.mech;
 	var actor = $statCalc.getCurrentPilot($gameTemp.currentMenuUnit.mech.id);
 	if(!actor){
@@ -39,7 +63,81 @@ DetailBarAttackSummary.prototype.redraw = function(){
 	var calculatedStats = mechData.stats.calculated;
 	var upgradeLevels = mechData.stats.upgradeLevels;
 	
-
+	if(this._includeBasicInfo){
+		
+		var listContent = "";
+		listContent+="<div class='basic_info_container'>";
+		listContent+="<div class='attack_list_row header summary'>";
+	
+		listContent+="<div class='attack_list_block header scaled_text '></div>";
+		listContent+="<div class='attack_list_block header scaled_text fitted_text'>"+APPSTRINGS.ATTACKLIST.label_attack_name+"</div>";
+		listContent+="<div class='attack_list_block header scaled_text '>"+APPSTRINGS.ATTACKLIST.label_attributes+"</div>";
+		listContent+="<div class='attack_list_block header scaled_text '>"+APPSTRINGS.ATTACKLIST.label_power+"</div>";
+		listContent+="<div class='attack_list_block header scaled_text '>"+APPSTRINGS.ATTACKLIST.label_range+"</div>";
+		listContent+="<div class='attack_list_block header scaled_text '>"+APPSTRINGS.ATTACKLIST.label_hit+"</div>";
+		listContent+="<div class='attack_list_block header scaled_text '>"+APPSTRINGS.ATTACKLIST.label_crit+"</div>";
+	
+		listContent+="</div>";
+		
+		listContent+="<div class='attack_list_row summary'>";
+		
+		
+		listContent+="<div class='attack_list_block scaled_text'>";
+		if(attackData.type == "M"){
+			listContent+="<img class='attack_list_type scaled_width' src='svg/punch_blast.svg'>";
+		} else if(attackData.type == "R"){
+			listContent+="<img class='attack_list_type scaled_width' src='svg/crosshair.svg'>";
+		}
+		
+		listContent+="</div>";
+		listContent+="<div class='attack_list_block scaled_text fitted_text'>"+(attackData.name || "---")+"</div>";
+		listContent+="<div class='attack_list_block scaled_text'>"+this.createAttributeBlock(attackData)+"</div>";
+		var currentPower = $statCalc.getWeaponPower(actor, attackData)*1;
+		
+		if(attackData.type == "M"){ //melee		
+			currentPower = $statCalc.applyStatModsToValue(actor, currentPower, ["weapon_melee"]);
+		} else if(attackData.type == "R"){ //ranged
+			currentPower = $statCalc.applyStatModsToValue(actor, currentPower, ["weapon_ranged"]);
+		}
+		
+		var tagBoostInfo = $statCalc.getModDefinitions(actor, ["weapon_type_boost"]);
+		for(const modDef of tagBoostInfo){
+			if(modDef.tag == attackData.particleType){
+				currentPower+=modDef.value;
+			}
+		}
+		if(!attackData.isEmpty){
+			listContent+="<div class='attack_list_block scaled_text "+$statCalc.getWeaponPowerStatState(actor, attackData)+"'>"+currentPower+"</div>";
+		} else {
+			listContent+="<div class='attack_list_block scaled_text "+$statCalc.getWeaponPowerStatState(actor, attackData)+"'>----</div>";
+		}
+		if(attackData.isEmpty){
+			listContent+="<div class='attack_list_block scaled_text'>---</div>";
+		}else if(attackData.isMap){
+			listContent+="<div class='attack_list_block scaled_text'>---</div>";
+		} else {
+			var minRange = $statCalc.getRealWeaponMinRange($gameTemp.currentMenuUnit.actor, attackData);
+			listContent+="<div class='attack_list_block scaled_text "+$statCalc.getWeaponRangeStatState(actor, attackData)+"'>"+(minRange ? minRange : "1")+"-"+$statCalc.getRealWeaponRange($gameTemp.currentMenuUnit.actor, attackData)+"</div>";
+		}
+		
+		var hitMod = attackData.hitMod;
+		if(attackData.hitMod >= 0){
+			hitMod = "+"+attackData.hitMod;
+		}
+		listContent+="<div class='attack_list_block scaled_text'>"+(hitMod || "--")+"</div>";
+		var critMod = attackData.critMod;
+		if(attackData.critMod >= 0){
+			critMod = "+"+attackData.critMod;
+		}
+		listContent+="<div class='attack_list_block scaled_text'>"+(critMod || "--")+"</div>";
+		listContent+="</div>";
+		listContent+="</div>";
+		
+		detailContent+="<div class='basic_detail'>";
+		detailContent+=listContent;
+		detailContent+="</div>";
+		detailContent+="<div class='break'></div>";
+	}
 	
 	detailContent+="<div class='summary_flex'>";	
 	
@@ -49,17 +147,18 @@ DetailBarAttackSummary.prototype.redraw = function(){
 	detailContent+="<div class='summary_row_label scaled_text'>";
 	detailContent+=APPSTRINGS.ATTACKLIST.label_ammo;
 	detailContent+="</div>";
+	let currentAmmo = $statCalc.getCurrentAmmo(actor, attackData);
 	if(attackData.totalAmmo == -1){
 		detailContent+="<div class='summary_row_value scaled_text disabled'>";
 		detailContent+="-- / --";
 		detailContent+="</div>";
-	} else if(attackData.currentAmmo < 0) {
+	} else if(currentAmmo <= 0) {
 		detailContent+="<div class='summary_row_value scaled_text insufficient'>";
-		detailContent+=attackData.currentAmmo + " / " + attackData.totalAmmo;
+		detailContent+=currentAmmo + " / " + attackData.totalAmmo;
 		detailContent+="</div>";
 	} else {
 		detailContent+="<div class='summary_row_value scaled_text'>";
-		detailContent+=attackData.currentAmmo + " / " + attackData.totalAmmo;
+		detailContent+=currentAmmo + " / " + attackData.totalAmmo;
 		detailContent+="</div>";
 	}		
 	detailContent+="</div>";
@@ -183,20 +282,20 @@ DetailBarAttackSummary.prototype.redraw = function(){
 	
 	detailContent+="<div class='summary_row_value scaled_text disabled'>";
 	
-	detailContent+="<div class='ability_block_row terrain scaled_height'>";
-	detailContent+="<div class='pilot_stat_container scaled_text scaled_width'>";
+	detailContent+="<div class='ability_block_row terrain scaled_height weapon_terrain_string'>";
+	detailContent+="<div class='pilot_stat_container scaled_text '>";
 	detailContent+="<div class='stat_label'>"+APPSTRINGS.GENERAL.label_AIR+"</div>";
 	detailContent+="<div class='stat_value'>"+(terrainStrings.air || "-")+"</div>";
 	detailContent+="</div>";
-	detailContent+="<div class='pilot_stat_container scaled_text scaled_width'>";
+	detailContent+="<div class='pilot_stat_container scaled_text '>";
 	detailContent+="<div class='stat_label'>"+APPSTRINGS.GENERAL.label_LND+"</div>";
 	detailContent+="<div class='stat_value'>"+(terrainStrings.land || "-")+"</div>";
 	detailContent+="</div>";
-	detailContent+="<div class='pilot_stat_container scaled_text scaled_width'>";
+	detailContent+="<div class='pilot_stat_container scaled_text '>";
 	detailContent+="<div class='stat_label'>"+APPSTRINGS.GENERAL.label_SEA+"</div>";
 	detailContent+="<div class='stat_value'>"+(terrainStrings.water || "-")+"</div>";
 	detailContent+="</div>";
-	detailContent+="<div class='pilot_stat_container scaled_text scaled_width'>";
+	detailContent+="<div class='pilot_stat_container scaled_text '>";
 	detailContent+="<div class='stat_label'>"+APPSTRINGS.GENERAL.label_SPC+"</div>";
 	detailContent+="<div class='stat_value'>"+(terrainStrings.space || "-")+"</div>";
 	detailContent+="</div>";
@@ -241,7 +340,13 @@ DetailBarAttackSummary.prototype.redraw = function(){
 	detailContent+="</div>";
 	
 	detailContent+="<div class='summary_row_value scaled_text disabled'>";
-	detailContent+=this.createUpgradeBarScaled(upgradeLevels.weapons);
+	let upgradeAmount = 0;
+	if(attackData.isEquipable){
+		upgradeAmount = attackData.upgrades;
+	} else {
+		upgradeAmount = upgradeLevels.weapons;
+	}
+	detailContent+=this.createUpgradeBarScaled(upgradeAmount);
 	detailContent+="</div>";
 		
 	detailContent+="</div>";	

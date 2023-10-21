@@ -146,6 +146,8 @@ APPSTRINGS.INTERMISSION = {
 	upgrade_label: "Upgrade",
 	equip_parts: "Equip Parts",
 	sell_parts: "Sell Parts",
+	equip_weapons: "Equip Weapons",
+	upgrade_equip_weapon: "Upgrade Equips",
 	pilot_label: "Pilot",
 	next_map: "Next Map",
 	tool_tips: {
@@ -279,12 +281,17 @@ APPSTRINGS.PILOTUPGRADES = {
 APPSTRINGS.MECHEQUIPS = {
 	select_title: "Select Unit",
 	title: "Equip Items",
+	weapon_title: "Equip Weapons",
+	weapon_upgrade_title: "Upgrade Equips",
 	label_balance: "Balance",
 	label_price: "Worth",
 	label_sell: "To Sell",
 	label_total: "Total",
 	label_available: "Available",
 	label_transfer_hint: "Select a unit to take the item from.",
+	label_weight: "Weight",
+	label_upgrades: "Upgrades",
+	label_holder: "Mech",
 }
 
 APPSTRINGS.SELLITEMS = {
@@ -640,6 +647,13 @@ EDITORSTRINGS.WEAPON = {
 	hint_no_cost: "-1 means no cost or requirement",
 	label_effects: "Effects",
 	label_combo_attack: "Combo Attack",
+	label_equipable: "Equipable Properties",
+	label_cost_type: "Cost Type",
+	label_upgrade_amount: "Upgrade Amount",
+	label_weight: "Weight",
+	
+	label_banned_mechs: "Banned on ids",
+	label_allowed_mechs: "Allowed on ids",
 	
 	label_type: "Type",
 	
@@ -727,10 +741,13 @@ EDITORSTRINGS.MECH = {
 	label_animations: "Animations",
 	
 	
+	
+	
 	hint_fallback: "Falling back to Battle Scene sprite because no Menu Sprite is defined!",
 	label_warn_fallback: "Using fallback!",
 	label_stats_label: "Stats Label",
 	label_is_ship: "Is Ship",
+	label_can_equip: "Can Equip",
 	label_can_hover: "Can Hover",
 	label_sync_parts: "Sync Parts With",
 	label_sync_upgrades: "Sync Upgrades With",
@@ -744,6 +761,7 @@ EDITORSTRINGS.MECH = {
 	label_tags: "Tags",
 	label_attribute1: "Attribute 1",
 	label_attribute2: "Attribute 2",
+	label_carrying_capacity: "Carrying Capacity",
 	
 	title_FUB: "Full Upgrade Bonus",
 	label_FUB: "FUB",

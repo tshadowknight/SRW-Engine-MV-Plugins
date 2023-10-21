@@ -97,6 +97,7 @@ var $patternManager = new PatternManager();
 var $abilityZoneManager = new AbilityZoneManager();
 
 var $inventoryManager = new SRWInventoryManager();
+var $equipablesManager = new SRWEquipablesManager();
 
 var $terrainTypeManager = new TerrainTypeManager();
 
@@ -466,8 +467,11 @@ SceneManager.isInSaveScene = function(){
 		this.createPilotUpgradeSelectionWindow();
 		this.createPilotUpgradeWindow();
 		this.createItemEquipWindow();
+		this.createWeaponEquipWindow();
+		this.createWeaponUpgradeWindow();
 		this.createItemSellWindow();
 		this.createItemEquipSelectionWindow();
+		this.createWeaponEquipSelectionWindow();
 		this.createMinimalBattleWindow();
 		this.createSpiritAnimWindow();
 		this.createDetailPagesWindow();
@@ -861,6 +865,24 @@ SceneManager.isInSaveScene = function(){
 		this.idToMenu["equip_item"] = this._itemEquipWindow;
     };	
 	
+	Scene_Map.prototype.createWeaponEquipWindow = function() {
+		var _this = this;
+		this._weaponEquipWindow = new Window_EquipWeapon(0, 0, Graphics.boxWidth, Graphics.boxHeight);
+		this._weaponEquipWindow.close();
+		this.addWindow(this._weaponEquipWindow);
+		this._weaponEquipWindow.hide();
+		this.idToMenu["equip_weapon"] = this._weaponEquipWindow;
+    };	
+	
+	Scene_Map.prototype.createWeaponUpgradeWindow = function() {
+		var _this = this;
+		this._weaponUpgradeWindow = new Window_UpgradeEquipWeapon(0, 0, Graphics.boxWidth, Graphics.boxHeight);
+		this._weaponUpgradeWindow.close();
+		this.addWindow(this._weaponUpgradeWindow);
+		this._weaponUpgradeWindow.hide();
+		this.idToMenu["upgrade_equip_weapon"] = this._weaponUpgradeWindow;
+    };	
+	
 	Scene_Map.prototype.createItemSellWindow = function() {
 		var _this = this;
 		this._itemSellWindow = new Window_SellItem(0, 0, Graphics.boxWidth, Graphics.boxHeight);
@@ -879,6 +901,15 @@ SceneManager.isInSaveScene = function(){
 		this._itemEquipSelectWindow.hide();
 		this.idToMenu["equip_item_select"] = this._itemEquipSelectWindow;
     };		
+	
+	Scene_Map.prototype.createWeaponEquipSelectionWindow = function() {
+		var _this = this;
+		this._weaponEquipSelectWindow = new Window_EquipWeaponSelection(0, 0, Graphics.boxWidth, Graphics.boxHeight);
+		this._weaponEquipSelectWindow.close();
+		this.addWindow(this._weaponEquipSelectWindow);
+		this._weaponEquipSelectWindow.hide();
+		this.idToMenu["equip_weapon_select"] = this._weaponEquipSelectWindow;
+    };	
 	
 	Scene_Map.prototype.createMinimalBattleWindow = function() {
 		var _this = this;
@@ -1886,7 +1917,7 @@ SceneManager.isInSaveScene = function(){
 										
 							actor.setMp(actor.mp - Math.floor(ENCost));
 							if(weapon){
-								weapon.currentAmmo-=battleResult.ammoUsed;
+								$statCalc.modifyCurrentAmmo(actor, weapon, battleResult.ammoUsed * -1);
 							}
 							var MPCost = battleResult.MPCost;
 							if(MPCost){

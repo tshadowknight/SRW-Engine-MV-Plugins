@@ -478,6 +478,137 @@ StatCalc.prototype.getPilotStatInfo = function(actorProperties){
 	}
 }
 
+StatCalc.prototype.parseWeaponDef = function(actor, isLocked, weaponDefinition, weaponProperties, currentWeaponsLookup){
+	var totalAmmo = parseInt(weaponProperties.weaponAmmo);
+	if(actor){
+		totalAmmo = Math.ceil(this.applyStatModsToValue(actor, totalAmmo, ["ammo"]));
+	}
+	
+	var effects = [];
+	for(var j = 0; j < 10; j++){
+		if(weaponProperties["weaponEffect"+j]){
+			effects[j] = {idx: String(weaponProperties["weaponEffect"+j]).trim() * 1, targeting: "all"};
+			if(weaponProperties["weaponEffectTargeting"+j]){
+				effects[j].targeting = weaponProperties["weaponEffectTargeting"+j];
+			}
+		}
+		
+	}
+	var isMap = false;
+	var mapId;
+	
+	if(weaponProperties.weaponMapId){
+		isMap = true;
+		mapId = JSON.parse(weaponProperties.weaponMapId);
+	}
+	var ignoresFriendlies = weaponProperties.weaponIgnoresFriendlies;
+	if(ignoresFriendlies == null || ignoresFriendlies == ""){//hack to ensure backwards compatibility for old weapon definitions
+		ignoresFriendlies = true;
+	} else {
+		ignoresFriendlies = ignoresFriendlies * 1;
+	}	
+
+	var enemiesCounter = weaponProperties.weaponEnemiesCounter;
+	if(enemiesCounter == null || enemiesCounter == ""){//hack to ensure backwards compatibility for old weapon definitions
+		enemiesCounter = true;
+	} else {
+		enemiesCounter = enemiesCounter * 1;
+	}	
+
+	var alliesCounter = weaponProperties.weaponAlliesCounter;
+	if(alliesCounter == null || alliesCounter == ""){//hack to ensure backwards compatibility for old weapon definitions
+		alliesCounter = true;
+	} else {
+		alliesCounter = alliesCounter * 1;
+	}	
+	
+	var isCombination = false;
+	var combinationWeapons = [];
+	var combinationType = 0;
+	if(weaponProperties.weaponComboWeapons){
+		isCombination = true;
+		combinationWeapons = JSON.parse(weaponProperties.weaponComboWeapons);
+	}
+	if(weaponProperties.weaponComboType){
+		combinationType = weaponProperties.weaponComboType;
+	}
+	var currentAmmo;
+	var currentWeapon;
+
+	if(currentWeaponsLookup){
+		currentWeapon = currentWeaponsLookup[parseInt(weaponDefinition.id)];
+	}	
+	if(currentWeapon){
+		currentAmmo = currentWeapon.currentAmmo;
+	} else {
+		currentAmmo = totalAmmo;
+	}
+	
+	var HPThreshold = -1;
+	if(weaponProperties.weaponHPThreshold){
+		HPThreshold = weaponProperties.weaponHPThreshold * 1;
+	}
+	let animId = parseInt(weaponProperties.weaponAnimId);
+	if(isNaN(animId)){
+		animId = -1;
+	}
+	let vsAllyAnimId = parseInt(weaponProperties.weaponVSAllyAnimId);
+	if(isNaN(vsAllyAnimId)){
+		vsAllyAnimId = -1;
+	}
+	let invalidTargetTags = {};
+	if(weaponProperties.weaponInvalidTags){					
+		var parts = weaponProperties.weaponInvalidTags.split(",");
+		parts.forEach(function(tag){
+			invalidTargetTags[String(tag).trim()] = true;
+		});				
+	}
+	return {
+		id: parseInt(weaponDefinition.id),
+		name: weaponDefinition.name,
+		type: weaponProperties.weaponType,
+		attribute1: weaponProperties.weaponAttribute1,
+		attribute2: weaponProperties.weaponAttribute2,
+		postMoveEnabled: parseInt(weaponProperties.weaponPostMoveEnabled),
+		power: parseInt(weaponProperties.weaponPower),
+		minRange: parseInt(weaponProperties.weaponMinRange),
+		range: parseInt(weaponProperties.weaponRange),
+		hitMod: parseInt(weaponProperties.weaponHitMod),
+		critMod: parseInt(weaponProperties.weaponCritMod),
+		totalAmmo: totalAmmo,
+		currentAmmo: currentAmmo,
+		ENCost: parseInt(weaponProperties.weaponEN),
+		MPCost: parseInt(weaponProperties.weaponMP || 0),
+		willRequired: parseInt(weaponProperties.weaponWill),
+		terrain: this.parseTerrainString(weaponProperties.weaponTerrain),
+		effects: effects,
+		particleType: (weaponProperties.weaponCategory || "").trim(), //missile, funnel, beam, gravity, physical or "".
+		animId: animId,
+		vsAllyAnimId: vsAllyAnimId,
+		isMap: isMap, 
+		mapId: mapId,
+		ignoresFriendlies: ignoresFriendlies,
+		ignoresEnemies: weaponProperties.weaponIgnoresEnemies*1 || 0,
+		isCombination: isCombination,
+		combinationWeapons: combinationWeapons,
+		combinationType: combinationType,
+		isLocked: isLocked,
+		isCounter: parseInt(weaponProperties.weaponIsCounter),
+		isCounterOnly: parseInt(weaponProperties.weaponIsCounterOnly),
+		upgradeType: parseInt(weaponProperties.weaponUpgradeType) || 0,
+		isSelfDestruct: parseInt(weaponProperties.weaponIsSelfDestruct),
+		isAll: parseInt(weaponProperties.weaponIsAll),
+		HPThreshold: HPThreshold,
+		enemiesCounter: enemiesCounter,
+		alliesCounter: alliesCounter,
+		enemiesInteraction: weaponProperties.weaponEnemyInteraction || "damage_and_status",
+		alliesInteraction: weaponProperties.weaponAllyInteraction || "damage_and_status",
+		invalidTargetTags: invalidTargetTags,
+		costType: parseInt(weaponProperties.weaponCostType)|| 0,
+		weight: parseInt(weaponProperties.weaponWeight)|| 0,		
+	};
+}
+
 StatCalc.prototype.getMechWeapons = function(actor, mechProperties, previousWeapons){
 	var result = [];
 	var currentWeaponsLookup = {};
@@ -495,125 +626,8 @@ StatCalc.prototype.getMechWeapons = function(actor, mechProperties, previousWeap
 			if(weaponId !== undefined && weaponId !== "" && weaponId != 0 && $dataWeapons[weaponId]){
 				var weaponDefinition = $dataWeapons[weaponId];
 				var weaponProperties = weaponDefinition.meta;
-				var totalAmmo = parseInt(weaponProperties.weaponAmmo);
-				totalAmmo = Math.ceil(this.applyStatModsToValue(actor, totalAmmo, ["ammo"]));
-				var effects = [];
-				for(var j = 0; j < 10; j++){
-					if(weaponProperties["weaponEffect"+j]){
-						effects[j] = {idx: String(weaponProperties["weaponEffect"+j]).trim() * 1, targeting: "all"};
-						if(weaponProperties["weaponEffectTargeting"+j]){
-							effects[j].targeting = weaponProperties["weaponEffectTargeting"+j];
-						}
-					}
-					
-				}
-				var isMap = false;
-				var mapId;
 				
-				if(weaponProperties.weaponMapId){
-					isMap = true;
-					mapId = JSON.parse(weaponProperties.weaponMapId);
-				}
-				var ignoresFriendlies = weaponProperties.weaponIgnoresFriendlies;
-				if(ignoresFriendlies == null || ignoresFriendlies == ""){//hack to ensure backwards compatibility for old weapon definitions
-					ignoresFriendlies = true;
-				} else {
-					ignoresFriendlies = ignoresFriendlies * 1;
-				}	
-
-				var enemiesCounter = weaponProperties.weaponEnemiesCounter;
-				if(enemiesCounter == null || enemiesCounter == ""){//hack to ensure backwards compatibility for old weapon definitions
-					enemiesCounter = true;
-				} else {
-					enemiesCounter = enemiesCounter * 1;
-				}	
-
-				var alliesCounter = weaponProperties.weaponAlliesCounter;
-				if(alliesCounter == null || alliesCounter == ""){//hack to ensure backwards compatibility for old weapon definitions
-					alliesCounter = true;
-				} else {
-					alliesCounter = alliesCounter * 1;
-				}	
-				
-				var isCombination = false;
-				var combinationWeapons = [];
-				var combinationType = 0;
-				if(weaponProperties.weaponComboWeapons){
-					isCombination = true;
-					combinationWeapons = JSON.parse(weaponProperties.weaponComboWeapons);
-				}
-				if(weaponProperties.weaponComboType){
-					combinationType = weaponProperties.weaponComboType;
-				}
-				var currentAmmo;
-				var currentWeapon = currentWeaponsLookup[parseInt(weaponDefinition.id)];
-				if(currentWeapon){
-					currentAmmo = currentWeapon.currentAmmo;
-				} else {
-					currentAmmo = totalAmmo;
-				}
-				
-				var HPThreshold = -1;
-				if(weaponProperties.weaponHPThreshold){
-					HPThreshold = weaponProperties.weaponHPThreshold * 1;
-				}
-				let animId = parseInt(weaponProperties.weaponAnimId);
-				if(isNaN(animId)){
-					animId = -1;
-				}
-				let vsAllyAnimId = parseInt(weaponProperties.weaponVSAllyAnimId);
-				if(isNaN(vsAllyAnimId)){
-					vsAllyAnimId = -1;
-				}
-				let invalidTargetTags = {};
-				if(weaponProperties.weaponInvalidTags){					
-					var parts = weaponProperties.weaponInvalidTags.split(",");
-					parts.forEach(function(tag){
-						invalidTargetTags[String(tag).trim()] = true;
-					});				
-				}
-				result.push({
-					id: parseInt(weaponDefinition.id),
-					name: weaponDefinition.name,
-					type: weaponProperties.weaponType,
-					attribute1: weaponProperties.weaponAttribute1,
-					attribute2: weaponProperties.weaponAttribute2,
-					postMoveEnabled: parseInt(weaponProperties.weaponPostMoveEnabled),
-					power: parseInt(weaponProperties.weaponPower),
-					minRange: parseInt(weaponProperties.weaponMinRange),
-					range: parseInt(weaponProperties.weaponRange),
-					hitMod: parseInt(weaponProperties.weaponHitMod),
-					critMod: parseInt(weaponProperties.weaponCritMod),
-					totalAmmo: totalAmmo,
-					currentAmmo: currentAmmo,
-					ENCost: parseInt(weaponProperties.weaponEN),
-					MPCost: parseInt(weaponProperties.weaponMP || 0),
-					willRequired: parseInt(weaponProperties.weaponWill),
-					terrain: this.parseTerrainString(weaponProperties.weaponTerrain),
-					effects: effects,
-					particleType: (weaponProperties.weaponCategory || "").trim(), //missile, funnel, beam, gravity, physical or "".
-					animId: animId,
-					vsAllyAnimId: vsAllyAnimId,
-					isMap: isMap, 
-					mapId: mapId,
-					ignoresFriendlies: ignoresFriendlies,
-					ignoresEnemies: weaponProperties.weaponIgnoresEnemies*1 || 0,
-					isCombination: isCombination,
-					combinationWeapons: combinationWeapons,
-					combinationType: combinationType,
-					isLocked: isLocked,
-					isCounter: parseInt(weaponProperties.weaponIsCounter),
-					isCounterOnly: parseInt(weaponProperties.weaponIsCounterOnly),
-					upgradeType: parseInt(weaponProperties.weaponUpgradeType) || 0,
-					isSelfDestruct: parseInt(weaponProperties.weaponIsSelfDestruct),
-					isAll: parseInt(weaponProperties.weaponIsAll),
-					HPThreshold: HPThreshold,
-					enemiesCounter: enemiesCounter,
-					alliesCounter: alliesCounter,
-					enemiesInteraction: weaponProperties.weaponEnemyInteraction || "damage_and_status",
-					alliesInteraction: weaponProperties.weaponAllyInteraction || "damage_and_status",
-					invalidTargetTags: invalidTargetTags
-				});
+				result.push(this.parseWeaponDef(actor, isLocked, weaponDefinition, weaponProperties, previousWeapons));
 			}
 		}
 	}
@@ -810,6 +824,40 @@ StatCalc.prototype.getActorMechItems = function(mechId){
 	}	
 	return result;
 }
+
+
+StatCalc.prototype.getActorMechEquipableSlots = function(mechId){
+	return ENGINE_SETTINGS.MAX_UNIT_EQUIPABLES || 5;
+}
+
+StatCalc.prototype.getActorMechCarryingCapacity = function(actor){
+	if(this.isActorSRWInitialized(actor)){
+		return this.applyStatModsToValue(actor, actor.SRWStats.mech.carryingCapacity, ["carrying_capacity"]);
+	}
+	return 0;
+}
+
+StatCalc.prototype.getActorMechEquipables = function(mechId){
+	var result = [];	
+	var mech = $dataClasses[mechId];
+	if(mech.meta.mechInheritsPartsFrom != null && mech.meta.mechInheritsPartsFrom != ""){
+		mechId = mech.meta.mechInheritsPartsFrom;
+		mech = $dataClasses[mechId];
+	}
+	//var targetActor = this.getCurrentPilot(mechId, true);
+	var slots = this.getActorMechEquipableSlots(mechId);
+
+	var ids = $equipablesManager.getActorItems(mechId);
+	for(var i = 0; i < slots; i++){
+		if(ids[i] != null){
+			result.push(ids[i]);
+		} else {
+			result.push(null);
+		}
+	}	
+	return result;
+}
+
 
 StatCalc.prototype.getMechItemInfo = function(mechProperties){
 	var result = [];
@@ -1730,7 +1778,8 @@ StatCalc.prototype.getMechData = function(mech, forActor, items, previousWeapons
 		fullUpgradeAbility: -1,
 		basicBattleSpriteName: "",
 		allowedPilots: [],
-		items: []
+		items: [],
+		noEquips: false
 	};
 	if(mech && mech.name && mech.meta && Object.keys(mech.meta).length){		
 		var mechProperties = mech.meta;
@@ -1932,6 +1981,10 @@ StatCalc.prototype.getMechData = function(mech, forActor, items, previousWeapons
 			result.noTwin = mechProperties.mechNoTwin * 1;
 		}
 		
+		
+		result.carryingCapacity = (mechProperties.mechCarryingCapacity || ENGINE_SETTINGS.DEFAULT_CARRING_CAPACITY) * 1;
+		
+		
 		//result.transformedActor = mechProperties.mechTransformedActor;
 
 		/*var mechOnDeployMain;
@@ -1957,6 +2010,8 @@ StatCalc.prototype.getMechData = function(mech, forActor, items, previousWeapons
 		
 		result.abilities = this.getMechAbilityInfo(mechProperties);
 		result.itemSlots = parseInt(mechProperties.mechItemSlots);		
+		
+		result.noEquips = !!(mechProperties.mechNoEquips || 0);
 			
 		if(forActor){
 			if(result.inheritsUpgradesFrom){
@@ -3370,7 +3425,54 @@ StatCalc.prototype.getMechStatIncreaseCost = function(actor, type, levels){
 	return cost;
 }
 
+StatCalc.prototype.getWeaponUpgradeCost = function(weaponId, levels){
+	var weaponCostTables = ENGINE_SETTINGS.COST_TYPES.WEAPON;
+	var cost = 0;
+	let costType = $dataWeapons[weaponId].meta.weaponCostType || 0;
+	for(var i = 0; i < levels.length; i++){
+		if(levels[i] < this.getMaxUpgradeLevel()){		
+			cost+=weaponCostTables[costType][levels[i]];			
+		}				
+	}
+	return cost;
+}
 
+StatCalc.prototype.mechCanEquip = function(actor){
+	if(this.isActorSRWInitialized(actor)){
+		return !actor.SRWStats.mech.noEquips;	
+	} else {
+		return false;
+	}
+}
+
+StatCalc.prototype.getWeaponValidHolders = function(weaponId, levels){	
+	function parseList(listString){
+		listString = listString || "";
+		let result = {};
+		const parts = listString.split(",");
+		for(let id of parts){
+			if(id != ""){
+				result[id * 1] = true;
+			}			
+		}
+		return result;
+	}
+	
+	const allowList = parseList($dataWeapons[weaponId].meta.weaponAllowedOn);
+	const banList = parseList($dataWeapons[weaponId].meta.weaponBannedOn);
+	
+	if(Object.keys(allowList).length){
+		return allowList;
+	}
+	
+	let result = {};
+	for(let i = 1; i < $dataActors.length; i++){
+		if(!banList[i]){
+			result[i] = true;
+		}
+	}
+	return result;
+}
 
 StatCalc.prototype.getMechStatIncrease = function(actor, type, levels){
 	var amountPerLevel = actor.SRWStats.mech.stats.upgradeAmounts;
@@ -3578,6 +3680,26 @@ StatCalc.prototype.getCurrentWeapons = function(actor){
 				tmp.push(allWeapons[i]);
 			}
 		}
+		
+		const equipables = this.getActorMechEquipables(actor.SRWStats.mech.id);
+		for(let weapon of equipables){
+			if(weapon){
+				var weaponDefinition = $dataWeapons[weapon.weaponId];
+				var weaponProperties = weaponDefinition.meta;
+				
+				let wep = this.parseWeaponDef(actor, false, weaponDefinition, weaponProperties);
+				wep.isEquipable = true;
+				//let levels = [];
+				//for(let i = 0; i < weapon.upgrades; i++){
+				//	levels.push(i)
+				//}
+				//wep.power+=this.getWeaponDamageUpgradeAmount(wep, levels);
+				wep.upgrades = weapon.upgrades;
+				wep.tempKey = "eWeap_"+weapon.weaponId+"_"+weapon.slot;
+				tmp.push(wep);
+			}			
+		}
+		
 		tmp = tmp.sort(function(a, b){
 			return a.power - b.power;
 		});
@@ -3630,11 +3752,20 @@ StatCalc.prototype.getWeaponPowerStatState = function(actor, attack){
 }
 
 StatCalc.prototype.getWeaponPower = function(actor, weapon){
+	//if(weapon.isEquipable){
+	//	return weapon.power - this.isAttackDown(actor);
+	//}
 	if(this.isActorSRWInitialized(actor)){
 		var levels = [];
-		for(var i = 0; i < actor.SRWStats.mech.stats.upgradeLevels.weapons; i++){
-			levels.push(i);
-		}
+		if(weapon.isEquipable){
+			for(let i = 0; i < weapon.upgrades; i++){
+				levels.push(i)
+			}
+		} else {
+			for(var i = 0; i < actor.SRWStats.mech.stats.upgradeLevels.weapons; i++){
+				levels.push(i);
+			}
+		}		
 		return weapon.power + this.getWeaponDamageUpgradeAmount(weapon, levels) - this.isAttackDown(actor);
 	} else {
 		return 0;
@@ -4054,7 +4185,7 @@ StatCalc.prototype.getCurrentWill = function(actor){
 	if(this.isActorSRWInitialized(actor)){
 		return actor.SRWStats.pilot.will;
 	} else {
-		return {};
+		return 100;
 	}	
 }
 
@@ -4425,7 +4556,7 @@ StatCalc.prototype.getCombinationWeaponParticipants = function(actor, weapon){
 					if(currentWeapon.requiredEN != -1 && _this.getCurrenEN(actor) < currentWeapon.ENCost){
 						canUse = false;
 					}						
-					if(currentWeapon.currentAmmo == 0){
+					if(_this.getCurrentAmmo(actor, currentWeapon) == 0){
 						canUse = false;
 					}							
 					if(canUse){
@@ -4577,7 +4708,7 @@ StatCalc.prototype.canUseWeaponDetail = function(actor, weapon, postMoveEnabledO
 				detail.noComboSupport = true;
 			}
 		}		
-		if(weapon.currentAmmo == 0){ //current ammo is -1 for attacks that don't consume any
+		if(this.getCurrentAmmo(actor, weapon) == 0){ //current ammo is -1 for attacks that don't consume any
 			canUse = false;
 			detail.ammo = true;
 		}
@@ -4707,7 +4838,7 @@ StatCalc.prototype.canUseWeapon = function(actor, weapon, postMoveEnabledOnly, d
 				return false;
 			}	
 		}
-		if(weapon.currentAmmo == 0){ //current ammo is -1 for attacks that don't consume any
+		if(this.getCurrentAmmo(actor, weapon) == 0){ //current ammo is -1 for attacks that don't consume any
 			return false;
 		}
 		if(weapon.ENCost > actor.SRWStats.mech.stats.calculated.currentEN){
@@ -6097,15 +6228,39 @@ StatCalc.prototype.canRecoverEN = function(actor, amount){
 	}
 }
 
-StatCalc.prototype.recoverAmmoPercent = function(actor, percent){		
+StatCalc.prototype.getCurrentAmmo = function(actor, weapon){		
+	if(weapon.isEquipable){
+		return weapon.totalAmmo + (this.getStageTemp(actor, weapon.tempKey) || 0);
+	} else {
+		return weapon.currentAmmo;
+	}
+}
+
+StatCalc.prototype.modifyCurrentAmmo = function(actor, weapon, amount){		
+	if(weapon.isEquipable){
+		let currentAmmoOffset = (this.getStageTemp(actor, weapon.tempKey) || 0);
+		let newAmount = currentAmmoOffset + amount;
+		this.setStageTemp(actor, weapon.tempKey, newAmount);	
+
+		if(newAmount > 0){
+			this.setStageTemp(actor, weapon.tempKey, 0);	
+		}
+		
+	} else {
+		weapon.currentAmmo+=amount;
+		if(weapon.currentAmmo > weapon.totalAmmo){
+			weapon.currentAmmo = weapon.totalAmmo;
+		}
+	}
+}
+
+StatCalc.prototype.recoverAmmoPercent = function(actor, percent){	
+	const _this = this;
 	if(this.isActorSRWInitialized(actor)){			
 		var weapons = this.getActorMechWeapons(actor);
 		weapons.forEach(function(weapon){
 			if(weapon.totalAmmo != -1){
-				weapon.currentAmmo+=Math.ceil(weapon.totalAmmo * percent / 100);
-				if(weapon.currentAmmo > weapon.totalAmmo){
-					weapon.currentAmmo = weapon.totalAmmo;
-				}
+				_this.modifyCurrentAmmo(actor, weapon, Math.ceil(weapon.totalAmmo * percent / 100));
 			}
 		});
 	} 	
@@ -6119,7 +6274,12 @@ StatCalc.prototype.canRecoverAmmo = function(actor, percent){
 		while(!hasUsedAmmo && ctr < weapons.length){
 			var weapon = weapons[ctr++];
 			if(weapon.totalAmmo != -1){
-				hasUsedAmmo = weapon.currentAmmo < weapon.totalAmmo;
+				if(weapon.isEquipable){
+					let currentAmmoOffset = (this.getStageTemp(actor, weapon.tempKey) || 0);
+					hasUsedAmmo = currentAmmoOffset < 0;
+				} else {
+					hasUsedAmmo = weapon.currentAmmo < weapon.totalAmmo;
+				}				
 			}			
 		}
 		return hasUsedAmmo;
@@ -6127,6 +6287,7 @@ StatCalc.prototype.canRecoverAmmo = function(actor, percent){
 }
 
 StatCalc.prototype.getRemainingAmmoRatio = function(actor){		
+	const _this = this;
 	if(this.isActorSRWInitialized(actor)){			
 		var weapons = this.getActorMechWeapons(actor);
 		var ctr = 0;
@@ -6136,7 +6297,7 @@ StatCalc.prototype.getRemainingAmmoRatio = function(actor){
 			var weapon = weapons[ctr++];
 			if(weapon.totalAmmo != -1){
 				totalAmmo+=weapon.totalAmmo;
-				currentAmmo+=weapon.currentAmmo;
+				currentAmmo+=_this.getCurrentAmmo(actor, weapon);
 			}			
 		}
 		return currentAmmo / totalAmmo;

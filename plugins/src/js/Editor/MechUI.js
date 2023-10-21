@@ -279,6 +279,7 @@ MechUI.prototype.initPropertyHandlers = function(){
 		tags: handleDefaultProp("mechTags",  EDITORSTRINGS.MECH.label_tags),
 		attribute1: handleDefaultProp("mechAttribute1",  EDITORSTRINGS.MECH.label_attribute1),
 		attribute2: handleDefaultProp("mechAttribute2",  EDITORSTRINGS.MECH.label_attribute2),
+		carryingCapacity: handleDefaultProp("mechCarryingCapacity",  EDITORSTRINGS.MECH.label_carrying_capacity),
 		fub: {
 			createControls(){		
 				var abilityDefs = $mechAbilityManager.getDefinitions()
@@ -651,6 +652,28 @@ MechUI.prototype.initPropertyHandlers = function(){
 				}
 			}
 		}, 	
+		no_equips: {
+			createControls(entry){
+				var content = "";
+				content+="<div class='row'>";
+				content+="<div class='cell'>";
+				content+=EDITORSTRINGS.MECH.label_can_equip;
+				content+="</div>";
+				content+="<div class='cell'>";
+				content+="<input id='can_equip' type=checkbox "+(!(_this.getMetaValue("mechNoEquips")) ? "checked" : "")+"></input>";
+				content+="</div>";
+				content+="</div>";
+				return content;
+			},
+			hook(entry){
+				entry = _this.getCurrentEntry();
+				containerNode.querySelector("#can_equip").addEventListener("change", function(){
+					_this.setMetaValue("mechNoEquips", this.checked ? 0 : 1);
+					_this.show();
+					_this._mainUIHandler.setModified();
+				});
+			}
+		},
 		transformation: {
 			createControls(){	
 				var content = "";
@@ -1993,6 +2016,11 @@ MechUI.prototype.show = async function(){
 	content+="<div class='row'>";
 	content+=_this._propertyHandlers.item_slots.createControls();
 	content+="</div>";
+	content+="<div class='row numeric'>";
+	content+=_this._propertyHandlers.carryingCapacity.createControls();
+	content+="</div>";
+	
+	
 	content+="<div class='row'>";
 	content+=_this._propertyHandlers.fub.createControls();
 	content+="</div>";
@@ -2067,8 +2095,9 @@ MechUI.prototype.show = async function(){
 	
 	
 	
+	content+="<div>";
+	content+=_this._propertyHandlers.no_equips.createControls();
 	content+=_this._propertyHandlers.weapons.createControls();
-	content+="<div class='table'>";
 	content+="</div>";
 	content+="</div>";
 	content+="</div>";

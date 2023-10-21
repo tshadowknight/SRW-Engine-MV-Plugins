@@ -148,7 +148,7 @@ WeaponUI.prototype.initPropertyHandlers = function(){
 		upgrade_type: {
 			createControls(){
 				var content = "";
-				var idx = _this.getMetaValue("weaponUpgradeType");
+				var idx = _this.getMetaValue("weaponUpgradeType") || 0;
 				var options = Object.keys(ENGINE_SETTINGS.WEAPON_UPGRADE_TYPES);
 				content+="<div class='cell'>";
 				content+=EDITORSTRINGS.WEAPON.label_upgrade_type;
@@ -744,6 +744,47 @@ WeaponUI.prototype.initPropertyHandlers = function(){
 				});
 			}
 		},
+		costType: {
+			createControls(){
+				var content = "";
+				var idx = _this.getMetaValue("weaponCostType") || 0;
+				var options = Object.keys(ENGINE_SETTINGS.COST_TYPES.WEAPON);
+				content+="<div class='cell'>";
+				content+=EDITORSTRINGS.WEAPON.label_cost_type;
+				content+="</div>";
+				content+="<div class='cell'>";
+				content+="<select id='weapon_cost_type'>";
+				for(var i = 0; i < options.length; i++){
+					content+="<option "+(i == idx ? "selected" : "")+" value='"+i+"'>"+i+"</option>";									
+				}				
+				content+="</select>";
+				
+				
+				var typeSummary = [];
+				var typeData = ENGINE_SETTINGS.COST_TYPES.WEAPON[options[idx]];
+				if(typeData){
+					for(var i = 0; i < typeData.length; i++){
+						typeSummary.push("Level "+(i+1)+": "+typeData[i]);
+					}
+					content+="<img title='"+(typeSummary.join("\n"))+"' class='view_type_costs_icon' img src='"+_this._svgPath+"eye-line.svg'>"
+				}
+				
+				content+="</div>";
+				
+				
+				return content;
+			},
+			hook(){
+				containerNode.querySelector("#weapon_cost_type").addEventListener("change", function(){
+					_this.setMetaValue("weaponCostType", this.value);
+					_this.show();
+					_this._mainUIHandler.setModified();
+				});	
+			}		
+		},
+		weight: handleDefaultProp("weaponWeight", EDITORSTRINGS.WEAPON.label_weight),
+		bannedMechs: handleDefaultProp("weaponBannedOn", EDITORSTRINGS.WEAPON.label_banned_mechs),
+		allowedMechs: handleDefaultProp("weaponAllowedOn", EDITORSTRINGS.WEAPON.label_allowed_mechs),
 	};	
 	
 	var terrains = [
@@ -958,6 +999,33 @@ WeaponUI.prototype.show = async function(){
 	
 	
 		
+	content+="</div>";
+	
+	
+	
+	content+="<div class='section'>";
+	content+="<div class='title abilities'>";
+	content+=EDITORSTRINGS.WEAPON.label_equipable;	
+	content+="</div>";
+	content+="<div class='content' style='display: block;'>";
+	content+="<div class='table'>";	
+	content+="<div class='row '>";
+	content+=_this._propertyHandlers.costType.createControls();
+	content+="</div>";
+	
+	content+="<div class='row numeric'>";
+	content+=_this._propertyHandlers.weight.createControls();
+	content+="</div>";
+	
+	content+="<div class='row'>";
+	content+=_this._propertyHandlers.bannedMechs.createControls();
+	content+="</div>";
+	
+	content+="<div class='row'>";
+	content+=_this._propertyHandlers.allowedMechs.createControls();
+	content+="</div>";
+	
+	content+="</div>";
 	content+="</div>";
 	content+="</div>";
 	
