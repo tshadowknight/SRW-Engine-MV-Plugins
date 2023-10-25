@@ -718,6 +718,14 @@
 		this.contents.drawText(c, textState.x, textState.y + (ENGINE_SETTINGS.LINE_OFFSET || 0), w * 2, textState.height);
 		textState.x += w;
 	};
+	
+	var _Window_Base_ResetFontSettings = Window_Base.prototype.resetFontSettings;
+	Window_Base.prototype.resetFontSettings = function() {
+		_Window_Base_ResetFontSettings.call( this );
+		if(ENGINE_SETTINGS.NO_TEXT_SHADOW){
+			this.contents.outlineWidth = 0;
+		}		
+	};
 
 	
 	function Window_SRWItemBattle() {

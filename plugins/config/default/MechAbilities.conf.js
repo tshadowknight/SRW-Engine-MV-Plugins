@@ -859,6 +859,34 @@ $SRWConfig.mechAbilties = function(){
 		}
 	);
 	
+	this.addDefinition(
+		56, 
+		"Weapons unlocking Weapons example", 
+		"Unlocks a fixed weapon for a unit if they are holding the right equipable weapons.", 
+		false,
+		false,
+		function(actor, level){
+			const requiredWeapons = [9,3];
+			const availableWeapons = $statCalc.getActorMechEquipables(actor.SRWStats.mech.id)
+			let weaponsLookup = {};
+			for(let weapon of availableWeapons){
+				if(weapon){
+					weaponsLookup[weapon.weaponId] = true;
+				}
+			}
+			const hasAllWeapons = requiredWeapons.filter(i => weaponsLookup[i]).length == requiredWeapons.length; 
+			if(hasAllWeapons){
+				return [{type: "unlock_weapon", modType: "addFlat", value: 7}];
+			} else {
+				return [];
+			}
+		},
+		function(actor, level){
+			return true;
+		}
+	);
+	
+	
 	
 	
 	/*Insert new ability here*/
