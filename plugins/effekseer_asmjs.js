@@ -681,20 +681,9 @@ var effekseer = function () {
     var extindex = ext_path.lastIndexOf(".");
     var ext = extindex >= 0 ? ext_path.slice(extindex) : "";
     if (ext == ".png" || ext == ".jpg") {
-	  let bitmap = await ImageManager.loadBitmapPromise("", path);
-      var image = new Image();
-      image.onload = function () {
-        var converted_image = _convertPowerOfTwoImage(image);
-        onload(converted_image);
-      };
-      image.onerror = function () {
-        if (!(typeof onerror === "undefined")) onerror('not found', path);
-      };
-
-      image.crossOrigin = _imageCrossOrigin;
-      //image.src = path;
-	  image.src = bitmap.canvas.toDataURL();	  
-	  
+		let bitmap = await ImageManager.loadBitmapPromise("", path);
+		var converted_image = _convertPowerOfTwoImage(bitmap.canvas);
+		onload(converted_image);
     } else if (ext == ".tga") {
       if (!(typeof onerror === "undefined")) onerror('not supported', path);
     } else {

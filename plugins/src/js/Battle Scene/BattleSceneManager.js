@@ -29,6 +29,7 @@ export default function BattleSceneManager(){
 	this._activeTextureCache = {};
 	
 	
+	
 	this._defaultPositions = {
 		// "camera_root": new BABYLON.Vector3(0, 0, -5),
 		"ally_main_idle": new BABYLON.Vector3(2, 0, 1),
@@ -337,6 +338,8 @@ BattleSceneManager.prototype.init = async function(attachControl){
 		this._engine = new BABYLON.Engine(this._canvas, true, {preserveDrawingBuffer: true, stencil: true, antialiasing: true}); // Generate the BABYLON 3D engine	
 		this._engine.getCaps().parallelShaderCompile = false;
 		
+		this._textureCopier = new BABYLON.CopyTextureToTexture(this._engine);
+		
 		this.initShaders();
 		//this.initParticleSystems();
 		
@@ -353,8 +356,9 @@ BattleSceneManager.prototype.init = async function(attachControl){
 
 BattleSceneManager.prototype.preloadTexture = async function(path){
 	const bitmap = await ImageManager.loadBitmapPromise("", path);
+	//populate the BABYLON cache by instantiating a texture
+	new BABYLON.Texture(bitmap.canvas.toDataURL(), this._scene, false, true, BABYLON.Texture.NEAREST_NEAREST);
 	this._activeTextureCache[path] = {
-		texture: new BABYLON.Texture(bitmap.canvas.toDataURL(), this._scene, false, true, BABYLON.Texture.NEAREST_NEAREST),
 		imgData: bitmap.canvas.toDataURL()
 	};
 }
@@ -363,7 +367,7 @@ BattleSceneManager.prototype.getCachedTexture = function(path){
 	if(!this._activeTextureCache[path]){
 		throw "An uncached texture was requested, is preloading broken?";
 	}
-	return this._activeTextureCache[path].texture;
+	return new BABYLON.Texture(this.getCachedImageData(path), this._scene, false, true, BABYLON.Texture.NEAREST_NEAREST);
 }
 
 BattleSceneManager.prototype.getCachedImageData = function(path){
@@ -4200,6 +4204,13 @@ BattleSceneManager.prototype.executeAnimation = function(animation, startTick){
 				targetObj.dispose();
 			}
 		},
+		remove_sprite: function(target, params){
+			var targetObj = getTargetObject(target);
+			if(targetObj){
+				targetObj.isVisible = false;
+				targetObj.dispose();
+			}
+		},
 		create_dragonbones_bg: function(target, params){
 			var position;
 			if(params.position){
@@ -5027,7 +5038,7 @@ BattleSceneManager.prototype.executeAnimation = function(animation, startTick){
 				}
 				
 				if(!action.barrierBroken && _this._debugBarriers != 2){
-					additions[startTick + params.duration] = [									
+					additions[startTick + params.duration].push([									
 						//{type: "send_effekseer_trigger", target: target+"sys_barrier", params:{id: 1}},
 						//{type: "send_effekseer_trigger", target: target+"sys_barrier", params:{id: 0}}
 						{type: "animate_effekseer_input", target: target+"sys_barrier", params:{
@@ -5036,7 +5047,7 @@ BattleSceneManager.prototype.executeAnimation = function(animation, startTick){
 							endValue: 0,
 							duration: 30
 						}}
-					];	
+					]);	
 				}									
 	
 				

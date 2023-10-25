@@ -12,7 +12,7 @@
 }
 
 #battle_scene_ui_layer_text_display  #name_container{
-	--fontsize: 1.8px;
+	--fontsize: 2.2px;
 }
 
 #battle_scene_ui_layer_text_display.fadeOut {
@@ -81,7 +81,7 @@
 }
 
 #battle_scene_ui_layer .text_container {
-	--fontsize: 2px;
+	--fontsize: 2.2px;
 	height: 70%;
 	max-width: 80%;
 }

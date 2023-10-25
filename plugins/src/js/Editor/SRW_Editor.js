@@ -308,16 +308,16 @@ SRWEditor.prototype.init = function(){
 			params: ["commands"],
 			desc: "Show the target's doging action. The commands provided as parameters define the evade movement of the target. If the target has a special dodge action, like Double Image, the matching animation will be played instead."
 		},
-		/*spawn_sprite: {
+		spawn_sprite: {
 			hasTarget: true,
 			params: ["path", "position", "size", "frameSize", "animationFrames", "animationLoop", "animationDelay"],
 			desc: "Create a new sprite."
-		},*/
-		/*remove_sprite: {
+		},
+		remove_sprite: {
 			hasTarget: true,
 			params: [],
 			desc: "Remove a sprite."
-		},*/
+		},
 		set_light_color: {
 			isLightCommand: true,
 			hasTarget: true,

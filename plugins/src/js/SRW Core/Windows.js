@@ -726,6 +726,18 @@
 			this.contents.outlineWidth = 0;
 		}		
 	};
+	
+	Window_Base.prototype.standardBackOpacity = function() {
+		return ENGINE_SETTINGS.BACK_OPACITY || 192;
+	};
+	
+	var _Window_updateCursor = Window.prototype._updateCursor;
+	Window.prototype._updateCursor = function() {
+		_Window_updateCursor.call( this );
+		if(ENGINE_SETTINGS.NO_CURSOR_BLINK){
+			this._windowCursorSprite.alpha = 1;
+		}
+	}
 
 	
 	function Window_SRWItemBattle() {

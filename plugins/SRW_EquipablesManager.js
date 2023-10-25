@@ -37,6 +37,18 @@ SRWEquipablesManager.prototype.getActorItems = function(mechId){
 	return this.getCurrentHolderLookup()[mechId] || [];
 }
 
+SRWEquipablesManager.prototype.getActorItemIds = function(mechId){
+	let result = [];
+	let items = this.getActorItems(mechId);
+	for(let slot in items){
+		const itemDef = items[slot];
+		if(itemDef){
+			result.push(itemDef.weaponId);
+		}
+	}
+	return result;
+}
+
 SRWEquipablesManager.prototype.getCurrentInventory = function(){
 	let inventoryBase = this.getInventorybase();
 	const storedInventoryState = $SRWSaveManager.getEquipablesData() || [];
