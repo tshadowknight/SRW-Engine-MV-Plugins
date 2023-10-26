@@ -7894,6 +7894,9 @@ StatCalc.prototype.getActiveCombatInfo = function(actor){
 		var initiatorType;
 		var target;
 		var action;
+		if(!$gameTemp.currentTargetingSettings){
+			$gameTemp.currentTargetingSettings = {};
+		}
 		if(actor == $gameTemp.currentBattleActor){
 			initiatorType = "actor";
 			if($gameTemp.currentTargetingSettings[initiatorType] == "main"){

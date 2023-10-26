@@ -4,7 +4,7 @@ $SRWConfig.battleSongs = {
 		3: {
 			default: "Theme1",
 			weapons: {
-				3: "Battle2",
+				4: "Battle2",
 				5: "Battle3"
 			}
 		}
