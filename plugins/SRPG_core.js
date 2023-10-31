@@ -1914,6 +1914,10 @@ SceneManager.isInSaveScene = function(){
 						if(battleResult.hasActed){
 							var ENCost = battleResult.ENUsed;
 							ENCost = $statCalc.applyStatModsToValue(actor, ENCost, ["EN_cost"]);
+							
+							if(!$statCalc.applyStatModsToValue(actor, 0, ["en_to_power"])){
+								ENCost = $statCalc.applyStatModsToValue(actor, ENCost, ["EN_cost"]);
+							}
 										
 							actor.setMp(actor.mp - Math.floor(ENCost));
 							if(weapon){

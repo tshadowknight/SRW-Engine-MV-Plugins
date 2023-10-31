@@ -290,4 +290,26 @@ $SRWConfig.weaponEffects = function(){
 			return true;
 		}
 	);
+	
+	this.addDefinition(
+		22, 
+		"Full Charge", 
+		"When this weapon is used it consumes all but 10EN of the unit's current EN. The more EN is left to consume the higher the Base Power of the weapon. ", 
+		false,
+		false,
+		function(actor, level){			
+			let ENThreshold = 100 + 10;
+			let remainingEN = $statCalc.getCalculatedMechStats(actor).currentEN;
+			let ratio = Math.floor((Math.min(1, remainingEN / ENThreshold) / 2 + 0.5) * 10) / 10;
+			
+			return [
+				{type: "en_to_power", modType: "addFlat", value: 1},
+				{type: "weapon_ranged", modType: "mult", value: ratio},
+				{type: "weapon_melee", modType: "mult", value: ratio},
+			];
+		},
+		function(actor, level){
+			return true;
+		}
+	);
 }

@@ -3772,6 +3772,45 @@ StatCalc.prototype.getWeaponPower = function(actor, weapon){
 	}
 }
 
+StatCalc.prototype.enableWeaponAbilityResolution = function(actor, weapon){
+	//hacky method to get weapon abilities resolved while not before battle(like in the attack list)
+	//set the currentAttack on the attacker
+	const storedBattleTemp = actor.SRWStats.battleTemp.currentAttack;
+	const storedBattleTarget = $gameTemp.currentBattleTarget;	
+	
+	actor.SRWStats.battleTemp.currentAttack = weapon;
+	//set a dummy battle target
+	$gameTemp.currentBattleTarget = {
+		factionId: 0
+	};
+	//invalidate the ability cache for the attacker
+	$statCalc.invalidateAbilityCache(actor);
+	
+	return {
+		storedBattleTemp: storedBattleTemp, 
+		storedBattleTarget: storedBattleTarget
+	};
+}
+
+StatCalc.prototype.restoreBattleTemps = function(actor, battleTemps){
+	actor.SRWStats.battleTemp.currentAttack = battleTemps.storedBattleTemp;
+	$gameTemp.currentBattleTarget = battleTemps.storedBattleTarget;
+}
+
+StatCalc.prototype.getWeaponPowerWithMods = function(actor, weapon){
+	let currentPower = this.getWeaponPower(actor, weapon);
+	const battleTemps = this.enableWeaponAbilityResolution(actor, weapon);
+	
+	if(weapon.type == "M"){ //melee		
+		currentPower = $statCalc.applyStatModsToValue(actor, currentPower, ["weapon_melee"]);
+	} else { //ranged
+		currentPower = $statCalc.applyStatModsToValue(actor, currentPower, ["weapon_ranged"]);
+	}	
+	this.restoreBattleTemps(actor, battleTemps);
+	
+	return currentPower;
+}
+
 StatCalc.prototype.getMaxPilotStat = function(){
 	return 400;
 }
@@ -6466,14 +6505,22 @@ StatCalc.prototype.setTurnEnd = function(actor){
 	} 	
 }
 
-StatCalc.prototype.getRealENCost = function(actor, cost){
+StatCalc.prototype.getRealENCost = function(actor, weapon){
+	let cost = weapon.ENCost;
 	if(this.isActorSRWInitialized(actor)){	
 		if(cost != -1){
 			cost = this.applyStatModsToValue(actor, cost, ["EN_cost"]);
-		}		
+		}
+		const battleTemps = this.enableWeaponAbilityResolution(actor, weapon);
+	
+		if(this.applyStatModsToValue(actor, 0, ["en_to_power"])){
+			cost = -2;
+		}
+		
+		this.restoreBattleTemps(actor, battleTemps);
 	} 
 	return cost;
-}
+}	
 
 StatCalc.prototype.getRealMPCost = function(actor, cost){
 	if(this.isActorSRWInitialized(actor)){	
@@ -6963,7 +7010,7 @@ StatCalc.prototype.createActiveAbilityLookup = function(excludedSkills){
 		Object.keys(accumulators).forEach(function(accType){
 			var activeAbilities = accumulators[accType];
 			activeAbilities.forEach(function(originalEffect){				
-				var rangeInfo = originalEffect.rangeInfo;
+				var rangeInfo = originalEffect.rangeInfo || {min: 0, max: 0, targets: "own"};
 				var target;
 				if(isEnemy){
 					if(rangeInfo.targets == "own"){

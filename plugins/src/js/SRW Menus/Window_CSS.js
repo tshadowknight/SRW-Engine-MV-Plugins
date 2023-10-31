@@ -17,7 +17,7 @@ Window_CSS.prototype.initialize = function() {
 	this._glowCycleTime = 120;
 	this._maxGlowDelta = 0.25;
 	this._glowTimer = this._glowCycleTime;
-	
+	this._container.classList.add("custom_css");
 }
 
 Window_CSS.prototype.destroy = function() {

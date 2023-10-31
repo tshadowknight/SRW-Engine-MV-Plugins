@@ -741,7 +741,8 @@ Window_DetailPages.prototype.drawPilotStats1 = function() {
 			if(idx == list.length){
 				idx = 0;
 			}
-			if(list.length > 1 && list[idx]){
+			//prevent the left icon from being filled in if there's only one two total pilots(main + 1 sub)
+			if(list.length > 1 && list[idx] && (offset != -1 || list.length > 2)){
 				_this.loadActorFace(list[idx], selectionIcon);
 			}
 			

@@ -168,10 +168,14 @@ DetailBarAttackSummary.prototype.redraw = function(){
 	detailContent+=APPSTRINGS.ATTACKLIST.label_EN_cost;
 	detailContent+="</div>";
 	
-	var realEnCost = $statCalc.getRealENCost($gameTemp.currentMenuUnit.actor, attackData.ENCost);
+	var realEnCost = $statCalc.getRealENCost($gameTemp.currentMenuUnit.actor, attackData);
 	if(realEnCost == -1){
 		detailContent+="<div class='summary_row_value scaled_text disabled'>";
 		detailContent+="--- ("+calculatedStats.currentEN+")";
+		detailContent+="</div>";
+	} else if(realEnCost == -2){
+		detailContent+="<div class='summary_row_value scaled_text disabled'>";
+		detailContent+="??? ("+calculatedStats.currentEN+")";
 		detailContent+="</div>";
 	} else if(calculatedStats.currentEN < realEnCost) {
 		detailContent+="<div class='summary_row_value scaled_text insufficient'>";

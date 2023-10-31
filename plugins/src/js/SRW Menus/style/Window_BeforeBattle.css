@@ -371,6 +371,10 @@
 	margin-right: 0%;
 }
 
+.participant_block .main_row .main_content .attack_name .attribute_effectiveness_block {
+	margin-right: 1%;
+}
+
 .participant_block .active_spirits {
 	width: 100%;
 	height: 10%;

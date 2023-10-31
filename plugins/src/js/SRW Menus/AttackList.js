@@ -164,13 +164,7 @@ AttackList.prototype.createSummaryViewRow = function(refData, attack) {
 	listContent+="</div>";
 	listContent+="<div class='attack_list_block scaled_text fitted_text'>"+attack.name+"</div>";
 	listContent+="<div class='attack_list_block scaled_text'>"+this.createAttributeBlock(attack)+"</div>";
-	var currentPower = $statCalc.getWeaponPower(refData, attack)*1;
-	
-	if(attack.type == "M"){ //melee		
-		currentPower = $statCalc.applyStatModsToValue(refData, currentPower, ["weapon_melee"]);
-	} else { //ranged
-		currentPower = $statCalc.applyStatModsToValue(refData, currentPower, ["weapon_ranged"]);
-	}
+	var currentPower = $statCalc.getWeaponPowerWithMods(refData, attack)*1;
 	
 	var tagBoostInfo = $statCalc.getModDefinitions(refData, ["weapon_type_boost"]);
 	for(const modDef of tagBoostInfo){
