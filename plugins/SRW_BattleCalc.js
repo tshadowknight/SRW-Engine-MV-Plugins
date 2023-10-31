@@ -1166,8 +1166,9 @@ BattleCalc.prototype.generateBattleResult = function(isPrediction){
 		if(ENCost != -1){
 			aCache.ENUsed = ENCost;
 		}
-		if($statCalc.applyStatModsToValue(this._attacker.actor, 0, ["en_to_power"])){
-			aCache.ENUsed = $statCalc.getCalculatedMechStats(this._attacker.actor).currentEN - 10;
+		let ENToPower = $statCalc.applyStatModsToValue(this._attacker.actor, 0, ["en_to_power"]);
+		if(ENToPower){
+			aCache.ENUsed = $statCalc.getCalculatedMechStats(this._attacker.actor).currentEN - ENToPower;
 		}
 		if(weaponref.totalAmmo != -1){
 			aCache.ammoUsed = 1;

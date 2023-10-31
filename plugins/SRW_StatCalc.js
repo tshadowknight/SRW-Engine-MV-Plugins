@@ -3795,6 +3795,7 @@ StatCalc.prototype.enableWeaponAbilityResolution = function(actor, weapon){
 StatCalc.prototype.restoreBattleTemps = function(actor, battleTemps){
 	actor.SRWStats.battleTemp.currentAttack = battleTemps.storedBattleTemp;
 	$gameTemp.currentBattleTarget = battleTemps.storedBattleTarget;
+	$statCalc.invalidateAbilityCache(actor);
 }
 
 StatCalc.prototype.getWeaponPowerWithMods = function(actor, weapon){

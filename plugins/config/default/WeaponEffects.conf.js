@@ -303,7 +303,7 @@ $SRWConfig.weaponEffects = function(){
 			let ratio = Math.floor((Math.min(1, remainingEN / ENThreshold) / 2 + 0.5) * 10) / 10;
 			
 			return [
-				{type: "en_to_power", modType: "addFlat", value: 1},
+				{type: "en_to_power", modType: "addFlat", value: 10},
 				{type: "weapon_ranged", modType: "mult", value: ratio},
 				{type: "weapon_melee", modType: "mult", value: ratio},
 			];
