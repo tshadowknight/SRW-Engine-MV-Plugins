@@ -302,30 +302,37 @@ Window_EquipWeapon.prototype.update = function() {
 				this._currentUIState = "item_selection";		
 				SoundManager.playOk();	
 			} else if(this._currentUIState == "item_selection"){
-				if(this.getCurrentWeightUsage() <= $statCalc.getActorMechCarryingCapacity($gameTemp.currentMenuUnit.actor)){
-					SoundManager.playOk();
+				var mech = this.getCurrentSelection();	
+				var itemIdx = this._itemList.getCurrentSelection().idx;
+				if(itemIdx != -1){				
 					var inventoryInfo = $equipablesManager.getCurrentInventory();
-					var itemIdx = this._itemList.getCurrentSelection().idx;
-					var mech = this.getCurrentSelection();				
+					var currentItem = inventoryInfo[itemIdx];	
+					if($equipablesManager.isDuplicate(currentItem.weaponId, mech.id)){
+						SoundManager.playBuzzer();
+					} else if(this.getCurrentWeightUsage() <= $statCalc.getActorMechCarryingCapacity($gameTemp.currentMenuUnit.actor)){
+						SoundManager.playOk();			
 						
-					let itemInfo = $equipablesManager.getActorItems(mech.id)[this._currentSelection];
-					if(itemInfo){
-						$equipablesManager.removeItemHolder(itemInfo.weaponId, itemInfo.instanceId);
-					}
-					
-					//mech.items = $statCalc.getActorMechItems(mech.id);
-					
-					if(itemIdx != -1){ 					
-						var currentItem = inventoryInfo[itemIdx];	
+									
+							
+						let itemInfo = $equipablesManager.getActorItems(mech.id)[this._currentSelection];
+						if(itemInfo){
+							$equipablesManager.removeItemHolder(itemInfo.weaponId, itemInfo.instanceId);
+						}
+						
+						//mech.items = $statCalc.getActorMechItems(mech.id);
+						
+									
+							
 						var mech = this.getCurrentSelection();
 						$equipablesManager.setItemHolder(currentItem.weaponId, currentItem.instanceId, mech.id, this._currentSelection);
 						//mech.items = $statCalc.getActorMechItems(mech.id);				
-					}
-					this._currentUIState = "slot_selection";
-					this.refreshAllUnits();	
-				} else {
-					SoundManager.playBuzzer();
-				}				
+						
+						this._currentUIState = "slot_selection";
+						this.refreshAllUnits();	
+					} else {
+						SoundManager.playBuzzer();
+					}		
+				}	
 			}
 			this.refresh();
 			return;	

@@ -116,10 +116,9 @@ SRWEquipablesManager.prototype.removeItem = function(weaponId, instanceId){
 }
 
 SRWEquipablesManager.prototype.addItemHolder = function(weaponId, mechId, slot){
-	let currentItems = this.getActorItemIds(mechId);
-	if(currentItems.indexOf(weaponId) != -1){
+	if(this.isDuplicate(weaponId, mechId)){
 		console.log("Attempted to assign a duplicate item("+weaponId+") to mech '"+mechId+"'!");
-		return;
+		return false;
 	}
 	
 	var inventory = this.getCurrentInventory();
@@ -151,8 +150,22 @@ SRWEquipablesManager.prototype.clearHolderSlot = function(mechId, slot){
 	}
 }
 
+SRWEquipablesManager.prototype.isDuplicate = function(weaponId, mechId){
+	let currentItems = this.getActorItemIds(mechId);
+	if(!ENGINE_SETTINGS.ALLOW_DUPLICATE_EQUIPS && currentItems.indexOf(weaponId) != -1){
+		console.log("Attempted to assign a duplicate item("+weaponId+") to mech '"+mechId+"'!");
+		return true;
+	}	
+	return false;
+}
+
 SRWEquipablesManager.prototype.setItemHolder = function(weaponId, instanceId, mechId, slot){
 	var inventory = this.getCurrentInventory();
+	if(this.isDuplicate(weaponId, mechId)){
+		console.log("Attempted to assign a duplicate item("+weaponId+") to mech '"+mechId+"'!");
+		return false;
+	}	
+	
 	const targetIdx = this.getItemIdx(weaponId, instanceId);
 	this.clearHolderSlot(mechId, slot);
 	

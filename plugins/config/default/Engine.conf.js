@@ -11,8 +11,9 @@ var ENGINE_SETTINGS = {
 	PRELOAD_AUDIO: true,
 	RPG_MAKER_INV_LIMIT: 1,
 	ENABLE_EQUIPABLES: true,
+	ALLOW_DUPLICATE_EQUIPS: false,
 	MAX_UNIT_EQUIPABLES: 5, //the number of equipable weapon slots a unit has by default
-	DEFAULT_CARRYING_CAPACITY: 150,	
+	DEFAULT_CARRYING_CAPACITY: 150,		
 	LOCK_CAMERA_TO_CURSOR: false,
 	BEFORE_BATTLE_SPIRITS: false,
 	ENABLE_TWIN_SYSTEM: true,
@@ -50,6 +51,38 @@ var ENGINE_SETTINGS = {
 		preferTarget: 0,//if 1 the unit will prefer to move closer to its target unit or region even if they have other targets to attack. Target units take priority over target regions.  
 	},
 	AI_USES_ITEMS: true,
+	WEAP_TERRAIN_VALUES: {//weapon damage is multiplied with this value depending on its terrain rating and the current terrain of the target
+		"S": 1.1,
+		"A": 1.0,
+		"B": 0.8,
+		"C": 0.6,
+		"D": 0.5,
+	},
+	MECH_TERRAIN_VALUES: {//damage received is multiplied with this value depending on the current terrain of the target
+		"S": 1.1,
+		"A": 1.0,
+		"B": 0.9,
+		"C": 0.8,
+		"D": 0.6,
+	},	
+	MECH_SIZES: ["S", "M", "1L", "2L", "XS"],
+	MECH_SIZE_MODS: {
+		DAMAGE: { // when calculating damage the size of the defender and attacker size are subtracted from each other and this value +1 is used as a multiplier for the defend value of the defender. 
+			//ex.: 2L attacks S size unit -> 0.8 - 1.4 = -0.6 -> 1 + (-0.6) = 0.4 -> defenders final defend is multiplier with 0.4
+			"XS": 0.6,
+			"S": 0.8,
+			"M": 1.0,
+			"1L": 1.2,
+			"2L": 1.4
+		},
+		EVADE: { //the accuracy of an attack targeting a unit is multiplied with this value
+			"XS": 0.6,
+			"S": 0.8,
+			"M": 1.0,
+			"1L": 1.2,
+			"2L": 1.4
+		}
+	},	
 	DISABLE_FULL_BATTLE_SCENE: false,// if true the option to show the battle DEMO will not be available
 	BATTLE_SCENE: {
 		FXAA_ON: false,

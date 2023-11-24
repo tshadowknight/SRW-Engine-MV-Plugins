@@ -1,31 +1,50 @@
 function BattleCalc(){
-	this._weaponTerrainValues = {
+	
+}
+
+BattleCalc.prototype.getWeaponTerrainValue = function(terrainRank){
+	let values =  ENGINE_SETTINGS.WEAP_TERRAIN_VALUES.DAMAGE || {
 		"S": 1.1,
 		"A": 1.0,
 		"B": 0.8,
 		"C": 0.6,
 		"D": 0.5,
-	};
-	this._mechTerrainValues = {
+	}
+	return values[terrainRank];
+}
+
+BattleCalc.prototype.getMechTerrainValue = function(terrainRank){
+	let values =  ENGINE_SETTINGS.MECH_TERRAIN_VALUES.DAMAGE || {
 		"S": 1.1,
 		"A": 1.0,
 		"B": 0.9,
 		"C": 0.8,
 		"D": 0.6,
-	};
-	this._mechSizeValues = {
-		"S": 0.8,
-		"M": 1.0,
-		"1L": 1.2,
-		"2L": 1.4
-	};
-	this._sizeEvadeMod = {
-		"S": 0.8,
-		"M": 1.0,
-		"1L": 1.2,
-		"2L": 1.4
-	};
+	}
+	return values[terrainRank];
 }
+
+BattleCalc.prototype.getMechSizeValue = function(size){
+	let values =  ENGINE_SETTINGS.MECH_SIZE_MODS.DAMAGE || {
+		"S": 0.8,
+		"M": 1.0,
+		"1L": 1.2,
+		"2L": 1.4
+	}
+	return values[size];
+}
+
+BattleCalc.prototype.getMechEvadeMod = function(size){
+	let values =  ENGINE_SETTINGS.MECH_SIZE_MODS.EVADE || {
+		"S": 0.8,
+		"M": 1.0,
+		"1L": 1.2,
+		"2L": 1.4
+	}
+	return values[size];
+}
+
+
 
 BattleCalc.prototype.isTargetInRange = function(originPos, targetPos, range, minRange){
 	var deltaX = Math.abs(targetPos.x - originPos.x);
@@ -182,7 +201,7 @@ BattleCalc.prototype.performHitCalculation = function(attackerInfo, defenderInfo
 		
 		var terrainEvadeFactor = $statCalc.getCurrentTerrainMods(defenderInfo.actor).evasion || 0;
 		
-		var finalHit = (baseHit - baseEvade) * this._sizeEvadeMod[$statCalc.getCurrentSize(defenderInfo.actor)] * (1 - terrainEvadeFactor/100);
+		var finalHit = (baseHit - baseEvade) * this.getMechEvadeMod($statCalc.getCurrentSize(defenderInfo.actor)) * (1 - terrainEvadeFactor/100);
 		
 		//finalHit = finalHit + $statCalc.getCommanderBonus(attackerInfo.actor) - $statCalc.getCommanderBonus(defenderInfo.actor);
 		
@@ -298,7 +317,7 @@ BattleCalc.prototype.performDamageCalculation = function(attackerInfo, defenderI
 		//initial attack
 		var weaponInfo = attackerAction.attack;
 		var weaponPower = $statCalc.getWeaponPower(attackerInfo.actor, weaponInfo)*1;
-		var weaponTerrainRating = this._weaponTerrainValues[$statCalc.getWeaponTerrainMod(defenderInfo.actor, weaponInfo)] || 0;
+		var weaponTerrainRating = this.getWeaponTerrainValue($statCalc.getWeaponTerrainMod(defenderInfo.actor, weaponInfo)) || 0;
 		
 		var attackerPilotOffense;
 		var attackerPilotStats = $statCalc.getCalculatedPilotStats(attackerInfo.actor);
@@ -352,11 +371,11 @@ BattleCalc.prototype.performDamageCalculation = function(attackerInfo, defenderI
 			armor = 1;
 		}	
 		
-		var defenderTerrainRating = this._mechTerrainValues[defenderMechStats.terrain[$statCalc.getCurrentAliasedTerrain(defenderInfo.actor)]] || 0;
+		var defenderTerrainRating = this.getMechTerrainValue(defenderMechStats.terrain[$statCalc.getCurrentAliasedTerrain(defenderInfo.actor)]) || 0;
 		
 		//final damage
 		var terrainDefenseFactor = $statCalc.getCurrentTerrainMods(defenderInfo.actor).defense || 0; 
-		var sizeFactor = 1 + this._mechSizeValues[$statCalc.getCurrentSize(defenderInfo.actor)] - this._mechSizeValues[$statCalc.getCurrentSize(attackerInfo.actor)];
+		var sizeFactor = 1 + this.getMechSizeValue($statCalc.getCurrentSize(defenderInfo.actor)) - this.getMechSizeValue($statCalc.getCurrentSize(attackerInfo.actor));
 		var attackerHasIgnoreSize = $statCalc.applyStatModsToValue(attackerInfo.actor, 0, ["ignore_size"]) || activeAttackerSpirits.fury;
 		if(attackerHasIgnoreSize && sizeFactor > 1){
 			sizeFactor = 1;

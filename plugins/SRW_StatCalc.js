@@ -1121,9 +1121,17 @@ StatCalc.prototype.isRevealed = function(actor){
 	}
 }
 
+StatCalc.prototype.isConfused = function(actor){
+	if(this.isActorSRWInitialized(actor)){
+		return actor.SRWStats.stageTemp.isConfused;
+	} else {
+		return false;
+	}
+}
+
 StatCalc.prototype.isAI = function(actor){
 	if(this.isActorSRWInitialized(actor)){
-		return !actor.isActor() || actor.SRWStats.stageTemp.isAI;
+		return !actor.isActor() || actor.SRWStats.stageTemp.isAI || this.isConfused(actor);
 	} else {
 		return false;
 	}
@@ -5142,6 +5150,7 @@ StatCalc.prototype.isValidWeaponTarget = function(actor, target, weapon, include
 	let targetRefEvent = _this.getReferenceEvent(target);
 	var isInRange = $battleCalc.isTargetInRange({x: actorRefEvent.posX(), y: actorRefEvent.posY()}, {x: targetRefEvent.posX(), y: targetRefEvent.posY()}, range, minRange);
 	var isValidTarget = false;
+
 	if(!weapon.ignoresEnemies){		
 		if(!$gameSystem.isFriendly(target, factionConfig.ownFaction)){
 			isValidTarget = true;
