@@ -107,8 +107,13 @@
 					}
 					if(b._character.isActiveShip){
 						return 1;
-					}				
-					return a._character.posY() - b._character.posY();						
+					}		
+					if(a._character.posY() != b._character.posY()) {
+						return a._character.posY() - b._character.posY();
+					} else {
+						return a._character.posX() - b._character.posX();
+					}
+									
 				});
 	
 				this.children[0].children = pre.concat(sorted).concat(post);
