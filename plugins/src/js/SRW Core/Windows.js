@@ -550,7 +550,7 @@
 				  
 			   //_SRPG_Window_MenuCommand_makeCommandList.call(this);
 			   
-			    this.addOriginalCommands();
+			   
 			   
 			   if($gameSystem.isSRPGMode()){
 				   this.addTurnEndCommand();     
@@ -562,6 +562,8 @@
 				   if(ENGINE_SETTINGS.ENABLE_TRANSFORM_ALL){
 						this.addCommand(APPSTRINGS.MAPMENU.cmd_transform_all, 'transform_all');
 					}
+			   } else {
+				    this.addOriginalCommands();
 			   }
 			   
 			   this.addCommand(APPSTRINGS.MAPMENU.cmd_options, 'options');
