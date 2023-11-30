@@ -510,6 +510,10 @@ SceneManager.isInSaveScene = function(){
 		this._commandWindow.setHandler('transform_all', this.transformAllActorMenuCommand.bind(this));		
 		this._commandWindow.setHandler('log',this.commandLog.bind(this)); 
 		
+		//hacky way to restore compatibility with plugins that still rely on scene_menu being used for the map menu		
+		Scene_Map.prototype.createCommandWindow.call(this)
+			
+		
 		this._commandWindow.y = 50;
 		this._commandWindow.x = 800;
 		this.addWindow(this._commandWindow);	
@@ -521,6 +525,10 @@ SceneManager.isInSaveScene = function(){
 		this._commandWindow.deactivate();
 		this._goldWindow.hide();
 		this._goldWindow.deactivate();
+	}
+	
+	Scene_Map.prototype.createCommandWindow = function(){
+		
 	}
 	
 	Scene_Map.prototype.createConditionsWindow = function() {
@@ -4654,13 +4662,7 @@ SceneManager.isInSaveScene = function(){
 //====================================================================
     var _SRPG_SceneMenu_createCommandWindow = Scene_Menu.prototype.createCommandWindow;
     Scene_Menu.prototype.createCommandWindow = function() {
-        _SRPG_SceneMenu_createCommandWindow.call(this);
-        if ($gameSystem.isSRPGMode() == true) {
-            this._commandWindow.setHandler('turnEnd',this.commandTurnEnd.bind(this));
-            this._commandWindow.setHandler('autoBattle',this.commandAutoBattle.bind(this));			
-        }
-		this._commandWindow.y = 100;
-		this._commandWindow.x = 800;
+       
     };    
 
     Scene_Menu.prototype.commandAutoBattle = function() {

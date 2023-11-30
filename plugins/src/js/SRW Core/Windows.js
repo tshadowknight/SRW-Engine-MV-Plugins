@@ -548,7 +548,9 @@
 			var _SRPG_Window_MenuCommand_makeCommandList = Window_MenuCommand.prototype.makeCommandList;
 			Window_MenuCommand.prototype.makeCommandList = function() {       
 				  
-			   // _SRPG_Window_MenuCommand_makeCommandList.call(this);
+			   //_SRPG_Window_MenuCommand_makeCommandList.call(this);
+			   
+			    this.addOriginalCommands();
 			   
 			   if($gameSystem.isSRPGMode()){
 				   this.addTurnEndCommand();     
