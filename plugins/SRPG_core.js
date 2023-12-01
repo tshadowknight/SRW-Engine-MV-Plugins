@@ -507,7 +507,14 @@ SceneManager.isInSaveScene = function(){
 		this._commandWindow.setHandler('unitList',this.commandUnitList.bind(this));   
 		this._commandWindow.setHandler('search',this.commandSearch.bind(this));   		
 		this._commandWindow.setHandler('conditions',this.commandConditions.bind(this)); 		
-		this._commandWindow.setHandler('transform_all', this.transformAllActorMenuCommand.bind(this));		
+		this._commandWindow.setHandler('transform_all', this.transformAllActorMenuCommand.bind(this));	
+
+		this._commandWindow.setHandler('item',      this.commandItemVanilla.bind(this));
+		this._commandWindow.setHandler('skill',     this.commandPersonal.bind(this));
+		this._commandWindow.setHandler('equip',     this.commandPersonal.bind(this));
+		this._commandWindow.setHandler('status',    this.commandPersonal.bind(this));
+		this._commandWindow.setHandler('formation', this.commandFormation.bind(this));
+		
 		this._commandWindow.setHandler('log',this.commandLog.bind(this)); 
 		
 		//hacky way to restore compatibility with plugins that still rely on scene_menu being used for the map menu		
@@ -531,6 +538,27 @@ SceneManager.isInSaveScene = function(){
 		
 	}
 	
+	
+	Scene_Map.prototype.commandItemVanilla = function() {
+		 SceneManager.push(Scene_Item);
+	};
+
+	
+	Scene_Map.prototype.commandPersonal = function() {
+		this._statusWindow.setFormationMode(false);
+		this._statusWindow.selectLast();
+		this._statusWindow.activate();
+		this._statusWindow.setHandler('ok',     this.onPersonalOk.bind(this));
+		this._statusWindow.setHandler('cancel', this.onPersonalCancel.bind(this));
+	};
+
+	Scene_Map.prototype.commandFormation = function() {
+		this._statusWindow.setFormationMode(true);
+		this._statusWindow.selectLast();
+		this._statusWindow.activate();
+		this._statusWindow.setHandler('ok',     this.onFormationOk.bind(this));
+		this._statusWindow.setHandler('cancel', this.onFormationCancel.bind(this));
+	};
 	Scene_Map.prototype.createConditionsWindow = function() {
 		this._conditionsWindow = new Window_ConditionsInfo(0, 0);
 		this._conditionsWindow.y = 50;

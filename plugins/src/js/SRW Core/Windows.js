@@ -547,10 +547,7 @@
 		//====================================================================
 			var _SRPG_Window_MenuCommand_makeCommandList = Window_MenuCommand.prototype.makeCommandList;
 			Window_MenuCommand.prototype.makeCommandList = function() {       
-				  
-			   //_SRPG_Window_MenuCommand_makeCommandList.call(this);
-			   
-			   
+				 
 			   
 			   if($gameSystem.isSRPGMode()){
 				   this.addTurnEndCommand();     
@@ -559,11 +556,14 @@
 				   this.addCommand(APPSTRINGS.MAPMENU.cmd_conditions, 'conditions', true);
 				   				   	
 			   
-				   if(ENGINE_SETTINGS.ENABLE_TRANSFORM_ALL){
+					if(ENGINE_SETTINGS.ENABLE_TRANSFORM_ALL){
 						this.addCommand(APPSTRINGS.MAPMENU.cmd_transform_all, 'transform_all');
 					}
 			   } else {
-				    this.addOriginalCommands();
+					if (this.needsCommand('item')) {
+						this.addCommand(TextManager.item, 'item', true);
+					}
+					this.addOriginalCommands();
 			   }
 			   
 			   this.addCommand(APPSTRINGS.MAPMENU.cmd_options, 'options');
