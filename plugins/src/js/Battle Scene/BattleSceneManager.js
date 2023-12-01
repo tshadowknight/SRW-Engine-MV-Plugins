@@ -1713,8 +1713,9 @@ BattleSceneManager.prototype.hookBeforeRender = function(){
 						} else if(texture.uOffsetAccumulator < 0){
 							texture.uOffsetAccumulator+=1;
 						}
-						texture.uOffset_ = texture.uOffsetAccumulator;
-						bg.material.diffuseTexture.getTextureMatrix().setRowFromFloats(2, texture.uOffset_, 0, 0, 0);
+						//texture.uOffset_ = texture.uOffsetAccumulator;
+						//bg.material.diffuseTexture.getTextureMatrix().setRowFromFloats(2, texture.uOffset_, 0, 0, 0);
+						texture.uOffset = texture.uOffsetAccumulator;
 					}
 					
 				}

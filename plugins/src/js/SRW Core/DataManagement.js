@@ -239,17 +239,11 @@
 			}
 			
 			async function loadActiveConfig(type){			
-				/*var path_lib = require('path');
-				var base = path_lib.dirname(process.mainModule.filename);
-				var path = base+'/js/plugins/config/active/'+type+'.conf.js';
-				if (!fs.existsSync(path)) {					
-					path = base+'/js/plugins/config/default/'+type+'.conf.js'
-				}*/
 				
 				var base = "";
 				if (Utils.isNwjs()) {
 					var path_lib = require('path');
-					base =  path_lib.dirname(process.mainModule.filename) + "/";
+					base = ""; //path_lib.dirname(process.mainModule.filename) + "/";
 				}
 				
 				var path = base+'js/plugins/config/active/'+type+'.conf.js';
@@ -292,7 +286,7 @@
 				var base = "";
 				if (Utils.isNwjs()) {
 					var path_lib = require('path');
-					base =  path_lib.dirname(process.mainModule.filename) + "/";
+					base = ""; //path_lib.dirname(process.mainModule.filename) + "/";
 				}
 				//Engine
 				await loadConfigFile(base+'js/plugins/config/default/Engine.conf.js');
@@ -504,7 +498,7 @@
 
 		
 			if(process.versions["nw-flavor"] === "sdk"){
-				var base = path.dirname(process.mainModule.filename);	
+				var base = ""; //path.dirname(process.mainModule.filename);	
 				return path.join(base, 'save/');
 			} else {
 				var base = path.dirname(process.execPath);
