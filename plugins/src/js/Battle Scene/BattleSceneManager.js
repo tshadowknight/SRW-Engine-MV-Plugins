@@ -340,7 +340,7 @@ BattleSceneManager.prototype.init = async function(attachControl){
 		
 		this._textureCopier = new BABYLON.CopyTextureToTexture(this._engine);
 		
-		this.initShaders();
+		//this.initShaders();
 		//this.initParticleSystems();
 		
 		this.initScene();
@@ -474,7 +474,7 @@ BattleSceneManager.prototype.initShader = async function(name){
 		var base = getBase();
 
 		var xhr = new XMLHttpRequest();
-		xhr.open('GET', base+"shader/"+name+".fx");
+		xhr.open('GET', "shader/"+name+".fx");
 		//xhr.overrideMimeType('application/json');
 		xhr.onload = function() {
 			if (xhr.status < 400) {

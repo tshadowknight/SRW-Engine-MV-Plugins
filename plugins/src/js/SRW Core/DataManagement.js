@@ -76,14 +76,14 @@
 		
 		DataManager.checkSRWKit = async function(){
 			var _this = this;
-			if (Utils.isNwjs()) {
+			if (Utils.isNwjs() && process.versions["nw-flavor"] === "sdk") {
 				const fs = require('fs');
 				var path = require('path');
 				var base = getBase();
 				let filesToCheck = ["AllyPilots", "Mechs", "MechWeapons", "EnemyPilots", "DeployActions", "MapAttacks", "ScriptCharacters", "Patterns", "BattleAnimations", "BattleEnvironments", "BattleText"];
 				let missingFiles = [];	
 				filesToCheck.forEach(function(file){
-					if (!fs.existsSync(base+"data/"+file+".json")) {
+					if (!fs.existsSync("data/"+file+".json")) {
 						missingFiles.push(file);
 					}
 				});
@@ -103,27 +103,27 @@
 			var base = getBase();
 			missingFiles.forEach(async function(file){
 				if(file == "AllyPilots"){
-					fs.copyFileSync(base+"data/Actors.json", "data/AllyPilots.json", fs.constants.COPYFILE_EXCL);
+					fs.copyFileSync("data/Actors.json", "data/AllyPilots.json", fs.constants.COPYFILE_EXCL);
 				}
 				if(file == "Mechs"){
-					fs.copyFileSync(base+"data/Classes.json", "data/Mechs.json", fs.constants.COPYFILE_EXCL);
+					fs.copyFileSync("data/Classes.json", "data/Mechs.json", fs.constants.COPYFILE_EXCL);
 				}
 				if(file == "MechWeapons"){
-					fs.copyFileSync(base+"data/Weapons.json", "data/MechWeapons.json", fs.constants.COPYFILE_EXCL);
+					fs.copyFileSync("data/Weapons.json", "data/MechWeapons.json", fs.constants.COPYFILE_EXCL);
 				}
 				if(file == "EnemyPilots"){
-					fs.copyFileSync(base+"data/Enemies.json", "data/EnemyPilots.json", fs.constants.COPYFILE_EXCL);
+					fs.copyFileSync("data/Enemies.json", "data/EnemyPilots.json", fs.constants.COPYFILE_EXCL);
 				}
 				if(file == "DeployActions"){				
-					fs.writeFileSync(base+"data/DeployActions.json", JSON.stringify({}));
+					fs.writeFileSync("data/DeployActions.json", JSON.stringify({}));
 				}
 				if(file == "Patterns"){				
-					fs.writeFileSync(base+"data/Patterns.json", JSON.stringify([]));
+					fs.writeFileSync("data/Patterns.json", JSON.stringify([]));
 				}
 				if(file == "MapAttacks"){
-					var sourceFile = base+"js/plugins/config/active/MapAttacks.conf.js";
+					var sourceFile = "js/plugins/config/active/MapAttacks.conf.js";
 					if(!fs.existsSync(sourceFile)){
-						sourceFile = base+"js/plugins/config/default/MapAttacks.conf.js";
+						sourceFile = "js/plugins/config/default/MapAttacks.conf.js";
 					}
 					var s = document.createElement("script");
 					s.type = "text/javascript";
@@ -132,37 +132,37 @@
 					await new Promise(function(resolve, reject){
 						 s.addEventListener('load', function() {
 							$mapAttackManager.initLegacyFormat();
-							fs.writeFileSync(base+"data/MapAttacks.json", JSON.stringify($mapAttackManager._definitions));
+							fs.writeFileSync("data/MapAttacks.json", JSON.stringify($mapAttackManager._definitions));
 						 });
 					});		
 				}
 				if(file == "ScriptCharacters"){
-					var sourceFile = base+"js/plugins/config/active/ScriptCharacters.json";
+					var sourceFile = "js/plugins/config/active/ScriptCharacters.json";
 					if(!fs.existsSync(sourceFile)){
-						sourceFile = base+"js/plugins/config/default/ScriptCharacters.json";
+						sourceFile = "js/plugins/config/default/ScriptCharacters.json";
 					}
-					fs.copyFileSync(sourceFile, base+"data/ScriptCharacters.json", fs.constants.COPYFILE_EXCL);	
+					fs.copyFileSync(sourceFile, "data/ScriptCharacters.json", fs.constants.COPYFILE_EXCL);	
 				}
 				if(file == "BattleAnimations"){
-					var sourceFile = base+"js/plugins/config/active/BattleAnimations.json";
+					var sourceFile = "js/plugins/config/active/BattleAnimations.json";
 					if(!fs.existsSync(sourceFile)){
-						sourceFile = base+"js/plugins/config/default/BattleAnimations.json";
+						sourceFile = "js/plugins/config/default/BattleAnimations.json";
 					}
-					fs.copyFileSync(sourceFile, base+"/data/BattleAnimations.json", fs.constants.COPYFILE_EXCL);	
+					fs.copyFileSync(sourceFile, "/data/BattleAnimations.json", fs.constants.COPYFILE_EXCL);	
 				}
 				if(file == "BattleEnvironments"){
-					var sourceFile = base+"js/plugins/config/active/BattleEnvironments.json";
+					var sourceFile = "js/plugins/config/active/BattleEnvironments.json";
 					if(!fs.existsSync(sourceFile)){
-						sourceFile = base+"js/plugins/config/default/BattleEnvironments.json";
+						sourceFile = "js/plugins/config/default/BattleEnvironments.json";
 					}
-					fs.copyFileSync(sourceFile, base+"/data/BattleEnvironments.json", fs.constants.COPYFILE_EXCL);	
+					fs.copyFileSync(sourceFile, "/data/BattleEnvironments.json", fs.constants.COPYFILE_EXCL);	
 				}
 				if(file == "BattleText"){
-					var sourceFile = base+"js/plugins/config/active/BattleText.json";
+					var sourceFile = "js/plugins/config/active/BattleText.json";
 					if(!fs.existsSync(sourceFile)){
-						sourceFile = base+"js/plugins/config/default/BattleText.json";
+						sourceFile = "js/plugins/config/default/BattleText.json";
 					}
-					fs.copyFileSync(sourceFile, base+"data/BattleText.json", fs.constants.COPYFILE_EXCL);	
+					fs.copyFileSync(sourceFile, "data/BattleText.json", fs.constants.COPYFILE_EXCL);	
 				}
 			});
 		}
@@ -241,18 +241,18 @@
 			async function loadActiveConfig(type){			
 				/*var path_lib = require('path');
 				var base = path_lib.dirname(process.mainModule.filename);
-				var path = base+'/js/plugins/config/active/'+type+'.conf.js';
+				var path = '/js/plugins/config/active/'+type+'.conf.js';
 				if (!fs.existsSync(path)) {					
-					path = base+'/js/plugins/config/default/'+type+'.conf.js'
+					path = '/js/plugins/config/default/'+type+'.conf.js'
 				}*/
 				
 				var base = getBase();
 				
-				var path = base+'js/plugins/config/active/'+type+'.conf.js';
+				var path = 'js/plugins/config/active/'+type+'.conf.js';
 				await loadConfigFile(path);		
 				if(configResults[path].status == "NOK"){
 					delete configResults[path];
-					path = base+'js/plugins/config/default/'+type+'.conf.js'
+					path = 'js/plugins/config/default/'+type+'.conf.js'
 					await loadConfigFile(path);		
 				}
 			}
@@ -287,34 +287,34 @@
 			await Promise.all(defs).then(async function(){
 				var base = getBase();
 				//Engine
-				await loadConfigFile(base+'js/plugins/config/default/Engine.conf.js');
+				await loadConfigFile('js/plugins/config/default/Engine.conf.js');
 				
 				var ENGINE_SETTINGS_DEFAULT = window.ENGINE_SETTINGS;
 				
-				//if (fs.existsSync(base+'/js/plugins/config/active/Engine.conf.js')) {
-					await loadConfigFile(base+'js/plugins/config/active/Engine.conf.js');						
+				//if (fs.existsSync('/js/plugins/config/active/Engine.conf.js')) {
+					await loadConfigFile('js/plugins/config/active/Engine.conf.js');						
 				//}			
-				if(configResults[base+'js/plugins/config/default/Engine.conf.js'].status == "OK") {
-					delete configResults[base+'js/plugins/config/active/Engine.conf.js'];
+				if(configResults['js/plugins/config/default/Engine.conf.js'].status == "OK") {
+					delete configResults['js/plugins/config/active/Engine.conf.js'];
 				}		
 				
 				//Appstrings
-				await loadConfigFile(base+'js/plugins/config/default/Appstrings.conf.js');
+				await loadConfigFile('js/plugins/config/default/Appstrings.conf.js');
 				
 				var APPSTRINGS_DEFAULT = window.APPSTRINGS;
 				var EDITORSTRINGS_DEFAULT = window.EDITORSTRINGS;
 				
-				await loadConfigFile(base+'js/plugins/config/active/Appstrings.conf.js');						
+				await loadConfigFile('js/plugins/config/active/Appstrings.conf.js');						
 					
-				if(configResults[base+'js/plugins/config/default/Appstrings.conf.js'].status == "OK") {
-					delete configResults[base+'js/plugins/config/active/Appstrings.conf.js'];
+				if(configResults['js/plugins/config/default/Appstrings.conf.js'].status == "OK") {
+					delete configResults['js/plugins/config/active/Appstrings.conf.js'];
 				}		
 					
 				
 				var errors = [];
 				Object.keys(configResults).forEach(function(type){
 					if(configResults[type].status == "NOK"){
-						errors.push("An error occurred while loading config file '"+configResults[type].path+"': "+configResults[type].data);
+						errors.push("An error occurred while loading config file '"+configResults[type].path+"': "+configResults[type].data+". Current work dir: " + process.cwd());
 					}
 				});
 				if(errors.length){
