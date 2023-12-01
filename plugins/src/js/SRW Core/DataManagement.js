@@ -79,7 +79,7 @@
 			if (Utils.isNwjs()) {
 				const fs = require('fs');
 				var path = require('path');
-				var base = "."//;path.dirname(process.mainModule.filename);
+				var base = path.dirname(process.mainModule.filename);
 				let filesToCheck = ["AllyPilots", "Mechs", "MechWeapons", "EnemyPilots", "DeployActions", "MapAttacks", "ScriptCharacters", "Patterns", "BattleAnimations", "BattleEnvironments", "BattleText"];
 				let missingFiles = [];	
 				filesToCheck.forEach(function(file){
@@ -100,7 +100,7 @@
 		DataManager.upgradeSRWKit = async function(missingFiles){
 			const fs = require('fs');
 			var path = require('path');
-			var base = "."//;path.dirname(process.mainModule.filename);
+			var base = path.dirname(process.mainModule.filename);
 			missingFiles.forEach(async function(file){
 				if(file == "AllyPilots"){
 					fs.copyFileSync(base+"/data/Actors.json", "data/AllyPilots.json", fs.constants.COPYFILE_EXCL);
@@ -239,18 +239,24 @@
 			}
 			
 			async function loadActiveConfig(type){			
+				/*var path_lib = require('path');
+				var base = path_lib.dirname(process.mainModule.filename);
+				var path = base+'/js/plugins/config/active/'+type+'.conf.js';
+				if (!fs.existsSync(path)) {					
+					path = base+'/js/plugins/config/default/'+type+'.conf.js'
+				}*/
 				
 				var base = "";
 				if (Utils.isNwjs()) {
 					var path_lib = require('path');
-					base = "."; //path_lib.dirname(process.mainModule.filename) + "/";
+					base =  path_lib.dirname(process.mainModule.filename) + "/";
 				}
 				
-				var path = base+'/js/plugins/config/active/'+type+'.conf.js';
+				var path = base+'js/plugins/config/active/'+type+'.conf.js';
 				await loadConfigFile(path);		
 				if(configResults[path].status == "NOK"){
 					delete configResults[path];
-					path = base+'/js/plugins/config/default/'+type+'.conf.js'
+					path = base+'js/plugins/config/default/'+type+'.conf.js'
 					await loadConfigFile(path);		
 				}
 			}
@@ -286,7 +292,7 @@
 				var base = "";
 				if (Utils.isNwjs()) {
 					var path_lib = require('path');
-					base = ""; //path_lib.dirname(process.mainModule.filename) + "/";
+					base =  path_lib.dirname(process.mainModule.filename) + "/";
 				}
 				//Engine
 				await loadConfigFile(base+'js/plugins/config/default/Engine.conf.js');
@@ -498,7 +504,7 @@
 
 		
 			if(process.versions["nw-flavor"] === "sdk"){
-				var base = "./"; //path.dirname(process.mainModule.filename);	
+				var base = path.dirname(process.mainModule.filename);	
 				return path.join(base, 'save/');
 			} else {
 				var base = path.dirname(process.execPath);
