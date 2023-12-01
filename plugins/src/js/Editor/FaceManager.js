@@ -47,8 +47,8 @@ FaceManager.showFaceSelector = function(e, faceName, faceIndex, elem){
 	_this._searchBuffer = "";
 	return new Promise(function(resolve, reject){	
 		var path = require('path');
-		var base = path.dirname(process.mainModule.filename);
-		const dir = base+"/img/faces";
+		var base = getBase();
+		const dir = base+"img/faces";
 		var availableFaceFiles = [];
 		FILESYSTEM.readdirSync(dir).forEach(function(file) {	
 			file = file.replace(/\.png$/, "");

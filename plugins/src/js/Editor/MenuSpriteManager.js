@@ -11,8 +11,8 @@ MenuSpriteManager.showSelector = function(e, current, elem){
 	}
 	return new Promise(function(resolve, reject){	
 		var path = require('path');
-		var base = path.dirname(process.mainModule.filename);
-		const dir = base+"/img/menu";
+		var base = getBase();
+		const dir = base+"img/menu";
 		var availableFiles = [];
 		const FILESYSTEM = require("fs"); 
 		FILESYSTEM.readdirSync(dir).forEach(function(file) {	

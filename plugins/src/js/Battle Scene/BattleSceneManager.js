@@ -444,8 +444,8 @@ BattleSceneManager.prototype.initShaders = function(){
 	if (Utils.isNwjs()){
 		const FILESYSTEM = require("fs"); 
 		var path = require('path');
-		var base = path.dirname(process.mainModule.filename);
-		const dir = base+"/shader";
+		var base = getBase();
+		const dir = base+"shader";
 		FILESYSTEM.readdirSync(dir).forEach(function(file) {
 			var name = file.replace(/\.fx$/, "");
 			var parts = name.split("_");
@@ -471,12 +471,7 @@ BattleSceneManager.prototype.initShader = async function(name){
 		var parts = name.split("_");
 		var shaderName = parts[0];
 		var shaderType = parts[1] == "fragment" ? "Fragment" : "Vertex";
-		var base = "";
-		if (Utils.isNwjs()){
-			const FILESYSTEM = require("fs"); 
-			var path = require('path');
-			base = path.dirname(process.mainModule.filename) + "/";
-		}
+		var base = getBase();
 
 		var xhr = new XMLHttpRequest();
 		xhr.open('GET', base+"shader/"+name+".fx");

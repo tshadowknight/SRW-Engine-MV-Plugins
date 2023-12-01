@@ -11,8 +11,8 @@ BasicBattleSpriteManager.showSelector = function(e, current, elem){
 	}
 	return new Promise(function(resolve, reject){	
 		var path = require('path');
-		var base = path.dirname(process.mainModule.filename);
-		const dir = base+"/img/basic_battle";
+		var base = getBase();
+		const dir = base+"img/basic_battle";
 		var availableFiles = [];
 		const FILESYSTEM = require("fs"); 
 		FILESYSTEM.readdirSync(dir).forEach(function(file) {	

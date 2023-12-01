@@ -19,6 +19,17 @@
 
 //global reference to the filesystem module to circumvent issues with webpacked sections(battle scene)
 
+
+function getBase(){
+	var base = "./";
+	if (Utils.isNwjs()) {
+		var path_lib = require('path');
+		base = path_lib.dirname(process.mainModule.filename) + "/";
+		base = base.replace(/^\//, "");
+	}
+	return base;
+}
+
 //disable touch support
 
 

@@ -4260,7 +4260,7 @@ SRWEditor.prototype.generateDist = async function(){
 	const fs = require('fs');
 	let fse = require('fs-extra');
 	let path = require('path');
-	let base = path.dirname(process.mainModule.filename)+"\\";
+	let base = getBase()+"\\";
 	let distPath = base+'\\dist\\www\\';
 	
 	function initDir(path){

@@ -45,8 +45,8 @@ OverworldSpriteManager.showOverworldSelector = function(e, faceName, faceIndex, 
 	
 	return new Promise(function(resolve, reject){	
 		var path = require('path');
-		var base = path.dirname(process.mainModule.filename);
-		const dir = base+"/img/characters";
+		var base = getBase();
+		const dir = base+"img/characters";
 		var availableFaceFiles = [];
 		const FILESYSTEM = require("fs"); 
 		FILESYSTEM.readdirSync(dir).forEach(function(file) {	
