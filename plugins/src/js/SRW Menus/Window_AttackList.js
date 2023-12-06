@@ -199,7 +199,7 @@ Window_AttackList.prototype.redraw = function() {
 	
 	
 	
-	if(attack.isMap){
+	if(attack && attack.isMap){
 		this._mapAttackPreview.classList.add("active");
 		this.updateScaledDiv(this._mapAttackPreview);
 		this._mapAttackPreviewHandler.showPreview(attack);

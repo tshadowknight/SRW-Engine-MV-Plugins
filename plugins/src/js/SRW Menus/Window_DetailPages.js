@@ -1040,7 +1040,7 @@ Window_DetailPages.prototype.redraw = function() {
 		_this._renderedTabs["AList"] = true;
 		this._attackSummary.redraw();
 		var attack = this._attackList.getCurrentSelection(); 
-		if(attack.isMap){
+		if(attack && attack.isMap){
 			this._mapAttackPreview.classList.add("active");
 			this.updateScaledDiv(this._mapAttackPreview);
 			this._mapAttackPreviewHandler.showPreview(attack);

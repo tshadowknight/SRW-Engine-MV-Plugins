@@ -559,7 +559,7 @@ $SRWConfig.itemEffects = function(){
 		},
 		{
 			type: "repair",
-			animId: "trust"
+			animId: "Trust"
 		},
 		500
 	);
@@ -579,7 +579,7 @@ $SRWConfig.itemEffects = function(){
 		},
 		{
 			type: "repair",
-			animId: "resupply"
+			animId: "Resupply"
 		},
 		500
 	);
@@ -599,7 +599,7 @@ $SRWConfig.itemEffects = function(){
 		},
 		{
 			type: "spirit",
-			animId: "resupply"
+			animId: "Resupply"
 		},
 		500
 	);
@@ -621,7 +621,7 @@ $SRWConfig.itemEffects = function(){
 		},
 		{
 			type: "spirit",
-			animId: "resupply"
+			animId: "Resupply"
 		},
 		1000
 	);
@@ -641,7 +641,7 @@ $SRWConfig.itemEffects = function(){
 		},
 		{
 			type: "repair",
-			animId: "resupply"
+			animId: "Resupply"
 		},
 		null,
 		1000
@@ -662,7 +662,7 @@ $SRWConfig.itemEffects = function(){
 		},
 		{
 			type: "repair",
-			animId: "resupply"
+			animId: "Resupply"
 		},
 		null,
 		2500
@@ -753,7 +753,7 @@ $SRWConfig.itemEffects = function(){
 		},
 		{
 			type: "spirit",
-			animId: "miracle"
+			animId: "Miracle"
 		},
 		null,
 		5000
@@ -774,7 +774,7 @@ $SRWConfig.itemEffects = function(){
 		},
 		{
 			type: "spirit",
-			animId: "drive"
+			animId: "Drive"
 		},
 		null,
 		3000
@@ -920,7 +920,7 @@ $SRWConfig.itemEffects = function(){
 		},
 		{
 			type: "repair",
-			animId: "resupply"
+			animId: "Resupply"
 		},
 		500
 	);

@@ -814,10 +814,10 @@ GameState_actor_support.prototype.updateMapEvent = function(x, y, triggers){
 					var baseYield;
 					if($gameTemp.supportType == "heal"){
 						baseYield = 250;
-						effect = {type: "repair", parameters: {animId: "trust", target: candidate, startAmount: stats.HPBeforeRecovery, endAmount: stats.currentHP, total: stats.maxHP}};									
+						effect = {type: "repair", parameters: {animId: "Trust", target: candidate, startAmount: stats.HPBeforeRecovery, endAmount: stats.currentHP, total: stats.maxHP}};									
 					} else {
 						baseYield = 375;
-						effect = {type: "repair", parameters: {animId: "resupply", target: candidate, startAmount: originalEN, endAmount: newEN, total: stats.maxEN}};		
+						effect = {type: "repair", parameters: {animId: "Resupply", target: candidate, startAmount: originalEN, endAmount: newEN, total: stats.maxEN}};		
 					}									
 					$gameTemp.queuedActorEffects = [effect];	
 
