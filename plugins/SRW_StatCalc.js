@@ -7790,7 +7790,7 @@ StatCalc.prototype.unbindLinkedDeploySlots = function(actorId, mechId, type, slo
 					
 					var sourceId = sourceDef.realId;
 					
-					if(targetDef.type == type){
+					if(sourceId != -1 && targetDef.type == type){
 						if(type != "sub" || targetDef.slot == slot){
 							var targetPilot = $gameActors.actor(sourceId);	
 							if(targetPilot && !lockedPilots[sourceId]){

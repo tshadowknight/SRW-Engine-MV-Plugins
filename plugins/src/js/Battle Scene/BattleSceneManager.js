@@ -4612,7 +4612,7 @@ BattleSceneManager.prototype.executeAnimation = function(animation, startTick){
 				
 				var imgPath = $statCalc.getBattleSceneImage(battleEffect.ref);
 				
-				targetObj.material.diffuseTexture = new BABYLON.Texture("img/SRWBattleScene/"+imgPath+"/"+params.name+".png", _this._scene, false, true, sampleMode);
+				targetObj.material.diffuseTexture = _this.getCachedTexture("img/SRWBattleScene/"+imgPath+"/"+params.name+".png"); 
 				targetObj.material.diffuseTexture.hasAlpha = true;
 				targetObj.material.useAlphaFromDiffuseTexture  = true;
 				targetObj.material.transparencyMode = BABYLON.Material.MATERIAL_ALPHATEST;
