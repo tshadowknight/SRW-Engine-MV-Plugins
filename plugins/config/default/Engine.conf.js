@@ -382,5 +382,10 @@ var ENGINE_SETTINGS = {
 		
 		AudioManager.loadBgm({name: "SRW_Engine_1"});
 	},
-	
+	GLOBAL_UNIT_MOD: function(actor){//a function that is applied to each unit when applying abilities, can return an array of stat mods like an ability effect handler
+		//you can also use this function to perform hacky mods to the actor that was passed in
+		
+		//example return value, optional. This example makes every unit in the game deal double the regular damage.
+		return [{type: "final_damage", modType: "mult", value: 2}];
+	}
 }

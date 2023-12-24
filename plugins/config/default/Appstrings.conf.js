@@ -752,6 +752,7 @@ EDITORSTRINGS.MECH = {
 	label_can_equip: "Can Equip",
 	label_can_hover: "Can Hover",
 	label_sync_parts: "Sync Parts With",
+	label_sync_equips: "Sync Equips With",
 	label_sync_upgrades: "Sync Upgrades With",
 	label_enabled: "Enabled",
 	label_move_penalty: "With Movement Penalty",

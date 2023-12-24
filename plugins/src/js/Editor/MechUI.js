@@ -154,18 +154,33 @@ MechUI.prototype.initPropertyHandlers = function(){
 				
 				content+="<div class='row'>";
 				content+="<div class='cell'>";
+				content+=EDITORSTRINGS.MECH.label_sync_equips;
+				content+="</div>";
+				content+="<div class='cell'>";
+				content+=_this.createMechSelect("sync_equipables_with", "", _this.getMetaValue("mechInheritsEquipablesFrom"));
+				content+="</div>";
+				content+="</div>";
+				
+				content+="<div class='row'>";
+				content+="<div class='cell'>";
 				content+=EDITORSTRINGS.MECH.label_sync_upgrades;
 				content+="</div>";
 				content+="<div class='cell'>";
 				content+=_this.createMechSelect("sync_upgrades_with", "", _this.getMetaValue("mechInheritsUpgradesFrom"));
 				content+="</div>";
 				content+="</div>";
+				
 				return content;
 			},
 			hook(entry){
 				entry = _this.getCurrentEntry();
 				containerNode.querySelector("#sync_parts_with").addEventListener("change", function(){
 					_this.setMetaValue("mechInheritsPartsFrom", this.value);
+					_this.show();
+					_this._mainUIHandler.setModified();
+				});
+				containerNode.querySelector("#sync_equipables_with").addEventListener("change", function(){
+					_this.setMetaValue("mechInheritsEquipablesFrom", this.value);
 					_this.show();
 					_this._mainUIHandler.setModified();
 				});

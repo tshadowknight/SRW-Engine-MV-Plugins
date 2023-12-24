@@ -840,8 +840,8 @@ StatCalc.prototype.getActorMechCarryingCapacity = function(actor){
 StatCalc.prototype.getActorMechEquipables = function(mechId){
 	var result = [];	
 	var mech = $dataClasses[mechId];
-	if(mech.meta.mechInheritsPartsFrom != null && mech.meta.mechInheritsPartsFrom != ""){
-		mechId = mech.meta.mechInheritsPartsFrom;
+	if(mech.meta.mechInheritsEquipablesFrom != null && mech.meta.mechInheritsEquipablesFrom != ""){
+		mechId = mech.meta.mechInheritsEquipablesFrom;
 		mech = $dataClasses[mechId];
 	}
 	//var targetActor = this.getCurrentPilot(mechId, true);
@@ -2014,6 +2014,8 @@ StatCalc.prototype.getMechData = function(mech, forActor, items, previousWeapons
 		result.inheritsUpgradesFrom = mechProperties.mechInheritsUpgradesFrom * 1 || null;	
 		
 		result.inheritsPartsFrom = mechProperties.mechInheritsPartsFrom * 1 || null;	
+		
+		result.inheritsEquipablesFrom = mechProperties.mechInheritsEquipablesFrom * 1 || null;	
 		
 		
 		result.abilities = this.getMechAbilityInfo(mechProperties);
@@ -3453,7 +3455,7 @@ StatCalc.prototype.mechCanEquip = function(actor){
 	}
 }
 
-StatCalc.prototype.getWeaponValidHolders = function(weaponId, levels){	
+StatCalc.prototype.getWeaponValidHolders = function(weaponId){	
 	function parseList(listString){
 		listString = listString || "";
 		let result = {};
@@ -3692,19 +3694,21 @@ StatCalc.prototype.getCurrentWeapons = function(actor){
 		const equipables = this.getActorMechEquipables(actor.SRWStats.mech.id);
 		for(let weapon of equipables){
 			if(weapon){
-				var weaponDefinition = $dataWeapons[weapon.weaponId];
-				var weaponProperties = weaponDefinition.meta;
-				
-				let wep = this.parseWeaponDef(actor, false, weaponDefinition, weaponProperties);
-				wep.isEquipable = true;
-				//let levels = [];
-				//for(let i = 0; i < weapon.upgrades; i++){
-				//	levels.push(i)
-				//}
-				//wep.power+=this.getWeaponDamageUpgradeAmount(wep, levels);
-				wep.upgrades = weapon.upgrades;
-				wep.tempKey = "eWeap_"+weapon.weaponId+"_"+weapon.slot;
-				tmp.push(wep);
+				if(this.getWeaponValidHolders(weapon.weaponId)[actor.SRWStats.mech.id]){				
+					var weaponDefinition = $dataWeapons[weapon.weaponId];
+					var weaponProperties = weaponDefinition.meta;
+					
+					let wep = this.parseWeaponDef(actor, false, weaponDefinition, weaponProperties);
+					wep.isEquipable = true;
+					//let levels = [];
+					//for(let i = 0; i < weapon.upgrades; i++){
+					//	levels.push(i)
+					//}
+					//wep.power+=this.getWeaponDamageUpgradeAmount(wep, levels);
+					wep.upgrades = weapon.upgrades;
+					wep.tempKey = "eWeap_"+weapon.weaponId+"_"+weapon.slot;
+					tmp.push(wep);
+				}
 			}			
 		}
 		
@@ -6969,7 +6973,14 @@ StatCalc.prototype.getActiveStatMods = function(actor, excludedSkills){
 						processStatMod(statMod)
 					});
 				}
-			}		
+			}
+
+			if(ENGINE_SETTINGS.GLOBAL_UNIT_MOD){
+				const statMods = ENGINE_SETTINGS.GLOBAL_UNIT_MOD(actor) || [];
+				for(let statMod of statMods){
+					processStatMod(statMod);
+				}								
+			}	
 		}
 	}
 	return result;
