@@ -706,7 +706,7 @@ EDITORSTRINGS.WEAPON = {
 	label_adjacent: "Adjacent",
 	label_on_map: "On Map",
 	label_required_weapons: "Required Weapons",
-	label_HP_treshold: "HP Treshold",
+	label_HP_treshold: "HP Threshold",
 	
 	label_map_attack: "Targeting",
 	label_animation: "Animation",
