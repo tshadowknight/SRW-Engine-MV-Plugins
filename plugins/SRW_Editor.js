@@ -632,7 +632,7 @@ eval("\n\nvar isOldIE = function isOldIE() {\n  var memo;\n  return function mem
 /***/ ((__unused_webpack_module, exports) => {
 
 "use strict";
-eval("\n\nexports.fromCallback = function (fn) {\n  return Object.defineProperty(function (...args) {\n    if (typeof args[args.length - 1] === 'function') fn.apply(this, args)\n    else {\n      return new Promise((resolve, reject) => {\n        fn.call(\n          this,\n          ...args,\n          (err, res) => (err != null) ? reject(err) : resolve(res)\n        )\n      })\n    }\n  }, 'name', { value: fn.name })\n}\n\nexports.fromPromise = function (fn) {\n  return Object.defineProperty(function (...args) {\n    const cb = args[args.length - 1]\n    if (typeof cb !== 'function') return fn.apply(this, args)\n    else fn.apply(this, args.slice(0, -1)).then(r => cb(null, r), cb)\n  }, 'name', { value: fn.name })\n}\n\n\n//# sourceURL=webpack://src/./node_modules/universalify/index.js?");
+eval("\n\nexports.fromCallback = function (fn) {\n  return Object.defineProperty(function (...args) {\n    if (typeof args[args.length - 1] === 'function') fn.apply(this, args)\n    else {\n      return new Promise((resolve, reject) => {\n        args.push((err, res) => (err != null) ? reject(err) : resolve(res))\n        fn.apply(this, args)\n      })\n    }\n  }, 'name', { value: fn.name })\n}\n\nexports.fromPromise = function (fn) {\n  return Object.defineProperty(function (...args) {\n    const cb = args[args.length - 1]\n    if (typeof cb !== 'function') return fn.apply(this, args)\n    else {\n      args.pop()\n      fn.apply(this, args).then(r => cb(null, r), cb)\n    }\n  }, 'name', { value: fn.name })\n}\n\n\n//# sourceURL=webpack://src/./node_modules/universalify/index.js?");
 
 /***/ }),
 
