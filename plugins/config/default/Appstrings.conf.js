@@ -606,6 +606,8 @@ EDITORSTRINGS.TEXT = {
 	label_add: "Add",
 	label_name: "Name",
 	label_duration: "Duration",
+	label_ticks: "ticks",
+	hint_duration: "The duration is expressed in animation ticks, each 1/60th of a second.",
 	label_variable: "Variable",
 	label_value: "Value",
 	label_copy_face: "Copy Face",

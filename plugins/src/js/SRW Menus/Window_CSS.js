@@ -665,7 +665,7 @@ Window_CSS.prototype.createAttributeBlock = function(attack) {
 		content+="Gr";	
 	}*/
 	if(attack.particleType != "" && attack.particleType != null){
-		var typeIndicator = attack.particleType.substring(0, 2);
+		var typeIndicator = attack.particleType.substring(0, (ENGINE_SETTINGS.ATTR_LABEL_LENGTH || 2));
 		content+=typeIndicator.charAt(0).toUpperCase() + typeIndicator.slice(1);
 	}
 	content+="</div>";

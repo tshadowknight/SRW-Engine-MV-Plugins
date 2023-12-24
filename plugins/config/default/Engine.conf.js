@@ -35,7 +35,8 @@ var ENGINE_SETTINGS = {
 		}
 	},	
 	TINT_CURSOR_PER_FACTION: true,
-	USE_TILE_PASSAGE: true,
+	ATTR_LABEL_LENGTH: 2, //The length of the weapon attribute string shown in the attack list. It takes a substring of this length of the attribute string and capitalizes the first letter.
+	USE_TILE_PASSAGE: true, //if true use RPG Maker tile passage setting to restrict movement
 	ENABLE_QUICK_MOVE: true,
 	LEVEL_CAP: 99,
 	SP_CAP: -1,

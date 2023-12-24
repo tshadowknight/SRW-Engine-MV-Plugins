@@ -1973,14 +1973,22 @@ SRWEditor.prototype.showBattleTextEditorControls = function(){
 			if(!elem){
 				elem = this;
 			}
+			function getQuoteLineValFromDOM(querySelector){
+				let targetElem = elem.closest(".quote_line").querySelector(querySelector);
+				if(targetElem){
+					return targetElem.value;
+				} else {
+					return "";
+				}
+			}
 			var newVal  = {
-				text: elem.closest(".quote_line").querySelector(".quote_text").value,
-				faceName: elem.closest(".quote_line").querySelector(".quote_face_name").value,
-				faceIndex: elem.closest(".quote_line").querySelector(".quote_face_index").value,
-				displayName: elem.closest(".quote_line").querySelector(".quote_display_name").value,
-				duration: elem.closest(".quote_line").querySelector(".quote_duration").value,
-				variable: elem.closest(".quote_line").querySelector(".quote_variable").value,
-				variableValue: elem.closest(".quote_line").querySelector(".quote_variable_value").value,
+				text: getQuoteLineValFromDOM(".quote_text"),
+				faceName: getQuoteLineValFromDOM(".quote_face_name"),
+				faceIndex: getQuoteLineValFromDOM(".quote_face_index"),
+				displayName: getQuoteLineValFromDOM(".quote_display_name"),
+				duration: getQuoteLineValFromDOM(".quote_duration"),
+				variable: getQuoteLineValFromDOM(".quote_variable"),
+				variableValue: getQuoteLineValFromDOM(".quote_variable_value"),
 			}
 			var params = getLocatorInfo(elem);
 			if(params.type == "attacks"){
@@ -2261,12 +2269,15 @@ SRWEditor.prototype.createQuoteContent = function(type, idx, quote, unitBaseInfo
 		
 		
 		
-		content+="<div>";
+		content+="<div class='controls_line'>";
 		content+="<div class='command_label name'>"+EDITORSTRINGS.TEXT.label_name+":</div>";
 		content+="<input class='quote_display_name' value='"+(quote.displayName || "")+"'></input>";
 		
+		content+="<div title='"+EDITORSTRINGS.TEXT.hint_duration+"' class='duration_controls'>";
 		content+="<div class='command_label duration'>"+EDITORSTRINGS.TEXT.label_duration+":</div>";
 		content+="<input class='quote_duration' value='"+(quote.duration ||  "")+"'></input>";
+		content+=EDITORSTRINGS.TEXT.label_ticks;		
+		content+="</div>";
 		content+="</div>";
 		
 		content+="<div class='quote_id_container'>";

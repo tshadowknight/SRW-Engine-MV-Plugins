@@ -674,6 +674,16 @@
 	margin-left: auto;
 }
 
+#srw_editor .controls_line {
+	display: flex;
+	align-items: center;
+}
+
+#srw_editor .quote_config .quote_controls .duration_controls {
+	display: flex;
+	align-items: center;
+}
+
 #srw_editor .quote_id_container {
 	display: flex;
 	margin-top: 2px;
