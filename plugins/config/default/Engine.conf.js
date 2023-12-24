@@ -385,7 +385,16 @@ var ENGINE_SETTINGS = {
 	GLOBAL_UNIT_MOD: function(actor){//a function that is applied to each unit when applying abilities, can return an array of stat mods like an ability effect handler
 		//you can also use this function to perform hacky mods to the actor that was passed in
 		
+		//tip: to avoid additional overhead or to prevent a mod being applied twice use the actor's stageTemp cache to track whether a mod has been applied already
+		//ex.:
+		/*
+		if(!$statCalc.getStageTemp(actor, "mod_applied")){
+			$statCalc.setStageTemp(actor, "mod_applied", 1);
+			actor.isModded = (actor.isModded || 0) + 1;
+		}
+		*/
+		
 		//example return value, optional. This example makes every unit in the game deal double the regular damage.
-		return [{type: "final_damage", modType: "mult", value: 2}];
+		//return [{type: "final_damage", modType: "mult", value: 2}];
 	}
 }
