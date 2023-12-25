@@ -2006,10 +2006,10 @@ SceneManager.isInSaveScene = function(){
 				if(statusEffects.inflict_spirit_seal){
 					$statCalc.setSpiritsSealed(defender);
 				}
-				var SPReduction = statusEffects.inflict_SP_down;
+				var SPReduction = statusEffects.inflict_SP_down || 0;
 				$statCalc.applySPCost(defender, SPReduction);
 				
-				var willReduction = statusEffects.inflict_will_down;
+				var willReduction = statusEffects.inflict_will_down || 0;
 				$statCalc.modifyWill(defender, willReduction * -1);
 			}
 		}

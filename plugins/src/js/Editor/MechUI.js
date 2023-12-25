@@ -478,17 +478,10 @@ MechUI.prototype.initPropertyHandlers = function(){
 				content+="</div>";
 				content+="<div class='cell'>";
 				var value = _this.getMetaValue("mechSize");
-				if(value == "LL"){
-					value = "2L";
-				}
-				if(value == "L"){
-					value = "1L";
-				}
-				if(value == "1S"){
-					value = "S";
-				}
+				
 				var options = ENGINE_SETTINGS.MECH_SIZES || ["S", "M", "1L", "2L"];
 				content+="<select id='prop_mechSize'>";
+				content+="<option value=''></option>"
 				for(var i = 0; i < options.length; i++){					
 					content+="<option "+(options[i] == value ? "selected" : "")+" value='"+options[i]+"'>"+options[i]+"</option>";										
 				}
