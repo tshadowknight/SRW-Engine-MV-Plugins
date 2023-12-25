@@ -1393,6 +1393,8 @@
 			
 			$gameTemp.AIActors = AIActors;
 			
+			$statCalc.invalidateAbilityCache();
+			
 			if(spiritActivations.length){					
 				_this.setSubBattlePhase('auto_spirits');
 			} else if($gameTemp.AIActors.length){
