@@ -3673,6 +3673,8 @@ StatCalc.prototype.isWeaponUnlocked = function(actor, weapon){
 	}
 }
 
+
+
 StatCalc.prototype.getCurrentWeapons = function(actor){
 	if(this.isActorSRWInitialized(actor)){
 		var tmp = [];
@@ -3711,6 +3713,10 @@ StatCalc.prototype.getCurrentWeapons = function(actor){
 	} else {
 		return [];
 	}	
+}
+
+StatCalc.prototype.hasWeapons = function(actor){
+	return this.getCurrentWeapons(actor).length > 0;
 }
 
 StatCalc.prototype.getActiveMapWeapons = function(actor, isPostMove){

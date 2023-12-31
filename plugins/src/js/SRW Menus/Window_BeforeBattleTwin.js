@@ -557,6 +557,9 @@ Window_BeforebattleTwin.prototype.update = function() {
 							if(_this._currentActionSelection < 0){
 								_this._currentActionSelection = 2;
 							}
+							if(_this._currentActionSelection == 0 && !$statCalc.hasWeapons($gameTemp.currentBattleActor)){
+								_this._currentActionSelection = 1;
+							}
 							quickUpdateActorAction();
 						}
 					}
@@ -569,6 +572,9 @@ Window_BeforebattleTwin.prototype.update = function() {
 							_this._currentActionSelection++;
 							if(_this._currentActionSelection > 2){
 								_this._currentActionSelection = 0;
+							}
+							if(_this._currentActionSelection == 0 && !$statCalc.hasWeapons($gameTemp.currentBattleActor)){
+								_this._currentActionSelection = 2;
 							}
 							quickUpdateActorAction();
 						}
@@ -633,14 +639,17 @@ Window_BeforebattleTwin.prototype.update = function() {
 							_this._currentUIState = "action_selection";
 							if($gameTemp.actorAction.type == "attack"){
 								_this._currentActionSelection = 0;
+								SoundManager.playOk();						
 							}
 							if($gameTemp.actorAction.type == "defend"){
 								_this._currentActionSelection = 1;
+								SoundManager.playOk();
 							}
 							if($gameTemp.actorAction.type == "evade"){
 								_this._currentActionSelection = 2;
+								SoundManager.playOk();
 							}
-							SoundManager.playOk();
+							
 						} else {
 							SoundManager.playBuzzer();
 						}						
@@ -751,112 +760,120 @@ Window_BeforebattleTwin.prototype.update = function() {
 					}		
 				}
 			} else if(this._currentUIState == "action_selection"){
-				SoundManager.playOk();
-				_this._currentUIState = "main_selection";
+				
+				
 				this.requestRedraw();
 				if(_this._currentActionSelection == 0){
-					$gameTemp.actorAction.type == "attack";
-					$gameTemp.allAttackSelectionRequired = false;
-					if(_this._currentTwinTargetSelection == 0){
-						$gameTemp.currentMenuUnit = {
-							actor: $gameTemp.currentBattleActor,
-							mech: $gameTemp.currentBattleActor.SRWStats.mech
-						};
-					} else {
-						if($gameTemp.currentTargetingSettings.actor == "all"){
-							$gameTemp.allAttackSelectionRequired = 1;
-						} else {
-							$gameTemp.allAttackSelectionRequired = -1;
-						}
-						$gameTemp.currentMenuUnit = {
-							actor: $gameTemp.currentBattleActor.subTwin,
-							mech: $gameTemp.currentBattleActor.subTwin.SRWStats.mech
-						};
-					}
-					$gameTemp.attackWindowCallback = function(attack){
-						$gameTemp.popMenu = true;	
-						var allSelected = false;
-						var allRequired = 0;
+					if($statCalc.hasWeapons($gameTemp.currentBattleActor)){
+						_this._currentUIState = "main_selection";
+						SoundManager.playOk();
+						$gameTemp.actorAction.type == "attack";
+						$gameTemp.allAttackSelectionRequired = false;
 						if(_this._currentTwinTargetSelection == 0){
-							$gameTemp.actorAction.type = "attack";
-							$gameTemp.actorAction.attack = attack;
-							if(attack.isAll){												
-								$gameTemp.currentTargetingSettings.actor = "all";
-								allSelected = true;
-								allRequired = 1;
+							$gameTemp.currentMenuUnit = {
+								actor: $gameTemp.currentBattleActor,
+								mech: $gameTemp.currentBattleActor.SRWStats.mech
+							};
+						} else {
+							if($gameTemp.currentTargetingSettings.actor == "all"){
+								$gameTemp.allAttackSelectionRequired = 1;
 							} else {
-								allRequired = -1;
-							} 
-							var target;
-							if($gameTemp.currentBattleEnemy.subTwin){
-								target = $gameTemp.currentBattleEnemy.subTwin;
-							} else {
-								target = $gameTemp.currentBattleEnemy;
+								$gameTemp.allAttackSelectionRequired = -1;
 							}
-							if($gameTemp.currentBattleActor.subTwin){
-								var enemyInfo = {actor: $gameTemp.currentBattleEnemy, pos: {x: $gameTemp.currentBattleEnemy.event.posX(), y: $gameTemp.currentBattleEnemy.event.posY()}};
-								var actorInfo = {actor: $gameTemp.currentBattleActor.subTwin, pos: {x: $gameTemp.currentBattleActor.event.posX(), y: $gameTemp.currentBattleActor.event.posY()}};
+							$gameTemp.currentMenuUnit = {
+								actor: $gameTemp.currentBattleActor.subTwin,
+								mech: $gameTemp.currentBattleActor.subTwin.SRWStats.mech
+							};
+						}
+						$gameTemp.attackWindowCallback = function(attack){
+							$gameTemp.popMenu = true;	
+							var allSelected = false;
+							var allRequired = 0;
+							if(_this._currentTwinTargetSelection == 0){
+								$gameTemp.actorAction.type = "attack";
+								$gameTemp.actorAction.attack = attack;
+								if(attack.isAll){												
+									$gameTemp.currentTargetingSettings.actor = "all";
+									allSelected = true;
+									allRequired = 1;
+								} else {
+									allRequired = -1;
+								} 
+								var target;
+								if($gameTemp.currentBattleEnemy.subTwin){
+									target = $gameTemp.currentBattleEnemy.subTwin;
+								} else {
+									target = $gameTemp.currentBattleEnemy;
+								}
+								if($gameTemp.currentBattleActor.subTwin){
+									var enemyInfo = {actor: $gameTemp.currentBattleEnemy, pos: {x: $gameTemp.currentBattleEnemy.event.posX(), y: $gameTemp.currentBattleEnemy.event.posY()}};
+									var actorInfo = {actor: $gameTemp.currentBattleActor.subTwin, pos: {x: $gameTemp.currentBattleActor.event.posX(), y: $gameTemp.currentBattleActor.event.posY()}};
 
-								var weaponResult = $battleCalc.getBestWeaponAndDamage(actorInfo, enemyInfo, false, false, false, allRequired);
-								if(weaponResult.weapon){
-									$gameTemp.actorTwinAction.type = "attack";
-									$gameTemp.actorTwinAction.attack = weaponResult.weapon;
-									if(allSelected){										
-										$gameTemp.currentTargetingSettings.actorTwin = "all";
-									} else if($gameTemp.currentBattleEnemy.subTwin && $gameTemp.preferredActorTwinTarget == "twin"){
-										$gameTemp.currentTargetingSettings.actorTwin = "twin";
-									} else {									
-										$gameTemp.currentTargetingSettings.actorTwin = "main";
+									var weaponResult = $battleCalc.getBestWeaponAndDamage(actorInfo, enemyInfo, false, false, false, allRequired);
+									if(weaponResult.weapon){
+										$gameTemp.actorTwinAction.type = "attack";
+										$gameTemp.actorTwinAction.attack = weaponResult.weapon;
+										if(allSelected){										
+											$gameTemp.currentTargetingSettings.actorTwin = "all";
+										} else if($gameTemp.currentBattleEnemy.subTwin && $gameTemp.preferredActorTwinTarget == "twin"){
+											$gameTemp.currentTargetingSettings.actorTwin = "twin";
+										} else {									
+											$gameTemp.currentTargetingSettings.actorTwin = "main";
+										}
+									} else if($gameTemp.actorTwinAction){
+										$gameTemp.actorTwinAction.type = "defend";	
 									}
-								} else if($gameTemp.actorTwinAction){
-									$gameTemp.actorTwinAction.type = "defend";	
-								}
-							}							
-						} else {
-							$gameTemp.actorTwinAction.type = "attack";
-							$gameTemp.actorTwinAction.attack = attack;
-							
-							if(!$gameTemp.isEnemyAttack){
-								$gameTemp.supportAttackSelected = -1;
-								$gameTemp.twinSupportAttack = null;
-							}	
-							if(attack.isAll){
-								$gameTemp.currentTargetingSettings.actorTwin = "all";
-								allSelected = true;
-							}
-						}
-						if(allSelected || !$gameTemp.currentBattleEnemy.subTwin){
-							_this._currentUIState = "main_selection";
-						} else {
-							
-							if(_this._currentTwinTargetSelection == 0 || !$gameTemp.currentBattleActor.subTwin){
-								if($gameTemp.currentTargetingSettings.actor == "main"){
-									_this._currentEnemySelection = 0;
-								} else {
-									_this._currentEnemySelection = 1;
-								}
+								}							
 							} else {
-								if($gameTemp.currentTargetingSettings.actorTwin == "main"){
-									_this._currentEnemySelection = 0;
-								} else {
-									_this._currentEnemySelection = 1;
+								$gameTemp.actorTwinAction.type = "attack";
+								$gameTemp.actorTwinAction.attack = attack;
+								
+								if(!$gameTemp.isEnemyAttack){
+									$gameTemp.supportAttackSelected = -1;
+									$gameTemp.twinSupportAttack = null;
+								}	
+								if(attack.isAll){
+									$gameTemp.currentTargetingSettings.actorTwin = "all";
+									allSelected = true;
 								}
-							}			
-							
-							
-							_this._currentUIState = "enemy_twin_target_selection";
+							}
+							if(allSelected || !$gameTemp.currentBattleEnemy.subTwin){
+								_this._currentUIState = "main_selection";
+							} else {
+								
+								if(_this._currentTwinTargetSelection == 0 || !$gameTemp.currentBattleActor.subTwin){
+									if($gameTemp.currentTargetingSettings.actor == "main"){
+										_this._currentEnemySelection = 0;
+									} else {
+										_this._currentEnemySelection = 1;
+									}
+								} else {
+									if($gameTemp.currentTargetingSettings.actorTwin == "main"){
+										_this._currentEnemySelection = 0;
+									} else {
+										_this._currentEnemySelection = 1;
+									}
+								}			
+								
+								
+								_this._currentUIState = "enemy_twin_target_selection";
+							}
+							$gameTemp.allAttackSelectionRequired = false;
+							_this._currentSelection = 0;
+							_this.requestRedraw();							
+						};		
+						
+						$gameTemp.attackWindowCancelCallback = function(){
+							$gameTemp.allAttackSelectionRequired = false;
 						}
-						$gameTemp.allAttackSelectionRequired = false;
-						_this._currentSelection = 0;
-						_this.requestRedraw();							
-					};		
-					
-					$gameTemp.attackWindowCancelCallback = function(){
-						$gameTemp.allAttackSelectionRequired = false;
+						$gameTemp.pushMenu = "attack_list";
+					} else {
+						SoundManager.playBuzzer();
 					}
-					$gameTemp.pushMenu = "attack_list";
 				}
 				if(_this._currentActionSelection == 1){
+					_this._currentUIState = "main_selection";
+					SoundManager.playOk();
 					if(_this._currentTwinTargetSelection == 0){
 						$gameTemp.actorAction.type = "defend";
 						//$gameTemp.actorAction.attack = null;						
@@ -871,6 +888,8 @@ Window_BeforebattleTwin.prototype.update = function() {
 					_this._currentUIState = "main_selection";
 				}
 				if(_this._currentActionSelection == 2){
+					_this._currentUIState = "main_selection";
+					SoundManager.playOk();
 					if(_this._currentTwinTargetSelection == 0){
 						$gameTemp.actorAction.type = "evade";	
 						//$gameTemp.actorAction.attack = null;	
@@ -1789,7 +1808,7 @@ Window_BeforebattleTwin.prototype.redraw = function() {
 	}
 	
 	content = "";
-	content+="<div data-idx=0 class='action_block "+(_this._currentActionSelection == 0 ? "selected" : "")+"'>";
+	content+="<div data-idx=0 class='action_block "+(_this._currentActionSelection == 0 ? "selected" : "")+" "+($statCalc.hasWeapons($gameTemp.currentBattleActor) ? "" : "disabled")+"'>";
 	content+="Attack";
 	content+="</div>";
 	content+="<div data-idx=1 class='action_block "+(_this._currentActionSelection == 1 ? "selected" : "")+"'>";

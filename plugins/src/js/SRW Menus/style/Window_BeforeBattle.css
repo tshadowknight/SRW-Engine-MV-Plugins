@@ -598,6 +598,10 @@
 	padding-left: 10%;
 }
 
+#before_battle_action_selection .action_block.disabled {	
+	color: #888888;
+}
+
 #before_battle_action_selection .action_block.selected {
 	background-color: var(--selected-color);
 }
