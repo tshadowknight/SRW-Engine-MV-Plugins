@@ -3137,7 +3137,7 @@ BattleSceneManager.prototype.executeAnimation = function(animation, startTick){
 		set_opacity_texture: function(target, params){
 			var targetObj = getTargetObject(target);
 			if(targetObj){
-				targetObj.material.opacityTexture = this.getCachedTexture("img/SRWBattleScene/opacityTextures/"+params.path+".png");
+				targetObj.material.opacityTexture = _this.getCachedTexture("img/SRWBattleScene/opacityTextures/"+params.path+".png");
 			}
 		},
 		clear_opacity_texture: function(target, params){
@@ -6387,7 +6387,7 @@ BattleSceneManager.prototype.preloadSceneAssets = function(){
 				}	
 			}
 			if(animCommand.type == "create_sky_box"){				
-				this.preloadTexture("img/skyboxes/"+params.path);
+				this.preloadTexture("img/skyboxes/"+params.path+".png");
 			}	
 			if(animCommand.type == "create_layer"){			
 				promises.push(this.preloadTexture("img/SRWBattleScene/"+params.path+".png"));													
@@ -6402,7 +6402,7 @@ BattleSceneManager.prototype.preloadSceneAssets = function(){
 				dragonBonesResources["img/SRWBattleScene/dragonbones/"+params.path+"/tex.png"] = true;	
 			}
 			if(animCommand.type == "set_opacity_texture"){
-				this.preloadTexture("img/SRWBattleScene/opacityTextures/"+params.path);
+				_this.preloadTexture("img/SRWBattleScene/opacityTextures/"+params.path+".png");
 			}
 			if(animCommand.type == "play_rmmv_anim"){
 				_this.createRMMVAnimationSprite(target+"_preload", params.animId, new BABYLON.Vector3(0, 0, -1000), {width: 0, height: 0}, true, false, true, true, 0);
