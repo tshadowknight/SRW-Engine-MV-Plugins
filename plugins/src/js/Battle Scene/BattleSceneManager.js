@@ -6317,14 +6317,25 @@ BattleSceneManager.prototype.getPreloadedModel = function(target){
 	return obj;
 }
 
+BattleSceneManager.prototype.earlyPreloadSceneAssets = async function(){
+	var _this = this;
+	_this.resetScene();
+	await _this.readBattleCache();
+	_this.preloadSceneAssets();
+}
+
 BattleSceneManager.prototype.preloadSceneAssets = function(){
 	var _this = this;
 	_this._cachedBgs = {};
 	_this._bgLayerInfo = {};
 	
+	if(_this.isPreloading){
+		return this._preloadPromise;
+	}
 	
+	_this.isPreloading = true;
 	
-	return new Promise(function(resolve, reject){
+	this._preloadPromise = new Promise(function(resolve, reject){
 		var promises = [];
 		var dragonBonesResources = {};
 		
@@ -6551,9 +6562,12 @@ BattleSceneManager.prototype.preloadSceneAssets = function(){
 		
 		
 		Promise.all(promises).then(() => {
+			_this.isPreloading = false;
 			resolve();
 		});	
 	});
+	
+	return this._preloadPromise;
 }
 
 BattleSceneManager.prototype.showScene = async function() {

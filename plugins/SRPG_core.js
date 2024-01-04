@@ -4560,9 +4560,9 @@ SceneManager.isInSaveScene = function(){
     };
 	
 	Scene_Map.prototype.playBattleScene = function() {
-		if($gameSystem.demoSetting){
-			
-			this.startEncounterEffect();			
+		if($gameSystem.demoSetting){			
+			this.startEncounterEffect();
+			//$battleSceneManager.earlyPreloadSceneAssets();				
 		} else {
 			$gameTemp.popMenu = true;//remove before battle menu
 			$gameSystem.setSubBattlePhase('battle_basic');
