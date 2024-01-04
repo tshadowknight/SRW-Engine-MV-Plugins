@@ -322,11 +322,31 @@ var _defaultPlayerSpeed = parameters['defaultPlayerSpeed'] || 4;
 				bitmap.addLoadListener(() => {
 					resolve(bitmap);
 				});
+				bitmap.setErrorHandler(() => {
+					resolve(-1);
+				});
 			} else {
 				resolve(this.loadEmptyBitmap());
 			}	
 		});		
 	};	
+	
+	/**
+	 * @method _onError
+	 * @private
+	 */
+	Bitmap.prototype._onError = function() {
+		if(this._errorHandler){
+			this._errorHandler();
+		}
+		this._image.removeEventListener('load', this._loadListener);
+		this._image.removeEventListener('error', this._errorListener);
+		this._loadingState = 'error';
+	};
+	
+	Bitmap.prototype.setErrorHandler = function(func) {
+		this._errorHandler = func;
+	};
 	
 	
 //====================================================================

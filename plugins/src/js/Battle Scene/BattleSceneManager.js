@@ -354,13 +354,17 @@ BattleSceneManager.prototype.init = async function(attachControl){
 	}
 }
 
-BattleSceneManager.prototype.preloadTexture = async function(path){
+BattleSceneManager.prototype.preloadTexture = async function(path, context){
 	const bitmap = await ImageManager.loadBitmapPromise("", path);
-	//populate the BABYLON cache by instantiating a texture
-	new BABYLON.Texture(bitmap.canvas.toDataURL(), this._scene, false, true, BABYLON.Texture.NEAREST_NEAREST);
-	this._activeTextureCache[path] = {
-		imgData: bitmap.canvas.toDataURL()
-	};
+	if(bitmap == -1){
+		alert("Failed to load image from path '" + path + "' "+(context ? " For "+context : "" + "") + "\n\nYou may need to reload the game to get the battlescene to load again after fixing the missing asset.");
+	} else {
+		//populate the BABYLON cache by instantiating a texture
+		new BABYLON.Texture(bitmap.canvas.toDataURL(), this._scene, false, true, BABYLON.Texture.NEAREST_NEAREST);
+		this._activeTextureCache[path] = {
+			imgData: bitmap.canvas.toDataURL()
+		};	
+	}	
 }
 
 BattleSceneManager.prototype.getCachedTexture = function(path){
@@ -6143,7 +6147,7 @@ BattleSceneManager.prototype.createEnvironment = function(ref){
 				bgs.forEach(function(bg){
 					if(!bg.hidden){	
 						if(!bg.isfixed){
-							promises.push(_this.preloadTexture("img/SRWBattlebacks/"+bg.path+".png"));
+							promises.push(_this.preloadTexture("img/SRWBattlebacks/"+bg.path+".png", "Environment Creation"));
 						}
 					}						
 				});
@@ -6154,7 +6158,7 @@ BattleSceneManager.prototype.createEnvironment = function(ref){
 					if(!bg.hidden){		
 						if(bg.isfixed){			
 							_this._bgLayerInfo[bgId] = bg.path;
-							await _this.preloadTexture("img/SRWBattlebacks/"+bg.path+".png");
+							await _this.preloadTexture("img/SRWBattlebacks/"+bg.path+".png", "Environment Creation Fixed BG");
 						} else {
 							_this.createScrollingBg("bg"+ctr, bgId, bg.path, {width: bg.width, height: bg.height}, bg.yoffset, bg.zoffset, maxZOffset - bg.zoffset);
 						}	
@@ -6317,15 +6321,22 @@ BattleSceneManager.prototype.preloadSceneAssets = function(){
 	var _this = this;
 	_this._cachedBgs = {};
 	_this._bgLayerInfo = {};
+	
+	
+	
 	return new Promise(function(resolve, reject){
 		var promises = [];
 		var dragonBonesResources = {};
 		
 		promises.push(_this.preloadTexture("img/SRWBattlebacks/shadow.png"));
 		
-		function handleAnimCommand(animCommand){
+		function handleAnimCommand(animCommand, animId, animType, tick){
 			var target = animCommand.target;
 			var params = animCommand.params;
+			
+		
+			const imgReportingContext = "preload of " + animCommand.type + " command \nin animation " + animId + "\nin sequence " + animType + "\non tick " + tick;
+			
 			
 			if(animCommand.type == "create_model"){				
 				promises.push(_this.createModel(
@@ -6352,7 +6363,7 @@ BattleSceneManager.prototype.preloadSceneAssets = function(){
 				//var bg = _this.createSceneBg(animCommand.target+"_preload", path, new BABYLON.Vector3(0,0,-1000), 1, 1, 0);
 				//promises.push(_this.getBgPromise(bg));
 				//_this._animationBackgroundsInfo.push(bg);
-				promises.push(_this.preloadTexture("img/SRWBattleScene/"+path+".png"));
+				promises.push(_this.preloadTexture("img/SRWBattleScene/"+path+".png", imgReportingContext));
 			}	
 			if(animCommand.type == "create_movie_bg"){
 				var r = new XMLHttpRequest();			
@@ -6382,15 +6393,15 @@ BattleSceneManager.prototype.preloadSceneAssets = function(){
 							params.name = "main";
 						}
 						
-						promises.push(_this.preloadTexture("img/SRWBattleScene/"+imgPath+"/"+params.name+".png"));
+						promises.push(_this.preloadTexture("img/SRWBattleScene/"+imgPath+"/"+params.name+".png", imgReportingContext));
 					}	
 				}	
 			}
 			if(animCommand.type == "create_sky_box"){				
-				this.preloadTexture("img/skyboxes/"+params.path+".png");
+				this.preloadTexture("img/skyboxes/"+params.path+".png", imgReportingContext);
 			}	
 			if(animCommand.type == "create_layer"){			
-				promises.push(this.preloadTexture("img/SRWBattleScene/"+params.path+".png"));													
+				promises.push(this.preloadTexture("img/SRWBattleScene/"+params.path+".png", imgReportingContext));													
 			}	
 			if(animCommand.type == "create_spriter_bg"){
 				var bgInfo = _this.createSpriterSprite(animCommand.target+"_preload", "spriter/"+params.path+"/",  new BABYLON.Vector3(0, 0, -1000));
@@ -6402,7 +6413,7 @@ BattleSceneManager.prototype.preloadSceneAssets = function(){
 				dragonBonesResources["img/SRWBattleScene/dragonbones/"+params.path+"/tex.png"] = true;	
 			}
 			if(animCommand.type == "set_opacity_texture"){
-				_this.preloadTexture("img/SRWBattleScene/opacityTextures/"+params.path+".png");
+				_this.preloadTexture("img/SRWBattleScene/opacityTextures/"+params.path+".png", imgReportingContext);
 			}
 			if(animCommand.type == "play_rmmv_anim"){
 				_this.createRMMVAnimationSprite(target+"_preload", params.animId, new BABYLON.Vector3(0, 0, -1000), {width: 0, height: 0}, true, false, true, true, 0);
@@ -6472,7 +6483,7 @@ BattleSceneManager.prototype.preloadSceneAssets = function(){
 						} else {
 							var imgPath = $statCalc.getBattleSceneImage(ref);
 							defaultFrames.forEach(function(frame){
-								promises.push(_this.preloadTexture("img/SRWBattleScene/"+imgPath+"/"+frame+".png"));												
+								promises.push(_this.preloadTexture("img/SRWBattleScene/"+imgPath+"/"+frame+".png", "Preload of mech asset for mech " + ref.SRWStats.mech.id));												
 							});
 						}					
 					}
@@ -6502,12 +6513,13 @@ BattleSceneManager.prototype.preloadSceneAssets = function(){
 					throw("Animation "+animId+" does not have a definition!");
 				}
 				Object.keys(animationList).forEach(function(animType){
-					animationList[animType].forEach(function(batch){
+					Object.keys(animationList[animType]).forEach(function(tick){
+						const batch = animationList[animType][tick];
 						batch.forEach(function(animCommand){
-							handleAnimCommand(animCommand)	
+							handleAnimCommand(animCommand, animId, animType, tick);
 							if(animCommand.type == "next_phase"){
 								for(let command of animCommand.params.commands){
-									handleAnimCommand(command);	
+									handleAnimCommand(command, animId, animType, tick);	
 								}
 							}	
 						});
@@ -6524,17 +6536,18 @@ BattleSceneManager.prototype.preloadSceneAssets = function(){
 		var animationList = _this._animationBuilder.buildAnimation(animId, _this);
 		
 		Object.keys(animationList).forEach(function(animType){
-			animationList[animType].forEach(function(batch){
+			Object.keys(animationList[animType]).forEach(function(tick){
+				const batch = animationList[animType][tick];
 				batch.forEach(function(animCommand){
-					handleAnimCommand(animCommand);	
+					handleAnimCommand(animCommand, animId, animType, tick);
 					if(animCommand.type == "next_phase"){
 						for(let command of animCommand.params.commands){
-							handleAnimCommand(command);	
+							handleAnimCommand(command, animId, animType, tick);	
 						}
-					}
+					}	
 				});
 			});				
-		});
+		});	
 		
 		
 		Promise.all(promises).then(() => {
