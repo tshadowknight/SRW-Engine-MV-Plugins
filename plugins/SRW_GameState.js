@@ -2134,7 +2134,8 @@ GameState_battle_intro.prototype.update = function(scene){
 			scene.removeChild(scene._transitionBackSprite);					
 		}, 500);						
 		
-		$gameSystem.setSubBattlePhase('halt');			
+		$gameSystem.setSubBattlePhase('halt');		
+		SceneManager.stop();	
 		$battleSceneManager.playBattleScene();
 		//
 		return false;

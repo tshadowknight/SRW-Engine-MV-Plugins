@@ -354,16 +354,19 @@ BattleSceneManager.prototype.init = async function(attachControl){
 	}
 }
 
+//TODO: figure out the impact of the use of object urls on Babylon's caching here. 
+//It is possible the babylon cache is bypassed due to mismatching urls, if so verify if this is enough of a problem to try and fix.
 BattleSceneManager.prototype.preloadTexture = async function(path, context){
-	const bitmap = await ImageManager.loadBitmapPromise("", path);
+	const _this = this;
+	const bitmap = await ImageManager.loadBitmapPromise("", path, true);
 	if(bitmap == -1){
 		alert("Failed to load image from path '" + path + "' "+(context ? " For "+context : "" + "") + "\n\nYou may need to reload the game to get the battlescene to load again after fixing the missing asset.");
 	} else {
-		//populate the BABYLON cache by instantiating a texture
-		new BABYLON.Texture(bitmap.canvas.toDataURL(), this._scene, false, true, BABYLON.Texture.NEAREST_NEAREST);
-		this._activeTextureCache[path] = {
-			imgData: bitmap.canvas.toDataURL()
-		};	
+		let objURL = bitmap._image.src; //after loading an image through the manager with asBlob=true, the returned bitmap has an image with an Object URL src
+		new BABYLON.Texture(objURL, _this._scene, false, true, BABYLON.Texture.NEAREST_NEAREST);
+		_this._activeTextureCache[path] = {
+			imgData: objURL
+		};		
 	}	
 }
 
@@ -386,6 +389,17 @@ BattleSceneManager.prototype.stopEffekContext = function(ctx){
 		ctx.stopAll();
 	}
 }
+
+BattleSceneManager.prototype.disposeTextureCache = function(){
+	if(this._activeTextureCache){
+		for(let cacheKey in this._activeTextureCache){
+			let objURL = this._activeTextureCache[cacheKey].imgData;
+			window.URL.revokeObjectURL(objURL);
+		}
+	}
+	this._activeTextureCache = {};
+}
+
 
 BattleSceneManager.prototype.dispose = function(){
 	function destroyCanvas(canvas){
@@ -416,7 +430,7 @@ BattleSceneManager.prototype.dispose = function(){
 	this.disposeMovieBackgrounds();
 	this.disposeRMMVBackgrounds();
 	this._animationList = [];
-	this._activeTextureCache = {};
+	this.disposeTextureCache();
 }
 
 BattleSceneManager.prototype.initEffekseerParticles = async function(){
@@ -6016,7 +6030,7 @@ BattleSceneManager.prototype.resetScene = function() {
 	_this.disposeLights();
 	_this.disposeMovieBackgrounds();
 	_this.disposeRMMVBackgrounds();
-	_this._activeTextureCache = {};
+	_this.disposeTextureCache();
 	
 	_this._spriteManagers = {};
 	_this.setBgScrollRatio(1);
@@ -6844,7 +6858,7 @@ BattleSceneManager.prototype.endScene = function(force) {
 			_this.disposeMovieBackgrounds();
 			_this.disposeRMMVBackgrounds();
 			_this._animationList = [];
-			_this._activeTextureCache = {};
+			_this.disposeTextureCache();
 			_this._UIcontainer.style.display = "";
 			_this._PIXIContainer.style.display = "";	
 			_this.stopScene();
@@ -6871,7 +6885,7 @@ BattleSceneManager.prototype.endScene = function(force) {
 			_this.disposeRMMVBackgrounds();
 			_this.disposeMovieBackgrounds();
 			_this._animationList = [];
-			_this._activeTextureCache = {};
+			_this.disposeTextureCache();
 			_this._UIcontainer.style.display = "";
 			_this._PIXIContainer.style.display = "";	
 			_this.stopScene();
@@ -6880,7 +6894,7 @@ BattleSceneManager.prototype.endScene = function(force) {
 				sanityCheck = false;
 				$gameSystem.setSubBattlePhase('after_battle');
 				if(!$gameTemp.editMode){
-					//SceneManager.resume();
+					SceneManager.resume();
 				}			
 			});			
 		});
@@ -6942,7 +6956,7 @@ BattleSceneManager.prototype.processActionQueue = function() {
 					_this.systemFadeFromBlack(1000).then(function(){
 						$gameSystem.setSubBattlePhase('after_battle');
 						if(!$gameTemp.editMode){
-							//SceneManager.resume();
+							SceneManager.resume();
 						}
 					});			
 				});		
@@ -7333,7 +7347,7 @@ BattleSceneManager.prototype.playBattleScene = async function(){
 	//_this.stopScene();
 	var promises = [];
 	
-	_this.systemFadeToBlack(200, 1000).then(async function(){		
+	_this.systemFadeToBlack(200, 200).then(async function(){		
 		
 		
 		$gameTemp.popMenu = true;//remove before battle menu

@@ -312,12 +312,31 @@ var _defaultPlayerSpeed = parameters['defaultPlayerSpeed'] || 4;
 		filename = this.getTranslationInfo(filename); 
 		return this.reserveBitmap('img/faces/', filename, hue, true, reservationId);
 	};
+	
+	ImageManager.loadNormalBitmap = function(path, hue, asBlob) {
+		var key = this._generateCacheKey(path, hue);
+		var bitmap = this._imageCache.get(key);
+		if (!bitmap || asBlob) {
+			bitmap = Bitmap.load(decodeURIComponent(path));
+			//if the bitmap is set to asBlob the blob for the associated object url is not cleared after creation of the internal canvas
+			//this mode is required when loading battle scene resources as the associated blob is used to create the texture
+			bitmap.asBlob = asBlob;
+			bitmap.addLoadListener(function() {
+				bitmap.rotateHue(hue);
+			});
+			this._imageCache.add(key, bitmap);
+		}else if(!bitmap.isReady()){
+			bitmap.decode();
+		}
 
-	ImageManager.loadBitmapPromise = async function(folder, filename, hue, smooth) {
+		return bitmap;
+	};
+
+	ImageManager.loadBitmapPromise = async function(folder, filename, asBlob, hue, smooth) {
 		return new Promise((resolve, reject) => {
 			if (filename) {
 				var path = folder + encodeURIComponent(filename);
-				var bitmap = this.loadNormalBitmap(path, hue || 0);
+				var bitmap = this.loadNormalBitmap(path, hue || 0, asBlob);
 				bitmap.smooth = smooth;
 				bitmap.addLoadListener(() => {
 					resolve(bitmap);
@@ -348,6 +367,90 @@ var _defaultPlayerSpeed = parameters['defaultPlayerSpeed'] || 4;
 		this._errorHandler = func;
 	};
 	
+	Bitmap.prototype._requestImage = function(url){
+		if(Bitmap._reuseImages.length !== 0){
+			this._image = Bitmap._reuseImages.pop();
+		}else{
+			this._image = new Image();
+		}
+
+		if (this._decodeAfterRequest && !this._loader) {
+			this._loader = ResourceHandler.createLoader(url, this._requestImage.bind(this, url), this._onError.bind(this));
+		}
+
+		this._image = new Image();
+		this._url = url;
+		
+		//always go into the decryptor and load the image as blob instead of using a different path for non-encrypted images.
+		//this is so the blob itself can be preserved for components that use it directly like the battle scene
+		this._loadingState = 'decrypting';
+		Decrypter.decryptImg(url, this);
+	};
+	
+	Bitmap.prototype._onLoad = function() {
+		this._image.removeEventListener('load', this._loadListener);
+		this._image.removeEventListener('error', this._errorListener);
+
+		this._renewCanvas();
+
+		switch(this._loadingState){
+			case 'requesting':
+				this._loadingState = 'requestCompleted';
+				if(this._decodeAfterRequest){
+					this.decode();
+				}else{
+					this._loadingState = 'purged';
+					this._clearImgInstance();
+				}
+				break;
+
+			case 'decrypting':
+				if(!this.asBlob){
+					window.URL.revokeObjectURL(this._image.src);
+				}
+				
+				this._loadingState = 'decryptCompleted';
+				if(this._decodeAfterRequest){
+					this.decode();
+				}else{
+					this._loadingState = 'purged';
+					this._clearImgInstance();
+				}
+				break;
+		}
+	};
+	
+	//decryption required checks were moved to here
+	Decrypter.decryptImg = function(url, bitmap) {
+		if(!Decrypter.checkImgIgnore(url) && Decrypter.hasEncryptedImages) {
+			url = this.extToEncryptExt(url);
+		}
+
+		var requestFile = new XMLHttpRequest();
+		requestFile.open("GET", url);
+		requestFile.responseType = "arraybuffer";
+		requestFile.send();
+
+		requestFile.onload = function () {
+			if(this.status < Decrypter._xhrOk) {
+				var arrayBuffer = requestFile.response;
+				if(!Decrypter.checkImgIgnore(url) && Decrypter.hasEncryptedImages) {
+					arrayBuffer = Decrypter.decryptArrayBuffer(requestFile.response);
+				}				
+				bitmap._image.src = Decrypter.createBlobUrl(arrayBuffer);
+				bitmap._image.addEventListener('load', bitmap._loadListener = Bitmap.prototype._onLoad.bind(bitmap));
+				bitmap._image.addEventListener('error', bitmap._errorListener = bitmap._loader || Bitmap.prototype._onError.bind(bitmap));
+			}
+		};
+
+		requestFile.onerror = function () {
+			if (bitmap._loader) {
+				bitmap._loader();
+			} else {
+				bitmap._onError();
+			}
+		};
+	};
 	
 //====================================================================
 // ●Spriteset_Map
