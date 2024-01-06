@@ -2014,7 +2014,7 @@ StatCalc.prototype.getMechData = function(mech, forActor, items, previousWeapons
 		result.abilities = this.getMechAbilityInfo(mechProperties);
 		result.itemSlots = parseInt(mechProperties.mechItemSlots);		
 		
-		result.noEquips = !!(mechProperties.mechNoEquips || 0);
+		result.noEquips = !!(mechProperties.mechNoEquips * 1 || 0);
 			
 		if(forActor){
 			if(result.inheritsUpgradesFrom){
