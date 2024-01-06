@@ -1389,6 +1389,7 @@ StatCalc.prototype.createEmptyActor = function(level){
 	result.isEmpty = true;
 	result.SRWInitialized = true;
 	_this.resetStageTemp(result);
+	_this.resetBattleTemp(result);
 	_this.resetSpiritsAndEffects(result);	
 	
 	return result;
@@ -2757,6 +2758,11 @@ StatCalc.prototype.split = function(actor){
 		calculatedStats.currentHP = Math.round(combinedHPRatio * calculatedStats.maxHP);
 		calculatedStats.currentEN = Math.round(combinedENRatio * calculatedStats.maxEN);*/
 		var combinesFrom = actor.SRWStats.mech.combinesFrom;
+		if(!combinesFrom || !combinesFrom.participants){
+			combineInfo = {
+				participants: combinesFrom
+			};
+		}
 
 		for(var i = 0; i < combineInfo.participants.length; i++){
 			var actor;
@@ -3785,6 +3791,7 @@ StatCalc.prototype.getWeaponPower = function(actor, weapon){
 StatCalc.prototype.enableWeaponAbilityResolution = function(actor, weapon){
 	//hacky method to get weapon abilities resolved while not before battle(like in the attack list)
 	//set the currentAttack on the attacker
+	
 	const storedBattleTemp = actor.SRWStats.battleTemp.currentAttack;
 	const storedBattleTarget = $gameTemp.currentBattleTarget;	
 	
