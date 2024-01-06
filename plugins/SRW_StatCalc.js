@@ -2758,8 +2758,8 @@ StatCalc.prototype.split = function(actor){
 		calculatedStats.currentHP = Math.round(combinedHPRatio * calculatedStats.maxHP);
 		calculatedStats.currentEN = Math.round(combinedENRatio * calculatedStats.maxEN);*/
 		var combinesFrom = actor.SRWStats.mech.combinesFrom;
-		if(!combinesFrom || !combinesFrom.participants){
-			combinesFrom = {
+		if(!combineInfo || !combineInfo.participants){
+			combineInfo = {
 				participants: combinesFrom
 			};
 		}
