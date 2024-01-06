@@ -668,7 +668,7 @@ MechUI.prototype.initPropertyHandlers = function(){
 				content+=EDITORSTRINGS.MECH.label_can_equip;
 				content+="</div>";
 				content+="<div class='cell'>";
-				content+="<input id='can_equip' type=checkbox "+(!(_this.getMetaValue("mechNoEquips")) ? "checked" : "")+"></input>";
+				content+="<input id='can_equip' type=checkbox "+(!(_this.getMetaValue("mechNoEquips") * 1) ? "checked" : "")+"></input>";
 				content+="</div>";
 				content+="</div>";
 				return content;
