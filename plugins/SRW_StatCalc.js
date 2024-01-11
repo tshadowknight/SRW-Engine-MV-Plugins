@@ -3750,6 +3750,14 @@ StatCalc.prototype.getCurrentWeapons = function(actor){
 			}			
 		}
 		
+		let addedWeaponMods =  $statCalc.getModDefinitions(actor, ["add_weapon"]);
+		for(let mod of addedWeaponMods){			
+			var weaponDefinition = $dataWeapons[mod.value];
+			var weaponProperties = weaponDefinition.meta;
+			let wep = this.parseWeaponDef(actor, false, weaponDefinition, weaponProperties);
+			tmp.push(wep);
+		}
+		
 		tmp = tmp.sort(function(a, b){
 			return a.power - b.power;
 		});

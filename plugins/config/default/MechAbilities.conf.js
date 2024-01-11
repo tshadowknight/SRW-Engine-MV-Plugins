@@ -886,7 +886,19 @@ $SRWConfig.mechAbilties = function(){
 		}
 	);
 	
-	
+	this.addDefinition(
+		57, 
+		"Weapon adding example", 
+		"Adds a weapon to the unit.", 
+		false,
+		false,
+		function(actor, level){
+			return [{type: "add_weapon", modType: "addFlat", value: 9}];
+		},
+		function(actor, level){
+			return true;
+		}
+	);
 	
 	
 	/*Insert new ability here*/
