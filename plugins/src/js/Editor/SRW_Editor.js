@@ -656,11 +656,11 @@ SRWEditor.prototype.init = function(){
 		}
 	};
 	
-	if(ENGINE_SETTINGS.BATTLE_SCENE.USE_RENDER_GROUPS){
+
 		_this._commandDisplayInfo["play_rmmv_anim"].params.push("isFront");
 		_this._commandDisplayInfo["create_bg"].params.push("isFront");
 		_this._commandDisplayInfo["create_movie_bg"].params.push("isFront");
-	}
+	
 		
 	
 	
