@@ -1603,11 +1603,10 @@ BattleSceneManager.prototype.createPlanarSprite = function(name, path, position,
 	material.diffuseTexture.wrapU = BABYLON.Texture.CLAMP_ADDRESSMODE;
 	material.diffuseTexture.wrapV = BABYLON.Texture.CLAMP_ADDRESSMODE;
 	
-	material.specularColor = new BABYLON.Color3(0, 0, 0);
-	material.emissiveColor = new BABYLON.Color3(1, 1, 1);
-	//material.ambientColor = new BABYLON.Color3(0, 0, 0);
-	//material.diffuseColor = new BABYLON.Color3(1, 1, 1);
-	material.disableLighting = true;
+	//material.specularColor = new BABYLON.Color3(0, 0, 0);
+	//material.emissiveColor = new BABYLON.Color3(1, 1, 1);
+	material.disableLighting = false;
+	
 	if(typeof alpha != "undefined"){
 		material.alpha = alpha;
 	}	
