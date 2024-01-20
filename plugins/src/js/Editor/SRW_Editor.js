@@ -343,7 +343,7 @@ SRWEditor.prototype.init = function(){
 		},
 		create_bg: {
 			hasTarget: true,
-			params: ["isPilotCutin", "path", "parent", "position", "size", "alpha", "billboardMode", "rotation", "frameSize", "lineCount", "columnCount", "animationLoop", "animationFrames", "animationDelay", "holdFrame", "scrollSpeed", "clamp", "uScale", "vScale", "uOffset", "vOffset"],//, "unlit"
+			params: ["isPilotCutin", "path", "parent", "position", "size", "alpha", "billboardMode", "rotation", "lineCount", "columnCount", "animationLoop", "animationFrames", "animationDelay", "holdFrame", "scrollSpeed", "clamp", "uScale", "vScale", "uOffset", "vOffset"],//, "unlit", "frameSize", 
 			aliases: {"animationLoop": "loopFromFrame", "animationFrames": "loopToFrame"},
 			desc: "Create a new background."
 		},
