@@ -1603,9 +1603,9 @@ BattleSceneManager.prototype.createPlanarSprite = function(name, path, position,
 	material.diffuseTexture.wrapU = BABYLON.Texture.CLAMP_ADDRESSMODE;
 	material.diffuseTexture.wrapV = BABYLON.Texture.CLAMP_ADDRESSMODE;
 	
-	//material.specularColor = new BABYLON.Color3(0, 0, 0);
-	//material.emissiveColor = new BABYLON.Color3(1, 1, 1);
-	material.disableLighting = false;
+	material.specularColor = new BABYLON.Color3(0, 0, 0);
+	material.emissiveColor = new BABYLON.Color3(1, 1, 1);
+	material.disableLighting = true;
 	
 	if(typeof alpha != "undefined"){
 		material.alpha = alpha;
@@ -3179,7 +3179,7 @@ BattleSceneManager.prototype.executeAnimation = function(animation, startTick){
 				}	*/			
 				_this.applyMutator(targetObj, (mesh) => {
 					if(mesh.material){
-						mesh.material.emissiveColor = new BABYLON.Color3(params.r / 255, params.g / 255, params.b / 255);
+						mesh.material.emissiveColor = new BABYLON.Color3(params.r / 255, params.g / 255, params.b / 255); 
 					}
 				});
 			}
