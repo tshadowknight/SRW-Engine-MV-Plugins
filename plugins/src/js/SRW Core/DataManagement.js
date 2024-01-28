@@ -148,14 +148,14 @@
 					if(!fs.existsSync(sourceFile)){
 						sourceFile = "js/plugins/config/default/BattleAnimations.json";
 					}
-					fs.copyFileSync(sourceFile, "/data/BattleAnimations.json", fs.constants.COPYFILE_EXCL);	
+					fs.copyFileSync(sourceFile, "data/BattleAnimations.json", fs.constants.COPYFILE_EXCL);	
 				}
 				if(file == "BattleEnvironments"){
 					var sourceFile = "js/plugins/config/active/BattleEnvironments.json";
 					if(!fs.existsSync(sourceFile)){
 						sourceFile = "js/plugins/config/default/BattleEnvironments.json";
 					}
-					fs.copyFileSync(sourceFile, "/data/BattleEnvironments.json", fs.constants.COPYFILE_EXCL);	
+					fs.copyFileSync(sourceFile, "data/BattleEnvironments.json", fs.constants.COPYFILE_EXCL);	
 				}
 				if(file == "BattleText"){
 					var sourceFile = "js/plugins/config/active/BattleText.json";
