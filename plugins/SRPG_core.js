@@ -1689,13 +1689,15 @@ SceneManager.isInSaveScene = function(){
 		
 			if(TouchInput.isPressed()) {
 				if($gameTemp._ckex == -1 || $gameTemp._ckey == -1){
-					$gameTemp._ckex = TouchInput.x;
-					$gameTemp._ckey = TouchInput.y;
-					$gameTemp.lastDragX = TouchInput.x;
-					$gameTemp.lastDragY = TouchInput.y;
-					$gameTemp.dragTimer = 10;
-					$gameTemp.dragAccelTimer = 0;
-					$gameTemp.isDraggingMap = true;
+					if($gameTemp.lastDragX != TouchInput.x || $gameTemp.lastDragY != TouchInput.y){
+						$gameTemp._ckex = TouchInput.x;
+						$gameTemp._ckey = TouchInput.y;
+						$gameTemp.lastDragX = TouchInput.x;
+						$gameTemp.lastDragY = TouchInput.y;
+						$gameTemp.dragTimer = 10;
+						$gameTemp.dragAccelTimer = 0;
+						$gameTemp.isDraggingMap = true;
+					}					
 				} else if($gameTemp.isDraggingMap){
 					if(Math.abs($gameTemp.lastDragX - TouchInput.x) > 50 || Math.abs($gameTemp.lastDragY - TouchInput.y) > 50){
 						$gameTemp.lastDragX = TouchInput.x;
