@@ -144,6 +144,7 @@ Window_DetailPages.prototype.createComponents = function() {
 	this._attackList.setView("summary");
 	this._attackList.enableSelection();
 	this._attackList.createComponents();	
+	this._attackList.registerObserver("redraw", function(){_this.requestRedraw();});
 	
 	this._weaponDetailContainer = document.createElement("div");
 	this._weaponDetailContainer.classList.add("list_detail");	

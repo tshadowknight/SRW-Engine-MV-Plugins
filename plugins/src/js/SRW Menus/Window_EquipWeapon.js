@@ -259,11 +259,13 @@ Window_EquipWeapon.prototype.update = function() {
 			this.requestRedraw();
 			this.decrementUpgradeLevel();
 			this.refresh();
+			this.resetTouchState();
 			return;	
 		} else if (Input.isTriggered('right') || Input.isRepeated('right') || this._touchRight) {
 			this.requestRedraw();
 			this.incrementUpgradeLevel();
 			this.refresh();
+			this.resetTouchState();
 			return;	
 		}
 		
@@ -332,8 +334,17 @@ Window_EquipWeapon.prototype.update = function() {
 					} else {
 						SoundManager.playBuzzer();
 					}		
+				} else {
+					let itemInfo = $equipablesManager.getActorItems(mech.id)[this._currentSelection];
+					if(itemInfo){
+						$equipablesManager.removeItemHolder(itemInfo.weaponId, itemInfo.instanceId);
+					}
+					SoundManager.playOk();			
+					this._currentUIState = "slot_selection";
+					this.refreshAllUnits();	
 				}	
 			}
+			this.resetTouchState();
 			this.refresh();
 			return;	
 		}
@@ -349,10 +360,11 @@ Window_EquipWeapon.prototype.update = function() {
 			}  else if(this._currentUIState == "item_transfer"){			
 				this._currentUIState = "item_selection";							
 			}
+			this.resetTouchState();
 			this.refresh();
 			return;				
 		}		
-		this.resetTouchState();
+		
 		this.refresh();
 	}		
 };

@@ -123,11 +123,13 @@ Window_AttackList.prototype.update = function() {
 		if(Input.isTriggered('left') || Input.isRepeated('left') || this._touchLeft){
 			this.requestRedraw();			
 			this._attackList.decrementPage();	
+			this.resetTouchState();
 			return;	
 			
 		} else if (Input.isTriggered('right') || Input.isRepeated('right') || this._touchRight) {
 			this.requestRedraw();			
 			this._attackList.incrementPage();	
+			this.resetTouchState();
 			return;	
 		}
 		
@@ -163,6 +165,7 @@ Window_AttackList.prototype.update = function() {
 			} else {
 				SoundManager.playCancel();
 			}	
+			this.resetTouchState();
 			return;	
 		}
 		if(Input.isTriggered('cancel') || TouchInput.isCancelled()){		
@@ -171,6 +174,7 @@ Window_AttackList.prototype.update = function() {
 			if(this._callbacks["closed"]){
 				this._callbacks["closed"]();
 			}
+			this.resetTouchState();
 			return;	
 		}		
 		

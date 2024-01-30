@@ -627,7 +627,7 @@ StatCalc.prototype.getMechWeapons = function(actor, mechProperties, previousWeap
 				var weaponDefinition = $dataWeapons[weaponId];
 				var weaponProperties = weaponDefinition.meta;
 				
-				result.push(this.parseWeaponDef(actor, isLocked, weaponDefinition, weaponProperties, previousWeapons));
+				result.push(this.parseWeaponDef(actor, isLocked, weaponDefinition, weaponProperties, currentWeaponsLookup));
 			}
 		}
 	}
