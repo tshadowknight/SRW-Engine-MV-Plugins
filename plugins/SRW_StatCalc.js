@@ -5219,12 +5219,12 @@ StatCalc.prototype.isValidWeaponTarget = function(actor, target, weapon, include
 	return isValidTarget && isInRange;
 }
 
-StatCalc.prototype.getAllInRange = function(initiator, includeMoveRange){
+StatCalc.prototype.getAllInRange = function(initiator, includeMoveRange, postMoveOnly){
 	var _this = this;
 	var result = [];	
 	var allWeapons = _this.getActorMechWeapons(initiator);
 	allWeapons.forEach(function(weapon){
-		if(_this.canUseWeapon(initiator, weapon, false)){			
+		if(_this.canUseWeapon(initiator, weapon, postMoveOnly)){			
 			_this.iterateAllActors(null, function(target, event){			
 				if(_this.isValidWeaponTarget(initiator, target, weapon, includeMoveRange) && !event._erased){
 					result.push(event);

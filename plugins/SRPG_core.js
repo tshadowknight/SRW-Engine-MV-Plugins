@@ -3721,7 +3721,7 @@ SceneManager.isInSaveScene = function(){
 			y: $gameTemp.activeEvent().posY()
 		};
 		var fullRange = $statCalc.getFullWeaponRange(battler, $gameTemp.isPostMove);
-        var targets = $statCalc.getAllInRange(battler);
+        var targets = $statCalc.getAllInRange(battler, false, $gameTemp.isPostMove);
 		var tmp = [];
 		for(var i = 0; i < targets.length; i++){
 			if((!battler.isEnemy() || !$gameSystem.untargetableAllies[targets[i].eventId()]) && $statCalc.canBeTargetedOnCurrentTerrain($gameSystem.EventToUnit(targets[i].eventId())[1])){		
