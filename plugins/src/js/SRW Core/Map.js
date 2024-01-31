@@ -318,8 +318,16 @@
 		
 		Spriteset_Map.prototype.createLowerLayer = function() {
 			Spriteset_Base.prototype.createLowerLayer.call(this);
-			this.createParallax();
-			this.createTilemap();
+			if(ENGINE_SETTINGS.PLACE_PARALLAX_ABOVE_MAP){
+				this.createTilemap();
+				this.createParallax();
+			} else {
+				this.createParallax();
+				this.createTilemap();
+			}
+			this._gridSprite = new Sprite_SrpgGrid();
+			this._baseSprite.addChild(this._gridSprite); 
+			
 			for(var i = 0; i < 7; i++){
 				this._baseSprite.addChild(new Sprite_AreaHighlights("ability_zone", i)); 
 			}
@@ -450,8 +458,15 @@
 								
 		
 			if(!(typeof UltraMode7 != "undefined") || !UltraMode7.isActive()){
-				this.addCharacterToBaseSprite(new Sprite_MapBorder(0, $gameMap.height(), ($gameMap.width() + 10) * $gameMap.tileWidth(), 480));	
-				this.addCharacterToBaseSprite(new Sprite_MapBorder($gameMap.width(), 0, 480, ($gameMap.height() + 10) * $gameMap.tileHeight()));		
+				const borderSize = 960;
+				//bottom
+				this.addCharacterToBaseSprite(new Sprite_MapBorder(0, $gameMap.height(), ($gameMap.width() + 10) * $gameMap.tileWidth(), borderSize));	
+				//right
+				this.addCharacterToBaseSprite(new Sprite_MapBorder($gameMap.width(), 0, borderSize, ($gameMap.height() + 10) * $gameMap.tileHeight()));		
+				//left
+				this.addCharacterToBaseSprite(new Sprite_MapBorder((borderSize / $gameMap.tileWidth()) * -1, 0, borderSize, ($gameMap.height() * $gameMap.tileHeight()) + 2 * borderSize));	
+				//top
+				this.addCharacterToBaseSprite(new Sprite_MapBorder((borderSize / $gameMap.tileWidth()) * -1, (borderSize / $gameMap.tileHeight()) * -1, ($gameMap.width() * $gameMap.tileWidth()) + 2 * borderSize, borderSize));	
 			}
 
 			$gameTemp.updatePlayerSpriteVisibility();
@@ -473,8 +488,7 @@
 			if($gameTemp.intermissionPending){
 				return;
 			}
-			this._gridSprite = new Sprite_SrpgGrid();
-			this._baseSprite.addChild(this._gridSprite);   
+			  
 			
 					
 				
