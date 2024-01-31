@@ -1741,23 +1741,25 @@
 						} else if ($gameTemp.isDestinationValid()){
 							var x = $gameTemp.destinationX();
 							var y = $gameTemp.destinationY();
-							if($gameTemp.cameraMode == "touch" && $gameSystem.isSRPGMode()){								
-								var validDestination = true;
-								if($gameTemp.mapRetargetLock && $gameTemp.currentMapTargetTiles && $gameTemp.currentMapTargetTiles.length){
-									validDestination = false;
-									var ctr = 0;
-									while(!validDestination && ctr < $gameTemp.currentMapTargetTiles.length){
-										var coords = $gameTemp.currentMapTargetTiles[ctr++];
-										if(coords[0] == x && coords[1] == y){
-											validDestination = true;
+							if($gameTemp.cameraMode == "touch" && $gameSystem.isSRPGMode()){	
+								if(!$gameTemp.isDraggingMap){
+									var validDestination = true;
+									if($gameTemp.mapRetargetLock && $gameTemp.currentMapTargetTiles && $gameTemp.currentMapTargetTiles.length){
+										validDestination = false;
+										var ctr = 0;
+										while(!validDestination && ctr < $gameTemp.currentMapTargetTiles.length){
+											var coords = $gameTemp.currentMapTargetTiles[ctr++];
+											if(coords[0] == x && coords[1] == y){
+												validDestination = true;
+											}
 										}
-									}
-								}								
-								
-								if(validDestination && x >= 0 && x < $gameMap.width() && y >= 0 && y < $gameMap.height() && (x != this.posX() || y != this.posY())){
-									this.locate(x, y, true);
-									this.wasTouchMoved = true;
-								}								
+									}								
+									
+									if(validDestination && x >= 0 && x < $gameMap.width() && y >= 0 && y < $gameMap.height() && (x != this.posX() || y != this.posY())){
+										this.locate(x, y, true);
+										this.wasTouchMoved = true;
+									}		
+								}	
 							} else {
 								direction = this.findDirectionTo(x, y);
 							}							
