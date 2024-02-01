@@ -2971,6 +2971,7 @@ SceneManager.isInSaveScene = function(){
 		this._swapPilotWindow.hide();
 		
 		actor.onAllActionsEnd();
+		$gameTemp.eraseActorAfterTurn = true; //indicate that hit and away and multi action must be ignored when ending the turn for the unit to prevent a softlock after the pilot swap
 		this.srpgAfterAction();	
     };	
 	
