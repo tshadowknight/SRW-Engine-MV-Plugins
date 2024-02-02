@@ -1587,7 +1587,7 @@ BattleCalc.prototype.generateMapBattleResult = function(){
 	
 	var targets = $gameTemp.currentMapTargets;
 	targets.forEach(function(target){
-		$statCalc.invalidateAbilityCache();
+		$statCalc.invalidateAbilityCache(target);
 		//temp variable used to resolve weapon effects per target in StatCalc.prototype.getActiveStatMods
 		$gameTemp.currentBattleTarget = target;
 		

@@ -668,6 +668,8 @@ GameState_actor_map_target_confirm.prototype.update = function(scene){
 		if(!mapAttackDef.retargetInfo || !mapAttackDef.retargetInfo.shape.length){
 			$gameTemp.clearMoveTable();	
 			$gameTemp.setResetMoveList(true);
+			$gamePlayer.locate($gameTemp.activeEvent().posX(), $gameTemp.activeEvent().posY(), false, true);
+			$gameTemp.mapAttackAnimationDelay = 30;
 			scene.mapAttackStart();
 		} else {
 			var triggerOK = true;
