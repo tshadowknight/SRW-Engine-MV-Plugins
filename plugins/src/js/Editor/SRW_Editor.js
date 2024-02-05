@@ -282,7 +282,12 @@ SRWEditor.prototype.init = function(){
 			hasTarget: true,
 			params: ["startFade", "endFade", "duration", "easingFunction", "easingMode"],
 			desc: "Fade in the target background."
-		},		
+		},	
+		fade_in_shadows: {
+			hasTarget: false,
+			params: ["startFade", "endFade", "duration", "easingFunction", "easingMode"],
+			desc: "Fade in the unit shadows."
+		},				
 		fade_swipe: {
 			hasTarget: false,
 			params: ["time"],

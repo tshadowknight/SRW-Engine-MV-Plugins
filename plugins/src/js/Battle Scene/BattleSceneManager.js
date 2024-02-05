@@ -1747,7 +1747,11 @@ BattleSceneManager.prototype.hookBeforeRender = function(){
 				shadowSprite.scaling.y = scale;
 				shadowSprite.scaling.z = scale;
 				shadowSprite.setEnabled(spriteInfo.sprite.isEnabled());
-				shadowSprite.visibility = spriteInfo.sprite.visibility;
+				
+				if(shadowSprite.animatedVisiblity){
+					shadowSprite.visibility = spriteInfo.sprite.visibility * shadowSprite.animatedVisiblity;
+				}
+				
 			}
 			
 			/*if(spriteInfo.sprite.isEnabled()){
@@ -2200,11 +2204,13 @@ BattleSceneManager.prototype.hookBeforeRender = function(){
 					
 					_this.applyMutator(targetObj, (mesh) => {
 						mesh.visibility = interpVector.x;
+						mesh.animatedVisiblity = interpVector.x;				
 					});
 					
 				} else {					
 					_this.applyMutator(targetObj, (mesh) => {
 						mesh.visibility = animation.endFade * 1;
+						mesh.animatedVisiblity = animation.endFade * 1;
 					});
 					delete _this._fadeAnimations[animationId];
 				}
@@ -3539,6 +3545,25 @@ BattleSceneManager.prototype.executeAnimation = function(animation, startTick){
 			if(targetObj){
 				_this.registerFadeAnimation(targetObj, params.startFade, params.endFade, startTick, params.duration, params.easingFunction, params.easingMode);
 			}
+		},	
+		fade_in_shadows: function(target, params){
+			var targetObj = getTargetObject(target);
+			
+			let targets = [
+				_this._actorShadow,
+				_this._actorTwinShadow,
+				_this._enemyShadow,
+				_this._enemyTwinShadow,
+				_this._actorSupporterShadow,
+				_this._actorTwinSupporterShadow,
+				_this._enemySupporterShadow,
+				_this._enemyTwinSupporterShadow
+			];
+			for(let target of targets){
+				if(target){
+					_this.registerFadeAnimation(target, params.startFade, params.endFade, startTick, params.duration, params.easingFunction, params.easingMode);
+				}
+			}			
 		},		
 		fade_swipe: function(target, params){
 			var swipeTime = params.time;
