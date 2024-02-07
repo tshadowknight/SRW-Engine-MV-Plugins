@@ -953,6 +953,7 @@ GameState_actor_target.prototype.updateMapEvent = function(x, y, triggers){
 				if(isInRange && validTarget){
 					let isValidWeaponTarget = $statCalc.isValidWeaponTarget(actionBattlerArray[1], targetBattlerArray[1], $gameTemp.actorAction.attack);
 					if(isValidWeaponTarget || (targetBattlerArray[0] === 'actor' && $gameTemp.actorAction.type === "support")){
+						
 						//$gameSystem.setSrpgBattleWindowNeedRefresh(actionBattlerArray, targetBattlerArray);
 						//$gameSystem.setSrpgStatusWindowNeedRefresh(actionBattlerArray);
 						$gameTemp.currentBattleActor = actionBattlerArray[1];
@@ -962,6 +963,7 @@ GameState_actor_target.prototype.updateMapEvent = function(x, y, triggers){
 						var enemyInfo = {actor: $gameTemp.currentBattleEnemy, pos: {x: event.posX(), y: event.posY()}};
 						var actorInfo = {actor: $gameTemp.currentBattleActor, pos: {x: $gameTemp.activeEvent()._x, y: $gameTemp.activeEvent()._y}};
 						$gameTemp.enemyAction = null;
+						$statCalc.invalidateAbilityCache(enemyInfo.actor);
 						if(enemyInfo.actor.counterBehavior == "defend"){
 							$gameTemp.enemyAction = {
 								type: "defend",

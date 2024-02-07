@@ -1172,6 +1172,12 @@ BattleSceneManager.prototype.updateMainSprite = async function(type, name, sprit
 			if(animInfo){
 				animInfo.start(false, 1.0, animInfo.from, animInfo.to, false);
 			}
+			
+			if(spriteConfig.defaultAttachments){
+				for(let defaultAttachment of spriteConfig.defaultAttachments){
+					_this.showAttachment(spriteInfo.sprite, defaultAttachment);
+				}
+			}
 		} 	
 		
 		pivothelper.position.y+=pivotYOffset;
@@ -4818,33 +4824,7 @@ BattleSceneManager.prototype.executeAnimation = function(animation, startTick){
 					m.isVisible = true;
 				}
 			});*/		
-			let stack = [];
-			stack.push(targetObj);
-			let attNodes = [];
-			while(stack.length){
-				let current = stack.shift();
-				if(current.id.indexOf(params.attachId) == 0){
-					attNodes.push(current);
-				}
-				
-				let children = current.getChildren();
-				
-				let materialLeaves = {};
-				for(let child of children){		
-					stack.push(child);		
-				}
-			}
-			
-			stack = attNodes;
-			while(stack.length){
-				let current = stack.shift();
-				current.isVisible = true;
-				let children = current.getChildren();
-				for(let child of children){		
-					stack.push(child);		
-				}
-			}
-				
+			_this.showAttachment(targetObj, params.attachId);				
 		},
 		hide_attachment: function(target, params){
 			const targetObj = getTargetObject(target);		
@@ -5412,6 +5392,36 @@ BattleSceneManager.prototype.getTargetAction = function(target){
 	return this._currentAnimatedAction.attacked_all_sub;
 }
 
+BattleSceneManager.prototype.showAttachment = function(targetObj, attachId){
+	let stack = [];
+	stack.push(targetObj);
+	let attNodes = [];
+	while(stack.length){
+		let current = stack.shift();
+		if(current.id.indexOf(attachId) == 0){
+			attNodes.push(current);
+		}
+		
+		let children = current.getChildren();
+		
+		let materialLeaves = {};
+		for(let child of children){		
+			stack.push(child);		
+		}
+	}
+
+	stack = attNodes;
+	while(stack.length){
+		let current = stack.shift();
+		current.isVisible = true;
+		let children = current.getChildren();
+		for(let child of children){		
+			stack.push(child);		
+		}
+	}
+}
+
+
 BattleSceneManager.prototype.startAnimation = function(){
 	
 	var _this = this;
@@ -5726,6 +5736,7 @@ BattleSceneManager.prototype.readBattleCache = async function() {
 		spriteInfo.canvasDims = battleSceneInfo.canvasDims;
 		spriteInfo.armatureName = battleSceneInfo.armatureName;
 		spriteInfo.BBHack = battleSceneInfo.BBHack;
+		spriteInfo.defaultAttachments = battleSceneInfo.defaultAttachments;
 		if(battleEffect.side == "actor"){
 			if(battleEffect.type == "initiator" || battleEffect.type == "defender"){
 				 

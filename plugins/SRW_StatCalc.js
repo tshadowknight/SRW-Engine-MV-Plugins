@@ -3363,6 +3363,15 @@ StatCalc.prototype.getBattleSceneInfo = function(actor){
 		result.rotation = parseInt(mechProperties.mechBattleSceneSpriteRotation) || 0;
 		
 		result.animGroup = mechProperties.mechBattleSceneAnimGroup;
+		
+		let defaultAttachments = [];
+		let parts = (mechProperties.mechBattleSceneDefaultAttachments || "").split(",");
+		for(let part of parts){
+			if(part){
+				defaultAttachments.push(String(part || "").trim());
+			}			
+		}
+		result.defaultAttachments = defaultAttachments;
 	} 
 	return result;
 }
@@ -6644,6 +6653,16 @@ StatCalc.prototype.getRealWeaponRange = function(actor, weapon){
 		}
 		if(result < 1){
 			result = 1;
+		}
+		if(weapon.type == "M"){
+			if(this.applyStatModsToValue(actor, 0, ["infinite_melee_range"])){
+				result = 99;
+			}
+		}
+		if(weapon.type == "R"){
+			if(this.applyStatModsToValue(actor, 0, ["infinite_ranged_range"])){
+				result = 99;
+			}
 		}
 		return result;
 	} else {

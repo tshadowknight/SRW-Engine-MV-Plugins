@@ -1642,6 +1642,11 @@ MechUI.prototype.initPropertyHandlers = function(){
 				content+="<div title='"+EDITORSTRINGS.MECH.hint_world_size+"' class='row'>";
 				content+=_this.createValueInput("mechBattleReferenceSize", EDITORSTRINGS.MECH.label_world_size, "", EDITORSTRINGS.MECH.label_world_units);
 				content+="</div>";
+				
+				content+="<div title='' class='row'>";
+				content+=_this.createValueInput("mechBattleSceneDefaultAttachments", EDITORSTRINGS.MECH.label_default_attachments, "", "");
+				content+="</div>";
+				
 				content+="<div title='' class='row'>";
 				content+="<div class='cell'>";
 				content+=EDITORSTRINGS.MECH.label_death_anim;
@@ -1655,6 +1660,9 @@ MechUI.prototype.initPropertyHandlers = function(){
 				for(var j = 0; j < options.length; j++){					
 					content+="<option "+(options[j] == value ? "selected" : "")+" value='"+options[j]+"'>"+animData[options[j]].name+"</option>";										
 				}
+				
+				
+		
 				
 				content+="</select>";
 				content+="</div>";
@@ -1746,7 +1754,8 @@ MechUI.prototype.initPropertyHandlers = function(){
 					"mechBattleSceneShadowSize",
 					"mechBattleSceneShadowOffsetZ",				
 					"mechBattleSceneShadowOffsetX",					
-					"mechBattleReferenceSize",					
+					"mechBattleReferenceSize",		
+					
 				];
 				
 				if(spriteType == "Default"){
@@ -1783,7 +1792,8 @@ MechUI.prototype.initPropertyHandlers = function(){
 				});
 				
 				hookedProperties = [			
-					"mechBattleSceneSprite",					
+					"mechBattleSceneSprite",			
+					"mechBattleSceneDefaultAttachments"						
 				];
 				if(spriteType == "DragonBones"){
 					hookedProperties.push("mechBattleSceneArmatureName");
