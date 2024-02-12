@@ -5425,6 +5425,7 @@ BattleSceneManager.prototype.showAttachment = function(targetObj, attachId){
 BattleSceneManager.prototype.startAnimation = function(){
 	
 	var _this = this;
+	
 	_this._runningAnimation	= true;
 	_this._lastAnimationTickTime = new Date().getTime();
 	_this._animationStartTickTime = _this._lastAnimationTickTime;
@@ -7008,6 +7009,7 @@ BattleSceneManager.prototype.processActionQueue = function() {
 		if(nextAction && nextAction.action.type != "defend" && nextAction.action.type != "evade" && nextAction.action.type != "none"){
 			_this._UILayerManager.resetTextBox();
 			_this._UILayerManager.hideNoise();
+			_this._battleTextManager.clearAttackGroupId();
 			
 			_this.doingFadeTransition = false;
 			var direction;

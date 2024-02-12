@@ -105,7 +105,7 @@ BattleTextBuilder.prototype.updateText = function(params, updateValues){
 	}
 }
 
-BattleTextBuilder.prototype.addText = function(params, value){
+BattleTextBuilder.prototype.addText = function(params, idx){
 	try {
 		var definition = this.getDefinitions();
 		var def = definition[params.sceneType];
@@ -163,7 +163,12 @@ BattleTextBuilder.prototype.addText = function(params, value){
 		if(params.type == "attacks"){
 			newEntry[0].quoteId = 0;
 		}
-		options.push(newEntry);
+		if(idx == null){
+			options.unshift(newEntry);
+		} else {
+			options.splice(idx * 1 + 1, 0 , newEntry);
+		}
+		
 	} catch(e){
 		console.log(e.message);
 	}
@@ -227,7 +232,61 @@ BattleTextBuilder.prototype.setUnitId = function(params, id){
 	}
 }
 
-BattleTextBuilder.prototype.setQuoteId = function(params, id){
+BattleTextBuilder.prototype.addAttackGroupOdds = function(params){
+	var def = this.getDefinitions()[params.sceneType];		
+	if(params.sceneType == "event"){			
+		def = def[params.eventId].data;
+	}		
+	var entityDef = def[params.entityType][params.entityId];
+	var hookDef = entityDef[params.type];
+	if(params.type == "attacks"){
+		hookDef = hookDef[params.weaponId];			
+	}
+	if(!hookDef["__groupodds"]){
+		hookDef["__groupodds"] = [];
+	}
+	hookDef["__groupodds"].push({
+		groupId: "",
+		weight: ""
+	});
+}
+
+BattleTextBuilder.prototype.removeAttackGroupOdds = function(params, idx){
+	var def = this.getDefinitions()[params.sceneType];		
+	if(params.sceneType == "event"){			
+		def = def[params.eventId].data;
+	}		
+	var entityDef = def[params.entityType][params.entityId];
+	var hookDef = entityDef[params.type];
+	if(params.type == "attacks"){
+		hookDef = hookDef[params.weaponId];			
+	}
+	if(!hookDef["__groupodds"]){
+		hookDef["__groupodds"] = [];
+	}
+	hookDef["__groupodds"].splice(idx, 1);
+}
+
+BattleTextBuilder.prototype.setAttackGroupProperty = function(params, idx, prop, value){
+	var def = this.getDefinitions()[params.sceneType];		
+	if(params.sceneType == "event"){			
+		def = def[params.eventId].data;
+	}		
+	var entityDef = def[params.entityType][params.entityId];
+	var hookDef = entityDef[params.type];
+	if(params.type == "attacks"){
+		hookDef = hookDef[params.weaponId];			
+	}
+	if(!hookDef["__groupodds"]){
+		hookDef["__groupodds"] = [];
+	}
+	if(hookDef["__groupodds"][idx]){
+		hookDef["__groupodds"][idx][prop] = value;
+	}
+
+}
+
+BattleTextBuilder.prototype.setAttackQuoteProperty = function(property, params, id){
 	try {
 		var def = this.getDefinitions()[params.sceneType];		
 		if(params.sceneType == "event"){			
@@ -250,7 +309,7 @@ BattleTextBuilder.prototype.setQuoteId = function(params, id){
 		//hack to ensure the quoteId is the same for all lines in a quote
 		if(params.type == "attacks"){
 			lines.forEach(function(line){
-				line.quoteId = id;
+				line[property] = id;
 			});
 		}
 		options[params.targetIdx] = lines;	
@@ -258,6 +317,14 @@ BattleTextBuilder.prototype.setQuoteId = function(params, id){
 	} catch(e){
 		console.log(e.message);
 	}
+}
+
+BattleTextBuilder.prototype.setQuoteId = function(params, id){
+	this.setAttackQuoteProperty("quoteId", params, id);
+}
+
+BattleTextBuilder.prototype.setQuoteGroup = function(params, id){
+	this.setAttackQuoteProperty("quoteGroup", params, id);
 }
 
 BattleTextBuilder.prototype.setMechId = function(params, id){

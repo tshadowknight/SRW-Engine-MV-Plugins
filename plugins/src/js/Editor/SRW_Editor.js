@@ -1751,7 +1751,38 @@ SRWEditor.prototype.showBattleTextEditorControls = function(){
 							content+="<div class='delete_weapon_entry'><img src='"+_this._svgPath+"close-line.svg'></div>";
 							content+="<div class='title_label'>"+weaponId+". "+$dataWeapons[weaponId].name+"</div>";
 							
+							
+							
 							var options = textInfo[weaponId];
+							if(!options["__groupodds"]){
+								options["__groupodds"] = [];
+							}
+							content+="<div data-weaponid='"+weaponId+"' class='group_frequency_controls'>";
+							content+="<div class='title'>"+EDITORSTRINGS.TEXT.label_quote_odds+"</div>";
+							
+							content+="<div class='scroll_pane'>";
+							let idx = 0;
+							for(let entry of options["__groupodds"]){
+								content+="<div data-idx='"+(idx++)+"' class='entry'>";
+								content+="<div class='label'>";
+								content+=EDITORSTRINGS.TEXT.label_quote_group;
+								content+="</div>";
+								content+="<div class='value'>";
+								content+="<input class='group_id' value='"+entry.groupId+"'></input>";
+								content+="</div>";
+								content+="<div class='label'>";
+								content+=EDITORSTRINGS.TEXT.label_quote_percent;
+								content+="</div>";
+								content+="<input class='group_weight' value='"+entry.weight+"'></input>";
+								content+="<img class='delete_group_def' src='"+_this._svgPath+"close-line.svg'>";
+								content+="</div>";
+							}
+							content+="</div>";
+							content+="<div class='line_controls'>";
+							content+="<img class='add_group_def' src='"+_this._svgPath+"add-line.svg'>";
+							content+="</div>";
+							content+="</div>";
+							
 							if(!options.default){
 								options.default = [];
 							}
@@ -1936,6 +1967,56 @@ SRWEditor.prototype.showBattleTextEditorControls = function(){
 			});
 		});			
 		
+		var buttons = containerNode.querySelectorAll(".group_frequency_controls .add_group_def");
+		buttons.forEach(function(button){
+			button.addEventListener("click", function(){			
+				var params = getLocatorInfo(this);				
+				_this._battleTextBuilder.addAttackGroupOdds(params);
+				_this._modified = true;
+				_this.showBattleTextEditorControls();							
+			});
+		});	
+		
+		var buttons = containerNode.querySelectorAll(".group_frequency_controls .delete_group_def");
+		buttons.forEach(function(button){
+			button.addEventListener("click", function(){			
+				var params = getLocatorInfo(this);				
+				let idx = this.closest(".entry").getAttribute("data-idx");
+				if(idx != null){
+					_this._battleTextBuilder.removeAttackGroupOdds(params, idx);
+					_this._modified = true;
+					_this.showBattleTextEditorControls();	
+				}										
+			});
+		});	
+		
+		var buttons = containerNode.querySelectorAll(".group_frequency_controls .group_id");
+		buttons.forEach(function(button){
+			button.addEventListener("change", function(){			
+				var params = getLocatorInfo(this);				
+				let idx = this.closest(".entry").getAttribute("data-idx");
+				if(idx != null){
+					_this._battleTextBuilder.setAttackGroupProperty(params, idx, "groupId", this.value);
+					_this._modified = true;
+					_this.showBattleTextEditorControls();	
+				}										
+			});
+		});	
+		
+		var buttons = containerNode.querySelectorAll(".group_frequency_controls .group_weight");
+		buttons.forEach(function(button){
+			button.addEventListener("change", function(){			
+				var params = getLocatorInfo(this);				
+				let idx = this.closest(".entry").getAttribute("data-idx");
+				if(idx != null){
+					_this._battleTextBuilder.setAttackGroupProperty(params, idx, "weight", this.value);
+					_this._modified = true;
+					_this.showBattleTextEditorControls();	
+				}										
+			});
+		});	
+		
+		
 		var buttons = containerNode.querySelectorAll(".add_attack");
 		buttons.forEach(function(button){
 			button.addEventListener("click", function(){			
@@ -2046,15 +2127,25 @@ SRWEditor.prototype.showBattleTextEditorControls = function(){
 				_this._battleTextBuilder.setQuoteId(params, this.value);
 				_this._modified = true;
 			});
-		});			
+		});	
+
+		var inputs = containerNode.querySelectorAll(".quote_group");
+		inputs.forEach(function(input){
+			input.addEventListener("change", function(){				
+				var params = getLocatorInfo(this);
+				_this._battleTextBuilder.setQuoteGroup(params, this.value);
+				_this._modified = true;
+			});
+		});				
 		
 		var inputs = containerNode.querySelectorAll(".add_category_quote");
 		inputs.forEach(function(input){
 			input.addEventListener("click", function(){
 				var params = getLocatorInfo(this);
-				var categoryControls = this.closest(".text_category_controls");
+				var categoryControls = this.closest(".unit_text").querySelector(".text_category_controls");
+				const idx = this.getAttribute("data-idx");
 				params.subType = categoryControls.getAttribute("data-subtype");
-				_this._battleTextBuilder.addText(params);
+				_this._battleTextBuilder.addText(params, idx);
 				_this._modified = true;
 				_this.showBattleTextEditorControls();
 			});
@@ -2224,7 +2315,10 @@ SRWEditor.prototype.createQuoteContent = function(type, idx, quote, unitBaseInfo
 		//hack to pretend that the quote id is stored for an entire quote instead of for each line of the quote		
 		if(quote.quoteId != null && lineCounter == 0){		
 			content+="<div class='command_label quote_id_label'>"+EDITORSTRINGS.TEXT.label_quote_id+":</div>";
-			content+="<input class='quote_id' value='"+quote.quoteId+"'></input>";		
+			content+="<input class='quote_id' value='"+quote.quoteId+"'></input>";	
+
+			content+="<div class='command_label quote_group_label'>"+EDITORSTRINGS.TEXT.label_quote_group+":</div>";
+			content+="<input class='quote_group' value='"+(quote.quoteGroup || "")+"'></input>";				
 		}	
 		
 		
@@ -2340,7 +2434,9 @@ SRWEditor.prototype.createQuoteContent = function(type, idx, quote, unitBaseInfo
 	
 	content+="</div>";
 	content+="</div>";
-	
+	content+="<div class='add_category_quote_container'>";
+	content+="<button class='add_category_quote' data-idx='"+idx+"'>"+EDITORSTRINGS.TEXT.label_new+"</button>";
+	content+="</div>";
 	return content;
 }
 

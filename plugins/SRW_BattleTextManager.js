@@ -16,6 +16,63 @@ SRWBattleTextManager.prototype.getTextBuilder = function(){
 	return this._textBuilder;
 }
 
+//clearAttackGroupId must be called at the start of an animation by the animation handler
+SRWBattleTextManager.prototype.clearAttackGroupId = function(ref, attackId){
+	this._currentAttackGroupId = null;
+}
+
+//the first time an attack quote is determined after calling clearAttackGroupId a group will be picked that will be used for the remaining attack quotes until clearAttackGroupId is called again
+//this is hacky but required since the battle text engine doesn't know which subType of text it is on until it has selected it
+SRWBattleTextManager.prototype.selectAttackGroupId = function(options, groupWeights){
+	function weighted_random(options) {
+		var i;
+
+		var weights = [options[0].weight];
+
+		for (i = 1; i < options.length; i++)
+			weights[i] = options[i].weight + weights[i - 1];
+		
+		var random = Math.random() * weights[weights.length - 1];
+		
+		for (i = 0; i < weights.length; i++)
+			if (weights[i] > random)
+				break;
+		
+		return options[i];
+	}
+	
+	if(this._currentAttackGroupId == null){
+		if(options.length){
+			let availableGroups = {};
+			for(let quote of options){
+				const groupId = quote[0].quoteGroup || 0;
+				availableGroups[groupId] = true;
+			}
+			let groups = Object.keys(availableGroups);
+			let groupWeightsLookup = {};
+			for(let entry of groupWeights){
+				groupWeightsLookup[entry.groupId] = entry.weight;
+			}
+			let weightedOptions = [];
+			for(let group of groups){
+				if(groupWeightsLookup[group] == null){
+					weightedOptions.push({
+						item: group,
+						weight: 1
+					});
+				} else {
+					weightedOptions.push({
+						item: group,
+						weight: groupWeightsLookup[group]
+					});
+				}
+			}			
+			this._currentAttackGroupId = weighted_random(weightedOptions).item;
+		}
+	}
+	
+}
+
 SRWBattleTextManager.prototype.getText = function(target, ref, type, subType, targetInfo, targetIdx, attackId, supportedInfo, noAlias){
 	var _this = this;
 	var definitions;
@@ -248,17 +305,51 @@ SRWBattleTextManager.prototype.getTextCandidate = function(definitions, target, 
 				var idx = -1;
 				if(type == "attacks"){
 					var ctr = 0;
-					while(ctr < options.length && idx == -1){
+					
+					this.selectAttackGroupId(options, definitions["__groupodds"] || []);
+					
+					let quoteIdOptions = [];
+					while(ctr < options.length){
 						//HACK: coerce into new format
 						if(!Array.isArray(options[ctr])){
 							options[ctr] = [options[ctr]];
 						}
 						//HACK: the lines are assumed to all have the same quote id and the first line's id is used
-						if(options[ctr] && options[ctr][0].quoteId == targetIdx){
-							idx = ctr;
+						if(options[ctr] && options[ctr][0].quoteId == targetIdx){							
+							quoteIdOptions.push({
+								data: options[ctr][0],
+								idx: ctr
+							});
 						}					
 						ctr++;
 					}
+					
+					ctr = 0;
+					let defaultIdx = -1;
+					while(ctr < quoteIdOptions.length && idx == -1){
+						let groupId;
+						if(quoteIdOptions[ctr].data.quoteGroup == null){
+							groupId = 0;
+						} else {
+							groupId = quoteIdOptions[ctr].data.quoteGroup;
+						}
+					
+						if(groupId == this._currentAttackGroupId){
+							idx = quoteIdOptions[ctr].idx;
+						}
+						if(groupId == 0){
+							defaultIdx = quoteIdOptions[ctr].idx;
+						}
+						ctr++;	
+					}
+					
+					if(idx == -1 && defaultIdx != -1){
+						idx = defaultIdx;
+					}
+					if(idx == -1 && quoteIdOptions.length){
+						idx = 0;
+					}						
+					
 				} else if(targetIdx != null){
 					idx = targetIdx;
 				} else {

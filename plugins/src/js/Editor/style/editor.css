@@ -396,6 +396,13 @@
 	font-size: 14px;
 }
 
+#srw_editor .quote_group_label {
+	display: inline-block;
+	width: 100px;
+	font-size: 14px;
+	margin-left: 5px;
+}
+
 #srw_editor .param_label {
 	display: inline-block;
 	width: 100px;
@@ -738,8 +745,13 @@
 	margin: 2px;
 }
 
+#srw_editor .add_category_quote_container {
+	display: flex;
+	align-items: center;
+}
+
 #srw_editor .add_category_quote {
-	margin-left: 5px;
+	margin-left: auto;
 	margin-right: 5px;
 }
 
@@ -765,7 +777,6 @@
 	top: 0;
 	right: 0;
 	cursor: pointer;
-	filter: var(--white-filter);
 }
 
 #srw_editor .attacks_controls {
@@ -775,6 +786,38 @@
 
 #srw_editor .attacks_controls .text_label{
 	width: 90px;
+}
+
+#srw_editor .group_frequency_controls {
+	padding: 5px;
+    color: #FFFFFF;
+    background-color: var(--editor-theme-color);
+    margin-bottom: 10px;
+    border-radius: 10px;
+}
+
+#srw_editor .group_frequency_controls .title {
+	font-size: 18px;
+	color: #000000;
+}
+
+#srw_editor .group_frequency_controls .entry{
+	display: flex;
+	align-items: center;
+}
+
+#srw_editor .group_frequency_controls .entry input{
+	width: 30px;
+	margin-left: 4px;
+}
+
+#srw_editor .group_frequency_controls .entry .group_id {
+	margin-right: 4px;
+}
+
+#srw_editor .group_frequency_controls .scroll_pane {
+	max-height: 250px;
+	overflow-y: auto;
 }
 
 #srw_editor .add_attack {
