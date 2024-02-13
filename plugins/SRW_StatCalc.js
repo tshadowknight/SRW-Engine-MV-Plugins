@@ -878,6 +878,7 @@ StatCalc.prototype.getPilotName = function(actor){
 		if(actor.SRWStats.pilot.usesClassName){
 			return actor.SRWStats.mech.classData.name;
 		} 
+		return actor.SRWStats.pilot.name;
 	} 
 	return actor._name;		
 }
