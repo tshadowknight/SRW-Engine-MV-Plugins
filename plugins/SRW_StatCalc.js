@@ -1517,15 +1517,17 @@ StatCalc.prototype.initSRWStats = function(actor, level, itemIds, preserveVolati
 	if(actor.isActor()){
 		actorId = parseInt(actor.actorId());
 		actorProperties = $dataActors[actorId].meta;
+		actor.SRWStats.pilot.name = $dataActors[actorId].name;
 	} else {
 		actorId = parseInt(actor.enemyId());
 		actorProperties = $dataEnemies[actorId].meta;
+		actor.SRWStats.pilot.name = actor.name();
 	}
 	
 	actor.SRWStats.pilot.grantsGainsTo = null;//actorProperties.pilotGrantsGainsTo;
 	
 	actor.SRWStats.pilot.id = actorId;
-	actor.SRWStats.pilot.name = actor.name();
+	
 	actor.SRWStats.pilot.statsLabel = actorProperties.pilotStatsLabel || "";
 	actor.SRWStats.pilot.usesClassName = actorProperties.pilotUsesClassName * 1;
 	actor.SRWStats.pilot.cutinPath = actorProperties.pilotCutinPath;	
