@@ -1306,6 +1306,11 @@
 		Game_Interpreter.prototype.setEventAbilityZone = function(eventId, params) {
 			$gameSystem.setEventAbilityZone(eventId, params);
 		}
+		
+		Game_Interpreter.prototype.clearEventAbilityZones = function(eventId) {
+			$gameSystem.clearEventAbilityZones(eventId);
+		}
+		
 
 		Game_Interpreter.prototype.applyFadeState = function() {
 			if(this.isTextSkipMode){

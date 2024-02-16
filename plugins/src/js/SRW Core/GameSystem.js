@@ -2536,6 +2536,16 @@
 			}			
 		}
 		
+		Game_System.prototype.clearEventAbilityZones = function(eventId) {
+			this.validateAbilityZoneInfo();
+			for(var i = 0; i < Game_System.ABI_ZONE_MAX; i++){
+				if(this.abilityZoneInfo[i].ownerEventId == eventId){
+					this.abilityZoneInfo[i].phaseCount = 0;
+					this.setAbilityZoneNeedsRefresh(i);
+				}				
+			}			
+		}
+		
 		Game_System.prototype.setAbilityZone = function(id, params) {
 			this.validateAbilityZoneInfo();
 			if(id < 0 || id >= Game_System.ABI_ZONE_MAX){
@@ -2560,6 +2570,8 @@
 			this.validateAbilityZoneInfo();
 			this.abilityZoneAnimationsPending[id] = true;
 			this.abilityZoneRefreshInfo[id] = true;
+			
+			$statCalc.invalidateZoneCache();
 		}
 		
 		Game_System.prototype.clearAbilityZoneNeedsRefresh = function(id) {

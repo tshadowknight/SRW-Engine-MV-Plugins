@@ -664,6 +664,10 @@
 
 		var _SRPG_Spriteset_Map_update = Spriteset_Map.prototype.update;
 		Spriteset_Map.prototype.update = function() {
+			if($gameTemp.intermissionPending){
+				return;
+			}
+			
 			_SRPG_Spriteset_Map_update.call(this);
 			if($gameTemp.tempSprites){
 				while($gameTemp.tempSprites.length){
