@@ -97,7 +97,7 @@ Window_CSS.prototype.loadImages = async function() {
 		if(imgPath){
 			if(imgNameLookup[imgPath] == null){
 				imgNameLookup[imgPath] = ctr++;
-				promises.push(ImageManager.loadBitmapPromise("", imgPath));
+				promises.push(ImageManager.loadBitmapPromise("", imgPath, true));
 			}	
 		}				
 	}
@@ -112,7 +112,7 @@ Window_CSS.prototype.loadImages = async function() {
 	for(let img of images){
 		let imgPath = img.getAttribute("data-img");
 		if(imgNameLookup[imgPath] != null){
-			img.setAttribute("src", bitmaps[imgNameLookup[imgPath]].canvas.toDataURL());
+			img.setAttribute("src", bitmaps[imgNameLookup[imgPath]]._image.src);
 		}	
 	}	
 }
@@ -187,10 +187,10 @@ Window_CSS.prototype.loadFaceByParams = function(faceName, faceIndex, elem, noTr
 		targetBitmap.blt(bitmap, sx, sy, sw, sh, dx, dy);
 		var facePicContainer = document.createElement("div");
 		facePicContainer.classList.add("face_pic_container");
-		var facePic = document.createElement("img");
-		facePic.style.width = "100%";
-		facePic.setAttribute("src", targetBitmap.canvas.toDataURL());
-		facePicContainer.appendChild(facePic);	
+		//var facePic = document.createElement("img");
+		//facePic.style.width = "100%";
+		//facePic.setAttribute("src", targetBitmap.canvas.toDataURL());
+		facePicContainer.appendChild(targetBitmap.canvas);	
 		elem.appendChild(facePicContainer);	
 	});
 }
@@ -219,10 +219,10 @@ Window_CSS.prototype.loadMechMiniSprite = function(mechClass, elem) {
 			targetBitmap.blt(bitmap, sx, sy, pw, ph, 0, 0); 
 			var mechPicContainer = document.createElement("div");
 			mechPicContainer.classList.add("mech_pic_container");
-			var mechPic = document.createElement("img");
-			mechPic.style.width = "100%";
-			mechPic.setAttribute("src", targetBitmap.canvas.toDataURL());
-			mechPicContainer.appendChild(mechPic);	
+			//var mechPic = document.createElement("img");
+			//mechPic.style.width = "100%";
+			//mechPic.setAttribute("src", targetBitmap.canvas.toDataURL());
+			mechPicContainer.appendChild(targetBitmap.canvas);	
 			elem.appendChild(mechPicContainer);	
 		});	
 	}

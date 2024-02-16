@@ -13,7 +13,7 @@ Window_TerrainDetails.prototype.initialize = function() {
 	this._layoutId = "terrain_details";	
 	Window_CSS.prototype.initialize.call(this, 0, 0, 0, 0);	
 	window.addEventListener("resize", function(){
-		_this.requestRedraw();
+		_this.redraw();
 	});	
 }
 

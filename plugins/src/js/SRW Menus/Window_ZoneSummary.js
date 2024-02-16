@@ -13,7 +13,7 @@ Window_ZoneSummary.prototype.initialize = function() {
 	this._layoutId = "zone_summary";	
 	Window_CSS.prototype.initialize.call(this, 0, 0, 0, 0);	
 	window.addEventListener("resize", function(){
-		_this.requestRedraw();
+		_this.redraw();
 	});	
 }
 
@@ -78,6 +78,7 @@ Window_ZoneSummary.prototype.redraw = function() {
 	_this._bgFadeContainer.innerHTML = content;		
 	
 	this.updateScaledDiv(_this._bgFadeContainer);	
+
 	Graphics._updateCanvas();
 }
 

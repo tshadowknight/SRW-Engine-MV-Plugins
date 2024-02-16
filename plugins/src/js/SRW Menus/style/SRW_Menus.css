@@ -43,6 +43,14 @@ body {
 	width: 100%;
 }
 
+.face_pic_container canvas{
+	width: 100%;
+}
+
+.mech_pic_container canvas{
+	width: 100%;
+}
+
 #custom_UI_positioning {
 	position: relative;
 	width: 100%;

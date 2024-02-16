@@ -34,7 +34,19 @@
 			this._srpgPriorityTarget = null;
 			this._mapButtons = {};
 			this.summariesTimeout = 0;
+			this.objURLS = {};
 		};
+		
+		
+		Game_Temp.prototype.registerObjURL = function(url) {
+			this.objURLS[url] = true;
+		}
+		
+		Game_Temp.prototype.revokeObjectURLs = function(url) {
+			for(let url in this.objURLS){
+				window.URL.revokeObjectURL(url);
+			}
+		}
 		
 		Game_Temp.prototype.isEnemyTurn = function() {
 			return $gameSystem.isBattlePhase() === 'AI_phase';

@@ -7389,6 +7389,7 @@ StatCalc.prototype.getActorStatMods = function(actor, excludedSkills){
 	const _this = this;
 	var abilityLookup = this.createActiveAbilityLookup(excludedSkills);
 	var statMods;// = this.getActiveStatMods(actor, excludedSkills);
+	
 	var event = this.getReferenceEvent(actor);
 	/*if(actor.isSubPilot && actor.mainPilot){		
 		event = actor.mainPilot.event;
@@ -7407,6 +7408,16 @@ StatCalc.prototype.getActorStatMods = function(actor, excludedSkills){
 		}		
 	} catch(e){
 		
+	}
+	
+	if(!statMods){
+		statMods = {
+			mult: [],
+			mult_ceil: [],
+			addPercent: [],
+			addFlat: [],
+			list: []
+		};
 	}
 	
 	try {				
@@ -7444,25 +7455,12 @@ StatCalc.prototype.getActorStatMods = function(actor, excludedSkills){
 		console.log("Error while processing global mods: "+e.message)
 	}
 	
-	if(!statMods){
-		statMods = {
-			mult: [],
-			mult_ceil: [],
-			addPercent: [],
-			addFlat: [],
-			list: []
-		};
-	}
+	
+	let zoneMods;
 	
 	try {
 		if(event){	
-			var tempMods = {};		
-			if(statMods){
-				Object.keys(statMods).forEach(function(modType){
-					tempMods[modType] = [...statMods[modType]];
-				});
-			}
-			
+					
 			if(!this._zoneEffectCache){
 				this._zoneEffectCache = {};
 			}
@@ -7535,21 +7533,13 @@ StatCalc.prototype.getActorStatMods = function(actor, excludedSkills){
 				this._zoneEffectCache[event.posX()][event.posY()] = tileMods;
 				
 			}
-			const zoneMods = this._zoneEffectCache[event.posX()][event.posY()];
-			if(zoneMods){
-				Object.keys(zoneMods).forEach(function(modType){
-					tempMods[modType] = tempMods[modType].concat(zoneMods[modType]);
-				});
-			}
-			
-			
-			statMods = tempMods;	
+			zoneMods = this._zoneEffectCache[event.posX()][event.posY()];	
 		} 
 	} catch(e){
 		console.log("Error while processing zone mods: "+e.message)
 	}
 
-	return statMods;
+	return {statMods: statMods, zoneMods: zoneMods};
 }
 
 StatCalc.prototype.getActorSlotInfo = function(actor){
@@ -7592,72 +7582,116 @@ StatCalc.prototype.validateEffectTarget = function(effect, actor){
 }
 
 StatCalc.prototype.getModDefinitions = function(actor, types, excludedSkills){
+	const _this = this;
 	var result = [];
-	var statMods = this.getActorStatMods(actor, excludedSkills);		
-	for(var i = 0; i < statMods.list.length; i++){
-		if(this.validateEffectTarget(statMods.list[i], actor) && types.indexOf(statMods.list[i].type) != -1){
-			result.push(statMods.list[i]);
-		}		
-	}	
+	
+	let typesLookup = {};
+	for(let type of types){
+		typesLookup[type] = 1;
+	}
+	
+	function appendResults(statMods){
+		
+		if(statMods){
+			for(var i = 0; i < statMods.list.length; i++){
+				if(_this.validateEffectTarget(statMods.list[i], actor) && typesLookup[statMods.list[i].type]){
+					result.push(statMods.list[i]);
+				}		
+			}
+		}
+	}
+	
+	var statModInfo = this.getActorStatMods(actor, excludedSkills);
+	appendResults(statModInfo.statMods);
+	appendResults(statModInfo.zoneMods);
+		
 	return result;
 }
 
 StatCalc.prototype.applyStatModsToValue = function(actor, value, types, excludedSkills){
-	var statMods = this.getActorStatMods(actor, excludedSkills);	
-	for(var i = 0; i < statMods.addFlat.length; i++){
-		if(this.validateEffectTarget(statMods.addFlat[i], actor) && types.indexOf(statMods.addFlat[i].type) != -1){
-			value+=statMods.addFlat[i].value*1;
+	const _this = this;
+	
+	let typesLookup = {};
+	for(let type of types){
+		typesLookup[type] = 1;
+	}
+	
+	function appendResults(statMods){
+		if(statMods){
+			for(var i = 0; i < statMods.addFlat.length; i++){
+				if(_this.validateEffectTarget(statMods.addFlat[i], actor) && typesLookup[statMods.addFlat[i].type]){
+					value+=statMods.addFlat[i].value*1;
+				}		
+			}
+			for(var i = 0; i < statMods.addPercent.length; i++){
+				if(_this.validateEffectTarget(statMods.addPercent[i], actor) && typesLookup[statMods.addPercent[i].type]){
+					value+=Math.floor(value * statMods.addPercent[i].value);
+				}		
+			}
+			for(var i = 0; i < statMods.mult.length; i++){
+				if(_this.validateEffectTarget(statMods.mult[i], actor) && typesLookup[statMods.mult[i].type]){
+					value = Math.floor(value * statMods.mult[i].value);
+				}		
+			}
+			for(var i = 0; i < statMods.mult_ceil.length; i++){
+				if(_this.validateEffectTarget(statMods.mult_ceil[i], actor) && typesLookup[statMods.mult_ceil[i].type]){
+					value = Math.ceil(value * statMods.mult_ceil[i].value);
+				}		
+			}
 		}		
 	}
-	for(var i = 0; i < statMods.addPercent.length; i++){
-		if(this.validateEffectTarget(statMods.addPercent[i], actor) && types.indexOf(statMods.addPercent[i].type) != -1){
-			value+=Math.floor(value * statMods.addPercent[i].value);
-		}		
-	}
-	for(var i = 0; i < statMods.mult.length; i++){
-		if(this.validateEffectTarget(statMods.mult[i], actor) && types.indexOf(statMods.mult[i].type) != -1){
-			value = Math.floor(value * statMods.mult[i].value);
-		}		
-	}
-	for(var i = 0; i < statMods.mult_ceil.length; i++){
-		if(this.validateEffectTarget(statMods.mult_ceil[i], actor) && types.indexOf(statMods.mult_ceil[i].type) != -1){
-			value = Math.ceil(value * statMods.mult_ceil[i].value);
-		}		
-	}
+	var statModInfo = this.getActorStatMods(actor, excludedSkills);
+	appendResults(statModInfo.statMods);
+	appendResults(statModInfo.zoneMods);
+	
 	return value;
 }
 
 StatCalc.prototype.applyMaxStatModsToValue = function(actor, value, types, excludedSkills){
+	const _this = this;
 	var max = value;
-	var statMods = this.getActorStatMods(actor, excludedSkills);	
-	for(var i = 0; i < statMods.addFlat.length; i++){
-		if(this.validateEffectTarget(statMods.addFlat[i], actor) && types.indexOf(statMods.addFlat[i].type) != -1){
-			if(value + statMods.addFlat[i].value*1 > max){
-				max = value + statMods.addFlat[i].value*1;
-			}
-		}		
+	
+	let typesLookup = {};
+	for(let type of types){
+		typesLookup[type] = 1;
 	}
-	for(var i = 0; i < statMods.addPercent.length; i++){
-		if(this.validateEffectTarget(statMods.addPercent[i], actor) && types.indexOf(statMods.addPercent[i].type) != -1){
-			if(value + Math.floor(value * statMods.addPercent[i].value) > max){
-				max = value + Math.floor(value * statMods.addPercent[i].value);
+	
+	function appendResults(statMods){
+		if(statMods){
+			for(var i = 0; i < statMods.addFlat.length; i++){
+				if(_this.validateEffectTarget(statMods.addFlat[i], actor) && typesLookup[statMods.addFlat[i].type]){
+					if(value + statMods.addFlat[i].value*1 > max){
+						max = value + statMods.addFlat[i].value*1;
+					}
+				}		
 			}
-		}		
-	}
-	for(var i = 0; i < statMods.mult.length; i++){
-		if(this.validateEffectTarget(statMods.mult[i], actor) && types.indexOf(statMods.mult[i].type) != -1){
-			if(Math.floor(value * statMods.mult[i].value) > max){
-				max = Math.floor(value * statMods.mult[i].value);
+			for(var i = 0; i < statMods.addPercent.length; i++){
+				if(_this.validateEffectTarget(statMods.addPercent[i], actor) && typesLookup[statMods.addPercent[i].type]){
+					if(value + Math.floor(value * statMods.addPercent[i].value) > max){
+						max = value + Math.floor(value * statMods.addPercent[i].value);
+					}
+				}		
 			}
-		}		
-	}
-	for(var i = 0; i < statMods.mult_ceil.length; i++){
-		if(this.validateEffectTarget(statMods.mult_ceil[i], actor) && types.indexOf(statMods.mult_ceil[i].type) != -1){
-			if(Math.ceil(value * statMods.mult_ceil[i].value) > max){
-				max = Math.ceil(value * statMods.mult_ceil[i].value);
+			for(var i = 0; i < statMods.mult.length; i++){
+				if(_this.validateEffectTarget(statMods.mult[i], actor) && typesLookup[statMods.mult[i].type]){
+					if(Math.floor(value * statMods.mult[i].value) > max){
+						max = Math.floor(value * statMods.mult[i].value);
+					}
+				}		
 			}
-		}		
+			for(var i = 0; i < statMods.mult_ceil.length; i++){
+				if(_this.validateEffectTarget(statMods.mult_ceil[i], actor) && typesLookup[statMods.mult_ceil[i].type]){
+					if(Math.ceil(value * statMods.mult_ceil[i].value) > max){
+						max = Math.ceil(value * statMods.mult_ceil[i].value);
+					}
+				}		
+			}
+		}
 	}
+	var statModInfo = this.getActorStatMods(actor, excludedSkills);
+	appendResults(statModInfo.statMods);
+	appendResults(statModInfo.zoneMods);
+	
 	return max;
 }
 

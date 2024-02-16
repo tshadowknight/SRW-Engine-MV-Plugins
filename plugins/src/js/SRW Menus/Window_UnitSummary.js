@@ -50,7 +50,7 @@ Window_UnitSummary.prototype.refresh = function() {
 	}	
 }
 
-Window_UnitSummary.prototype.redraw = function() {	
+Window_UnitSummary.prototype.redraw = async function() {	
 	var _this = this;
 	var content = "";
 	if($gameTemp.summaryUnit){

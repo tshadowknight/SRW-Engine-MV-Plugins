@@ -313,10 +313,15 @@ var _defaultPlayerSpeed = parameters['defaultPlayerSpeed'] || 4;
 		return this.reserveBitmap('img/faces/', filename, hue, true, reservationId);
 	};
 	
-	ImageManager.loadNormalBitmap = function(path, hue, asBlob) {
+	//noCache is used by the battle scene as it manages revoking the object urls itself upon completing a scene.
+	ImageManager.loadNormalBitmap = function(path, hue, asBlob, noCache) {
 		var key = this._generateCacheKey(path, hue);
+		//hacky method to differentiate between regular and blob entries in the cache
+		if(asBlob){
+			key = "__blob__"+key;
+		}
 		var bitmap = this._imageCache.get(key);
-		if (!bitmap || asBlob) {
+		if (!bitmap || noCache) {
 			bitmap = Bitmap.load(decodeURIComponent(path));
 			//if the bitmap is set to asBlob the blob for the associated object url is not cleared after creation of the internal canvas
 			//this mode is required when loading battle scene resources as the associated blob is used to create the texture
@@ -331,6 +336,45 @@ var _defaultPlayerSpeed = parameters['defaultPlayerSpeed'] || 4;
 
 		return bitmap;
 	};
+	
+	ImageCache.prototype.removeBlobs = function(key, value){
+		let tmp = {};
+		for(let key in this._items){
+			if(!key.match(/__blob__.*/)){
+				tmp[key] = this._items[key];
+			}
+		}
+		this._items = tmp;
+		this._truncateCache();
+	};
+	
+	ImageManager.resetBlobCache = async function() {
+		this._imageCache.removeBlobs();
+	}
+	
+	ImageCache.prototype._truncateCache = function(){
+		var items = this._items;
+		var sizeLeft = ImageCache.limit;
+
+		Object.keys(items).map(function(key){
+			return items[key];
+		}).sort(function(a, b){
+			return b.touch - a.touch;
+		}).forEach(function(item){
+			var bitmap = item.bitmap;				
+			let usedSize = bitmap.width * bitmap.height;			
+			
+			if(sizeLeft > 0 || this._mustBeHeld(item)){
+				sizeLeft -= usedSize;
+			} else {
+				if(item.key.match(/__blob__.*/)){
+					window.URL.revokeObjectURL(item.bitmap._image.src);
+				}
+				delete items[item.key];
+			}
+		}.bind(this));
+	};
+	
 
 	ImageManager.loadBitmapPromise = async function(folder, filename, asBlob, hue, smooth) {
 		return new Promise((resolve, reject) => {
