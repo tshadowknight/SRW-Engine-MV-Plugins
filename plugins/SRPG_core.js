@@ -376,11 +376,11 @@ var _defaultPlayerSpeed = parameters['defaultPlayerSpeed'] || 4;
 	};
 	
 
-	ImageManager.loadBitmapPromise = async function(folder, filename, asBlob, hue, smooth) {
+	ImageManager.loadBitmapPromise = async function(folder, filename, asBlob, hue, smooth, noCache) {
 		return new Promise((resolve, reject) => {
 			if (filename) {
 				var path = folder + encodeURIComponent(filename);
-				var bitmap = this.loadNormalBitmap(path, hue || 0, asBlob);
+				var bitmap = this.loadNormalBitmap(path, hue || 0, asBlob, noCache);
 				bitmap.smooth = smooth;
 				bitmap.addLoadListener(() => {
 					resolve(bitmap);

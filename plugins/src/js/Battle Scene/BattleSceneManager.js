@@ -358,7 +358,7 @@ BattleSceneManager.prototype.init = async function(attachControl){
 //It is possible the babylon cache is bypassed due to mismatching urls, if so verify if this is enough of a problem to try and fix.
 BattleSceneManager.prototype.preloadTexture = async function(path, context){
 	const _this = this;
-	const bitmap = await ImageManager.loadBitmapPromise("", path, true, true);
+	const bitmap = await ImageManager.loadBitmapPromise("", path, true, null, null, true);
 	if(bitmap == -1){
 		alert("Failed to load image from path '" + path + "' "+(context ? " For "+context : "" + "") + "\n\nYou may need to reload the game to get the battlescene to load again after fixing the missing asset.");
 	} else {
