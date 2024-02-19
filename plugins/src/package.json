@@ -18,8 +18,8 @@
     "webpack-cli": "^5.1.4"
   },
   "dependencies": {
-    "@esotericsoftware/spine-canvas": "^4.2.9",
-    "@esotericsoftware/spine-webgl": "^4.2.8",
+    "@esotericsoftware/spine-canvas": "^4.2.35",
+    "@esotericsoftware/spine-webgl": "^4.2.35",
     "acorn": "^8.6.0",
     "babylon": "^6.18.0",
     "babylonjs": "^6.20.1",

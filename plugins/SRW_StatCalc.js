@@ -7072,9 +7072,8 @@ StatCalc.prototype.invalidateAbilityCache = function(actor){
 		return; //a sub pilot should not trigger a partial cache invalidation to prevent issue with reloading a unit
 	}
 	if(!this._abilityCacheLocked){
-		//the intermission has some issues supporting partial ability cache updates so this hack prevent them durign the intermission
-		//&& !$gameSystem._isIntermission
-		if(actor ){
+
+		if(actor){
 			var event = this.getReferenceEvent(actor);
 			if(event){
 				this._invalidatedEventIds[event.eventId()] = actor;
@@ -8237,8 +8236,9 @@ StatCalc.prototype.getEffectivenessMultiplier = function(attacker, weaponInfo, d
 	
 	let result = attr1Mult[type] * attr2Mult[type];
 	
-	if(this.applyStatModsToValue(attacker, 0, ["always_se"])){
-		result = ENGINE_SETTINGS.DEFAULT_SE_MULTIPLIER;
+	let forceSEMultiplier = this.applyStatModsToValue(attacker, 0, ["always_se"]);
+	if(forceSEMultiplier){
+		result = ENGINE_SETTINGS.DEFAULT_SE_MULTIPLIER * forceSEMultiplier;
 	}
 	
 	if(this.applyStatModsToValue(defender, 0, ["ignore_se"])){

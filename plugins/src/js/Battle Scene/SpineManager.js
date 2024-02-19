@@ -34,7 +34,7 @@ spine.AssetManager.prototype.loadTexture = async function(path, success = () => 
 			path = this.downloader.rawDataUris[path];
 		image.src = path;
 	}*/
-	let bitmap = await ImageManager.loadBitmapPromise("", path);
+	let bitmap = await ImageManager.loadBitmapPromise("", path, true, null, null, true);
 	let image = new Image();
 	image.crossOrigin = "anonymous";
 	image.onload = () => {
@@ -43,7 +43,8 @@ spine.AssetManager.prototype.loadTexture = async function(path, success = () => 
 	image.onerror = () => {
 		this.error(error, path, `Couldn't load image: ${path}`);
 	};
-	image.src = bitmap.canvas.toDataURL();	  
+	image.src = bitmap._image.src;	  
+	$battleSceneManager.appendTextureCache(path, image.src);
 }
 
 SpineManager.prototype.startAnimation = function(animationContext, path, animKey, force){	
@@ -92,7 +93,7 @@ SpineManager.prototype.loadFiles = async function(){
 	// Instantiate a new skeleton based on the atlas and skeleton data.
 	this._skeleton = new spine.Skeleton(skeletonData);
 	this._skeleton.setToSetupPose();
-	this._skeleton.updateWorldTransform();
+	this._skeleton.updateWorldTransform("none");
 	this._bounds = this._skeleton.getBoundsRect();
 
 	// Setup an animation state with a default mix of 0.2 seconds.
@@ -125,7 +126,7 @@ SpineManager.prototype.update = function(dt) {
 	// world transforms and render the skeleton.
 	this.animationState.update(dt);
 	this.animationState.apply(this._skeleton);
-	this._skeleton.updateWorldTransform();
+	this._skeleton.updateWorldTransform("none");
 	this.skeletonRenderer.draw(this._skeleton);
 	
 	this._animationContext.texture.update();

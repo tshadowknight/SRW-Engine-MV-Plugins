@@ -354,6 +354,13 @@ BattleSceneManager.prototype.init = async function(attachControl){
 	}
 }
 
+//to be called by external components that load images in the scope of the battle scene so the battle scene can clear the object urls after the scene finishes
+BattleSceneManager.prototype.appendTextureCache = function(path, objURL){
+	this._activeTextureCache[path] = {
+		imgData: objURL
+	};	
+}
+
 //TODO: figure out the impact of the use of object urls on Babylon's caching here. 
 //It is possible the babylon cache is bypassed due to mismatching urls, if so verify if this is enough of a problem to try and fix.
 BattleSceneManager.prototype.preloadTexture = async function(path, context){
@@ -5131,7 +5138,7 @@ BattleSceneManager.prototype.executeAnimation = function(animation, startTick){
 			});
 			
 			var animId = $statCalc.getBattleSceneInfo(action.ref).deathAnimId;
-			if(animId == null){
+			if(animId == null || animId == ''){
 				animId = ENGINE_SETTINGS.BATTLE_SCENE.DEFAULT_ANIM.DESTROY;
 			}
 			var animData = _this._animationBuilder.buildAnimation(animId, _this).mainAnimation;
@@ -6324,30 +6331,46 @@ BattleSceneManager.prototype.preloadEffekseerParticles = async function(){
 				});				
 			});	
 			
-			
-			var animId = $statCalc.getBattleSceneInfo(nextAction.action.ref).deathAnimId;
-			if(animId == null){
-				animId = ENGINE_SETTINGS.BATTLE_SCENE.DEFAULT_ANIM.DESTROY;
+			let animIdsToPreload = {};
+			if(nextAction.isDestroyed){
+				var animId = $statCalc.getBattleSceneInfo(nextAction.action.ref).deathAnimId;
+				if(animId == null || animId == ''){
+					animId = ENGINE_SETTINGS.BATTLE_SCENE.DEFAULT_ANIM.DESTROY;
+				}
+				animIdsToPreload[animId] = true;
 			}
-			var animationList = _this._animationBuilder.buildAnimation(animId, _this);
 			
-			Object.keys(animationList).forEach(function(animType){
-				animationList[animType].forEach(function(batch){
-					batch.forEach(function(animCommand){
-						var params = animCommand.params;
-						if(animCommand.type == "play_effekseer"){
-							
-							promises.push(new Promise(function(resolve, reject){
-								_this._effksContext.loadEffect("effekseer/"+params.path+".efk", 1.0, resolve);	
-								_this._effksContextMirror.loadEffect("effekseer/"+params.path+".efk", 1.0, resolve);	
-								_this._effksContextBg.loadEffect("effekseer/"+params.path+".efk", 1.0, resolve);	
-								_this._effksContextBgMirror.loadEffect("effekseer/"+params.path+".efk", 1.0, resolve);	
-								_this._effksContextAttached.loadEffect("effekseer/"+params.path+".efk", 1.0, resolve);	
-							}));
-						}								
-					});
-				});				
-			});	
+			
+			if(nextAction.attacked && nextAction.attacked.isDestroyed){
+				var animId = $statCalc.getBattleSceneInfo(nextAction.attacked.ref).deathAnimId;
+				if(animId == null || animId == ''){
+					animId = ENGINE_SETTINGS.BATTLE_SCENE.DEFAULT_ANIM.DESTROY;
+				}
+				animIdsToPreload[animId] = true;
+			}	
+			
+			for(let animId in animIdsToPreload){
+				var animationList = _this._animationBuilder.buildAnimation(animId, _this);
+			
+				Object.keys(animationList).forEach(function(animType){
+					animationList[animType].forEach(function(batch){
+						batch.forEach(function(animCommand){
+							var params = animCommand.params;
+							if(animCommand.type == "play_effekseer"){
+								
+								promises.push(new Promise(function(resolve, reject){
+									_this._effksContext.loadEffect("effekseer/"+params.path+".efk", 1.0, resolve);	
+									_this._effksContextMirror.loadEffect("effekseer/"+params.path+".efk", 1.0, resolve);	
+									_this._effksContextBg.loadEffect("effekseer/"+params.path+".efk", 1.0, resolve);	
+									_this._effksContextBgMirror.loadEffect("effekseer/"+params.path+".efk", 1.0, resolve);	
+									_this._effksContextAttached.loadEffect("effekseer/"+params.path+".efk", 1.0, resolve);	
+								}));
+							}								
+						});
+					});				
+				});	
+			}
+			
 			
 			await Promise.all(promises);	
 		}	
@@ -6512,12 +6535,15 @@ BattleSceneManager.prototype.preloadSceneAssets = function(){
 			if(nextAction){			
 				var attack = nextAction.action.attack;
 				
+				const animIdsToPreload = {};
+				
 				var animId;
 				if(attack && typeof attack.animId != "undefined" && attack.animId != -1){
 					animId = attack.animId;
 				} else {
 					animId = _this.getDefaultAnim(attack);//default
 				}
+				animIdsToPreload[animId] = true;
 				var preloadCtr = 0;
 				function preloadDefaultFrames(ref){
 					var defaultFrames = ["main", "in", "out", "hurt", "dodge", "block"];
@@ -6568,48 +6594,50 @@ BattleSceneManager.prototype.preloadSceneAssets = function(){
 					promises.push(_this.createEnvironment(nextAction.attacked.ref));
 				}
 				
-				var animationList = _this._animationBuilder.buildAnimation(animId, _this);
-				if(!animationList){
-					alert("Animation "+animId+" does not have a definition!");
-					throw("Animation "+animId+" does not have a definition!");
+				if(nextAction.isDestroyed){
+					var animId = $statCalc.getBattleSceneInfo(nextAction.action.ref).deathAnimId;
+					if(animId == null || animId == ''){
+						animId = ENGINE_SETTINGS.BATTLE_SCENE.DEFAULT_ANIM.DESTROY;
+					}
+					animIdsToPreload[animId] = true;
 				}
-				Object.keys(animationList).forEach(function(animType){
-					Object.keys(animationList[animType]).forEach(function(tick){
-						const batch = animationList[animType][tick];
-						batch.forEach(function(animCommand){
-							handleAnimCommand(animCommand, animId, animType, tick);
-							if(animCommand.type == "next_phase"){
-								for(let command of animCommand.params.commands){
-									handleAnimCommand(command, animId, animType, tick);	
-								}
-							}	
-						});
-					});				
-				});		
-			}	
-		}	
-		promises.push(DragonBonesManager.load(Object.keys(dragonBonesResources)));
-		
-		var animId = $statCalc.getBattleSceneInfo(nextAction.action.ref).deathAnimId;
-		if(animId == null){
-			animId = ENGINE_SETTINGS.BATTLE_SCENE.DEFAULT_ANIM.DESTROY;
+				
+				
+				if(nextAction.attacked && nextAction.attacked.isDestroyed){
+					var animId = $statCalc.getBattleSceneInfo(nextAction.attacked.ref).deathAnimId;
+					if(animId == null || animId == ''){
+						animId = ENGINE_SETTINGS.BATTLE_SCENE.DEFAULT_ANIM.DESTROY;
+					}
+					animIdsToPreload[animId] = true;
+				}			
+				
+				
+				for(let animId in animIdsToPreload){
+					var animationList = _this._animationBuilder.buildAnimation(animId, _this);
+					if(!animationList){
+						alert("Animation "+animId+" does not have a definition!");
+						throw("Animation "+animId+" does not have a definition!");
+					}
+					Object.keys(animationList).forEach(function(animType){
+						Object.keys(animationList[animType]).forEach(function(tick){
+							const batch = animationList[animType][tick];
+							batch.forEach(function(animCommand){
+								handleAnimCommand(animCommand, animId, animType, tick);
+								if(animCommand.type == "next_phase"){
+									for(let command of animCommand.params.commands){
+										handleAnimCommand(command, animId, animType, tick);	
+									}
+								}	
+							});
+						});				
+					});	
+				}
+				
+					
+			}	 
+			
+			promises.push(DragonBonesManager.load(Object.keys(dragonBonesResources)));
 		}
-		var animationList = _this._animationBuilder.buildAnimation(animId, _this);
-		
-		Object.keys(animationList).forEach(function(animType){
-			Object.keys(animationList[animType]).forEach(function(tick){
-				const batch = animationList[animType][tick];
-				batch.forEach(function(animCommand){
-					handleAnimCommand(animCommand, animId, animType, tick);
-					if(animCommand.type == "next_phase"){
-						for(let command of animCommand.params.commands){
-							handleAnimCommand(command, animId, animType, tick);	
-						}
-					}	
-				});
-			});				
-		});	
-		
 		
 		Promise.all(promises).then(() => {
 			_this.isPreloading = false;
