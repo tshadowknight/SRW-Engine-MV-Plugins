@@ -5693,6 +5693,14 @@ BattleSceneManager.prototype.readBattleCache = async function() {
 	_this._participantInfo.enemy_twin.participating = false;
 	_this._participantInfo.enemy_supporter.participating = false;
 	_this._participantInfo.enemy_twin_supporter.participating = false;
+	
+	_this._actorSupporterSprite = null;
+	_this._enemySupporterSprite = null;
+	_this._actorTwinSprite = null;
+	_this._actorTwinSupporterSprite = null;
+	_this._enemyTwinSprite = null;
+	_this._enemyTwinSupporterSprite = null;
+	
 	const keys = Object.keys($gameTemp.battleEffectCache);
 	for(let i = 0; i < keys.length; i++){
 		const cacheRef = keys[i];
@@ -6780,6 +6788,7 @@ BattleSceneManager.prototype.setUpActionSceneState = function(action) {
 		_this._bgsHidden = false;
 		_this.setBgMode($statCalc.isBattleShadowHiddenOnCurrentTerrain(action.ref) ? "sky" : "land");
 		_this._actorSprite.sprite.visibility = 1;
+		
 		if(_this._actorSprite.sprite.material){
 			_this._actorSprite.sprite.material.diffuseTexture.uScale = 1;
 			_this._actorSprite.sprite.material.diffuseTexture.vScale = 1;
@@ -6800,7 +6809,7 @@ BattleSceneManager.prototype.setUpActionSceneState = function(action) {
 		_this._actorSupporterSprite.sprite.visibility = 1;
 		if(_this._actorSupporterSprite.sprite.material){
 			_this._actorSupporterSprite.sprite.material.diffuseTexture.uScale = 1;
-			_this._actorSupporterSprite.sprite.material.diffuseTexture.vScale = 1;
+			_this._actorSupporterSprite.sprite.material.diffuseTexture.vScale = 1;  
 		}
 		_this._actorTwinSupporterSprite.sprite.visibility = 1;
 		if(_this._actorTwinSupporterSprite.sprite.material){
