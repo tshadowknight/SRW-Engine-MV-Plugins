@@ -379,14 +379,14 @@ BattleSceneManager.prototype.preloadTexture = async function(path, context){
 
 BattleSceneManager.prototype.getCachedTexture = function(path){
 	if(!this._activeTextureCache[path]){
-		throw "An uncached texture was requested, is preloading broken?";
+		throw "An uncached texture was requested("+path+"), is preloading broken?";
 	}
 	return new BABYLON.Texture(this.getCachedImageData(path), this._scene, false, true, BABYLON.Texture.NEAREST_NEAREST);
 }
 
 BattleSceneManager.prototype.getCachedImageData = function(path){
 	if(!this._activeTextureCache[path]){
-		throw "An uncached texture was requested, is preloading broken?";
+		throw "An uncached texture was requested("+path+"), is preloading broken?";
 	}
 	return this._activeTextureCache[path].imgData;
 }

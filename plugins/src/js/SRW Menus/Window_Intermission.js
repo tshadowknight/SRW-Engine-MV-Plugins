@@ -65,6 +65,10 @@ Window_Intermission.prototype.initialize = function() {
 		return validateMechMenu() && validatePilotMenu();
 	}
 	
+	function validateEquips(){
+		return $equipablesManager.getCurrentInventory().length > 0;
+	}
+	
 	this._commands = [
 		{name: APPSTRINGS.INTERMISSION.mech_label, key: "mech", enabled: validateMechMenu, subCommands: [
 			{name: APPSTRINGS.INTERMISSION.list_label, key: "mech_list"},
@@ -94,8 +98,8 @@ Window_Intermission.prototype.initialize = function() {
 		this._commands = this._commands.filter((item) => {return enabledCategories[item.key]});	
 	}	
 	if(ENGINE_SETTINGS.ENABLE_EQUIPABLES){
-		this._commands[0].subCommands.push({name: APPSTRINGS.INTERMISSION.equip_weapons, key: "equip_weapons"});
-		this._commands[0].subCommands.push({name: APPSTRINGS.INTERMISSION.upgrade_equip_weapon, key: "upgrade_equip_weapon"});
+		this._commands[0].subCommands.push({name: APPSTRINGS.INTERMISSION.equip_weapons, key: "equip_weapons", enabled: validateEquips});
+		this._commands[0].subCommands.push({name: APPSTRINGS.INTERMISSION.upgrade_equip_weapon, key: "upgrade_equip_weapon", enabled: validateEquips});
 	}
 	
 	this._tooltips = APPSTRINGS.INTERMISSION.tool_tips;
@@ -168,10 +172,20 @@ Window_Intermission.prototype.initialize = function() {
 			$gameTemp.pushMenu = "equip_item_select";
 		}, 
 		"equip_weapons": function(){
-			$gameTemp.pushMenu = "equip_weapon_select";
+			this._handlingInput = false;
+			if(validateEquips()){
+				$gameTemp.pushMenu = "equip_weapon_select";
+				return false;//isprevented
+			}
+			return true;
 		}, 
 		"upgrade_equip_weapon": function(){
-			$gameTemp.pushMenu = "upgrade_equip_weapon";
+			this._handlingInput = false;
+			if(validateEquips()){
+				$gameTemp.pushMenu = "upgrade_equip_weapon";	
+				return false;//isprevented	
+			}		
+			return true;	
 		}, 
 		
 		"sell_parts": function(){

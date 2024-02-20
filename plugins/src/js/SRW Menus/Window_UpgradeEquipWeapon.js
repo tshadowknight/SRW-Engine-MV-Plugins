@@ -142,7 +142,7 @@ Window_UpgradeEquipWeapon.prototype.createComponents = function() {
 
 	
 		let selected = _this._itemList.getCurrentSelection();
-		if(selected.idx == -1){
+		if(selected == null || selected.idx == -1){
 			return null;
 		}
 		equipableInfo = selected.info;			
@@ -301,9 +301,10 @@ Window_UpgradeEquipWeapon.prototype.getWeaponLevels = function() {
 
 Window_UpgradeEquipWeapon.prototype.currentCost = function() {
 	var _this = this;
+	var cost = 0;
 	const inventoryInfo = $equipablesManager.getCurrentInventory();
 	const weaponId = this._itemList.getCurrentSelection().info.weaponId;
-	var cost = 0;
+	
 	
 	let startLevel = this.getCurrentEntryUpgradeLevel();
 	var levels = [];
