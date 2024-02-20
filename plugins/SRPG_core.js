@@ -352,7 +352,7 @@ var _defaultPlayerSpeed = parameters['defaultPlayerSpeed'] || 4;
 		this._imageCache.removeBlobs();
 	}
 	
-	ImageCache.prototype._truncateCache = function(){
+	ImageCache.prototype._truncateCache = function(force){
 		var items = this._items;
 		var sizeLeft = ImageCache.limit;
 
@@ -364,15 +364,27 @@ var _defaultPlayerSpeed = parameters['defaultPlayerSpeed'] || 4;
 			var bitmap = item.bitmap;				
 			let usedSize = bitmap.width * bitmap.height;			
 			
-			if(sizeLeft > 0 || this._mustBeHeld(item)){
+			if(!force && (sizeLeft > 0 || this._mustBeHeld(item))){
 				sizeLeft -= usedSize;
 			} else {
 				if(item.key.match(/__blob__.*/)){
 					window.URL.revokeObjectURL(item.bitmap._image.src);
+					console.log("Revoked blob url");
 				}
 				delete items[item.key];
 			}
 		}.bind(this));
+	};
+	
+	ImageCache.prototype._mustBeHeld = function(item){
+		// request only is weak so It's purgeable
+		if(item.bitmap.isRequestOnly()) return false;
+		// reserved item must be held
+		if(item.reservationId) return true;
+		// not ready bitmap must be held (because of checking isReady())
+		if(!item.bitmap.isReady()) return true;
+		// then the item may purgeable
+		return false;
 	};
 	
 

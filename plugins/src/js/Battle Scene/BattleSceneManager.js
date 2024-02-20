@@ -5566,7 +5566,7 @@ BattleSceneManager.prototype.playAttackAnimation = function(cacheRef, attackDef)
 		if(attackDef.onHitOverwrite){
 			overwriteAnimList(attackDef.onHitOverwrite);
 		}
-		if(cacheRef.attacked && cacheRef.attacked.isDestroyed && cacheRef.attacked.destroyer == cacheRef.ref){
+		if(cacheRef.attacked && cacheRef.attacked.isDestroyed && cacheRef.attacked.destroyer == cacheRef.ref && cacheRef.attacked.destroyedOrderIdx == cacheRef.actionOrder){
 			_this.mergeAnimList(attackDef.onDestroy);
 			if(attackDef.onDestroyOverwrite){
 				overwriteAnimList(attackDef.onDestroyOverwrite);

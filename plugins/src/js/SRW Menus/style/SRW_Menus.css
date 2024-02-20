@@ -45,10 +45,12 @@ body {
 
 .face_pic_container canvas{
 	width: 100%;
+	/*image-rendering: pixelated; image-rendering: crisp-edges;*/
 }
 
 .mech_pic_container canvas{
 	width: 100%;
+	/*image-rendering: pixelated; image-rendering: crisp-edges;*/
 }
 
 #custom_UI_positioning {
@@ -518,4 +520,13 @@ body {
 	align-items: center;
 	padding-left: 2%;
 	padding-right: 2%;
+}
+
+.img_wrapper {
+	
+}
+
+.img_wrapper canvas{
+	width: 100%;
+	image-rendering: pixelated; image-rendering: crisp-edges;
 }

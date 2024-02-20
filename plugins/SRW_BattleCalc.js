@@ -1111,6 +1111,7 @@ BattleCalc.prototype.generateBattleResult = function(isPrediction){
 					} else {
 						activeDefenderCache.isDestroyed = true;
 						activeDefenderCache.destroyer = aCache.ref;
+						activeDefenderCache.destroyedOrderIdx = orderIdx;
 						aCache.destroyedTarget = true;
 					}				
 				}				
