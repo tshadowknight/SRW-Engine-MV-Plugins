@@ -329,7 +329,9 @@ var _defaultPlayerSpeed = parameters['defaultPlayerSpeed'] || 4;
 			bitmap.addLoadListener(function() {
 				bitmap.rotateHue(hue);
 			});
-			this._imageCache.add(key, bitmap);
+			if(!noCache){
+				this._imageCache.add(key, bitmap);
+			}			
 		}else if(!bitmap.isReady()){
 			bitmap.decode();
 		}
@@ -351,7 +353,7 @@ var _defaultPlayerSpeed = parameters['defaultPlayerSpeed'] || 4;
 	ImageManager.resetBlobCache = async function() {
 		this._imageCache.removeBlobs();
 	}
-	
+		
 	ImageCache.prototype._truncateCache = function(force){
 		var items = this._items;
 		var sizeLeft = ImageCache.limit;
