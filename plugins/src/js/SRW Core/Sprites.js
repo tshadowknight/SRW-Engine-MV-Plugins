@@ -1775,7 +1775,6 @@
 
 	Sprite_Reticule.prototype.update = function() {
 		function lerp(start, end, t){
-		//	t => 1-(--t)*t*t*t;
 			return start + (end - start) * t;
 		}
 		
@@ -1791,13 +1790,18 @@
 				this._time = 0;
 				this.scale.x = 1;
 				this.scale.y = 1;
+				$gamePlayer.setTransparent(false);
 			}			
 		}
 		if(this._actorEvent && this._targetActorEvent){	
 			if(this._time <= this._duration){
+				$gamePlayer.setTransparent(true);
 				this.visible = true;
 				this.x = lerp(this._actorEvent.screenX(), this._targetActorEvent.screenX(), this._time / this._duration);
 				this.y = lerp(this._actorEvent.screenY() - 24, this._targetActorEvent.screenY() - 24, this._time / this._duration);				
+			}
+			if(this._time > this._duration / 2 && !$gameMap.isEventOnScreen( this._targetActorEvent.eventId())){
+				$gamePlayer.locate(this._targetActorEvent.posX(), this._targetActorEvent.posY());
 			}
 			this._time+=$gameSystem.getBattleSpeed();
 		} else if($gameTemp.reticuleInfo){

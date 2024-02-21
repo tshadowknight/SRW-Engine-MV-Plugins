@@ -218,6 +218,30 @@
 				y: this._displayY
 			}
 		};
+		
+		Game_Map.prototype.isEventOnScreen = function(eventId) {
+			var mapDispCoords = this.getDisplayPos();
+			let width = SceneManager._screenWidth / this.tileWidth();
+			let height = SceneManager._screenHeight / this.tileHeight();
+			let bounds = {
+				top: mapDispCoords.y,
+				left: mapDispCoords.x,
+				bottom: mapDispCoords.y + height,
+				right: mapDispCoords.x + width
+			}
+			let result = false;
+			let event = $gameMap.event(eventId);
+			if(event){
+				let x = event.posX();
+				let y = event.posY();
+				result = x >= bounds.left && x <= bounds.right && y >= bounds.top && y <= bounds.bottom;
+			}
+			console.log("Is event on screen: " + result)
+			return result;
+		};
+		
+		
+		
 	//====================================================================
 	// ●Spriteset_Map
 	//====================================================================
