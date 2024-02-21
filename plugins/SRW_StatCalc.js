@@ -57,6 +57,8 @@ function StatCalc(){
 		se: "SRWExplosion"
 	};
 	this._invalidatedEventIds = {};
+	
+	this._abilityLookupDepth = 0;
 }
 
 StatCalc.prototype.isActorSRWInitialized = function(actor){
@@ -6836,7 +6838,7 @@ StatCalc.prototype.isStatModActiveOnAnyActor = function(modType, excludedSkills)
 	return result;
 }
 
-StatCalc.prototype.getActiveStatMods = function(actor, excludedSkills){
+StatCalc.prototype.getActiveStatMods = function(actor, actorKey, excludedSkills){
 	var _this = this;
 	if(!excludedSkills){
 		excludedSkills = {};
@@ -6849,49 +6851,68 @@ StatCalc.prototype.getActiveStatMods = function(actor, excludedSkills){
 		list: []
 	};
 	
+	if(!_this._currentActorBeingProcessed[actorKey]){
+		_this._currentActorBeingProcessed[actorKey] = {
+		
+		};
+	}
+	
+	
+	
 	function accumulateFromAbilityList(abilityList, abilityManager){
 		if(abilityList && abilityManager){			
+			let ctr = 0;
 			abilityList.forEach(function(abilityDef){
-				if(abilityDef && !excludedSkills[abilityManager.getIdPrefix()+"_"+abilityDef.idx] && (typeof abilityDef.requiredLevel == "undefined" || abilityDef.requiredLevel == 0 || _this.getCurrentLevel(actor) >= abilityDef.requiredLevel) && abilityManager.isActive(actor, abilityDef.idx, abilityDef.level)){
-					var statMods = abilityManager.getStatmod(actor, abilityDef.idx, abilityDef.level);
-					var targetList;	
-					//hack to ensure direct function assignements for consumable items are skipped
-					if(Array.isArray(statMods)){				
-						statMods.forEach(function(statMod){
-							if(statMod.modType == "mult"){
-								targetList = result.mult;
-							} else if(statMod.modType == "addPercent"){
-								targetList = result.addPercent;
-							} else if(statMod.modType == "addFlat"){
-								targetList = result.addFlat;
-							} else if(statMod.modType == "mult_ceil"){
-								targetList = result.mult_ceil;
-							}
-							
-							statMod.rangeInfo = abilityManager.getRangeDef(actor, abilityDef.idx, abilityDef.level) || {min: 0, max: 0, targets: "own"};
-							
-							statMod.stackId = abilityManager.getIdPrefix()+"_"+abilityDef.idx;
-							statMod.canStack = abilityManager.canStack(abilityDef.idx);
-							
-							statMod.appliesTo = abilityDef.appliesTo;
-							
-							statMod.originType = actor.isActor() ? "actor" : "enemy";
-							statMod.originId = actor.SRWStats.pilot.id;
-							
-							statMod.originLevel = abilityDef.level;
-							
-							if(targetList){
-								targetList.push(statMod);
-							}
-							var listEntry = JSON.parse(JSON.stringify(statMod));
-							if(!listEntry.name){
-								listEntry.name = abilityManager.getAbilityDisplayInfo(abilityDef.idx).name;
-							}
-							
-							result.list.push(listEntry);
-						});	
-					}	
-				}			
+				if(abilityDef){
+					const sourceId = abilityManager.getIdPrefix()+"_"+abilityDef.idx + "_" + ctr;
+					if(!_this._currentActorBeingProcessed[actorKey][sourceId]){						
+						_this._currentActorBeingProcessed[actorKey][sourceId] = true;
+						
+						if((typeof abilityDef.requiredLevel == "undefined" || abilityDef.requiredLevel == 0 || _this.getCurrentLevel(actor) >= abilityDef.requiredLevel) && abilityManager.isActive(actor, abilityDef.idx, abilityDef.level)){
+							var statMods = abilityManager.getStatmod(actor, abilityDef.idx, abilityDef.level);
+							var targetList;	
+							//hack to ensure direct function assignements for consumable items are skipped
+							if(Array.isArray(statMods)){				
+								statMods.forEach(function(statMod){
+									if(statMod.modType == "mult"){
+										targetList = result.mult;
+									} else if(statMod.modType == "addPercent"){
+										targetList = result.addPercent;
+									} else if(statMod.modType == "addFlat"){
+										targetList = result.addFlat;
+									} else if(statMod.modType == "mult_ceil"){
+										targetList = result.mult_ceil;
+									}
+									
+									statMod.rangeInfo = abilityManager.getRangeDef(actor, abilityDef.idx, abilityDef.level) || {min: 0, max: 0, targets: "own"};
+									
+									statMod.stackId = abilityManager.getIdPrefix()+"_"+abilityDef.idx;
+									statMod.canStack = abilityManager.canStack(abilityDef.idx);
+									
+									statMod.sourceId = sourceId;
+									
+									statMod.appliesTo = abilityDef.appliesTo;
+									
+									statMod.originType = actor.isActor() ? "actor" : "enemy";
+									statMod.originId = actor.SRWStats.pilot.id;
+									
+									statMod.originLevel = abilityDef.level;
+									
+									if(targetList){
+										targetList.push(statMod);
+									}
+									var listEntry = JSON.parse(JSON.stringify(statMod));
+									if(!listEntry.name){
+										listEntry.name = abilityManager.getAbilityDisplayInfo(abilityDef.idx).name;
+									}
+									
+									result.list.push(listEntry);
+								});	
+							}	
+						}							
+					}
+					ctr++;	
+				}
 			});	
 		}
 	}
@@ -6983,7 +7004,7 @@ StatCalc.prototype.getActiveStatMods = function(actor, excludedSkills){
 			directEffects = directEffects.concat(actor.SRWStats.pilot.activeEffects || []);
 			
 				
-			
+			let ctr = 0;
 			function processStatMod(statMod){
 				var targetList;	
 				if(statMod.modType == "mult"){
@@ -6999,6 +7020,7 @@ StatCalc.prototype.getActiveStatMods = function(actor, excludedSkills){
 				statMod.rangeInfo = {min: 0, max: 0, targets: "own"};
 				
 				statMod.stackId = "active_effect";
+				statMod.sourceId = "active_effect_"+(ctr++);
 				statMod.canStack = true;
 				
 				statMod.appliesTo = null;
@@ -7068,6 +7090,7 @@ StatCalc.prototype.unlockAbilityCache = function(){
 }
 
 StatCalc.prototype.invalidateAbilityCache = function(actor){
+	this._abilityLookupDepth = 0;
 	if(actor && actor.isSubPilot){
 		return; //a sub pilot should not trigger a partial cache invalidation to prevent issue with reloading a unit
 	}
@@ -7082,27 +7105,73 @@ StatCalc.prototype.invalidateAbilityCache = function(actor){
 			}			
 		} else {
 			console.log("Full cache invalidation");
+			this._abilityCacheBuilding = false;
 			this._abilityCacheDirty = true;
-		}		
+		}	
+
+		this.invalidateActorAbiTracking(actor);	
 	}	
 }
 
-StatCalc.prototype.createActiveAbilityLookup = function(excludedSkills){
+
+
+StatCalc.prototype.invalidateActorAbiTracking = function(actor){
+	if(actor){
+		delete this._currentActorBeingProcessed[this.createActorAbiCacheTrackingKey(actor)];
+	} else {
+		this._currentActorBeingProcessed = {};
+	}	
+}
+
+StatCalc.prototype.createActorAbiCacheTrackingKey = function(actor){
+	let key;
+	if(actor.isActor()){
+		key = "actor_" + actor.SRWStats.pilot.id;
+	} else {
+		key = "enemy_" + actor.SRWStats.pilot.id;
+	}
+	return key;
+}
+
+StatCalc.prototype.createActiveAbilityLookup = function(){
 	var _this = this;
 	
+	
+	//_this._currentActorBeingProcessed tracks for each actor which ability source has already been processed during this cache reload
+	//this tracking is used to prevent infinite recursion during recursive ability lookups(abilities checking abilities) and to avoid results being computed more than once for a give ability source
 	if(!_this._currentActorBeingProcessed){
 		_this._currentActorBeingProcessed = {};
 	}
+	
+	if(!$gameTemp.abiLookupDebug){
+		$gameTemp.abiLookupDebug = {};
+	}
+	
 	function processActor(actor, eventId, isEnemy, sourceX, sourceY, type, slot){
 		//hack to prevent nested ability checks from causing abilities to be registered multiple times
-		if(!actor.SRWStats || _this._currentActorBeingProcessed[actor.SRWStats.pilot.id] || (actor.SRWStats.stageTemp && actor.SRWStats.stageTemp.isBoarded)){
+		
+		let key = _this.createActorAbiCacheTrackingKey(actor);
+			
+		if(!$gameTemp.abiLookupDebug[key]){
+			$gameTemp.abiLookupDebug[key] = 0;
+		}
+		
+		$gameTemp.abiLookupDebug[key]++;
+		
+		if(!actor.SRWStats || (actor.SRWStats.stageTemp && actor.SRWStats.stageTemp.isBoarded)){
 			return;
 		}
-		_this._currentActorBeingProcessed[actor.SRWStats.pilot.id] = true;
-		var accumulators = _this.getActiveStatMods(actor, excludedSkills);
+		if(!_this._currentActorBeingProcessed[key]){
+			_this._currentActorBeingProcessed[key] = {
+			
+			};
+		}
+			
+		var accumulators = _this.getActiveStatMods(actor, key);
 		Object.keys(accumulators).forEach(function(accType){
 			var activeAbilities = accumulators[accType];
-			activeAbilities.forEach(function(originalEffect){				
+			activeAbilities.forEach(function(originalEffect){	 							
+			
 				var rangeInfo = originalEffect.rangeInfo || {min: 0, max: 0, targets: "own"};
 				var target;
 				if(isEnemy){
@@ -7262,16 +7331,25 @@ StatCalc.prototype.createActiveAbilityLookup = function(excludedSkills){
 				});
 			});	
 		});	
-		delete _this._currentActorBeingProcessed[actor.SRWStats.pilot.id];
+		//delete _this._currentActorBeingProcessed[key];
 	}
 	
 	if(_this._cachedAbilityLookup && !_this._abilityCacheDirty && !Object.keys(_this._invalidatedEventIds).length){
 		return _this._cachedAbilityLookup;
 	}
+	if(this._abilityCacheDirty){
+		console.log("recreate full ActiveAbilityLookup");
+	} else {
+		console.log("update partial ActiveAbilityLookup");
+	}
 	
+	//only change the ability cache reference the first time this is invoked per full cache invalidation(not when running this for nested ability checks)
+	if(!_this._abilityCacheBuilding){
+		_this._abilityCacheBuilding = true;
+		_this._cachedAbilityLookup = {};
+	}
 	
-	
-	var result = {};
+	var result = _this._cachedAbilityLookup;
 	var eventToAffectedTiles = {};
 	var globalEffects = {
 		enemy: [],
@@ -7280,7 +7358,6 @@ StatCalc.prototype.createActiveAbilityLookup = function(excludedSkills){
 	var auraTiles = {};
 	
 	if(!_this._abilityCacheDirty){
-		result = _this._cachedAbilityLookup || {};
 		eventToAffectedTiles = _this._eventToAffectedTiles || {};
 		globalEffects = _this._globalEffects || {
 			enemy: [],
@@ -7363,6 +7440,7 @@ StatCalc.prototype.createActiveAbilityLookup = function(excludedSkills){
 	_this._eventToAffectedTiles = eventToAffectedTiles;
 	_this._auraTiles = auraTiles;
 	_this._abilityCacheDirty = false;
+	_this._abilityLookupDepth--;
 	return result;
 }
 
@@ -7604,6 +7682,12 @@ StatCalc.prototype.getModDefinitions = function(actor, types, excludedSkills){
 	appendResults(statModInfo.statMods);
 	appendResults(statModInfo.zoneMods);
 		
+	return result;
+}
+
+StatCalc.prototype.checkInnerAbility = function(actor, value, types, excludedSkills){
+	let result = this.applyStatModsToValue(actor, value, types, excludedSkills);
+	this.invalidateAbilityCache(actor);
 	return result;
 }
 
@@ -8162,20 +8246,20 @@ StatCalc.prototype.getActiveCombatInfo = function(actor){
 StatCalc.prototype.getParticipantAttribute = function(participant, attribute, weaponInfo){
 	let result = "";
 	if(weaponInfo && ENGINE_SETTINGS.USE_WEAPON_ATTRIBUTE){
-		const weapAttributeOverrides = $statCalc.getModDefinitions(participant, ["weapon_attribute"]);
+		/*const weapAttributeOverrides = $statCalc.getModDefinitions(participant, ["weapon_attribute"]);
 		if(weapAttributeOverrides.length){
 			result = weapAttributeOverrides[0].attribute;
-		} else {
+		} else {*/
 			result = weaponInfo[attribute];
-		}	
+		//}	
 	}
 	
-	if(!result && attribute == "attribute1"){
+	/*if(!result && attribute == "attribute1"){
 		const attributeOverrides = $statCalc.getModDefinitions(participant, ["attribute"]);
 		if(attributeOverrides.length){
 			result = attributeOverrides[0].attribute;
 		}
-	}
+	}*/
 	
 	if(!result){
 		result = participant.SRWStats.stageTemp[attribute] || "";
