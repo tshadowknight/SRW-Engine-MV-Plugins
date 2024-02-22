@@ -552,6 +552,7 @@
 				setMinDeployCount: true,
 				setShipDeployCount: true,
 				assignSlot: true,
+				assignSlotFromMech: true,
 				assignSlotSub: true,
 				assignShipSlot: true,
 				lockDeploySlot: true,

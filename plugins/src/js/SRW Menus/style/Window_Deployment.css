@@ -420,7 +420,7 @@
     left: 25%;
     align-items: center;
 }
-#deployment .selection_icon{
+.deployment .selection_icon{
 	 --widthpixels: 36;
     --heightpixels: 36;
     background-color: rgba(85, 164, 255, 0.5);
@@ -430,13 +430,13 @@
 	margin: 1.2%;
 }
    
-#deployment .sub_pilot_list {
+.deployment .sub_pilot_list {
 	display: flex;
 	justify-content: flex-end;
 	align-items: center;	
 	padding-right: 4%;
 }
 
-#deployment .pilot_basic_info {
+.deployment .pilot_basic_info {
 	margin-top: 12%;
 }
