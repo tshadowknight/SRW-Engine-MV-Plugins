@@ -442,18 +442,21 @@ Window_DetailPages.prototype.update = function() {
 };
 
 Window_DetailPages.prototype.validateTab = function() {
-	if(!this.getCurrentSelection().actor || this.getCurrentSelection().actor.SRWStats.pilot.id == -1){
-		if(this._selectedTab == 0){
-			this._selectedTab = 1;
-			this.requestRedraw();
+	const currentSelection = this.getCurrentSelection();
+	if(currentSelection){
+		if(!currentSelection.actor || currentSelection.actor.SRWStats.pilot.id == -1){
+			if(this._selectedTab == 0){
+				this._selectedTab = 1;
+				this.requestRedraw();
+			}
+		}		
+		if(currentSelection.mech.id == -1){
+			if(this._selectedTab != 0){
+				this._selectedTab = 0;
+				this.requestRedraw();
+			}
 		}
-	}		
-	if(this.getCurrentSelection().mech.id == -1){
-		if(this._selectedTab != 0){
-			this._selectedTab = 0;
-			this.requestRedraw();
-		}
-	}
+	}	
 }
 
 Window_DetailPages.prototype.drawPilotStats1 = function() {

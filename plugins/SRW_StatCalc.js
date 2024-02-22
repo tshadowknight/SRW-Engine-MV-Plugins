@@ -1266,7 +1266,7 @@ StatCalc.prototype.applyEnemyDestroyedWill = function(factionId){
 		if($gameSystem.isFriendly(actor, factionId)){
 			_this.modifyWill(actor, _this.applyStatModsToValue(actor, 1, ["destroy_will"]), true);
 		} else {
-			_this.modifyWill(actor, _this.getPersonalityInfo(actor).ally_down || 0, true);			
+			_this.modifyWill(actor, _this.getPersonalityInfo(actor).ally_down || 0, true);		 	
 		}
 	});
 	//this.invalidateAbilityCache();
