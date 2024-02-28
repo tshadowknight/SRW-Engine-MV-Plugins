@@ -2048,11 +2048,11 @@ SceneManager.isInSaveScene = function(){
 					$gameTemp.destroyTransformQueue.push({actor: battleEffect.ref, event: battleEffect.ref.event});
 				} else {
 					//battleEffect.ref.event._erased = true;
-					$gameTemp.deathQueue.push({actor: battleEffect.ref, event: $statCalc.getReferenceEvent(battleEffect.ref)});
+					$gameTemp.deathQueue.push({actor: battleEffect.ref, event: $statCalc.getReferenceEvent(battleEffect.ref), destroyer: battleEffect.destroyer});
 					if($statCalc.isShip(battleEffect.ref)){
 						var boardedUnits = $statCalc.getBoardedUnits(battleEffect.ref)
 						for(var i = 0; i < boardedUnits.length; i++){
-							$gameTemp.deathQueue.push({actor: boardedUnits[i], event: boardedUnits[i].event});
+							$gameTemp.deathQueue.push({actor: boardedUnits[i], event: boardedUnits[i].event, destroyer: battleEffect.destroyer});
 						}
 					}
 				}				

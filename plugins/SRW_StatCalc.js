@@ -7124,12 +7124,14 @@ StatCalc.prototype.invalidateActorAbiTracking = function(actor){
 }
 
 StatCalc.prototype.createActorAbiCacheTrackingKey = function(actor){
-	let key;
-	if(actor.isActor()){
-		key = "actor_" + actor.SRWStats.pilot.id;
-	} else {
-		key = "enemy_" + actor.SRWStats.pilot.id;
-	}
+	let key = "";
+	if(this.isActorSRWInitialized(actor)){
+		if(actor.isActor()){
+			key = "actor_" + actor.SRWStats.pilot.id;
+		} else {
+			key = "enemy_" + actor.SRWStats.pilot.id;
+		}
+	}	
 	return key;
 }
 

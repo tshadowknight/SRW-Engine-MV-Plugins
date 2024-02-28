@@ -349,6 +349,40 @@
 			}
 			return result;
 		}
+		
+		//warning: this function will only return the count once per requested combination per completed attack sequence
+		//repeated calls like during a map attack will return 0!
+		Game_Interpreter.prototype.getPendingDestructionCount  = function(type, ofFactionId, byFactionId){
+			var result = 0;
+			if($gameTemp.deathQueue && $gameTemp.deathQueue.length){
+				$gameTemp.deathQueue.forEach(function(queuedDeath){
+					if(!queuedDeath.countedKeys){
+						queuedDeath.countedKeys = {};
+					}
+					const lookupKey = type+"_"+ofFactionId+"_"+byFactionId;	
+					
+						
+					if(!queuedDeath.countedKeys[lookupKey]){	//hacky way to make it so a destruction is only counted once per attack. Otherwise they would be counted double for each enemy destroyed in a map attack
+						queuedDeath.countedKeys[lookupKey] = true;
+						
+						let isType;
+						if(type == null){
+							isType = true;
+						} else if(type == "actor"){
+							isType = queuedDeath.actor.isActor();
+						} else {
+							isType = queuedDeath.actor.isEnemy();
+						}
+						const isOwnFaction = $gameSystem.getFactionId(queuedDeath.actor) == ofFactionId || ofFactionId == null;
+						const isDestroyerFaction = $gameSystem.getFactionId(queuedDeath.destroyer) == byFactionId || byFactionId == null;				
+						if(isType && isOwnFaction && isDestroyerFaction){
+							result++;
+						}
+					}					
+				});
+			}
+			return result;
+		}
 
 		Game_Interpreter.prototype.isActorBelowHP  = function(id, hp){
 			return $statCalc.isActorBelowHP(id, hp);
