@@ -3606,14 +3606,14 @@ StatCalc.prototype.calculateSRWMechStats = function(targetStats, preserveVolatil
 		}
 		
 		
-		calculatedStats.maxHP = $statCalc.applyStatModsToValue(mechData, calculatedStats.maxHP, "maxHP");
-		calculatedStats.maxEN = $statCalc.applyStatModsToValue(mechData, calculatedStats.maxEN, "maxEN");
+		calculatedStats.maxHP = $statCalc.applyStatModsToValue(mechData, calculatedStats.maxHP, ["maxHP"]);
+		calculatedStats.maxEN = $statCalc.applyStatModsToValue(mechData, calculatedStats.maxEN, ["maxEN"]);
 		
-		calculatedStats.armor = $statCalc.applyStatModsToValue(mechData, calculatedStats.armor, "base_arm");
-		calculatedStats.mobility = $statCalc.applyStatModsToValue(mechData, calculatedStats.mobility, "base_mob");
-		calculatedStats.accuracy = $statCalc.applyStatModsToValue(mechData, calculatedStats.accuracy, "base_acc");
+		calculatedStats.armor = $statCalc.applyStatModsToValue(mechData, calculatedStats.armor, ["base_arm"]);
+		calculatedStats.mobility = $statCalc.applyStatModsToValue(mechData, calculatedStats.mobility, ["base_mob"]);
+		calculatedStats.accuracy = $statCalc.applyStatModsToValue(mechData, calculatedStats.accuracy, ["base_acc"]);
 		
-		calculatedStats.move = $statCalc.applyStatModsToValue(mechData, calculatedStats.move, "base_move");
+		calculatedStats.move = $statCalc.applyStatModsToValue(mechData, calculatedStats.move, ["base_move"]);
 		
 		
 		if(!preserveVolatile){

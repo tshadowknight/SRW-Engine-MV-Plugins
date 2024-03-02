@@ -66,7 +66,7 @@ Window_BeforebattleTwin.prototype.isBuffingAttack = function(){
 }
 
 Window_BeforebattleTwin.prototype.assistIsValid = function(){
-	return !$gameTemp.currentBattleActor.isActor() && (!this.isBuffingAttack());
+	return $gameTemp.currentBattleActor.isActor() && !this.isBuffingAttack() && !$statCalc.isAI($gameTemp.currentBattleActor);
 }
 
 Window_BeforebattleTwin.prototype.counterValid = function(){
