@@ -314,7 +314,8 @@ StatCalc.prototype.setCurrentTerrainModsFromTilePropertyString = function(actor,
 }
 
 StatCalc.prototype.updateTerrainInfo = function(actor){
-	if(this.isActorSRWInitialized(actor)){		
+	//check data map as hacky fix for crash when running this function before a map has been loaded
+	if($dataMap && this.isActorSRWInitialized(actor)){		
 		let referenceEvent = this.getReferenceEvent(actor);
 		if(referenceEvent && (!actor.SRWStats.mech.currentTerrainMods || !actor.SRWStats.mech.currentTerrain || !referenceEvent._lastModsPosition || referenceEvent._lastModsPosition.x != referenceEvent.posX() || referenceEvent._lastModsPosition.y != referenceEvent.posY())){
 			referenceEvent._lastModsPosition = {
@@ -1725,6 +1726,8 @@ StatCalc.prototype.initSRWStats = function(actor, level, itemIds, preserveVolati
 			}	
 		}		
 	}
+	
+	this.updateTerrainInfo(actor);
 }
 
 StatCalc.prototype.getSubTwinId = function(actor){
@@ -7126,11 +7129,16 @@ StatCalc.prototype.invalidateActorAbiTracking = function(actor){
 StatCalc.prototype.createActorAbiCacheTrackingKey = function(actor){
 	let key = "";
 	if(this.isActorSRWInitialized(actor)){
+		
 		if(actor.isActor()){
 			key = "actor_" + actor.SRWStats.pilot.id;
 		} else {
 			key = "enemy_" + actor.SRWStats.pilot.id;
 		}
+		key+="_"+this.getReferenceEventId(actor);
+		
+		key+="_"+(actor.isSubTwin ? "sub_twin" : "main");
+		
 	}	
 	return key;
 }
