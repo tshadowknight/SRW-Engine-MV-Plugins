@@ -7102,7 +7102,7 @@ StatCalc.prototype.invalidateAbilityCache = function(actor){
 		if(actor){
 			var event = this.getReferenceEvent(actor);
 			if(event){
-				this._invalidatedEventIds[event.eventId()] = actor;
+				this._invalidatedEventIds[event.eventId()] = {actor: actor, hasBeenInvalidated: false};
 				event._lastModsPosition = null;
 				//this._invalidatedActor = actor;
 			}			
@@ -7349,15 +7349,20 @@ StatCalc.prototype.createActiveAbilityLookup = function(){
 	}
 	if(this._abilityCacheDirty){
 		console.log("recreate full ActiveAbilityLookup");
+		
+		//only change the ability cache reference the first time this is invoked per full cache invalidation(not when running this for nested ability checks)
+		if(!_this._abilityCacheBuilding){
+			_this._abilityCacheBuilding = true;
+			_this._cachedAbilityLookup = {};
+		}
 	} else {
 		console.log("update partial ActiveAbilityLookup");
 	}
 	
-	//only change the ability cache reference the first time this is invoked per full cache invalidation(not when running this for nested ability checks)
-	if(!_this._abilityCacheBuilding){
-		_this._abilityCacheBuilding = true;
+	if(_this._cachedAbilityLookup == null){
 		_this._cachedAbilityLookup = {};
 	}
+	
 	
 	var result = _this._cachedAbilityLookup;
 	var eventToAffectedTiles = {};
@@ -7408,31 +7413,35 @@ StatCalc.prototype.createActiveAbilityLookup = function(){
 	var invalidatedEventIds = _this._invalidatedEventIds;
 	if(!_this._abilityCacheDirty && Object.keys(invalidatedEventIds).length){
 		Object.keys(invalidatedEventIds).forEach(function(eventId){
-			if(_this._eventToAffectedTiles[eventId]){
-				var affectedAccumulators = _this._eventToAffectedTiles[eventId];			
-				Object.keys(affectedAccumulators).forEach(function(accKey){
-					var accumulatorContext = affectedAccumulators[accKey];				
-					var tmp = [];
-					var list = result[accumulatorContext.realX][accumulatorContext.realY][accumulatorContext.target][accumulatorContext.accType];
-					while(list.length){
-						var current = list.shift();
-						if(current.eventId != eventId){
-							tmp.push(current);
-						}
-					}
-					result[accumulatorContext.realX][accumulatorContext.realY][accumulatorContext.target][accumulatorContext.accType] = tmp;
-				});
-				_this._eventToAffectedTiles[eventId] = null;
-			}
-			var eventActor = invalidatedEventIds[eventId];
-			
-			var entityKey;
-			var entityKey = _this.getReferenceEvent(eventActor).eventId();
-			delete auraTiles[entityKey];	
-			
-			if(invalidatedEventIds[eventId]){
-				//hacky solution to issue caused by recursive abilities clearing _this._invalidatedEventIds when called during handleEventActors
+			//each event id should only be invalidated once in case of recursive ability cache checks
+			if(!invalidatedEventIds[eventId].hasBeenInvalidated){
+				invalidatedEventIds[eventId].hasBeenInvalidated = true;	
 				
+				if(_this._eventToAffectedTiles[eventId]){
+					var affectedAccumulators = _this._eventToAffectedTiles[eventId];			
+					Object.keys(affectedAccumulators).forEach(function(accKey){
+						var accumulatorContext = affectedAccumulators[accKey];				
+						var tmp = [];
+						var list = result[accumulatorContext.realX][accumulatorContext.realY][accumulatorContext.target][accumulatorContext.accType];
+						while(list.length){
+							var current = list.shift();
+							if(current.eventId != eventId){
+								tmp.push(current);
+							}
+						}
+						result[accumulatorContext.realX][accumulatorContext.realY][accumulatorContext.target][accumulatorContext.accType] = tmp;
+					});
+					_this._eventToAffectedTiles[eventId] = null;
+				}
+				var eventActor = invalidatedEventIds[eventId].actor;
+				
+				var entityKey;
+				var entityKey = _this.getReferenceEvent(eventActor).eventId();
+				delete auraTiles[entityKey];	
+				
+				
+			
+							
 				handleEventActors(eventActor, _this.getReferenceEvent(eventActor));
 			}			
 					
