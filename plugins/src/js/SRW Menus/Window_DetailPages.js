@@ -929,7 +929,7 @@ Window_DetailPages.prototype.drawPilotStats2 = function() {
 		var uniqueString = "";
 		var descriptionData = "";
 		var descriptionClass = "";
-		if(typeof spiritList[i] != "undefined" && spiritList[i].level <= currentLevel){
+		if(typeof spiritList[i] != "undefined" && spiritList[i].idx !== '' &&  spiritList[i].level <= currentLevel){
 			descriptionClass = "described_element";
 			descriptionData = "data-type='spirit' data-idx='"+spiritList[i].idx+"'";
 			

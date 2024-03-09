@@ -1443,68 +1443,73 @@ BattleCalc.prototype.generateBattleResult = function(isPrediction){
 	
 	var gainRecipient = $gameTemp.currentBattleActor;	
 	var aCache = $gameTemp.battleEffectCache[gainRecipient._cacheReference];
-	aCache.expGain = 0;
-	aCache.ppGain = 0;
-	aCache.fundGain = 0;
-	
-	var gainDonors = [];
-	gainDonors.push($gameTemp.currentBattleEnemy);
-	if(supportDefender && !$gameSystem.isFriendly(supportDefender.actor, "player")){
-		gainDonors.push(supportDefender.actor);
-	}
-	if($gameTemp.currentBattleEnemy.subTwin){
-		gainDonors.push($gameTemp.currentBattleEnemy.subTwin);
-	}
-	aCache.gainDonors = [];
-	gainDonors.forEach(function(gainDonor){		
-		//var gainDonor = $gameTemp.currentBattleEnemy;
-		var dCache = $gameTemp.battleEffectCache[gainDonor._cacheReference];			
-		if(!dCache){
-			dCache = $gameTemp.battleEffectCache[gainDonor._supportCacheReference];	
+	if(aCache){	
+		aCache.expGain = 0;
+		aCache.ppGain = 0;
+		aCache.fundGain = 0;
+		
+		var gainDonors = [];
+		gainDonors.push($gameTemp.currentBattleEnemy);
+		if(supportDefender && !$gameSystem.isFriendly(supportDefender.actor, "player")){
+			gainDonors.push(supportDefender.actor);
 		}
-		
-		if(aCache && dCache){	
-			aCache.gainDonors.push(dCache);
-		
-			var expGain = _this.performExpCalculation(gainRecipient, gainDonor);
-			expGain = $statCalc.applyStatModsToValue(gainRecipient, expGain, ["exp"]);
-			if($statCalc.getActiveSpirits(gainRecipient).gain && !aCache.isBuffingAttack){
-				expGain*=2;
+		if($gameTemp.currentBattleEnemy.subTwin){
+			gainDonors.push($gameTemp.currentBattleEnemy.subTwin);
+		}
+		aCache.gainDonors = [];
+		gainDonors.forEach(function(gainDonor){		
+			//var gainDonor = $gameTemp.currentBattleEnemy;
+			var dCache = $gameTemp.battleEffectCache[gainDonor._cacheReference];			
+			if(!dCache){
+				dCache = $gameTemp.battleEffectCache[gainDonor._supportCacheReference];	
 			}
 			
-			var ppGain = _this.performPPCalculation(gainRecipient, gainDonor);
-			var fundGain = $statCalc.getAwardedFunds(gainDonor);
-			if($statCalc.getActiveSpirits(gainRecipient).fortune){
-				fundGain*=2;
-			}
-			if(!dCache.isDestroyed){
-				if(aCache.isBuffingAttack){
-					expGain = Math.floor(expGain / 4);
+			if(aCache && dCache){	
+				aCache.gainDonors.push(dCache);
+			
+				var expGain = _this.performExpCalculation(gainRecipient, gainDonor);
+				expGain = $statCalc.applyStatModsToValue(gainRecipient, expGain, ["exp"]);
+				if($statCalc.getActiveSpirits(gainRecipient).gain && !aCache.isBuffingAttack){
+					expGain*=2;
+				}
+				
+				var ppGain = _this.performPPCalculation(gainRecipient, gainDonor);
+				var fundGain = $statCalc.getAwardedFunds(gainDonor);
+				if($statCalc.getActiveSpirits(gainRecipient).fortune){
+					fundGain*=2;
+				}
+				if(!dCache.isDestroyed){
+					if(aCache.isBuffingAttack){
+						expGain = Math.floor(expGain / 4);
+					} else {
+						expGain = Math.floor(expGain / 10);
+					}				
+					ppGain = 0;
+					fundGain = 0;
 				} else {
-					expGain = Math.floor(expGain / 10);
-				}				
-				ppGain = 0;
-				fundGain = 0;
-			} else {
-				fundGain = $statCalc.applyStatModsToValue(gainRecipient, fundGain, ["fund_gain_destroy"]);
+					fundGain = $statCalc.applyStatModsToValue(gainRecipient, fundGain, ["fund_gain_destroy"]);
+				}
+				
+				aCache.expGain+= expGain;
+				aCache.ppGain+= ppGain;
+				aCache.fundGain+= fundGain;
+				
+				
 			}
-			
-			aCache.expGain+= expGain;
-			aCache.ppGain+= ppGain;
-			aCache.fundGain+= fundGain;
-			
-			
+		});
+		if(!isPrediction && !aCache.isBuffingAttack){
+			if($statCalc.getActiveSpirits(gainRecipient).gain){
+				$statCalc.clearSpirit(gainRecipient, "gain");
+			}
+			if($statCalc.getActiveSpirits(gainRecipient).fortune){
+				$statCalc.clearSpirit(gainRecipient, "fortune");
+			}
 		}
-	});
-	if(!isPrediction && !aCache.isBuffingAttack){
-		if($statCalc.getActiveSpirits(gainRecipient).gain){
-			$statCalc.clearSpirit(gainRecipient, "gain");
-		}
-		if($statCalc.getActiveSpirits(gainRecipient).fortune){
-			$statCalc.clearSpirit(gainRecipient, "fortune");
-		}
-	}
 	
+	
+	} else {
+		console.log("!!! Gainrecipient " + gainRecipient.actorId() + " does not have a valid battle cache ref!");
+	}
 	
 	$gameTemp.unitHitInfo = {
 		actor: {

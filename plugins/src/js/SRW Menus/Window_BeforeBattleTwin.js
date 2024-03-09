@@ -557,7 +557,7 @@ Window_BeforebattleTwin.prototype.update = function() {
 							if(_this._currentActionSelection < 0){
 								_this._currentActionSelection = 2;
 							}
-							if(_this._currentActionSelection == 0 && !$statCalc.hasWeapons($gameTemp.currentBattleActor)){
+							if(_this._currentActionSelection == 0 && !$gameTemp.actorAction.attack){
 								_this._currentActionSelection = 1;
 							}
 							quickUpdateActorAction();
@@ -573,7 +573,7 @@ Window_BeforebattleTwin.prototype.update = function() {
 							if(_this._currentActionSelection > 2){
 								_this._currentActionSelection = 0;
 							}
-							if(_this._currentActionSelection == 0 && !$statCalc.hasWeapons($gameTemp.currentBattleActor)){
+							if(_this._currentActionSelection == 0 && !$gameTemp.actorAction.attack){
 								_this._currentActionSelection = 2;
 							}
 							quickUpdateActorAction();

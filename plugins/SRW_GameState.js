@@ -523,7 +523,8 @@ GameState_actor_map_target.prototype.update = function(scene){
 				$gamePlayer.locate($gameTemp.activeEvent().posX() + adjusted[0][0], $gameTemp.activeEvent().posY() + adjusted[0][1]);
 				$gameTemp.mapTouchRetargetState = "init";
 				$gameSystem.setSubBattlePhase('actor_map_target_confirm');
-				Input.clear();
+				$gameTemp.AHeldCtr = 30;
+				//Input.clear();
 			}	
 		}									
 	} else if (Input.isTriggered('cancel') || TouchInput.isCancelled()) {
@@ -616,6 +617,8 @@ GameState_actor_map_target_confirm.prototype.constructor = GameState_actor_map_t
 
 GameState_actor_map_target_confirm.prototype.update = function(scene){
 	
+	
+	
 	var currentPosition = {x: $gamePlayer.posX(), y: $gamePlayer.posY()};		
 
 	var summaryUnit = $statCalc.activeUnitAtPosition(currentPosition);
@@ -662,6 +665,15 @@ GameState_actor_map_target_confirm.prototype.update = function(scene){
 		
 		$gameTemp.currentMapTargets = targets;				
 	}			
+	
+	if(Input.isPressed("ok") && $gameTemp.AHeldCtr > 0){
+		$gameTemp.AHeldCtr--;
+		if($gameTemp.AHeldCtr > 0){
+			return;
+		}		
+	} else {
+		$gameTemp.AHeldCtr = 0;
+	}
 	
 	if(Input.isTriggered("ok") || TouchInput.isTriggered()){// && !$gameTemp.OKHeld	
 		
@@ -1787,8 +1799,9 @@ GameState_normal.prototype.updateMapEvent = function(x, y, triggers){
 				
 				$gameSystem.srpgMakeMoveTable(event);
 				$gameSystem.setSubBattlePhase('enemy_range_display');
-				Input.clear();
-				TouchInput.clear();
+				$gameTemp.AHeldCtr = 30;
+				//Input.clear();
+				//TouchInput.clear();
 				return true;
 				
 			} else if (event.isType() === 'playerEvent') {
@@ -1961,6 +1974,14 @@ GameState_enemy_range_display.prototype = Object.create(GameState.prototype);
 GameState_enemy_range_display.prototype.constructor = GameState_enemy_range_display;
 
 GameState_enemy_range_display.prototype.update = function(scene){
+	if(Input.isPressed("ok") && $gameTemp.AHeldCtr > 0){
+		$gameTemp.AHeldCtr--;
+		if($gameTemp.AHeldCtr > 0){
+			return;
+		}		
+	} else {
+		$gameTemp.AHeldCtr = 0;
+	}
 	if(Input.isTriggered("cancel") || TouchInput.isCancelled()){
 		$gameTemp.clearMoveTable();
 		$gameSystem.setSubBattlePhase("normal");

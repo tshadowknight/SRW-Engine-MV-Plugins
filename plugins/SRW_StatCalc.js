@@ -102,16 +102,20 @@ StatCalc.prototype.getReferenceEvent = function(actor, depth){
 }
 
 StatCalc.prototype.getReferenceEventId = function(actor){
-	var id;
-	if(actor.isSubPilot && actor.mainPilot){		
-		id = "sub_"+actor.mainPilot.event.eventId();
-	} else if(actor.isEventSubTwin){
-		id = "twin_"+actor.event.eventId();
-	} else if(actor.isSubTwin){
-		id = "twin_"+this.getMainTwin(actor).event.eventId();
-	} else {
-		id = actor.event.eventId();
-	}
+	let id;
+	try {
+		if(actor.isSubPilot && actor.mainPilot){		
+			id = "sub_"+actor.mainPilot.event.eventId();
+		} else if(actor.isEventSubTwin){
+			id = "twin_"+actor.event.eventId();
+		} else if(actor.isSubTwin){
+			id = "twin_"+this.getMainTwin(actor).event.eventId();
+		} else {
+			id = actor.event.eventId();
+		}
+	} catch(e){
+		
+	}	
 	return id;
 }
 
@@ -4844,7 +4848,7 @@ StatCalc.prototype.canUseWeaponDetail = function(actor, weapon, postMoveEnabledO
 			canUse = false;
 			detail.will = true;
 		}
-		if(postMoveEnabledOnly && !weapon.postMoveEnabled && !this.getActiveSpirits(actor).charge){
+		if(postMoveEnabledOnly && !weapon.postMoveEnabled && (!this.getActiveSpirits(actor).charge || weapon.isMap)){
 			canUse = false;
 			detail.postMove = true;
 		}
@@ -4892,9 +4896,8 @@ StatCalc.prototype.canUseWeaponDetail = function(actor, weapon, postMoveEnabledO
 				}						
 			} else {
 				var rangeResult;
-				var type = actor.isActor() ? "enemy" : "actor";
 				
-				if(!this.getAllInRange(actor).length){
+				if(!this.getAllInRangeOfWeapon(actor, weapon, false, false).length){
 					canUse = false;
 					detail.target = true;
 				}
@@ -4970,7 +4973,7 @@ StatCalc.prototype.canUseWeapon = function(actor, weapon, postMoveEnabledOnly, d
 		if(weapon.willRequired > actor.SRWStats.pilot.will){
 			return false;
 		}
-		if(postMoveEnabledOnly && !weapon.postMoveEnabled && !this.getActiveSpirits(actor).charge){
+		if(postMoveEnabledOnly && !weapon.postMoveEnabled && (!this.getActiveSpirits(actor).charge || weapon.isMap)){
 			return false;
 		}
 		if(!actor.isActor() && weapon.isMap && actor.SRWStats.stageTemp.nonMapAttackCounter < actor.SRWStats.stageTemp.mapAttackCoolDown){
@@ -5236,19 +5239,47 @@ StatCalc.prototype.isValidWeaponTarget = function(actor, target, weapon, include
 	return isValidTarget && isInRange;
 }
 
-StatCalc.prototype.getAllInRange = function(initiator, includeMoveRange, postMoveOnly){
+StatCalc.prototype.getAllInRange = function(initiator, includeMoveRange, postMoveOnly, includeFriendlies){
 	var _this = this;
+	const factionId = $gameSystem.getFactionId(initiator);
 	var result = [];	
 	var allWeapons = _this.getActorMechWeapons(initiator);
 	allWeapons.forEach(function(weapon){
 		if(_this.canUseWeapon(initiator, weapon, postMoveOnly)){			
-			_this.iterateAllActors(null, function(target, event){			
-				if(_this.isValidWeaponTarget(initiator, target, weapon, includeMoveRange) && !event._erased){
-					result.push(event);
-				}			
+			_this.iterateAllActors(null, function(target, event){	
+				if(!$gameSystem.isFriendly(target, factionId) || includeFriendlies){
+					if(_this.isValidWeaponTarget(initiator, target, weapon, includeMoveRange) && !event._erased){
+						result.push(event);
+					}	
+				}						
 			});
 		}		
 	});
+	return result;
+}
+
+StatCalc.prototype.getAllInRangeOfWeapon = function(initiator, weapon, includeMoveRange, postMoveOnly){
+	var _this = this;
+	const factionId = $gameSystem.getFactionId(initiator);
+	var result = [];	
+	
+	if(_this.canUseWeapon(initiator, weapon, postMoveOnly)){			
+		_this.iterateAllActors(null, function(target, event){
+			let isValidFactionTarget = false;
+			if($gameSystem.isFriendly(target, factionId)){
+				isValidFactionTarget = !weapon.ignoresFriendlies;
+			} else {
+				isValidFactionTarget = !weapon.ignoresEnemies;
+			}
+			
+			if(isValidFactionTarget){
+				if(_this.isValidWeaponTarget(initiator, target, weapon, includeMoveRange) && !event._erased){
+					result.push(event);
+				}	
+			}						
+		});
+	}		
+	
 	return result;
 }
 
