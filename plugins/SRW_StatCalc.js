@@ -4848,7 +4848,7 @@ StatCalc.prototype.canUseWeaponDetail = function(actor, weapon, postMoveEnabledO
 			canUse = false;
 			detail.will = true;
 		}
-		if(postMoveEnabledOnly && !weapon.postMoveEnabled && (!this.getActiveSpirits(actor).charge || weapon.isMap)){
+		if(postMoveEnabledOnly && !weapon.postMoveEnabled && (!this.getActiveSpirits(actor).charge || (weapon.isMap && !ENGINE_SETTINGS.ALLOW_MAP_CHARGE))){
 			canUse = false;
 			detail.postMove = true;
 		}
@@ -4973,7 +4973,7 @@ StatCalc.prototype.canUseWeapon = function(actor, weapon, postMoveEnabledOnly, d
 		if(weapon.willRequired > actor.SRWStats.pilot.will){
 			return false;
 		}
-		if(postMoveEnabledOnly && !weapon.postMoveEnabled && (!this.getActiveSpirits(actor).charge || weapon.isMap)){
+		if(postMoveEnabledOnly && !weapon.postMoveEnabled && (!this.getActiveSpirits(actor).charge || (weapon.isMap && !ENGINE_SETTINGS.ALLOW_MAP_CHARGE))){
 			return false;
 		}
 		if(!actor.isActor() && weapon.isMap && actor.SRWStats.stageTemp.nonMapAttackCounter < actor.SRWStats.stageTemp.mapAttackCoolDown){
