@@ -757,6 +757,7 @@ EDITORSTRINGS.MECH = {
 	label_sync_parts: "Sync Parts With",
 	label_sync_equips: "Sync Equips With",
 	label_sync_upgrades: "Sync Upgrades With",
+	label_fub_transform: "FUB Transform",
 	label_enabled: "Enabled",
 	label_move_penalty: "With Movement Penalty",
 	label_terrain_rank: "Rank",

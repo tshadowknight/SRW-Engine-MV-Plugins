@@ -170,6 +170,15 @@ MechUI.prototype.initPropertyHandlers = function(){
 				content+="</div>";
 				content+="</div>";
 				
+				content+="<div class='row'>";
+				content+="<div class='cell'>";
+				content+=EDITORSTRINGS.MECH.label_fub_transform;
+				content+="</div>";
+				content+="<div class='cell'>";
+				content+=_this.createMechSelect("fub_transform", "", _this.getMetaValue("mechFUBTransform"));
+				content+="</div>";
+				content+="</div>";
+				
 				return content;
 			},
 			hook(entry){
@@ -186,6 +195,11 @@ MechUI.prototype.initPropertyHandlers = function(){
 				});
 				containerNode.querySelector("#sync_upgrades_with").addEventListener("change", function(){
 					_this.setMetaValue("mechInheritsUpgradesFrom", this.value);
+					_this.show();
+					_this._mainUIHandler.setModified();
+				});
+				containerNode.querySelector("#fub_transform").addEventListener("change", function(){
+					_this.setMetaValue("mechFUBTransform", this.value);
 					_this.show();
 					_this._mainUIHandler.setModified();
 				});

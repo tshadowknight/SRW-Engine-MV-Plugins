@@ -1615,62 +1615,73 @@ StatCalc.prototype.initSRWStats = function(actor, level, itemIds, preserveVolati
 		mech = $dataClasses[actor._mechClass];
 		isForActor = false;	
 	}	
-	if(mech){
-		var previousWeapons = [];
-		var previousStats;
-		var previousSuperState;
-		var previousCombineInfo;
-		var previousBoarded;
-		var customStats;
-		
-		if(preserveVolatile){
-			if(actor.SRWStats.mech && actor.SRWStats.mech.stats){
-				var previousStats = actor.SRWStats.mech.stats.calculated;				
-				if(preserveVolatile){
-					previousWeapons = actor.SRWStats.mech.weapons;
+	
+	let mechInitialized = false;
+	
+	while(!mechInitialized){		
+		if(mech){			
+			var previousWeapons = [];
+			var previousStats;
+			var previousSuperState;
+			var previousCombineInfo;
+			var previousBoarded;
+			var customStats;
+			
+			if(preserveVolatile){
+				if(actor.SRWStats.mech && actor.SRWStats.mech.stats){
+					var previousStats = actor.SRWStats.mech.stats.calculated;				
+					if(preserveVolatile){
+						previousWeapons = actor.SRWStats.mech.weapons;
+					}
+					previousSuperState = actor.SRWStats.mech.enabledTerrainSuperState;
+					previousCombineInfo = actor.SRWStats.mech.combineInfo;
+					previousBoarded = actor.SRWStats.mech.unitsOnBoard;
+					customStats = actor.SRWStats.mech.stats.custom;
+				}			
+			}
+			actor.SRWStats.mech = this.getMechData(mech, isForActor, items, previousWeapons);
+			actor.SRWStats.dropBoxItems = boxDropIds || [];
+			if(!isForActor && $gameSystem.enemyUpgradeLevel){
+				var levels = actor.SRWStats.mech.stats.upgradeLevels;
+				levels.maxHP = $gameSystem.enemyUpgradeLevel;
+				levels.maxEN = $gameSystem.enemyUpgradeLevel;
+				levels.armor = $gameSystem.enemyUpgradeLevel;
+				levels.mobility = $gameSystem.enemyUpgradeLevel;			
+				levels.accuracy = $gameSystem.enemyUpgradeLevel;
+				levels.weapons = $gameSystem.enemyUpgradeLevel;			
+			}		
+			this.invalidateAbilityCache(actor);
+			this.calculateSRWMechStats(actor.SRWStats.mech, preserveVolatile, actor);	
+			if(preserveVolatile){
+				if(previousStats){
+					actor.SRWStats.mech.stats.calculated.currentHP = previousStats.currentHP;
+					actor.SRWStats.mech.stats.calculated.currentEN = previousStats.currentEN;
 				}
-				previousSuperState = actor.SRWStats.mech.enabledTerrainSuperState;
-				previousCombineInfo = actor.SRWStats.mech.combineInfo;
-				previousBoarded = actor.SRWStats.mech.unitsOnBoard;
-				customStats = actor.SRWStats.mech.stats.custom;
-			}			
+				if(customStats){
+					Object.keys(customStats).forEach(function(stat){
+						actor.SRWStats.mech.stats.calculated[stat] = customStats[stat];
+					});
+				}
+				if(previousSuperState != null){
+					actor.SRWStats.mech.enabledTerrainSuperState = previousSuperState;
+				}
+				if(previousCombineInfo){
+					actor.SRWStats.mech.combineInfo = previousCombineInfo;
+				}
+				if(previousBoarded){
+					actor.SRWStats.mech.unitsOnBoard = previousBoarded;
+				}
+			}
+		} else {
+			actor.SRWStats.mech = this.getMechData();
+		}	
+		if(this.isFUB(actor) && actor.SRWStats.mech.FUBTransform){
+			$SRWSaveManager.registerEvolvedMech(mech.id);
+			mech = $dataClasses[actor.SRWStats.mech.FUBTransform];
+		} else {
+			mechInitialized = true;
 		}
-		actor.SRWStats.mech = this.getMechData(mech, isForActor, items, previousWeapons);
-		actor.SRWStats.dropBoxItems = boxDropIds || [];
-		if(!isForActor && $gameSystem.enemyUpgradeLevel){
-			var levels = actor.SRWStats.mech.stats.upgradeLevels;
-			levels.maxHP = $gameSystem.enemyUpgradeLevel;
-			levels.maxEN = $gameSystem.enemyUpgradeLevel;
-			levels.armor = $gameSystem.enemyUpgradeLevel;
-			levels.mobility = $gameSystem.enemyUpgradeLevel;			
-			levels.accuracy = $gameSystem.enemyUpgradeLevel;
-			levels.weapons = $gameSystem.enemyUpgradeLevel;			
-		}		
-		this.invalidateAbilityCache(actor);
-		this.calculateSRWMechStats(actor.SRWStats.mech, preserveVolatile, actor);	
-		if(preserveVolatile){
-			if(previousStats){
-				actor.SRWStats.mech.stats.calculated.currentHP = previousStats.currentHP;
-				actor.SRWStats.mech.stats.calculated.currentEN = previousStats.currentEN;
-			}
-			if(customStats){
-				Object.keys(customStats).forEach(function(stat){
-					actor.SRWStats.mech.stats.calculated[stat] = customStats[stat];
-				});
-			}
-			if(previousSuperState != null){
-				actor.SRWStats.mech.enabledTerrainSuperState = previousSuperState;
-			}
-			if(previousCombineInfo){
-				actor.SRWStats.mech.combineInfo = previousCombineInfo;
-			}
-			if(previousBoarded){
-				actor.SRWStats.mech.unitsOnBoard = previousBoarded;
-			}
-		}
-	} else {
-		actor.SRWStats.mech = this.getMechData();
-	}			
+	}
 	
 	if(!preserveVolatile){		
 		if(actor.event && $dataMap){ //hacky solution to the initializer being called in context where either no event has been assigned to the actor(initial load of map, intermission) or where $dataMap has not loaded yet(loading save)
@@ -1733,6 +1744,10 @@ StatCalc.prototype.initSRWStats = function(actor, level, itemIds, preserveVolati
 	
 	this.updateTerrainInfo(actor);
 }
+
+StatCalc.prototype.isEvolvedMech = function(mechId){
+	return $SRWSaveManager.isEvolvedMech(mechId)
+}	
 
 StatCalc.prototype.getSubTwinId = function(actor){
 	return actor.subTwinId;
@@ -2021,6 +2036,8 @@ StatCalc.prototype.getMechData = function(mech, forActor, items, previousWeapons
 		result.inheritsPartsFrom = mechProperties.mechInheritsPartsFrom * 1 || null;	
 		
 		result.inheritsEquipablesFrom = mechProperties.mechInheritsEquipablesFrom * 1 || null;	
+		
+		result.FUBTransform = mechProperties.mechFUBTransform * 1 || null;	
 		
 		
 		result.abilities = this.getMechAbilityInfo(mechProperties);
