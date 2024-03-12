@@ -1676,7 +1676,6 @@ StatCalc.prototype.initSRWStats = function(actor, level, itemIds, preserveVolati
 			actor.SRWStats.mech = this.getMechData();
 		}	
 		if(this.isFUB(actor) && actor.SRWStats.mech.FUBTransform){
-			$SRWSaveManager.registerEvolvedMech(mech.id);
 			mech = $dataClasses[actor.SRWStats.mech.FUBTransform];
 		} else {
 			mechInitialized = true;
@@ -1744,10 +1743,6 @@ StatCalc.prototype.initSRWStats = function(actor, level, itemIds, preserveVolati
 	
 	this.updateTerrainInfo(actor);
 }
-
-StatCalc.prototype.isEvolvedMech = function(mechId){
-	return $SRWSaveManager.isEvolvedMech(mechId)
-}	
 
 StatCalc.prototype.getSubTwinId = function(actor){
 	return actor.subTwinId;

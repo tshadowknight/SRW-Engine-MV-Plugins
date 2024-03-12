@@ -256,10 +256,17 @@ Window_UpgradeMech.prototype.update = function() {
 				}
 				if(!disabled){				
 					$statCalc.applyGenericFUB(refData, this._genericFUBInfo[this._currentGenericFUBSelection].id);
+					if(refData.SRWStats.mech.FUBTransform != null){
+						$SRWSaveManager.registerEvolvedMech(refData.SRWStats.mech.id, refData.SRWStats.mech.FUBTransform);
+						$gameSystem.updateAvailableUnits();
+					}					
+					
 					$statCalc.storeMechData(mechData);
 					this.refreshAllUnits();
 					$gameTemp.currentMenuUnit.mech = $statCalc.getMechData($dataClasses[$gameTemp.currentMenuUnit.mech.id], true);
 					$statCalc.calculateSRWMechStats($gameTemp.currentMenuUnit.mech);
+					
+					
 					
 					this._genericFUBDisplay.classList.remove("active");
 					this._UIState = "upgrades";		

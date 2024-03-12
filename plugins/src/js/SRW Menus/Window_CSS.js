@@ -320,7 +320,7 @@ Window_CSS.prototype.getAvailableUnits = function(unitMode, deployableOnly){
 	var tmp = [];
 	if(this._availableUnits){
 		this._availableUnits.forEach(function(unit){
-			if($statCalc.isActorSRWInitialized(unit) && (!deployableOnly || !unit.SRWStats.mech.notDeployable) && !$statCalc.isEvolvedMech(unit.SRWStats.mech.id)){
+			if($statCalc.isActorSRWInitialized(unit) && (!deployableOnly || !unit.SRWStats.mech.notDeployable) && !$SRWSaveManager.isEvolvedMech(unit.SRWStats.mech.id)){
 				tmp.push(unit);
 			}
 		});

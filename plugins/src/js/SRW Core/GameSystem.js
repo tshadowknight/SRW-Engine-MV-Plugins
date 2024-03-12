@@ -342,9 +342,14 @@
 			
 			var tmp = Object.keys($SRWSaveManager.getUnlockedUnits());			
 			for(var i = 0; i < tmp.length; i++){
-				var currentPilot = $statCalc.getCurrentPilot(tmp[i]);
+				let mechId = tmp[i];
+				var currentPilot = $statCalc.getCurrentPilot(mechId);
 				if(!currentPilot){
-					var mechData = $statCalc.getMechData($dataClasses[tmp[i]], true);			
+					//wholesale replace evolved units with their targets for availability
+					if($SRWSaveManager.isEvolvedMech(mechId)){
+						mechId = $SRWSaveManager.getEvolutionTarget(mechId);
+					}
+					var mechData = $statCalc.getMechData($dataClasses[mechId], true);			
 					
 					var result = $statCalc.createEmptyActor();				
 					result.SRWStats.mech = mechData;		
