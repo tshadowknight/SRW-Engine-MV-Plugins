@@ -724,10 +724,16 @@
 					});
 				},
 				showBackground: function(eventList, indent, params){
+					let x = 0;
+					let y = 0;
+					if(ENGINE_SETTINGS.VN_BG_OFFSET){
+						x = ENGINE_SETTINGS.VN_BG_OFFSET.x || 0;
+						y = ENGINE_SETTINGS.VN_BG_OFFSET.y || 0;
+					}
 					eventList.push({
 						code: 231,
 						indent: indent,
-						parameters: [params[0], params[1], 0, 0, 0, 0, 100, 100, 255, 0]
+						parameters: [params[0], params[1], 0, 0, x, y, 100, 100, 255, 0]
 					});
 				},
 				showPicture: function(eventList, indent, params){

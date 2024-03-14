@@ -2341,7 +2341,7 @@ GameState_process_death.prototype.update = function(scene){
 			var oldValue = $gameVariables.value(_actorsDestroyed) * 1;
 			$gameVariables.setValue(_actorsDestroyed, oldValue + delta); 
 			
-			if(scene._currentDeath.event.isType() == "ship"){
+			if(scene._currentDeath.event.isType() == "ship" || $statCalc.isShip(scene._currentDeath.actor)){
 				var oldValue = $gameVariables.value(_existShipVarId);
 				$gameVariables.setValue(_existShipVarId, oldValue - 1); 	
 			}

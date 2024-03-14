@@ -7051,43 +7051,47 @@ StatCalc.prototype.getActiveStatMods = function(actor, actorKey, excludedSkills)
 			
 				
 			let ctr = 0;
-			function processStatMod(statMod){
-				var targetList;	
-				if(statMod.modType == "mult"){
-					targetList = result.mult;
-				} else if(statMod.modType == "addPercent"){
-					targetList = result.addPercent;
-				} else if(statMod.modType == "addFlat"){
-					targetList = result.addFlat;
-				} else if(statMod.modType == "mult_ceil"){
-					targetList = result.mult_ceil;
+			function processStatMod(statMod, sourceId){
+				if(!_this._currentActorBeingProcessed[actorKey][sourceId]){						
+					_this._currentActorBeingProcessed[actorKey][sourceId] = true;
+					var targetList;	
+					if(statMod.modType == "mult"){
+						targetList = result.mult;
+					} else if(statMod.modType == "addPercent"){
+						targetList = result.addPercent;
+					} else if(statMod.modType == "addFlat"){
+						targetList = result.addFlat;
+					} else if(statMod.modType == "mult_ceil"){
+						targetList = result.mult_ceil;
+					}
+					
+					statMod.rangeInfo = {min: 0, max: 0, targets: "own"};
+					
+					statMod.stackId = "active_effect";
+					statMod.sourceId = "active_effect_"+(ctr++);
+					statMod.canStack = true;
+					
+					statMod.appliesTo = null;
+					
+					statMod.originType = actor.isActor() ? "actor" : "enemy";
+					statMod.originId = actor.SRWStats.pilot.id;
+					
+					if(targetList){
+						targetList.push(statMod);
+					}
+					var listEntry = JSON.parse(JSON.stringify(statMod));
+					if(!listEntry.name){
+						listEntry.name = "Active Effect";
+					}
+					
+					result.list.push(listEntry);	
 				}
-				
-				statMod.rangeInfo = {min: 0, max: 0, targets: "own"};
-				
-				statMod.stackId = "active_effect";
-				statMod.sourceId = "active_effect_"+(ctr++);
-				statMod.canStack = true;
-				
-				statMod.appliesTo = null;
-				
-				statMod.originType = actor.isActor() ? "actor" : "enemy";
-				statMod.originId = actor.SRWStats.pilot.id;
-				
-				if(targetList){
-					targetList.push(statMod);
-				}
-				var listEntry = JSON.parse(JSON.stringify(statMod));
-				if(!listEntry.name){
-					listEntry.name = "Active Effect";
-				}
-				
-				result.list.push(listEntry);
 			}
 			
 			if(directEffects && directEffects.length){
+				let ctr = 0;
 				directEffects.forEach(function(statMod){
-					processStatMod(statMod)
+					processStatMod(statMod, "direct_effect_"+(ctr++));
 				});
 			}
 			
@@ -7110,8 +7114,9 @@ StatCalc.prototype.getActiveStatMods = function(actor, actorKey, excludedSkills)
 				}
 				
 				if(attributeMods && attributeMods.length){
+					let ctr = 0;
 					attributeMods.forEach(function(statMod){
-						processStatMod(statMod)
+						processStatMod(statMod, "attr_effects_"+(ctr++))
 					});
 				}
 			}
