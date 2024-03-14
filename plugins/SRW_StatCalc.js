@@ -7402,6 +7402,7 @@ StatCalc.prototype.createActiveAbilityLookup = function(){
 		if(!_this._abilityCacheBuilding){
 			_this._abilityCacheBuilding = true;
 			_this._cachedAbilityLookup = {};
+			_this._eventToAffectedTiles = {};
 		}
 	} else {
 		console.log("update partial ActiveAbilityLookup");
@@ -7411,9 +7412,13 @@ StatCalc.prototype.createActiveAbilityLookup = function(){
 		_this._cachedAbilityLookup = {};
 	}
 	
+	if(_this._eventToAffectedTiles == null){
+		_this._eventToAffectedTiles = {};
+	}
+	
 	
 	var result = _this._cachedAbilityLookup;
-	var eventToAffectedTiles = {};
+	var eventToAffectedTiles = _this._eventToAffectedTiles;
 	var globalEffects = {
 		enemy: [],
 		ally: []		
@@ -7421,7 +7426,6 @@ StatCalc.prototype.createActiveAbilityLookup = function(){
 	var auraTiles = {};
 	
 	if(!_this._abilityCacheDirty){
-		eventToAffectedTiles = _this._eventToAffectedTiles || {};
 		globalEffects = _this._globalEffects || {
 			enemy: [],
 			ally: []		
