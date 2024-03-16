@@ -966,8 +966,15 @@ MechList.prototype.getCurrentSelection = function(){
 		this.requestRedraw();
 	}
 	var unit = availableUnits[idx];
+	
 	if(unit){
-		return {mech: unit.SRWStats.mech, actor: unit};
+		let mech;
+		if(unit.isSubPilot){
+			mech = unit.mainPilot.SRWStats.mech;
+		} else {
+			mech = unit.SRWStats.mech;
+		}
+		return {mech: mech, actor: unit};
 	} else {
 		return null;
 	}	

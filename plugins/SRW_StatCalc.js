@@ -707,7 +707,7 @@ StatCalc.prototype.getSpiritInfo = function(actor, actorProperties){
 			if(spiritCostModLookup[idx]){
 				cost = spiritCostModLookup[idx];
 			}
-			cost = $statCalc.applyStatModsToValue(actor, cost, ["sp_cost"]);
+			//cost = $statCalc.applyStatModsToValue(actor, cost, ["sp_cost"]);
 			if(spiritModLookup[idx]){
 				idx = spiritModLookup[idx];
 			}
@@ -1695,7 +1695,7 @@ StatCalc.prototype.initSRWStats = function(actor, level, itemIds, preserveVolati
 	if(actorProperties.pilotTwinSpirit){
 		var parts = actorProperties.pilotTwinSpirit.split(",");
 		var cost = String(parts[1]).trim()*1;			
-		cost = $statCalc.applyStatModsToValue(actor, cost, ["sp_cost"]);
+		//cost = $statCalc.applyStatModsToValue(actor, cost, ["sp_cost"]);
 		actor.SRWStats.pilot.twinSpirit = {
 			idx: String(parts[0]).trim(),
 			cost: cost,
@@ -4157,7 +4157,11 @@ StatCalc.prototype.getPersonalityInfo = function(actor){
 
 StatCalc.prototype.getSpiritList = function(actor){
 	if(this.isActorSRWInitialized(actor)){
-		return actor.SRWStats.pilot.spirits || [];
+		let result = structuredClone(actor.SRWStats.pilot.spirits || []);
+		for(let entry of result){
+			entry.cost = $statCalc.applyStatModsToValue(actor, entry.cost, ["sp_cost"]);
+		}
+		return result;
 	} else {
 		return [];
 	}	
@@ -7167,8 +7171,19 @@ StatCalc.prototype.invalidateAbilityCache = function(actor){
 
 
 StatCalc.prototype.invalidateActorAbiTracking = function(actor){
+	const _this = this;
 	if(actor){
-		delete this._currentActorBeingProcessed[this.createActorAbiCacheTrackingKey(actor)];
+		delete _this._currentActorBeingProcessed[_this.createActorAbiCacheTrackingKey(actor)];
+		var subPilots = this.getSubPilots(actor);
+		if(!actor.isSubPilot && actor.isActor()){				
+			var ctr = 0;
+			subPilots.forEach(function(pilotId){
+				var actor = $gameActors.actor(pilotId);
+				if(actor){
+					delete _this._currentActorBeingProcessed[_this.createActorAbiCacheTrackingKey(actor)];
+				}			
+			});	
+		}	
 	} else {
 		this._currentActorBeingProcessed = {};
 	}	
@@ -7403,6 +7418,11 @@ StatCalc.prototype.createActiveAbilityLookup = function(){
 			_this._abilityCacheBuilding = true;
 			_this._cachedAbilityLookup = {};
 			_this._eventToAffectedTiles = {};
+			_this._auraTiles = {};
+			_this._globalEffects = {
+				enemy: [],
+				ally: []
+			};
 		}
 	} else {
 		console.log("update partial ActiveAbilityLookup");
@@ -7416,22 +7436,30 @@ StatCalc.prototype.createActiveAbilityLookup = function(){
 		_this._eventToAffectedTiles = {};
 	}
 	
+	if(_this._auraTiles == null){
+		_this._auraTiles = {};
+	}
+	
+	if(_this._globalEffects == null){
+		_this._globalEffects = {
+			enemy: [],
+			ally: []
+		};
+	}
+	
 	
 	var result = _this._cachedAbilityLookup;
 	var eventToAffectedTiles = _this._eventToAffectedTiles;
-	var globalEffects = {
-		enemy: [],
-		ally: []		
-	};
-	var auraTiles = {};
-	
+	var globalEffects = _this._globalEffects;
+	var auraTiles = _this._auraTiles;
+	/*
 	if(!_this._abilityCacheDirty){
 		globalEffects = _this._globalEffects || {
 			enemy: [],
 			ally: []		
 		};
-		auraTiles = _this._auraTiles || {};
-	} 
+		auraTiles = _this._auraTiles;
+	} */
 	
 	function handleEventActors(actor, event){
 		if(actor && event && event.isErased && (!event.isErased() || event.isPendingDeploy) && !actor.isSubPilot){
