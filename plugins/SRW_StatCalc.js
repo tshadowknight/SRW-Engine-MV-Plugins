@@ -5394,7 +5394,7 @@ StatCalc.prototype.getAllOccupiedSpaces = function(){
 StatCalc.prototype.isActorInRegion = function(actorId, regionId){
 	var result = false;
 	this.iterateAllActors("actor", function(actor, event){	
-		if((actorId == -1 || actorId == actor.actorId()) && $gameMap.regionId(event.posX(), event.posY()) == regionId){
+		if(!event.isErased() && (actorId == -1 || actorId == actor.actorId()) && $gameMap.regionId(event.posX(), event.posY()) == regionId){
 			result = true;
 		}				
 	});
@@ -5404,7 +5404,7 @@ StatCalc.prototype.isActorInRegion = function(actorId, regionId){
 StatCalc.prototype.isEnemyInRegion = function(enemyId, regionId){
 	var result = false;
 	this.iterateAllActors("enemy", function(actor, event){	
-		if((enemyId == -1 || enemyId == actor.enemyId()) && $gameMap.regionId(event.posX(), event.posY()) == regionId){
+		if(!event.isErased() && (enemyId == -1 || enemyId == actor.enemyId()) && $gameMap.regionId(event.posX(), event.posY()) == regionId){
 			result = true;
 		}				
 	});
@@ -5416,7 +5416,7 @@ StatCalc.prototype.isEventInRegion = function(eventId, regionId){
 	var result = false;
 	this.iterateAllActors("", function(actor, event){	
 		var referenceEvent = _this.getReferenceEvent(actor);
-		if((eventId == -1 || eventId == referenceEvent.eventId()) && $gameMap.regionId(event.posX(), event.posY()) == regionId){
+		if(!event.isErased() && (eventId == -1 || eventId == referenceEvent.eventId()) && $gameMap.regionId(event.posX(), event.posY()) == regionId){
 			result = true;
 		}				
 	});
