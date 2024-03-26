@@ -1547,7 +1547,11 @@
 				}
 				if(this._floatTimer >= 0) {
 					this._floatTimer--;					
-					this._floatOffset = lerp(floatAmount, this._animStartFloat, this._floatTimer/this._floatTimerTotal) * -1;					
+					this._floatOffset = lerp(floatAmount, this._animStartFloat, this._floatTimer/this._floatTimerTotal) * -1;	
+					if(isNaN(this._floatOffset)){
+						this._floatOffset = this._lastTargetFloat;
+						this._floatTimer = 0;
+					}	
 				} else {
 					this.transitioningFloat = false;
 				}
