@@ -842,6 +842,10 @@
 			$statCalc.invalidateAbilityCache(actor_unit);
 			$statCalc.initSRWStats(actor_unit);
 			$statCalc.applyBattleStartWill(actor_unit);
+			let preferredSuperState = this.getPreferredSuperState(actor_unit);
+			if(preferredSuperState){
+				$statCalc.setSuperState(actor_unit, preferredSuperState);
+			}
 			$statCalc.updateSuperState(actor_unit, true);
 			//call refresh to clear any lingering states of the actor
 			actor_unit.refresh();
@@ -972,7 +976,9 @@
 					event.isDeployed = false;
 				}
 			 });
+			 $statCalc.externalLockUnitUpdates();
 			 this.deployActors(false, $gameTemp.manualDeployType, validatePositions);
+			 $statCalc.externalUnlockUnitUpdates();
 		}
 		
 		Game_System.prototype.redeployActor = function(actorId, toAnimQueue){  
@@ -2890,5 +2896,24 @@
 				this.favPoints = 0;
 			}
 			return this.favPoints;
+		}
+		
+		Game_System.prototype.setPreferredSuperState = function(actor, state) {
+			if(!this.preferredSuperStates){
+				this.preferredSuperStates = {};
+			}
+			if(actor.actorId){
+				this.preferredSuperStates[actor.actorId()] = state;
+			}
+			
+		}
+		
+		Game_System.prototype.getPreferredSuperState = function(actor) {
+			if(!this.preferredSuperStates){
+				this.preferredSuperStates = {};
+			}
+			if(actor.actorId){
+				return this.preferredSuperStates[actor.actorId()];
+			}
 		}
 	}

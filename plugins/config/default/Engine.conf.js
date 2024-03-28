@@ -144,6 +144,7 @@ var ENGINE_SETTINGS = {
 		0: [100, 100, 100, 150, 150, 150, 200, 200, 200, 250, 200, 200, 200, 200, 200],
 		1: [100, 150, 150, 150, 150, 200, 200, 200, 200, 250, 200, 200, 200, 200, 200]		
 	},
+	SCORE_GOES_TO_SUBS: false,
 	ACE_REQUIREMENT: 50, //amount of kills required to unlocked the Ace Bonus
 	DEFAULT_SP_REGEN: 0, //default SP regen in points of SP
 	DEFAULT_HP_REGEN: 0, //default HP regen in percent of total(10,50,etc.)

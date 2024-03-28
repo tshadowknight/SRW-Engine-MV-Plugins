@@ -2634,6 +2634,7 @@ SceneManager.isInSaveScene = function(){
 		var actor = $gameSystem.EventToUnit($gameTemp.activeEvent().eventId())[1];
 		let terrainCmd = $statCalc.getAvailableSuperStateTransitionsForCurrentPosition(actor)[idx];	
 		$statCalc.setSuperState(actor, terrainCmd.endState, false, terrainCmd.se);
+		$gameSystem.setPreferredSuperState(actor, terrainCmd.endState)
 	   
 		$gameTemp.activeEvent().transitioningFloat = true;
 		$gameSystem.setSubBattlePhase('await_actor_float');		

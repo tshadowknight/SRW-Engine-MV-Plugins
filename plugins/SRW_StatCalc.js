@@ -6214,8 +6214,16 @@ StatCalc.prototype.subtractPP = function(actor, amount){
 	} 	
 }
 
-StatCalc.prototype.addKill = function(actor){		
+StatCalc.prototype.addKill = function(actor, depth){		
+	const _this = this;
+	if(!depth){
+		depth = 0;
+	}
+	if(depth > 1){
+		return;
+	}
 	if(this.isActorSRWInitialized(actor)){	
+		
 		if(actor.SRWStats.pilot.grantsGainsTo){
 			actor = $gameActors.actor(actor.SRWStats.pilot.grantsGainsTo);
 		}
@@ -6225,6 +6233,18 @@ StatCalc.prototype.addKill = function(actor){
 		var isAce = this.isAce(actor);
 		if(wasAce != isAce){
 			this.reloadSRWStats(actor);
+		}
+		
+		if(ENGINE_SETTINGS.SCORE_GOES_TO_SUBS){
+			var subPilots = this.getSubPilots(actor);
+			if(!actor.isSubPilot){
+				subPilots.forEach(function(pilotId){
+					var subActor = $gameActors.actor(pilotId);
+					if(subActor){
+						_this.addKill(subActor, depth + 1);		
+					}			
+				});	
+			}
 		}
 	} 	
 }
@@ -7136,6 +7156,14 @@ StatCalc.prototype.getActiveStatMods = function(actor, actorKey, excludedSkills)
 	return result;
 }
 
+StatCalc.prototype.externalLockUnitUpdates = function(){
+	this._unitUpdatesExternalLocked = true;
+}
+
+StatCalc.prototype.externalUnlockUnitUpdates = function(){
+	this._unitUpdatesExternalLocked = false;
+}
+
 StatCalc.prototype.lockAbilityCache = function(){
 	this._abilityCacheLocked = true;
 }
@@ -7149,7 +7177,7 @@ StatCalc.prototype.invalidateAbilityCache = function(actor){
 	if(actor && actor.isSubPilot){
 		return; //a sub pilot should not trigger a partial cache invalidation to prevent issue with reloading a unit
 	}
-	if(!this._abilityCacheLocked){
+	if(!this._abilityCacheLocked && !this._unitUpdatesExternalLocked){
 
 		if(actor){
 			var event = this.getReferenceEvent(actor);
@@ -8164,6 +8192,9 @@ StatCalc.prototype.unbindLinkedDeploySlots = function(actorId, mechId, type, slo
 //if overwriteFallbackInfo is set the stored state for all affected units will be update to the state after the deploy actions are applied
 StatCalc.prototype.applyDeployActions = function(actorId, mechId, overwriteFallbackInfo){
 	var _this = this;
+	if(this._unitUpdatesExternalLocked){
+		return;
+	}
 	this.lockAbilityCache();
 	var deployActions = this.getDeployActions(actorId, mechId);
 	var affectedActors = [];
