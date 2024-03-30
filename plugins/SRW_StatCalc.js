@@ -7777,6 +7777,10 @@ StatCalc.prototype.getActorSlotInfo = function(actor){
 StatCalc.prototype.validateEffectTarget = function(effect, actor){
 	var slotInfo = this.getActorSlotInfo(actor);
 	var validSlot = true;
+	//workaround to prevent ship pilot effects from bleeding onto a unit being deployed from the ship
+	if($gameTemp.activeShip && effect.eventId == $gameTemp.activeShip.event.eventId() && actor != $gameTemp.activeShip.actor){
+		validSlot = false;
+	}
 	if(slotInfo.type == effect.slotType){
 		if(slotInfo.type == "main_sub" || slotInfo.type == "twin_sub"){
 			if(slotInfo.slot != effect.slot){

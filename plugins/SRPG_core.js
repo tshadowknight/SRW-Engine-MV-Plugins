@@ -2674,6 +2674,7 @@ SceneManager.isInSaveScene = function(){
 
 			$statCalc.applyRelativeTransforms();	
 			$gameMap.setEventImages();	
+			$statCalc.invalidateAbilityCache(deployed.actor);
 			
 			$gameTemp.setActiveEvent(event);			
 			var actor = $gameSystem.EventToUnit(event.eventId())[1];
