@@ -337,7 +337,7 @@ GameState_actor_move.prototype.updateTriggerAction = function(cursor){
 				var target = $statCalc.activeUnitAtPosition({x: cursor._x, y: cursor._y}, "actor");	
 				var initiator = $gameSystem.EventToUnit($gameTemp.activeEvent().eventId())[1];
 				
-				if(!$statCalc.isEssential(initiator) && !$gameTemp.activeShip && $statCalc.isShip(target) && $gameTemp.activeEvent().eventId() != target.event.eventId()){
+				if(!$statCalc.isEssential(initiator) && !$gameTemp.activeShip && $statCalc.isShip(target)  && !$statCalc.isShip(initiator) && $gameTemp.activeEvent().eventId() != target.event.eventId()){
 					SoundManager.playOk();
 					var battlerArray = $gameSystem.EventToUnit($gameTemp.activeEvent().eventId());
 					battlerArray[1].srpgMakeNewActions();
