@@ -3068,6 +3068,10 @@ StatCalc.prototype.applyStoredActorData = function(actor, dbAbilities, dbRelatio
 					requiredLevel: dbAbilities[abilityIdx].requiredLevel,
 					slot: slot
 				}
+			} else {
+				if(storedAbilities[abilityIdx].level < dbAbilities[abilityIdx].level){
+					storedAbilities[abilityIdx].level = dbAbilities[abilityIdx].level;
+				}
 			}
 		});
 		
