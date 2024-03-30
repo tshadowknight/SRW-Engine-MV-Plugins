@@ -152,14 +152,15 @@ Window_MechListDeployed.prototype.update = function() {
 				$gameTemp.detailPageMode = "menu";
 				$gameTemp.pushMenu = "detail_pages";	
 			}*/			
-			var event = $statCalc.getReferenceEvent(this.getCurrentSelection().actor);
+			const selectedActor = this.getCurrentSelection().actor;
+			var event = $statCalc.getReferenceEvent(selectedActor);
 			$gamePlayer.locate(event.posX(), event.posY(), false);		
 			$gameTemp.popMenu = true;
 			this._mechList.setCurrentSelection(0);
 			Input.clear();
 			
 			if($gameTemp.mechListWindowSearchSelectionCallback){
-				$gameTemp.mechListWindowSearchSelectionCallback(this.getCurrentSelection().actor);
+				$gameTemp.mechListWindowSearchSelectionCallback(selectedActor);
 			}
 			
 			if(this._callbacks["closed"]){
