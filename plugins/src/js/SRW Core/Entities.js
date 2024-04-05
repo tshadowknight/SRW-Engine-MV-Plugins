@@ -1239,6 +1239,8 @@
 		//移動範囲の計算
 		Game_CharacterBase.prototype.makeMoveTableRecursive = function(x, y, moveBudget, visitedNodes, actor, pushedNodes) {
 			var _this = this;
+			
+			const blockedSpacesLookup = $statCalc.getBlockedSpacesLookup(null, $gameSystem.getUnitFactionInfo(actor));
 			function isPassableTile(currentX, currentY, x, y, actor){
 				if(ENGINE_SETTINGS.USE_TILE_PASSAGE && !$statCalc.ignoresTerrainCollision(actor, $gameMap.regionId(x, y) % 8)){
 					var direction = 0;			
@@ -1281,7 +1283,7 @@
 				if(!actor.isActor() && $gameSystem.enemySolidTerrain && $gameSystem.enemySolidTerrain[$gameMap.regionId(x, y)]){
 					return false;
 				}
-				return $statCalc.isFreeSpace({x: x, y: y}, null, $gameSystem.getUnitFactionInfo(actor));
+				return !blockedSpacesLookup[x] || !blockedSpacesLookup[x][y];
 			}
 			
 			var currentRegion = $gameMap.regionId(x, y) % 8; //1 air, 2 land, 3 water, 4 space

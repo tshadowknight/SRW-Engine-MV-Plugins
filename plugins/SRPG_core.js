@@ -4215,17 +4215,24 @@ SceneManager.isInSaveScene = function(){
 		
 		candidatePaths.push([{x: battler.event.posX(), y: battler.event.posY()}])
 		
+		const ignoresCollision = $statCalc.ignoresTerrainCollision(battler) || $gameSystem.unitsIgnoreCollision;
+		
 		candidatePaths.forEach(function(path){
 			var node = path[path.length-1];
 			
 			var startNode = graph.grid[node.x][node.y];
 			var endNode = graph.grid[targetCoords.x][targetCoords.y];
-			var distPath = astar.search(graph, startNode, endNode, {closest: true});
-			var travelDistToTarget = distPath.length;
+			
 			
 			var deltaX = Math.abs(targetCoords.x - node.x);
 			var deltaY = Math.abs(targetCoords.y - node.y);
 			var dist = deltaX + deltaY;
+			
+			var travelDistToTarget = dist;
+			if(!ignoresCollision){
+				var distPath = astar.search(graph, startNode, endNode, {closest: true});
+				travelDistToTarget = distPath.length;
+			}
 			
 			var srcDeltaX = Math.abs(battler.event.posX() - node.x);
 			var srcDeltaY = Math.abs(battler.event.posY() - node.y);

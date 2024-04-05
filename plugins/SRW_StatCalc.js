@@ -122,8 +122,12 @@ StatCalc.prototype.getReferenceEventId = function(actor){
 StatCalc.prototype.canStandOnTile = function(actor, position){
 	if(this.isActorSRWInitialized(actor)){
 		const currentTerrain = $gameMap.regionId(position.x, position.y) % 8;
-		const baseTerrainOK = this.canBeOnTerrain(actor, currentTerrain);
-		const currentSuperStateOK = this.getValidSuperStatesLookup(actor, position)[this.getSuperState(actor)];
+		if(this.canBeOnTerrain(actor, currentTerrain)){ //base terrain OK
+			return true;
+		}
+		if(this.getValidSuperStatesLookup(actor, position)[this.getSuperState(actor)]){ //current super state OK
+			return true;
+		}
 		
 		let hasTransitionToValidSuperState = false;
 		
@@ -134,7 +138,7 @@ StatCalc.prototype.canStandOnTile = function(actor, position){
 			}
 		}
 		
-		return baseTerrainOK || currentSuperStateOK || hasTransitionToValidSuperState;		
+		return hasTransitionToValidSuperState;		
 	} 
 	return false;	
 }
@@ -5443,6 +5447,46 @@ StatCalc.prototype.isEventInRegion = function(eventId, regionId){
 	return result;
 }
 
+StatCalc.prototype.isFreeSpace = function(position, type, factionConfig){
+	var isFree = true;
+	this.iterateAllActors(type, function(actor, event){		
+		var isPassThrough = false;
+		if(factionConfig){
+			if(actor.isActor() && !factionConfig.attacksPlayers){
+				isPassThrough = true;
+			} 
+			if(actor.isEnemy() && factionConfig.attacksFactions.indexOf(actor.factionId) == -1){
+				isPassThrough = true;
+			}
+		}
+		if(!isPassThrough && (event.posX() == position.x && event.posY() == position.y && !event.isErased())){
+			isFree = false;
+		}		
+	});
+	return isFree;
+}
+
+StatCalc.prototype.getBlockedSpacesLookup = function(type, factionConfig){	
+	let result = {};
+	this.iterateAllActors(type, function(actor, event){		
+		var isPassThrough = false;
+		if(factionConfig){
+			if(actor.isActor() && !factionConfig.attacksPlayers){
+				isPassThrough = true;
+			} 
+			if(actor.isEnemy() && factionConfig.attacksFactions.indexOf(actor.factionId) == -1){
+				isPassThrough = true;
+			}
+		}
+		if(!isPassThrough && !event.isErased()){
+			if(!result[event.posX()]){
+				result[event.posX()] = {};
+			}
+			result[event.posX()][event.posY()] = true;
+		}		
+	});
+	return result;
+}
 
 StatCalc.prototype.isFreeSpace = function(position, type, factionConfig){
 	var isFree = true;
