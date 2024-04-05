@@ -523,6 +523,63 @@
 				params.targetBox
 			);
 		}
+		
+		Game_Interpreter.prototype.parseDeployAssignment = function(assignments) {
+			let unrolledList = {};
+			for(let entry of Object.keys(assignments)){
+				if(entry){
+					let targetValue = assignments[entry];
+					let parts = entry.split("-");
+					let start;
+					let end;
+					if(parts.length == 1){
+						if(parts[0] == "default"){
+							start = end = -1;
+						} else {
+							start = end = parts[0] * 1;
+						}						
+					} else {
+						start = parts[0] * 1;
+						end = parts[1] * 1;
+					}
+					for(let i = start; i <= end; i++){
+						unrolledList[i] = targetValue;
+					}
+				}
+				
+			}
+			return unrolledList;
+		}
+		
+		Game_Interpreter.prototype.addEnemiesFromSettings = function(settings){
+			let unrolledParams = {};
+			for(let paramSetting in settings.params){
+				unrolledParams[paramSetting] = this.parseDeployAssignment(settings.params[paramSetting]);
+			}
+			function getParamSetting(param, eventId){
+				if(!unrolledParams[param]){
+					return null;
+				}
+				if(unrolledParams[param][eventId] != null){
+					return unrolledParams[param][eventId];
+				}
+				return unrolledParams[param][-1];
+			}
+			
+			for (let eventId = settings.events.start; eventId <= settings.events.end; eventId++) {
+				this.addEnemyFromObj({
+					toAnimQueue: getParamSetting("toAnimQueue", eventId),
+					eventId: eventId,
+					enemyId: getParamSetting("enemyId", eventId),
+					mechClass: getParamSetting("mechClass", eventId),
+					level: getParamSetting("level", eventId) || 1,
+					mode: getParamSetting("mode", eventId) || "",
+					attribute1: getParamSetting("attribute1", eventId) || "",
+					items: getParamSetting("items", eventId) || [],
+					squadId: getParamSetting("squadId", eventId),
+				});
+			}
+		}
 
 		// 新規エネミーを追加する（増援）
 		Game_Interpreter.prototype.addEnemy = function(toAnimQueue, eventId, enemyId, mechClass, level, mode, targetId, items, squadId, targetRegion, factionId, counterBehavior, attackBehavior, noUpdateCount, attribute1, attribute2, boxDrop, targetBox) {
@@ -2006,7 +2063,7 @@
 							}
 							var damage = Math.floor(mechStats.maxHP * (damagePercent / 100));
 							aCache["damageInflicted"+attackedRef] = damage;
-							aCache.statusEffects = {};
+							aCache.statusEffects =  this._attacker.params.statusEffects || {};		
 							dCache.damageTaken+= damage;
 							if(this._attacker.params.targetEndHP <= 0){
 								dCache.isDestroyed = true;

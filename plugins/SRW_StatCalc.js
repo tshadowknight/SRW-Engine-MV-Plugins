@@ -110,7 +110,7 @@ StatCalc.prototype.getReferenceEventId = function(actor){
 			id = "twin_"+actor.event.eventId();
 		} else if(actor.isSubTwin){
 			id = "twin_"+this.getMainTwin(actor).event.eventId();
-		} else {
+		} else if(actor.event){
 			id = actor.event.eventId();
 		}
 	} catch(e){
@@ -5201,33 +5201,30 @@ StatCalc.prototype.getFullWeaponRange = function(actor, postMoveEnabledOnly){
 
 
 
-StatCalc.prototype.isReachable = function(target, user, range, minRange){
-	var _this = this;	
-	var hasEmptyTiles = false;
-	var userIsInRange = false;
-	var event = this.getReferenceEvent(target);
-	var offsetX = event.posX();
-	var offsetY = event.posY();
-	var refEvent = _this.getReferenceEvent(user);
-	for(var i = 0; i < $gameMap.width(); i++){
-		for(var j = 0; j < $gameMap.height(); j++){
-			var deltaX = Math.abs(offsetX - i);
-			var deltaY = Math.abs(offsetY - j);
-			var totalDelta = deltaX + deltaY;
-			if(totalDelta <= range && totalDelta >= minRange){
-				var unit = this.activeUnitAtPosition({x: i, y: j});
-				if(unit){
-					
-					if(this.getReferenceEvent(unit).eventId() == refEvent.eventId()){
-						userIsInRange = true;
-					}
-				} else {
-					hasEmptyTiles = true;
+StatCalc.prototype.isReachable = function(target, range, minRange){
+	const _this = this;	
+	let hasEmptyTiles = false;
+	const event = this.getReferenceEvent(target);
+	const offsetX = event.posX();
+	const offsetY = event.posY();
+	
+	const occupiedSpaces = this.getAllOccupiedSpacesLookup();
+	
+	for(let i = 0; i < range * 2; i++){
+		for(let j = 0; j < range * 2; j++){
+			const x = offsetX - range + i;
+			const y = offsetY - range + j;
+			if(!occupiedSpaces[x] || !occupiedSpaces[x][y]){
+				const deltaX = Math.abs(offsetX - x);
+				const deltaY = Math.abs(offsetY - y);
+				const totalDelta = deltaX + deltaY;
+				if(totalDelta <= range && totalDelta >= minRange){				
+					hasEmptyTiles = true;				
 				}
 			}
 		}
 	}
-	return hasEmptyTiles || userIsInRange;
+	return hasEmptyTiles;
 }
 
 StatCalc.prototype.isValidWeaponTarget = function(actor, target, weapon, includeMoveRange){
@@ -5395,6 +5392,21 @@ StatCalc.prototype.getAllOccupiedSpaces = function(){
 	var result = [];
 	this.iterateAllActors(null, function(actor, event){			
 		result.push({x: event.posX(), y: event.posY()});				
+	});
+	return result;
+}
+
+StatCalc.prototype.getAllOccupiedSpacesLookup = function(){
+	var result = {};
+	this.iterateAllActors(null, function(actor, event){		
+		if(!event.isErased()){
+			const x = event.posX();
+			const y = event.posY();
+			if(!result[x]){
+				result[x] = {};
+			}
+			result[x][y] = true;
+		}						
 	});
 	return result;
 }

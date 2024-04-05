@@ -1751,7 +1751,11 @@ BattleCalc.prototype.getBestWeaponAndDamage = function(attackerInfo, defenderInf
 	var defenderHP = defenderInfo.actor.hp;
 	var canShootDown = false;
 	allWeapons.forEach(function(weapon){
-		if(!weapon.isMap && (!allRequired || (allRequired == 1 && weapon.isAll) || (allRequired == -1 && !weapon.isAll)) && $statCalc.canUseWeapon(attackerInfo.actor, weapon, postMoveEnabledOnly, defenderInfo.actor) && (ignoreRange || _this.isTargetInRange(attackerInfo.pos, defenderInfo.pos, $statCalc.getRealWeaponRange(attackerInfo.actor, weapon), $statCalc.getRealWeaponMinRange(attackerInfo.actor, weapon)))){
+		let isInRange;
+		if(!ignoreRange){
+			isInRange = _this.isTargetInRange(attackerInfo.pos, defenderInfo.pos, $statCalc.getRealWeaponRange(attackerInfo.actor, weapon), $statCalc.getRealWeaponMinRange(attackerInfo.actor, weapon));
+		}
+		if(!weapon.isMap && (!allRequired || (allRequired == 1 && weapon.isAll) || (allRequired == -1 && !weapon.isAll)) && $statCalc.canUseWeapon(attackerInfo.actor, weapon, postMoveEnabledOnly, defenderInfo.actor) && (ignoreRange || isInRange)){
 			var damageResult = _this.performDamageCalculation(
 				{actor: attackerInfo.actor, action: {type: "attack", attack: weapon}},
 				{actor: defenderInfo.actor, action: {type: "none"}},
@@ -1759,10 +1763,13 @@ BattleCalc.prototype.getBestWeaponAndDamage = function(attackerInfo, defenderInf
 				!considerBarrier
 			);
 			var isReachable;
-			var range = $statCalc.getRealWeaponRange(attackerInfo.actor, weapon);
-			isReachable = $statCalc.isReachable(defenderInfo.actor, attackerInfo.actor, range, $statCalc.getRealWeaponMinRange(attackerInfo.actor, weapon));
+			if(!isInRange){
+				var range = $statCalc.getRealWeaponRange(attackerInfo.actor, weapon);
+				isReachable = $statCalc.isReachable(defenderInfo.actor, range, $statCalc.getRealWeaponMinRange(attackerInfo.actor, weapon));
+			}
 			
-			if(isReachable){				
+			
+			if(isInRange || isReachable){				
 				if(optimizeCost){
 					var currentWeaponCanShootDown = false;
 					if(damageResult.damage >= defenderHP){
