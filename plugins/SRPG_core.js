@@ -4084,8 +4084,9 @@ SceneManager.isInSaveScene = function(){
 
     // 最適移動位置の探索
     Scene_Map.prototype.srpgSearchOptimalPos = function(targetCoords, battler, type, range, minRange, noTargets) {
+		const blockedSpacesLookup = $statCalc.getBlockedSpacesLookup(null);
 		function isValidSpace(pos){
-			return $statCalc.isFreeSpace(pos) || (pos.x == $gameTemp.activeEvent().posX() && pos.y == $gameTemp.activeEvent().posY());
+			return (!blockedSpacesLookup[pos.x] || !blockedSpacesLookup[pos.x][pos.y]) || (pos.x == $gameTemp.activeEvent().posX() && pos.y == $gameTemp.activeEvent().posY());
 		}
 		
 		if(targetCoords.x == battler.event.posX() && targetCoords.y == battler.event.posY()){

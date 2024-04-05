@@ -1204,6 +1204,7 @@
 				}
 			}
 			let visitedNodes = {};
+			
 			return this.makeMoveTableRecursive(x, y, moveBudget, visitedNodes, actor, {});
 		}
 		
@@ -1239,9 +1240,10 @@
 		//移動範囲の計算
 		Game_CharacterBase.prototype.makeMoveTableRecursive = function(x, y, moveBudget, visitedNodes, actor, pushedNodes) {
 			var _this = this;
-			
+			//console.log("checking tile " + x + ", " + y + " with budget " + JSON.stringify(moveBudget))
 			const blockedSpacesLookup = $statCalc.getBlockedSpacesLookup(null, $gameSystem.getUnitFactionInfo(actor));
 			function isPassableTile(currentX, currentY, x, y, actor){
+				
 				if(ENGINE_SETTINGS.USE_TILE_PASSAGE && !$statCalc.ignoresTerrainCollision(actor, $gameMap.regionId(x, y) % 8)){
 					var direction = 0;			
 					if(currentX == x){
@@ -1286,71 +1288,93 @@
 				return !blockedSpacesLookup[x] || !blockedSpacesLookup[x][y];
 			}
 			
-			var currentRegion = $gameMap.regionId(x, y) % 8; //1 air, 2 land, 3 water, 4 space
-			var moveCost = 1;
-			if($gameTemp.moveList().length > 1){//no movecost for the start tile
-				var taggedCost = $gameMap.SRPGTerrainTag(x, y);
-				if(taggedCost > 1){								
-					if(!$statCalc.ignoresTerrainCost(actor, currentRegion)){
-						moveCost = taggedCost;
-					}
-				}
+			visitedNodes[x] = {};
+			visitedNodes[x][y] = structuredClone(moveBudget);
+			
+			let stack = [{x: x, y: y}];
+			
+			while(stack.length){
+				let next = stack.shift();
+				handleTile(next.x, next.y);
 			}
 			
-			let terrainDef = $terrainTypeManager.getTerrainDefinition(currentRegion);	
-			if($statCalc.canBeOnTerrain(actor, currentRegion) < 2 && !$statCalc.ignoresTerrainCost(actor, currentRegion)){
-				moveCost*=terrainDef.moveCostMod;
-			}	
-			
-			if (!_this.hasMoveBudgetRemaining(moveBudget)) {
-				return;
-			}
-			if(!(pushedNodes[x] && pushedNodes[x][y])){
-				if(!pushedNodes[x]){
-					pushedNodes[x] = {};
-				}
-				pushedNodes[x][y] = true;
-				$gameTemp.pushMoveList([x, y, false]);
-			}		
-			
-			let extraBudgetRefTerrain = $statCalc.getSuperState(actor);
-			if(extraBudgetRefTerrain == -1){
-				extraBudgetRefTerrain = currentRegion;
-			}
-			const remainingBudget = this.updateMoveBudget(moveBudget, moveCost, extraBudgetRefTerrain);	
-			let nextStepBudget = remainingBudget[currentRegion];
+			function handleTile(x, y){
 
-			let checkedDirs = [
-				{x: 0, y: -1},
-				{x: 1, y: 0},
-				{x: 0, y: 1},
-				{x: -1, y: 0},				
-			];
-			
-			for(let dir of checkedDirs){
-				let newX = x + dir.x;
-				let newY = y + dir.y;
-				if (isPassableTile(x, y, newX,newY, actor)) {
-					if(!visitedNodes[newX]){
-						visitedNodes[newX] = {};
+				const moveBudget = visitedNodes[x][y];
+				if(moveBudget){		
+					
+					var currentRegion = $gameMap.regionId(x, y) % 8; //1 air, 2 land, 3 water, 4 space
+					var moveCost = 1;
+					if($gameTemp.moveList().length > 1){//no movecost for the start tile
+						var taggedCost = $gameMap.SRPGTerrainTag(x, y);
+						if(taggedCost > 1){								
+							if(!$statCalc.ignoresTerrainCost(actor, currentRegion)){
+								moveCost = taggedCost;
+							}
+						}
 					}
-					if(!visitedNodes[newX][newY]){
-						visitedNodes[newX][newY] = {
-							standard: 0,
-							extra: 0
-						};
+					
+					let terrainDef = $terrainTypeManager.getTerrainDefinition(currentRegion);	
+					if($statCalc.canBeOnTerrain(actor, currentRegion) < 2 && !$statCalc.ignoresTerrainCost(actor, currentRegion)){
+						moveCost*=terrainDef.moveCostMod;
+					}	
+					
+					if (!_this.hasMoveBudgetRemaining(moveBudget)) {
+						return;
 					}
-					let isUpgrade = false;
-					if(nextStepBudget.extra > visitedNodes[newX][newY].extra){
-						isUpgrade = true;
-					} 
-					if(nextStepBudget.standard > visitedNodes[newX][newY].standard){
-						isUpgrade = true;
+					if(!(pushedNodes[x] && pushedNodes[x][y])){
+						if(!pushedNodes[x]){
+							pushedNodes[x] = {};
+						}
+						pushedNodes[x][y] = true;
+						$gameTemp.pushMoveList([x, y, false]);
+					}		
+					
+					let extraBudgetRefTerrain = $statCalc.getSuperState(actor);
+					if(extraBudgetRefTerrain == -1){
+						extraBudgetRefTerrain = currentRegion;
 					}
-					if(isUpgrade){
-						visitedNodes[newX][newY] = nextStepBudget;
-						this.makeMoveTableRecursive(newX, newY, remainingBudget, visitedNodes, actor, pushedNodes);
-					}					
+					const remainingBudget = _this.updateMoveBudget(moveBudget, moveCost, extraBudgetRefTerrain);	
+					let nextStepBudget = remainingBudget[currentRegion];
+					
+					if(nextStepBudget.standard == 0 && nextStepBudget.extra == 0){
+						return;
+					}
+
+					let checkedDirs = [
+						{x: 0, y: -1},
+						{x: 1, y: 0},
+						{x: 0, y: 1},
+						{x: -1, y: 0},				
+					];
+					
+					for(let dir of checkedDirs){
+						let newX = x + dir.x;
+						let newY = y + dir.y;
+						if (isPassableTile(x, y, newX,newY, actor)) {
+							if(!visitedNodes[newX]){
+								visitedNodes[newX] = {};
+							}
+							let isUpgrade = false;
+							if(!visitedNodes[newX][newY]){
+								visitedNodes[newX][newY] = remainingBudget;
+								isUpgrade = true;
+							}
+							
+							if(nextStepBudget.extra > visitedNodes[newX][newY][currentRegion].extra){
+								isUpgrade = true;
+							} 
+							if(nextStepBudget.standard > visitedNodes[newX][newY][currentRegion].standard){
+								isUpgrade = true;
+							}
+							if(isUpgrade){
+								visitedNodes[newX][newY] = remainingBudget;
+								//this.makeMoveTableRecursive(newX, newY, remainingBudget, visitedNodes, actor, pushedNodes);
+								
+								stack.push({x: newX, y: newY});
+							}					
+						}
+					}
 				}
 			}
 		

@@ -122,6 +122,20 @@ StatCalc.prototype.getReferenceEventId = function(actor){
 StatCalc.prototype.canStandOnTile = function(actor, position){
 	if(this.isActorSRWInitialized(actor)){
 		const currentTerrain = $gameMap.regionId(position.x, position.y) % 8;
+		if(!actor.SRWStats.stageTemp.validTerrainCache){
+			actor.SRWStats.stageTemp.validTerrainCache = {};
+		}
+		if(actor.SRWStats.stageTemp.validTerrainCache[currentTerrain] == null){
+			actor.SRWStats.stageTemp.validTerrainCache[currentTerrain] = this.canStandOnTileResolve(actor, position);
+		}
+		return actor.SRWStats.stageTemp.validTerrainCache[currentTerrain];
+	}
+	return false;
+}
+
+StatCalc.prototype.canStandOnTileResolve = function(actor, position){
+	if(this.isActorSRWInitialized(actor)){
+		const currentTerrain = $gameMap.regionId(position.x, position.y) % 8;
 		if(this.canBeOnTerrain(actor, currentTerrain)){ //base terrain OK
 			return true;
 		}
