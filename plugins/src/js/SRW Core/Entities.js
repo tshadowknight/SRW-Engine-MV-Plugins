@@ -1195,54 +1195,46 @@
 		};
 	
 		Game_CharacterBase.prototype.makeMoveTable = function(x, y, move, route, actor) {
-			let moveBudget = {};
-			let terrainDefs = $terrainTypeManager.getDefinitions();
-			for(let terrainId in terrainDefs){
-				moveBudget[terrainId] = {
-					standard: move + 1,
-					extra: 0
-				}
-			}
-			let visitedNodes = {};
-			
-			return this.makeMoveTableRecursive(x, y, moveBudget, visitedNodes, actor, {});
+			let moveBudgetsInfo = $gameTemp.getMoveBudgetsRef();
+			let visitedNodes = moveBudgetsInfo.budgets		
+			return this.makeMoveTableRecursive(x, y, move, visitedNodes, actor, moveBudgetsInfo.freshFor);
 		}
 		
-		Game_CharacterBase.prototype.updateMoveBudget = function(moveBudget, cost, fromTerrain) {
-			let result = {};
-			for(let terrainId in moveBudget){
-				if(moveBudget[terrainId].extra > 0 && terrainId == fromTerrain){
-					result[terrainId] = {
-						standard: moveBudget[terrainId].standard,
-						extra: Math.max(0, moveBudget[terrainId].extra - cost)
-					}
-				} else {
-					result[terrainId] = {
-						standard: Math.max(0, moveBudget[terrainId].standard - cost),
-						extra: moveBudget[terrainId].extra
-					}
-				}				
-				
-			}
-			return result;
-		}
-		
-		Game_CharacterBase.prototype.hasMoveBudgetRemaining = function(moveBudget) {
+		Game_CharacterBase.prototype.hasMoveBudgetRemaining = function(moveBudget, freshFor) {
 			let result = false;
-			for(let terrainId in moveBudget){
-				if(moveBudget[terrainId].standard > 0){
-					result = true;
+			if(moveBudget.freshFor == freshFor){
+				for(let terrainId in moveBudget.budgets){
+					if(moveBudget.budgets[terrainId].standard > 0){
+						result = true;
+					}
 				}
 			}
+			
 			return result;
 		}
 		
 		//移動範囲の計算
-		Game_CharacterBase.prototype.makeMoveTableRecursive = function(x, y, moveBudget, visitedNodes, actor, pushedNodes) {
+		Game_CharacterBase.prototype.makeMoveTableRecursive = function(x, y, move, visitedNodes, actor, freshFor) {
 			var _this = this;
 			//console.log("checking tile " + x + ", " + y + " with budget " + JSON.stringify(moveBudget))
 			const blockedSpacesLookup = $statCalc.getBlockedSpacesLookup(null, $gameSystem.getUnitFactionInfo(actor));
 			function isPassableTile(currentX, currentY, x, y, actor){
+				
+				if(x < 0){
+					return false;
+				}
+				
+				if(x > $gameMap.width()){
+					return false;
+				}
+				
+				if(y < 0){
+					return false;
+				}
+				
+				if(y > $gameMap.height()){
+					return false;
+				}
 				
 				if(ENGINE_SETTINGS.USE_TILE_PASSAGE && !$statCalc.ignoresTerrainCollision(actor, $gameMap.regionId(x, y) % 8)){
 					var direction = 0;			
@@ -1267,12 +1259,6 @@
 				if($gameMap.regionId(x, y) == 0){
 					return false;
 				}
-				if($gameTemp._MoveTable[x] == undefined){
-					return false;
-				}
-				if($gameTemp._MoveTable[x][y] == undefined){
-					return false;
-				}
 				
 				if(!$statCalc.canEnterTerrain(actor, $gameMap.regionId(x, y) % 8)){
 					return false;
@@ -1288,9 +1274,14 @@
 				return !blockedSpacesLookup[x] || !blockedSpacesLookup[x][y];
 			}
 			
-			visitedNodes[x] = {};
-			visitedNodes[x][y] = structuredClone(moveBudget);
+			let terrainDefs = $terrainTypeManager.getDefinitions();
+			for(let terrainId in terrainDefs){
+				visitedNodes[x][y].budgets[terrainId].standard = move + 1;
+				visitedNodes[x][y].budgets[terrainId].extra = 0;
+				visitedNodes[x][y].freshFor = freshFor;
+			}			
 			
+			let pushedNodes = {};
 			let stack = [{x: x, y: y}];
 			
 			while(stack.length){
@@ -1301,6 +1292,7 @@
 			function handleTile(x, y){
 
 				const moveBudget = visitedNodes[x][y];
+				
 				if(moveBudget){		
 					
 					var currentRegion = $gameMap.regionId(x, y) % 8; //1 air, 2 land, 3 water, 4 space
@@ -1319,7 +1311,7 @@
 						moveCost*=terrainDef.moveCostMod;
 					}	
 					
-					if (!_this.hasMoveBudgetRemaining(moveBudget)) {
+					if (!_this.hasMoveBudgetRemaining(moveBudget, freshFor)) {
 						return;
 					}
 					if(!(pushedNodes[x] && pushedNodes[x][y])){
@@ -1334,12 +1326,6 @@
 					if(extraBudgetRefTerrain == -1){
 						extraBudgetRefTerrain = currentRegion;
 					}
-					const remainingBudget = _this.updateMoveBudget(moveBudget, moveCost, extraBudgetRefTerrain);	
-					let nextStepBudget = remainingBudget[currentRegion];
-					
-					if(nextStepBudget.standard == 0 && nextStepBudget.extra == 0){
-						return;
-					}
 
 					let checkedDirs = [
 						{x: 0, y: -1},
@@ -1351,26 +1337,34 @@
 					for(let dir of checkedDirs){
 						let newX = x + dir.x;
 						let newY = y + dir.y;
-						if (isPassableTile(x, y, newX,newY, actor)) {
-							if(!visitedNodes[newX]){
-								visitedNodes[newX] = {};
-							}
-							let isUpgrade = false;
-							if(!visitedNodes[newX][newY]){
-								visitedNodes[newX][newY] = remainingBudget;
-								isUpgrade = true;
-							}
+						if (isPassableTile(x, y, newX,newY, actor)) {							
+							let isUpgrade = false;			
+							let targetBudget = visitedNodes[newX][newY];
 							
-							if(nextStepBudget.extra > visitedNodes[newX][newY][currentRegion].extra){
-								isUpgrade = true;
-							} 
-							if(nextStepBudget.standard > visitedNodes[newX][newY][currentRegion].standard){
-								isUpgrade = true;
-							}
-							if(isUpgrade){
-								visitedNodes[newX][newY] = remainingBudget;
-								//this.makeMoveTableRecursive(newX, newY, remainingBudget, visitedNodes, actor, pushedNodes);
+							for(let terrainId in moveBudget.budgets){
+								if(moveBudget.budgets[terrainId].extra > 0 && terrainId == extraBudgetRefTerrain){
+									let newVal = Math.max(0, moveBudget.budgets[terrainId].extra - moveCost);
+									if(newVal > 0){
+										if(newVal > targetBudget.budgets[terrainId].extra || moveBudget.freshFor > targetBudget.freshFor){
+											targetBudget.budgets[terrainId].extra = newVal;
+											isUpgrade = true;
+										}
+									}
+																		
+								} else {
+									let newVal = Math.max(0, moveBudget.budgets[terrainId].standard - moveCost);
+									if(newVal > 0){
+										if(newVal > targetBudget.budgets[terrainId].standard || moveBudget.freshFor > targetBudget.freshFor){
+											targetBudget.budgets[terrainId].standard = newVal;
+											isUpgrade = true;
+										}
+									}
+								}				
 								
+							}	
+							
+							if(isUpgrade){				
+								targetBudget.freshFor = freshFor;
 								stack.push({x: newX, y: newY});
 							}					
 						}
@@ -1428,69 +1422,6 @@
 				}
 			default:
 				return true;
-			}
-		};
-
-		//攻撃射程の計算
-		Game_CharacterBase.prototype.makeRangeTable = function(x, y, range, route, oriX, oriY, skill) {
-			if (range <= 0) {
-				return;
-			}
-			//上方向を探索
-			if (route[route.length - 1] != 2) {
-				if (this.srpgRangeCanPass(x, y, 8)) {
-					//if ($gameTemp.RangeTable(x, $gameMap.roundY(y - 1))[0] < range - 1) {
-						if (this.srpgRangeExtention(x, $gameMap.roundY(y - 1), oriX, oriY, skill, range + route.length - 1) == true) {
-							if ($gameTemp.MoveTable(x, $gameMap.roundY(y - 1))[0] < 0 && $gameTemp.RangeTable(x, $gameMap.roundY(y - 1))[0] < 0) {
-								$gameTemp.pushRangeList([x, $gameMap.roundY(y - 1), true]);
-							}
-							$gameTemp.setRangeTable(x, $gameMap.roundY(y - 1), range - 1, route.concat(8));
-						}
-						this.makeRangeTable(x, $gameMap.roundY(y - 1), range - 1, route.concat(8), oriX, oriY, skill);
-					//}
-				}
-			}
-			//右方向を探索
-			if (route[route.length - 1] != 4) {
-				if (this.srpgRangeCanPass(x, y, 6)) {
-					//if ($gameTemp.RangeTable($gameMap.roundX(x + 1), y)[0] < range - 1) {
-						if (this.srpgRangeExtention($gameMap.roundX(x + 1), y, oriX, oriY, skill, range + route.length - 1) == true) {
-							if ($gameTemp.MoveTable($gameMap.roundX(x + 1), y)[0] < 0 && $gameTemp.RangeTable($gameMap.roundX(x + 1), y)[0] < 0) {
-								$gameTemp.pushRangeList([$gameMap.roundX(x + 1), y, true]);
-							}
-							$gameTemp.setRangeTable($gameMap.roundX(x + 1), y, range - 1, route.concat(6));
-						}
-						this.makeRangeTable($gameMap.roundX(x + 1), y, range - 1, route.concat(6), oriX, oriY, skill);
-					//}
-				}
-			}
-			//左方向を探索
-			if (route[route.length - 1] != 6) {
-				if (this.srpgRangeCanPass(x, y, 4)) {
-					//if ($gameTemp.RangeTable($gameMap.roundX(x - 1), y)[0] < range - 1) {
-						if (this.srpgRangeExtention($gameMap.roundX(x - 1), y, oriX, oriY, skill, range + route.length - 1) == true) {
-							if ($gameTemp.MoveTable($gameMap.roundX(x - 1), y)[0] < 0 && $gameTemp.RangeTable($gameMap.roundX(x - 1), y)[0] < 0) {
-								$gameTemp.pushRangeList([$gameMap.roundX(x - 1), y, true]);
-							}
-							$gameTemp.setRangeTable($gameMap.roundX(x - 1), y, range - 1, route.concat(4));
-						}
-						this.makeRangeTable($gameMap.roundX(x - 1), y, range - 1, route.concat(4), oriX, oriY, skill);
-					//}
-				}
-			}
-			//下方向を探索
-			if (route[route.length - 1] != 8) {
-				if (this.srpgRangeCanPass(x, y, 2)) {
-					//if ($gameTemp.RangeTable(x, $gameMap.roundY(y + 1))[0] < range - 1) {
-						if (this.srpgRangeExtention(x, $gameMap.roundY(y + 1), oriX, oriY, skill, range + route.length - 1) == true) {
-							if ($gameTemp.MoveTable(x, $gameMap.roundY(y + 1))[0] < 0 && $gameTemp.RangeTable(x, $gameMap.roundY(y + 1))[0] < 0) {
-								$gameTemp.pushRangeList([x, $gameMap.roundY(y + 1), true]);
-							}
-							$gameTemp.setRangeTable(x, $gameMap.roundY(y + 1), range - 1, route.concat(2));
-						}
-						this.makeRangeTable(x, $gameMap.roundY(y + 1), range - 1, route.concat(2), oriX, oriY, skill);
-					//}
-				}
 			}
 		};
 

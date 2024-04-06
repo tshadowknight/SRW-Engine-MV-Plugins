@@ -19,6 +19,15 @@
 		};
 		
 		
+		Scene_Map.prototype.onMapLoaded = function() {
+			$gameTemp.allocateSRPGMapStructures();
+			DataManager.resetTextScriptCache(); //do not cache script files from previous map(s)
+			if (this._transfer) {
+				$gamePlayer.performTransfer();
+			}			
+			this.createDisplayObjects();			
+		};
+
 	}	
 	
 	

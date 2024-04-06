@@ -540,17 +540,11 @@ GameState_actor_map_target.prototype.update = function(scene){
 			var battlerArray = $gameSystem.EventToUnit(event.eventId());
 			$gameTemp.clearMoveTable();
 			
-			/*var list = $gameTemp.moveList();
-			for (var i = 0; i < list.length; i++) {
-				var pos = list[i];
-				event.makeRangeTable(pos[0], pos[1], battlerArray[1].srpgWeaponRange(), [0], pos[0], pos[1], $dataSkills[battlerArray[1].attackSkillId()]);
-			}*/
 			$gameTemp.pushRangeListToMoveList();
 			$gameTemp.setResetMoveList(true);
 			$gameSystem.setSrpgActorCommandWindowNeedRefresh(battlerArray);
 			if($gameTemp.isPostMove){
 				$gameSystem.setSubBattlePhase('post_move_command_window');
-				$gameTemp.initialMoveTable($gameTemp.originalPos()[0], $gameTemp.originalPos()[1], $statCalc.getCurrentMoveRange(battlerArray[1]));
 				event.makeMoveTable($gameTemp.originalPos()[0], $gameTemp.originalPos()[1], $statCalc.getCurrentMoveRange(battlerArray[1]), [0], battlerArray[1]);
 			} else {
 				$gamePlayer.locate(event.posX(), event.posY());
@@ -923,18 +917,12 @@ GameState_actor_target.prototype.update = function(scene){
 		}
 		$gameTemp.disableHighlightGlow = true;
 		
-		/*var list = $gameTemp.moveList();
-		for (var i = 0; i < list.length; i++) {
-			var pos = list[i];
-			event.makeRangeTable(pos[0], pos[1], battlerArray[1].srpgWeaponRange(), [0], pos[0], pos[1], $dataSkills[battlerArray[1].attackSkillId()]);
-		}*/
 		$gameTemp.pushRangeListToMoveList();
 		$gameTemp.setResetMoveList(true);
 		$gameSystem.setSrpgActorCommandWindowNeedRefresh(battlerArray);
 		$gamePlayer.locate(event.posX(), event.posY());
 		if($gameTemp.isPostMove){
 			$gameSystem.setSubBattlePhase('post_move_command_window');
-			$gameTemp.initialMoveTable($gameTemp.originalPos()[0], $gameTemp.originalPos()[1], $statCalc.getCurrentMoveRange(battlerArray[1]));
 			event.makeMoveTable($gameTemp.originalPos()[0], $gameTemp.originalPos()[1], $statCalc.getCurrentMoveRange(battlerArray[1]), [0], battlerArray[1]);
 		} else {			
 			$gameSystem.setSubBattlePhase('actor_command_window');	
@@ -2051,7 +2039,6 @@ GameState_enemy_hit_and_away.prototype.update = function(scene){
 				$gameSystem.srpgMakeMoveTable(event);
 				$gameTemp.isPostMove = true;
 				$gameTemp.hitAndAwayTimer = $gameSystem.getScaledTime(30);
-				var route = $gameTemp.MoveTable(optimalPos[0], optimalPos[1])[1];
 				$gameSystem.setSrpgWaitMoving(true);
 				event.srpgMoveToPoint({x: optimalPos[0], y: optimalPos[1]});
 				$gamePlayer.setTransparent(true);

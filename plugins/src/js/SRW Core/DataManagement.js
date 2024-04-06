@@ -476,20 +476,30 @@
 			{ name: '$dataMapInfos',     src: 'MapInfos.json'     },
 		];
 		
+		DataManager.textScriptCache = {};
+		
+		DataManager.resetTextScriptCache = function(){
+			DataManager.textScriptCache = {};
+		}
+		
 		DataManager.loadTextScript = function(id) {
 			return new Promise(function(resolve, reject){
-				var xhr = new XMLHttpRequest();
-				var url = 'text_scripts/' + id + ".mvs";
-				xhr.open('GET', url);
-				xhr.onload = function() {
-					if (xhr.status < 400) {
-						resolve(xhr.responseText);
-					}
-				};
-				xhr.onerror = reject;
-				xhr.send();
-			});
-			
+				if(!DataManager.textScriptCache[id]){
+					var xhr = new XMLHttpRequest();
+					var url = 'text_scripts/' + id + ".mvs";
+					xhr.open('GET', url);
+					xhr.onload = function() {
+						if (xhr.status < 400) {
+							DataManager.textScriptCache[id] = xhr.responseText;
+							resolve(xhr.responseText);
+						}
+					};
+					xhr.onerror = reject;
+					xhr.send();
+				} else {
+					resolve(DataManager.textScriptCache[id]);
+				}				
+			});			
 		};
 		StorageManager.localFileDirectoryPath = function() {
 			var path = require('path');
@@ -1259,7 +1269,7 @@
 					return eventList;
 				}
 				for(var i = 0; i < contentParts.length; i++){
-					var line = JSON.parse(JSON.stringify(contentParts[i]));								
+					var line = contentParts[i];								
 				
 					line = processArgTokens(args, line);
 					line = processDefineTokens(line);

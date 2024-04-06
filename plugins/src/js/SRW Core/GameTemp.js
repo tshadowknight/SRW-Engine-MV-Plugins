@@ -12,10 +12,8 @@
 		var _SRPG_Game_Temp_initialize = Game_Temp.prototype.initialize;
 		Game_Temp.prototype.initialize = function() {
 			_SRPG_Game_Temp_initialize.call(this);
-			this._MoveTable = [];
+
 			this._MoveList = [];
-			this._RangeTable = [];
-			this._RangeList = [];
 			this._ResetMoveList = false;
 			this._SrpgDistance = 0;
 			this._SrpgSpecialRange = true;
@@ -69,26 +67,6 @@
 		
 		Game_Temp.prototype.mapButtonClicked = function(button) {
 			return this._mapButtons[button];
-		};
-		
-		//移動範囲と移動経路を記録する配列変数を返す
-		Game_Temp.prototype.MoveTable = function(x, y) {
-			return this._MoveTable[x][y];
-		};
-
-		//移動範囲を設定する
-		Game_Temp.prototype.setMoveTable = function(x, y, move, route) {
-			this._MoveTable[x][y] = [move, route];
-		};
-
-		//攻撃射程と計算経路を記録する配列変数を返す
-		Game_Temp.prototype.RangeTable = function(x, y) {
-			return this._RangeTable[x][y];
-		};
-
-		//攻撃射程を設定する
-		Game_Temp.prototype.setRangeTable = function(x, y, move, route) {
-			this._RangeTable[x][y] = [move, route];
 		};
 
 		//移動可能な座標のリストを返す(移動範囲表示で使用)
@@ -147,25 +125,8 @@
 			$gameSystem.showMoveEdge = false;
 			$gameSystem.moveEdgeHighlightsRefreshed = true;
 			$gameSystem.moveEdgeHighlights = [];
-			
-			this._MoveTable = [];
-			this._MoveList = [];
-			for (var i = 0; i < $dataMap.width; i++) {
-			  var vartical = [];
-			  for (var j = 0; j < $dataMap.height; j++) {
-				vartical[j] = [-1, []];
-			  }
-			  this._MoveTable[i] = vartical;
-			}
-			this._RangeTable = [];
-			this._RangeList = [];
-			for (var i = 0; i < $dataMap.width; i++) {
-			  var vartical = [];
-			  for (var j = 0; j < $dataMap.height; j++) {
-				vartical[j] = [-1, []];
-			  }
-			  this._RangeTable[i] = vartical;
-			}
+		
+			this._MoveList = [];		
 		};
 
 		//移動範囲のスプライト消去のフラグを返す
@@ -177,18 +138,6 @@
 		Game_Temp.prototype.setResetMoveList = function(flag) {
 			this._ResetMoveList = flag;
 		};
-
-		//自身の直下は常に歩けるようにする
-		Game_Temp.prototype.initialMoveTable = function(oriX, oriY, oriMove) {
-			this.setMoveTable(oriX, oriY, oriMove, [0]);
-			this.pushMoveList([oriX, oriY, false]);
-		}
-
-		//自身の直下は常に攻撃射程に含める
-		Game_Temp.prototype.initialRangeTable = function(oriX, oriY, oriMove) {
-			this.setRangeTable(oriX, oriY, oriMove, [0]);
-			this.pushRangeList([oriX, oriY, true]);
-		}
 
 		//攻撃ユニットと対象の距離を返す
 		Game_Temp.prototype.SrpgDistance = function() {
@@ -429,5 +378,54 @@
 				delete this.activeShip.event.isActiveShip;
 			}
 			this.activeShip = null;
+		}
+		
+		Game_Temp.prototype.invalidateSRPGStructures = function() {
+			this.SRPGStructuresAllocated = false;			
+		}
+		
+		Game_Temp.prototype.allocateSRPGMapStructures = function() {			
+			if($dataMap){
+				this._moveBudgets = [];
+				this._moveBudgetFreshCtr = 0;
+				
+				let terrainDefs = $terrainTypeManager.getDefinitions();
+				for(let i = 0; i < $gameMap.width(); i++){
+					this._moveBudgets[i] = [];
+					for(let j = 0; j < $gameMap.width(); j++){
+						this._moveBudgets[i][j] = {
+							freshFor: this._moveBudgetFreshCtr,
+							budgets: {}
+						};
+						
+						for(let terrainId in terrainDefs){
+							this._moveBudgets[i][j].budgets[terrainId] = {
+								standard: 0,
+								extra: 0
+							}
+						}							
+					}
+				}
+				
+				
+			}						
+		}
+		
+		Game_Temp.prototype.resetMoveBudgets = function() {
+			if($dataMap && this._moveBudgets){
+				let terrainDefs = $terrainTypeManager.getDefinitions();
+				for(let i = 0; i < $gameMap.width(); i++){
+					for(let j = 0; j < $gameMap.width(); j++){						
+						for(let terrainId in terrainDefs){
+							this._moveBudgets[i][j][terrainId].standard = 0;
+							this._moveBudgets[i][j][terrainId].extra = 0;
+						}							
+					}
+				}
+			}
+		}
+		
+		Game_Temp.prototype.getMoveBudgetsRef = function() {
+			return {freshFor: ++this._moveBudgetFreshCtr, budgets: this._moveBudgets};
 		}
 	}

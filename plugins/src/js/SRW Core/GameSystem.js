@@ -1536,7 +1536,6 @@
 			
 			var moveRange = $statCalc.getCurrentMoveRange(battlerArray[1]);
 			$gameTemp.clearMoveTable();
-			$gameTemp.initialMoveTable(event.posX(), event.posY(), battlerArray[1].srpgThroughTag());
 			event.makeMoveTable(event.posX(), event.posY(), moveRange, [0], battlerArray[1]);
 			var list = $gameTemp.moveList();
 			var tileLookup = {};

@@ -1476,11 +1476,6 @@ SceneManager.isInSaveScene = function(){
 				caster: caster
 			};
 			$gameTemp.clearMoveTable()
-			/*$gameTemp.initialRangeTable(referenceEvent.posX(), referenceEvent.posY(), 1);
-			referenceEvent.makeRangeTable(referenceEvent.posX(), referenceEvent.posY(), 1, [0], referenceEvent.posX(), referenceEvent.posY(), null);
-			$gameTemp.minRangeAdapt(referenceEvent.posX(), referenceEvent.posY(), 0);
-			$gameTemp.pushRangeListToMoveList();
-			$gameTemp.setResetMoveList(true);*/
 			
 			$gameSystem.highlightedTiles.push({x: referenceEvent.posX() - 1, y: referenceEvent.posY(), color: "#2c57ff"});
 			$gameSystem.highlightedTiles.push({x: referenceEvent.posX() + 1, y: referenceEvent.posY(), color: "#2c57ff"});
@@ -1920,11 +1915,6 @@ SceneManager.isInSaveScene = function(){
         //ターン終了コマンドの実行
         if ($gameTemp.isTurnEndFlag() == true) {
             this.menuActorTurnEnd();
-            return;
-        }
-        //アクターコマンドからの装備変更の後処理
-        if ($gameTemp.isSrpgActorEquipFlag() == true) {
-            this.srpgAfterActorEquip();
             return;
         }
 			
@@ -2719,12 +2709,7 @@ SceneManager.isInSaveScene = function(){
 		var event = $gameTemp.activeEvent();
 		var battler = $gameSystem.EventToUnit($gameTemp.activeEvent().eventId())[1];
 		$gameTemp.supportType = "heal";        
-		/*$gameTemp.clearMoveTable();
-        $gameTemp.initialRangeTable(event.posX(), event.posY(), 1);
-        event.makeRangeTable(event.posX(), event.posY(), 1, [0], event.posX(), event.posY(), null);
-        $gameTemp.minRangeAdapt(event.posX(), event.posY(), 0);
-        $gameTemp.pushRangeListToMoveList();
-        $gameTemp.setResetMoveList(true);*/
+		
 		$gameSystem.highlightedTiles = [];
 		$gameSystem.highlightedActionTiles = [];
 		$gameSystem.highlightsRefreshed = true;
@@ -2747,14 +2732,7 @@ SceneManager.isInSaveScene = function(){
 		var event = $gameTemp.activeEvent();
 		var battler = $gameSystem.EventToUnit($gameTemp.activeEvent().eventId())[1];
 		$gameTemp.supportType = "resupply";        
-		/*$gameTemp.clearMoveTable();
-		if(!$statCalc.applyStatModsToValue(battler, 0, ["all_range_resupply"])){			
-			$gameTemp.initialRangeTable(event.posX(), event.posY(), 1);
-			event.makeRangeTable(event.posX(), event.posY(), 1, [0], event.posX(), event.posY(), null);
-			 $gameTemp.minRangeAdapt(event.posX(), event.posY(), 0);
-			$gameTemp.pushRangeListToMoveList();
-			$gameTemp.setResetMoveList(true);
-		}    */       
+	     
 		
 		if(!$statCalc.applyStatModsToValue(battler, 0, ["all_range_resupply"])){	
 			$gameSystem.highlightedTiles = [];
@@ -3258,24 +3236,6 @@ SceneManager.isInSaveScene = function(){
         return;
     };
 
-    //アクターコマンドからの装備変更の後処理
-    Scene_Map.prototype.srpgAfterActorEquip = function() {
-        var event = $gameTemp.activeEvent();
-        var battlerArray = $gameSystem.EventToUnit(event.eventId());
-        $gameTemp.clearMoveTable();
-        $gameTemp.initialMoveTable($gameTemp.originalPos()[0], $gameTemp.originalPos()[1], battlerArray[1].srpgMove());
-        event.makeMoveTable($gameTemp.originalPos()[0], $gameTemp.originalPos()[1], $statCalc.getCurrentMoveRange(battlerArray[1]), [0], battlerArray[1]);
-        var list = $gameTemp.moveList();
-        for (var i = 0; i < list.length; i++) {
-            var pos = list[i];
-            event.makeRangeTable(pos[0], pos[1], battlerArray[1].srpgWeaponRange(), [0], pos[0], pos[1], $dataSkills[battlerArray[1].attackSkillId()]);
-        }
-        $gameTemp.pushRangeListToMoveList();
-        $gameTemp.setResetMoveList(true);
-        $gameTemp.setSrpgActorEquipFlag(false); // 処理終了
-        return;
-    };
-
     //自動行動アクターの行動決定
     Scene_Map.prototype.srpgInvokeAutoActorCommand = function() {
 		
@@ -3322,28 +3282,6 @@ SceneManager.isInSaveScene = function(){
             actor.onAllActionsEnd();
             this.srpgAfterAction();
         }
-    };
-
-    //自動行動アクターの移動先決定と移動実行
-    Scene_Map.prototype.srpgInvokeAutoActorMove = function() {
-        var event = $gameTemp.activeEvent();
-        var type = $gameSystem.EventToUnit(event.eventId())[0];
-        var actor = $gameSystem.EventToUnit(event.eventId())[1];
-        var targetType = this.makeTargetType(actor, type);
-        $gameSystem.srpgMakeMoveTable(event);
-        this.srpgPriorityTarget(actor); //優先ターゲットの設定
-        var canAttackTargets = this.srpgMakeCanAttackTargets(actor, targetType); //行動対象としうるユニットのリストを作成
-        var targetEvent = this.srpgDecideTarget(canAttackTargets, event, targetType); //ターゲットの設定
-        $gameTemp.setTargetEvent(targetEvent);
-        if ($gameTemp.isSrpgBestSearchFlag() == true) {
-            $gameTemp.setSrpgBestSearchFlag(false);
-            $gameSystem.srpgMakeMoveTable(event);
-        }
-        var optimalPos = this.srpgSearchOptimalPos(targetEvent, actor, type);
-        var route = $gameTemp.MoveTable(optimalPos[0], optimalPos[1])[1];
-        $gameSystem.setSrpgWaitMoving(true);
-        event.srpgMoveRouteForce(route);
-        $gameSystem.setSubBattlePhase('auto_actor_action');
     };
 
     //エネミーの行動決定
@@ -3727,7 +3665,6 @@ SceneManager.isInSaveScene = function(){
 				if(optimalPos[0] != event.posX() || optimalPos[1] != event.posY()){
 					$gameSystem.srpgMakeMoveTable(event);
 					$gameTemp.isPostMove = true;
-					var route = $gameTemp.MoveTable(optimalPos[0], optimalPos[1])[1];
 					$gameSystem.setSrpgWaitMoving(true);
 					event.srpgMoveToPoint({x: optimalPos[0], y: optimalPos[1]});
 					$gamePlayer.setTransparent(true);
