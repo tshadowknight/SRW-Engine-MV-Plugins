@@ -2,6 +2,14 @@ export default function CSSUIManager(){
 	
 }
 
+
+CSSUIManager.textScaleCache = {};
+CSSUIManager.textScaleCacheCtr = 0;
+
+window.addEventListener("resize", function(){
+	CSSUIManager.textScaleCache = {};
+});
+
 CSSUIManager.prototype.updateLayer = function(dimensions){
 	if(this.customUILayer){
 		this.customUILayer.style.width = dimensions.width+"px";
@@ -11,6 +19,17 @@ CSSUIManager.prototype.updateLayer = function(dimensions){
 
 CSSUIManager.prototype.updateScaledText = function(windowId){
 	if(this.customUILayer){
+		
+		function getElemCacheIdx(elem){
+			let resultParts = [];
+			resultParts.push(elem.id+"::"+Array.from(elem.classList).join("__"));
+			/*while(elem.parent){
+				elem = elem.parent;
+				resultParts.push(elem.id+"::"+Array.from(elem.classList).join("__"));
+			}*/
+			return resultParts.join("->");
+		}
+		
 		var sourceContainer;
 		if(windowId){
 			sourceContainer = window.document.getElementById(windowId);
@@ -19,10 +38,20 @@ CSSUIManager.prototype.updateScaledText = function(windowId){
 			sourceContainer = window.document;
 		}
 		
+		const baseCacheKey = "::";
+		
 		//this.customUILayer.style.display = "none";
 		var referenceWidth = Graphics._getCurrentWidth();
 		var textElements = sourceContainer.querySelectorAll(".scaled_text");	
 		textElements.forEach(function(textElement){
+			const cacheKey = "scaled_text:" + getElemCacheIdx(textElement);
+			if(CSSUIManager.textScaleCache[cacheKey]){
+				textElement.style.fontSize = CSSUIManager.textScaleCache[cacheKey].fontSize;
+				if(ENGINE_SETTINGS.FONT_LINE_HEIGHT_SCALE){
+					textElement.style.lineHeight = CSSUIManager.textScaleCache[cacheKey].lineHeight;
+				}
+				return;
+			}
 			var fontPercent = textElement.getAttribute("data-font-percent");
 			if(!fontPercent){
 				fontPercent = window.getComputedStyle(textElement, null).getPropertyValue('--fontsize');
@@ -34,9 +63,19 @@ CSSUIManager.prototype.updateScaledText = function(windowId){
 			if(ENGINE_SETTINGS.FONT_LINE_HEIGHT_SCALE){
 				textElement.style.lineHeight = Math.floor(referenceWidth/100 * fontPercent) * (ENGINE_SETTINGS.FONT_SCALE || 1) * ENGINE_SETTINGS.FONT_LINE_HEIGHT_SCALE + "px";
 			}
+			CSSUIManager.textScaleCache[cacheKey] = {
+				fontSize: textElement.style.fontSize,
+				lineHeight: textElement.style.lineHeight
+			};
 		});
 		var scaledWidthElements = sourceContainer.querySelectorAll(".scaled_width");	
 		scaledWidthElements.forEach(function(scaledElement){
+			const cacheKey = "scaled_width:" + getElemCacheIdx(scaledElement);
+			if(CSSUIManager.textScaleCache[cacheKey]){
+				scaledElement.style.width = CSSUIManager.textScaleCache[cacheKey].width;
+				return;
+			}
+			
 			var scalePercent = scaledElement.getAttribute("data-original-width");
 			if(!scalePercent){
 				scalePercent = window.getComputedStyle(scaledElement, null).getPropertyValue('--widthscaling');
@@ -48,10 +87,18 @@ CSSUIManager.prototype.updateScaledText = function(windowId){
 			}
 			
 			scaledElement.style.width = Math.floor(referenceWidth/100 * scalePercent) + "px";
+			CSSUIManager.textScaleCache[cacheKey] = {
+				width: scaledElement.style.width
+			}
 		});
 		
 		var scaledHeightElements = sourceContainer.querySelectorAll(".scaled_height");	
 		scaledHeightElements.forEach(function(scaledElement){
+			const cacheKey = "scaled_height:" + getElemCacheIdx(scaledElement);
+			if(CSSUIManager.textScaleCache[cacheKey]){
+				scaledElement.style.height = CSSUIManager.textScaleCache[cacheKey].height;
+				return;
+			}
 			var scalePercent = scaledElement.getAttribute("data-original-height");
 			if(!scalePercent){
 				scalePercent = window.getComputedStyle(scaledElement, null).getPropertyValue('--heightscaling');
@@ -63,6 +110,9 @@ CSSUIManager.prototype.updateScaledText = function(windowId){
 			}
 			
 			scaledElement.style.height = Math.floor(referenceWidth/100 * scalePercent) + "px";
+			CSSUIManager.textScaleCache[cacheKey] = {
+				height: scaledElement.style.height
+			}
 		});
 		
 		//this.customUILayer.style.display = "";
@@ -76,40 +126,36 @@ CSSUIManager.prototype.updateScaledText = function(windowId){
 			fittedElemInfo[elemId] = {
 				elem: textElement,
 				currentFontSize: currentFontSize,
-				minFontSize: Math.floor(currentFontSize / 10)		
+				minFontSize: Math.floor(currentFontSize / 10),
+				isValid: true
 			}
 			elemId++;	
 		});
-		while(Object.keys(fittedElemInfo).length){
-			for(const elemId in fittedElemInfo){
-				const textElement = fittedElemInfo[elemId].elem;
-				if(textElement.scrollHeight > textElement.clientHeight || textElement.scrollWidth > textElement.clientWidth){
+		
+		for(const elemId in fittedElemInfo){
+			const textElement = fittedElemInfo[elemId].elem;
+			
+			const cacheKey = "fitted_text:" + getElemCacheIdx(textElement)+"="+textElement.innerText;
+			if(CSSUIManager.textScaleCache[cacheKey]){
+				textElement.style.fontSize = CSSUIManager.textScaleCache[cacheKey].fontSize;
+				
+			} else {
+				let needsProcessing = true;
+				let isUnderflow = false;
+				while(!isUnderflow && textElement.scrollHeight > textElement.clientHeight || textElement.scrollWidth > textElement.clientWidth){
 					const nextSize = Math.floor(fittedElemInfo[elemId].currentFontSize / 1.2);
 					if(nextSize > fittedElemInfo[elemId].minFontSize){
 						fittedElemInfo[elemId].currentFontSize = nextSize;
 					} else {
-						delete fittedElemInfo[elemId];
+						isUnderflow = true;
 					}
-				} else {
-					delete fittedElemInfo[elemId];
+					fittedElemInfo[elemId].elem.style.fontSize = fittedElemInfo[elemId].currentFontSize + "px";
+					CSSUIManager.textScaleCache[cacheKey] = {
+						fontSize: fittedElemInfo[elemId].elem.style.fontSize
+					}
 				}
-				
-			}
-			
-			for(const elemId in fittedElemInfo){
-				fittedElemInfo[elemId].elem.style.fontSize = fittedElemInfo[elemId].currentFontSize + "px";
-			}
-		}
-		
-		//document.body.display = "";
-		/*
-		
-		while(currentFontSize > minFontSize && (textElement.scrollHeight > textElement.clientHeight || textElement.scrollWidth > textElement.clientWidth)){
-				currentFontSize = Math.floor(currentFontSize / 1.2);
-				textElement.style.fontSize = currentFontSize + "px";
-			}	
-		*/
-		
+			}					
+		}		
 	}
 }
 

@@ -530,6 +530,6 @@ Window_Intermission.prototype.redraw = function() {
 			_this.requestRedraw();
 		});		
 	});
-	
+	this.loadImages();
 	Graphics._updateCanvas();
 };	

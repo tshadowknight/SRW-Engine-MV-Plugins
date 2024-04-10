@@ -163,6 +163,6 @@ Window_PilotList.prototype.redraw = function() {
 		this._detailBarPilotSpirits.show();
 		this._detailBarPilotStats.hide();
 	}
-
+	this.loadImages();
 	Graphics._updateCanvas();
 }

@@ -369,6 +369,6 @@ Window_SellItem.prototype.redraw = function() {
 	});
 	
 	
-	
+	this.loadImages();
 	Graphics._updateCanvas();
 }

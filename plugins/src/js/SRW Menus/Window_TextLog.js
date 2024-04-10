@@ -106,7 +106,7 @@ Window_TextLog.prototype.redraw = function() {
 		div.innerText = $gameSystem.textLog[div.getAttribute("data-idx")].text;
 		_this.updateScaledDiv(div, true);
 	});	
-	
+	this.loadImages();
 	Graphics._updateCanvas();
 	_this._bgFadeContainer.style.visibility = "hidden";
 	setTimeout(function(){

@@ -245,7 +245,7 @@
 			this._searchedItemList = [];
 		};
 
-		Game_System.prototype.updateAvailableUnits = function(ignoreEventDeploys, preservePilotTypes){
+		Game_System.prototype.updateAvailableUnits = function(ignoreEventDeploys, preservePilotTypes, noReload){
 			const _this = this;
 			this._availableMechs = [];//available mechs must be cleared to avoid conflicts with previously serialized entries in the listing
 			this._availableUnits = $gameParty.allMembers();
@@ -287,18 +287,21 @@
 				$statCalc.applyBattleStartWill(actor);
 			}
 			
-			//main twin must be initialized first to ensure a reference event is available for their sub twin
-			this._availableUnits.forEach(function(actor){
-				if(!actor.isSubTwin){
-					updateUnit(actor);
-				}					
-			});
+			if(!noReload){
+				//main twin must be initialized first to ensure a reference event is available for their sub twin
+				this._availableUnits.forEach(function(actor){
+					if(!actor.isSubTwin){
+						updateUnit(actor);
+					}					
+				});
+				
+				this._availableUnits.forEach(function(actor){
+					if(actor.isSubTwin){
+						updateUnit(actor);
+					}					
+				});
+			}
 			
-			this._availableUnits.forEach(function(actor){
-				if(actor.isSubTwin){
-					updateUnit(actor);
-				}					
-			});
 			
 			var deployList = this.getDeployList();
 			var isSubTwin = {};

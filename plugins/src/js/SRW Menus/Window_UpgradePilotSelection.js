@@ -143,6 +143,6 @@ Window_UpgradePilotSelection.prototype.update = function() {
 Window_UpgradePilotSelection.prototype.redraw = function() {
 	this._mechList.redraw();
 	this._detailBarPilotDetail.redraw();		
-
+	this.loadImages();
 	Graphics._updateCanvas();
 }

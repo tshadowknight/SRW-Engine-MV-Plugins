@@ -11,11 +11,15 @@ Window_DeploymentTwin.prototype.constructor = Window_DeploymentTwin;
 
 Window_DeploymentTwin.prototype.initialize = function() {
 	var _this = this;
+	this.scaleCache = {};
+	this._scaleCacheAll = true;
+	
 	this._layoutId = "deployment";	
 	
 	Window_CSS.prototype.initialize.call(this, 0, 0, 0, 0);	
 	
 	window.addEventListener("resize", function(){
+		_this.scaleCache = {};
 		_this.requestRedraw();
 	});	
 	this._UIState = "select_deploy_slot";
@@ -309,7 +313,7 @@ Window_DeploymentTwin.prototype.update = function() {
 				} else {
 					deployList[targetSlot][targetType] = null;
 				}
-				$gameSystem.updateAvailableUnits(true);
+				//$gameSystem.updateAvailableUnits(true, false, true);
 			}				
 				
 			var currentSelection = this._availableList.querySelector(".active");
@@ -614,15 +618,41 @@ Window_DeploymentTwin.prototype.updateDeployInfo = function(deployInfo) {
 	$gameSystem.syncPreferredSlots();
 }
 
+Window_DeploymentTwin.prototype.show = function() {
+	this.resetSelection();
+	this.scaleCache = {};
+	this._cachedUnits = null;
+	this._cachedUnitsLookup = null;
+	this._handlingInput = false;
+    this.visible = true;
+	this._redrawRequested = true;
+	this._visibility = "";
+	this.refresh();	
+	Graphics._updateCanvas(this._layoutId);
+}
+
 Window_DeploymentTwin.prototype.getAvailableUnits = function() {
-	var candidates = $gameSystem.getAvailableUnits();	
-	var tmp = [];
-	candidates.forEach(function(candidate){
-		if($statCalc.isValidForDeploy(candidate)){
-			tmp.push(candidate);
-		}
-	});
-	return tmp;
+	const _this = this;
+	if(!this._cachedUnits){
+		this._cachedUnitsLookup = {};
+		var candidates = $gameSystem.getAvailableUnits();	
+		var tmp = [];
+		candidates.forEach(function(candidate){
+			if($statCalc.isValidForDeploy(candidate)){
+				tmp.push(candidate);
+				_this._cachedUnitsLookup[candidate.actorId()] = true;
+			}
+		});
+		this._cachedUnits = tmp;
+	}
+	return this._cachedUnits;
+}
+
+Window_DeploymentTwin.prototype.isValidForDeploy = function(actor) {
+	if(!this._cachedUnits){
+		this.getAvailableUnits();
+	}
+	return !!this._cachedUnitsLookup[actor.actorId()];
 }
 
 Window_DeploymentTwin.prototype.getSlotLookup = function() {
@@ -690,7 +720,7 @@ Window_DeploymentTwin.prototype.redraw = function() {
 		}
 		content+="<div data-idx='"+realIdx+"' data-islocked='"+(_this.getLockedSlots()[slot] ? 1 : 0)+"' data-actorid='"+(actorId || -1)+"'  class='entry "+displayClass+" "+displayClassValid+" "+displayClassFocus+" main'>"
 		//var actorId = deployInfo.assigned[i];
-		if(actorId != null && !listedUnits[actorId] && $statCalc.isValidForDeploy($gameActors.actor(actorId))){
+		if(actorId != null && !listedUnits[actorId] && _this.isValidForDeploy($gameActors.actor(actorId))){
 			listedUnits[actorId] = true;
 			var menuImagePath = $statCalc.getMenuImagePath($gameActors.actor(actorId));
 			content+="<img class='actor_img' data-img='img/"+menuImagePath+"'>";
@@ -738,7 +768,7 @@ Window_DeploymentTwin.prototype.redraw = function() {
 		}
 		content+="<div data-idx='"+realIdx+"' data-islocked='"+(_this.getLockedSlots()[slot] ? 1 : 0)+"' data-actorid='"+(subActorId || -1)+"' class='entry "+displayClass+" "+displayClassValid+"  "+displayClassFocus+" sub'>"
 		//var actorId = deployInfo.assignedSub[i];
-		if(subActorId != null && !listedUnits[subActorId] && $statCalc.isValidForDeploy($gameActors.actor(subActorId))){
+		if(subActorId != null && !listedUnits[subActorId] && _this.isValidForDeploy($gameActors.actor(subActorId))){
 			listedUnits[subActorId] = true;
 			var menuImagePath = $statCalc.getMenuImagePath($gameActors.actor(subActorId));
 			content+="<img class='actor_img sub' data-img='img/"+menuImagePath+"'>";
@@ -749,7 +779,7 @@ Window_DeploymentTwin.prototype.redraw = function() {
 			content+="<img class='locked_icon' src='svg/padlock.svg'/>";
 		}	
 		
-		content+="<div class='order_icon scaled_text'>"+(idx + 1)+"</div>";
+		content+="<div class='order_icon scaled_text scale_cache'>"+(idx + 1)+"</div>";
 		content+="</div>";
 		return content;
 	}
@@ -868,7 +898,7 @@ Window_DeploymentTwin.prototype.redraw = function() {
 	const subPilots = $statCalc.getSubPilots(pilotData);
 	for(let i = 0; i < Math.min(subPilots.length, 5); i++){
 		if(subPilots[i] != -1 && subPilots[i] != null && subPilots[i] != ""){	
-			pilotInfoContent+="<div data-pilotid="+subPilots[i]+" data-type=twin class='left twin selection_icon'></div>";//icon 	
+			pilotInfoContent+="<div data-pilotid="+subPilots[i]+" data-type=twin class='left twin selection_icon scale_cache'></div>";//icon 	
 		}
 	}
 	
@@ -883,7 +913,7 @@ Window_DeploymentTwin.prototype.redraw = function() {
 		_this.loadActorFace(pilotId, selectionIcon);						
 	});
 	
-	if(pilotData && $statCalc.isValidForDeploy(pilotData)){
+	if(pilotData && _this.isValidForDeploy(pilotData)){
 		var actorIcon = this._container.querySelector("#deploy_pilot_icon");
 		this.loadActorFace(pilotData.actorId(), actorIcon);
 	}
@@ -928,7 +958,7 @@ Window_DeploymentTwin.prototype.redraw = function() {
 		});
 	}
 	this.loadImages();
-	Graphics._updateCanvas();
+	Graphics._updateCanvas(this._layoutId);
 	
 	if(activeElem){
 		var listRect = _this._availableList.getBoundingClientRect();

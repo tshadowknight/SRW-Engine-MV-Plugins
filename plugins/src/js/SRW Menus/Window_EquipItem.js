@@ -400,6 +400,6 @@ Window_EquipItem.prototype.redraw = function() {
 			}
 		});
 	});
-	
+	this.loadImages();
 	Graphics._updateCanvas();
 }

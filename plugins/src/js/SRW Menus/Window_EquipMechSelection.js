@@ -154,6 +154,6 @@ Window_EquipMechSelection.prototype.update = function() {
 Window_EquipMechSelection.prototype.redraw = function() {
 	this._mechList.redraw();
 	this._detailBarMechDetail.redraw();		
-
+	this.loadImages();
 	Graphics._updateCanvas();
 }

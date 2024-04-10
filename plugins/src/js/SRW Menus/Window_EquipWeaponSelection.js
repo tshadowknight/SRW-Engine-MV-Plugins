@@ -154,6 +154,6 @@ Window_EquipWeaponSelection.prototype.update = function() {
 Window_EquipWeaponSelection.prototype.redraw = function() {
 	this._mechList.redraw();
 	this._detailBarMechDetail.redraw();		
-
+	this.loadImages();
 	Graphics._updateCanvas();
 }

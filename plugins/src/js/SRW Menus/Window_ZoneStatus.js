@@ -122,6 +122,7 @@ Window_ZoneStatus.prototype.redraw = function() {
 		content+="</div>";
 	}	
 	this._listContainer.innerHTML = content;
+	this.loadImages();
 	Graphics._updateCanvas();
 }
 

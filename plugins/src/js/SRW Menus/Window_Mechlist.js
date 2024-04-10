@@ -191,4 +191,6 @@ Window_MechList.prototype.redraw = function() {
 		this._detailBarPilot.show();
 		this._detailBarMech.hide();
 	}
+	
+	this.loadImages();
 }

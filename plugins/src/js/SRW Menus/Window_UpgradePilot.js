@@ -1062,6 +1062,6 @@ Window_UpgradePilot.prototype.redraw = function() {
 	
 	
 	
-	
+	this.loadImages();
 	Graphics._updateCanvas();
 }

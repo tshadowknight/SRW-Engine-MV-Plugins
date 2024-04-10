@@ -80,14 +80,23 @@ Window_CSS.prototype.createComponents = function() {
 	this._bgFadeContainer.classList.add("bg_fade_container");
 	this._bgTextureContainer = document.createElement("div");
 	this._bgTextureContainer.classList.add("bg_container");
-	this._bgFadeContainer.appendChild(this._bgTextureContainer);
+	this._bgFadeContainer.appendChild(this._bgTextureContainer);	
+	
 	windowNode.appendChild(this._bgFadeContainer);
+	
+	if(ENGINE_SETTINGS.CUSTOM_MENU_BG_CREATOR){
+		this._customMenuBg = ENGINE_SETTINGS.CUSTOM_MENU_BG_CREATOR();
+		if(this._customMenuBg){
+			windowNode.appendChild(this._customMenuBg);
+		}
+	}
 }
 
 Window_CSS.prototype.loadImages = async function() {	
 	const windowNode = this.getWindowNode();
 	
-	let images = windowNode.querySelectorAll("img");
+	let images = Array.from(windowNode.querySelectorAll("img"));
+	images = images.concat(Array.from(windowNode.querySelectorAll(".img_bg")))
 	
 	let promises = [];
 	let imgNameLookup = {};
@@ -112,7 +121,12 @@ Window_CSS.prototype.loadImages = async function() {
 	for(let img of images){
 		let imgPath = img.getAttribute("data-img");
 		if(imgNameLookup[imgPath] != null){
-			img.setAttribute("src", bitmaps[imgNameLookup[imgPath]]._image.src);
+			if(img.nodeName == "IMG"){
+				img.setAttribute("src", bitmaps[imgNameLookup[imgPath]]._image.src);
+			} else {
+				img.style.background = "url('" + bitmaps[imgNameLookup[imgPath]]._image.src + "')";
+			}
+			
 		}	
 	}	
 }
@@ -446,6 +460,16 @@ Window_CSS.prototype.updateScaledImage = function(img) {
 
 Window_CSS.prototype.updateScaledDiv = function(div, noWidth, noHeight, ignoreOriginalDimensions) {
 	if(div){
+		const scaleCacheKey = Array.from(div.classList).join("__");
+		if(this.scaleCache && this.scaleCache[scaleCacheKey]){
+			if(!noWidth){
+				div.style.width = this.scaleCache[scaleCacheKey].width;
+			}
+			if(!noHeight){
+				div.style.height = this.scaleCache[scaleCacheKey].height;
+			}	
+			return;
+		}
 		var computedStyle = getComputedStyle(div);
 		var originalWidth = div.getAttribute("original-width");
 		if(!originalWidth || ignoreOriginalDimensions){
@@ -469,6 +493,14 @@ Window_CSS.prototype.updateScaledDiv = function(div, noWidth, noHeight, ignoreOr
 		if(!noHeight){
 			div.style.height = (originalHeight * Graphics.getScale()) + "px";
 		}	
+		if(this.scaleCache){//only if the decending class initialized the property
+			if(this._scaleCacheAll || div.classList.contains("scale_cache")){
+				this.scaleCache[scaleCacheKey] = {
+					width: div.style.width,
+					height: div.style.height
+				};	
+			}					
+		}
 	}
 }
 

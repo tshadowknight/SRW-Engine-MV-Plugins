@@ -4021,6 +4021,7 @@ SceneManager.isInSaveScene = function(){
 
     // 最適移動位置の探索
     Scene_Map.prototype.srpgSearchOptimalPos = function(targetCoords, battler, type, range, minRange, noTargets) {
+
 		const blockedSpacesLookup = $statCalc.getBlockedSpacesLookup(null);
 		function isValidSpace(pos){
 			return (!blockedSpacesLookup[pos.x] || !blockedSpacesLookup[pos.x][pos.y]) || (pos.x == $gameTemp.activeEvent().posX() && pos.y == $gameTemp.activeEvent().posY());
@@ -4030,42 +4031,7 @@ SceneManager.isInSaveScene = function(){
 			return [targetCoords.x, targetCoords.y];
 		}
 		
-        if ($gameTemp.isSrpgBestSearchRoute()[0] && 
-            !(battler.battleMode() === 'absRegionUp' || battler.battleMode() === 'absRegionDown')) {
-            var route = $gameTemp.isSrpgBestSearchRoute()[1].slice(1, battler.srpgMove() + 1);
-            for (var i = 0; i < battler.srpgMove() + 1; i++) {
-                var pos = [$gameTemp.activeEvent().posX(), $gameTemp.activeEvent().posY()];
-                for (var j = 0; j < route.length; j++) {
-                    var d = route[j];
-                    if (d == 2) {
-                        pos[1] += 1;
-                    } else if (d == 4) {
-                        pos[0] -= 1;
-                    } else if (d == 6) {
-                        pos[0] += 1;
-                    } else if (d == 8) {
-                        pos[1] -= 1;
-                    }
-                }
-                if (pos[0] < 0) {
-                  pos[0] += $gameMap.width();
-                } else if (pos[0] >= $gameMap.width()) {
-                  pos[0] -= $gameMap.width();
-                }
-                if (pos[1] < 0) {
-                  pos[1] += $gameMap.height();
-                } else if (pos[1] >= $gameMap.height()) {
-                  pos[1] -= $gameMap.height();
-                }
-                if (isValidSpace({x: pos[0], y: pos[1]})) {
-                    break;
-                } else {
-                    route.pop();
-                }
-            }
-            $gameTemp.setSrpgBestSearchRoute([null, []]);
-            return pos;
-        }
+        
         var list = $gameTemp.moveList();
 		list.push([$gameTemp.activeEvent().posX(), $gameTemp.activeEvent().posY(), false]);
 		

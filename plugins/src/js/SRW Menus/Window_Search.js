@@ -408,7 +408,7 @@ Window_Search.prototype.redraw = function() {
 			}		
 		});
 	});
-	
+	this.loadImages();
 	Graphics._updateCanvas();
 	
 	

@@ -520,7 +520,8 @@
 				params.attribute1,
 				params.attribute2,
 				params.boxDrop,
-				params.targetBox
+				params.targetBox,
+				params.AIFlags
 			);
 		}
 		
@@ -577,12 +578,14 @@
 					attribute1: getParamSetting("attribute1", eventId) || "",
 					items: getParamSetting("items", eventId) || [],
 					squadId: getParamSetting("squadId", eventId),
+					targetRegion: getParamSetting("targetRegion", eventId),
+					AIFlags: getParamSetting("AIFlags", eventId),
 				});
 			}
 		}
 
 		// 新規エネミーを追加する（増援）
-		Game_Interpreter.prototype.addEnemy = function(toAnimQueue, eventId, enemyId, mechClass, level, mode, targetId, items, squadId, targetRegion, factionId, counterBehavior, attackBehavior, noUpdateCount, attribute1, attribute2, boxDrop, targetBox) {
+		Game_Interpreter.prototype.addEnemy = function(toAnimQueue, eventId, enemyId, mechClass, level, mode, targetId, items, squadId, targetRegion, factionId, counterBehavior, attackBehavior, noUpdateCount, attribute1, attribute2, boxDrop, targetBox, AIFlags) {
 			if(!$dataEnemies[enemyId] || !$dataEnemies[enemyId].meta || !Object.keys($dataEnemies[enemyId].meta).length){
 				throw("Attempted to create an enemy pilot with id '"+enemyId+"' which does not have SRW data.");
 			}
@@ -592,6 +595,7 @@
 			}
 			
 			var enemy_unit = new Game_Enemy(enemyId, 0, 0);
+			enemy_unit.AIFlags = AIFlags;
 			var event = $gameMap.event(eventId);
 			
 			event._appearSpriteInitialized = false;

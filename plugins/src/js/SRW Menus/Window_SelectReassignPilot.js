@@ -288,6 +288,6 @@ Window_SelectReassignPilot.prototype.redraw = function() {
 	
 	this._detailBarMech.show();
 	
-
+	this.loadImages();
 	Graphics._updateCanvas();
 }

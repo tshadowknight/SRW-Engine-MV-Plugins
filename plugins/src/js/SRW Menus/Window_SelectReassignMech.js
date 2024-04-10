@@ -328,6 +328,6 @@ Window_SelectReassignMech.prototype.redraw = function() {
 		this._slotSelectionContainer.innerHTML = "";
 		this._slotSelectionContainer.style.display = "none";
 	}	
-	
+	this.loadImages();
 	Graphics._updateCanvas();
 }

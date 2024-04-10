@@ -133,7 +133,7 @@ Window_UpgradeUnitSelection.prototype.redraw = function() {
 	this._mechList.redraw();
 	this._DetailBarMechUpgrades.redraw();		
 	
-
+	this.loadImages();
 	Graphics._updateCanvas();
 }
 

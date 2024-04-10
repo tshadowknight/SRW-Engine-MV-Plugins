@@ -2516,7 +2516,11 @@ GameState_rearrange_deploys.prototype.update = function(scene){
 		$gameTemp.doingManualDeploy = false;
 		$gameTemp.disableHighlightGlow = false;
 		$gameSystem.undeployActors(true);
+		
+		$statCalc.externalLockUnitUpdates();
 		$gameSystem.deployActors(true, $gameTemp.manualDeployType, true);
+		$statCalc.externalUnlockUnitUpdates();
+		
 		$gameSystem.setBattlePhase($gameTemp.deployContextState);
 		$gameSystem.setSubBattlePhase($gameTemp.deployContextSubState);
 		
