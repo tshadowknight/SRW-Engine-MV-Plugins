@@ -3979,7 +3979,7 @@ SceneManager.isInSaveScene = function(){
 				formula = translateTagTokens(formula);
 				var score = eval(formula);
 				
-				if(score > bestScore){
+				if(score > bestScore || bestScore == -1){
 					bestScore = score;
 					bestTarget = targetsByHit[ctr].event;
 					bestWeapon = weaponResult.weapon
