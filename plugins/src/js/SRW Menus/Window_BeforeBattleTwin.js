@@ -1365,7 +1365,7 @@ Window_BeforebattleTwin.prototype.createParticipantBlock = function(ref, action,
 		var activeSpirits = $statCalc.getActiveSpirits(ref);
 		content+="<div class='active_spirits scaled_text'>";	
 		for(var i = 0; i < spirits.length; i++){
-			content+="<div class='spirit_entry "+(activeSpirits[spirits[i]] ? "active" : "")+"'>";	
+			content+="<div class='spirit_entry "+(activeSpirits[spirits[i]] ? "active" : "")+" fitted_text'>";	
 			content+=spirits[i].substring(0, 3).toUpperCase();	
 			content+="</div>";	
 		}

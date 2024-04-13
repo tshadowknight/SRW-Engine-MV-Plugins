@@ -970,7 +970,7 @@
 			});
 		}
 		
-		Game_System.prototype.redeployActors = function(validatePositions){                                                                                                                                                                                                                             
+		Game_System.prototype.redeployActors = function(validatePositions, forceRefresh){                                                                                                                                                                                                                             
 			$gameVariables.setValue(_existActorVarID, 0);
 			$gameSystem.clearSrpgAllActors();
 			$gameMap.events().forEach(function(event) {
@@ -979,7 +979,9 @@
 					event.isDeployed = false;
 				}
 			 });
-			 $statCalc.externalLockUnitUpdates();
+			 if(!forceRefresh){
+				$statCalc.externalLockUnitUpdates(); 
+			 }			 
 			 this.deployActors(false, $gameTemp.manualDeployType, validatePositions);
 			 $statCalc.externalUnlockUnitUpdates();
 		}

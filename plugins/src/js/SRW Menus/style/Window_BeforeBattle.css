@@ -211,7 +211,7 @@
 }
 
 .participant_block .percent_indicator .entry img{
-	width: 1px;
+	--widthscaling: 1px;
 	filter: var(--white-filter);
 }
 

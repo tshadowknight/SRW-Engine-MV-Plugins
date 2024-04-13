@@ -10,6 +10,7 @@ Window_UpgradePilot.prototype = Object.create(Window_CSS.prototype);
 Window_UpgradePilot.prototype.constructor = Window_UpgradePilot;
 
 Window_UpgradePilot.prototype.initialize = function() {	
+	const _this = this;
 	this._layoutId = "upgrade_pilot";	
 	this._unitMode == "actor";
 	this.resetDeltas();
@@ -45,6 +46,9 @@ Window_UpgradePilot.prototype.initialize = function() {
 	this._currentFavSkillsPending = {};
 	
 	Window_CSS.prototype.initialize.call(this, 0, 0, 0, 0);	
+	window.addEventListener("resize", function(){
+		_this.requestRedraw();
+	});	
 }
 
 Window_UpgradePilot.prototype.resetDeltas = function() {

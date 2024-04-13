@@ -11,10 +11,13 @@ Window_UpgradePilotSelection.prototype = Object.create(Window_CSS.prototype);
 Window_UpgradePilotSelection.prototype.constructor = Window_UpgradePilotSelection;
 
 Window_UpgradePilotSelection.prototype.initialize = function() {
-	
+	const _this = this;
 	this._layoutId = "pilot_upgrade_list";	
 	this._pageSize = 1;
 	Window_CSS.prototype.initialize.call(this, 0, 0, 0, 0);	
+	window.addEventListener("resize", function(){
+		_this.requestRedraw();
+	});	
 }
 
 Window_UpgradePilotSelection.prototype.getCurrentSelection = function(){

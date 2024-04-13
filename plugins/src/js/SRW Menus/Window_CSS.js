@@ -49,8 +49,16 @@ Window_CSS.prototype.show = function() {
 	this._redrawRequested = true;
 	this._visibility = "";
 	this.refresh();	
+	this.triggerCustomBgCreate();
+	
 	Graphics._updateCanvas();
 };
+
+Window_CSS.prototype.triggerCustomBgCreate = function() {
+	if(ENGINE_SETTINGS.CUSTOM_MENU_ON_SHOW){
+		ENGINE_SETTINGS.CUSTOM_MENU_ON_SHOW(this._container);
+	}
+}
 
 Window_CSS.prototype.requestRedraw = function() {	
 	this._redrawRequested = true;

@@ -8,7 +8,7 @@
 }
 
 .ability_block {
-	width: 25px;
+	--widthscaling: 25px;
 	margin-left: 5%;
 }
 
@@ -20,7 +20,7 @@
 .ability_block_row {
 	display: flex;
 	border-bottom: 0.1vw solid var(--underline-color);
-	height: 3px;
+	--heightscaling: 3px;
     align-items: flex-end;
 }
 
@@ -31,11 +31,11 @@
 }
 
 .ability_block_row .pilot_stat_container {
-	width: 8px;
+	--widthscaling: 8px;
 }
 
 .ability_block_row.terrain .pilot_stat_container {
-	width: 4px;
+	--widthscaling: 4px;
 }
 
 .ability_block.skills {
@@ -46,13 +46,10 @@
 }
 
 .ability_block.skills .pilot_stat_container{	
-	width: 12px;
+	--widthscaling: 12px;
 }
 
 .ability_block.skills .stat_value{
 	margin-left: 1%;
 }
 
-.unique_skill_mark {
-	width: 1px;
-}

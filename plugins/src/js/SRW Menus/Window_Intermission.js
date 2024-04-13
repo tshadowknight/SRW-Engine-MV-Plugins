@@ -15,6 +15,7 @@ Window_Intermission.prototype.show = function() {
 	this._redrawRequested = true;
 	this._visibility = "";
 	this.refresh();	
+	this.triggerCustomBgCreate();
 	Graphics._updateCanvas();
 };
 

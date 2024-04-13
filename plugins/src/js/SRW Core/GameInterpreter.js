@@ -2072,6 +2072,7 @@
 							if(this._attacker.params.targetEndHP <= 0){
 								dCache.isDestroyed = true;
 								dCache.destroyer = aCache.ref;
+								dCache.destroyedOrderIdx = orderIdx;
 							}
 						} 
 					}

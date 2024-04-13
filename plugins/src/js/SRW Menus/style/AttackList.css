@@ -187,7 +187,7 @@
 }
 
 .attack_list_type {
-	width: 2.2px;
+	--widthscaling: 2.2px;
 	filter: var(--white-filter);
 	display: flex;
 }
@@ -208,9 +208,8 @@
 
 .attribute_block_entry{
 	--fontsize: 1.5px;
-	width: 1.8px;
 	--widthscaling: 1.8;
-	height: 1.8px;
+	--heightscaling: 1.8px;
 	display: flex;
     align-items: center;
     justify-content: center;
@@ -339,7 +338,7 @@
 }
 
 .summary_row_value .upgrade_bar {
-    height: 1.2px;
+    --heightscaling: 1.2px;
     padding: 1%;
     position: relative;
 }

@@ -35,6 +35,7 @@ Window_UpgradeEquipWeapon.prototype.initialize = function() {
 	
 	this._currentUpgradeDeltas = 0;
 	Window_CSS.prototype.initialize.call(this, 0, 0, 0, 0);	
+
 }
 
 Window_UpgradeEquipWeapon.prototype.resetDeltas = function() {

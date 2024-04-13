@@ -628,6 +628,7 @@ Window_DeploymentTwin.prototype.show = function() {
 	this._redrawRequested = true;
 	this._visibility = "";
 	this.refresh();	
+	this.triggerCustomBgCreate();
 	Graphics._updateCanvas(this._layoutId);
 }
 

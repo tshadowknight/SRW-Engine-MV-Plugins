@@ -285,7 +285,7 @@
 }
 
 .deployment .ability_block_row {
-	height: 2.7px;
+	--heightscaling: 2.7px;
 }
 
 .deployment .right_items .ability_block_row {
@@ -303,7 +303,7 @@
 }
 
 .deployment .center_items .pilot_stat_container {
-	width: 10px;
+	--widthscaling: 10px;
 }
 
 .deployment .center_items {

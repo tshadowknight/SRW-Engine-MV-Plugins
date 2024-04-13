@@ -187,6 +187,11 @@ var _defaultPlayerSpeed = parameters['defaultPlayerSpeed'] || 4;
 		
 	}
 	
+	Graphics._onWindowResize = function() {
+		CSSUIManager.bumpScaleCache();
+		this._updateAllElements();
+	};
+	
 	Graphics._createAllElements = function() {
 		this._createErrorPrinter();
 		this._createCanvas();
@@ -633,6 +638,7 @@ SceneManager.isInSaveScene = function(){
     var _SRPG_SceneMap_createAllWindows = Scene_Map.prototype.createAllWindows;
     Scene_Map.prototype.createAllWindows = function() {
         _SRPG_SceneMap_createAllWindows.call(this);
+		
         this.createSrpgActorCommandWindow();
         this.createHelpWindow();
         

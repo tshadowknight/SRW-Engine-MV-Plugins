@@ -303,7 +303,7 @@ body {
 
 #detail_list_icon_pilot {
 	width: 5%;
-	margin-left: 1%;
+	margin-left: 8%;
 }
 
 .actor_name {
@@ -349,8 +349,8 @@ body {
 .detail_bar_upgrades .upgrade_block {
 	border-bottom: 0.1vw solid var(--underline-color);
 	position: absolute;	
-	width: 18px;
-	height: 2.5px;
+	--widthscaling: 18px;
+	--heightscaling: 2.5px;
 	display: flex;
 	align-items: flex-end;
 }
@@ -446,7 +446,7 @@ body {
 }
 
 .chevron_right {
-	width: 1.5px;
+	--widthscaling: 1.5px;
     margin-top: 0.5%;
 	margin-left: 5%;
 }
@@ -529,4 +529,8 @@ body {
 .img_wrapper canvas{
 	width: 100%;
 	image-rendering: pixelated; image-rendering: crisp-edges;
+}
+
+.unique_skill_mark {
+	--widthscaling: 1px;
 }

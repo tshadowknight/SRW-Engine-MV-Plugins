@@ -82,7 +82,7 @@ Window_DeploymentInStage.prototype.onMenu = function(){
 			$gameSystem.setActiveDeployList(activeDeployList);
 			$gameSystem.setSubBattlePhase("rearrange_deploys_init");
 			$gameSystem.highlightDeployTiles();
-			$gameSystem.redeployActors(false);
+			$gameSystem.redeployActors(false, true);
 		} else {			
 			$gameSystem.setActiveShipDeployList(activeDeployList);
 			$gameTemp.popMenu = true;

@@ -10,8 +10,12 @@ Window_UpgradeUnitSelection.prototype = Object.create(Window_CSS.prototype);
 Window_UpgradeUnitSelection.prototype.constructor = Window_UpgradeUnitSelection;
 
 Window_UpgradeUnitSelection.prototype.initialize = function() {	
+	const _this = this;
 	this._layoutId = "upgrade_unit_selection";	
 	Window_CSS.prototype.initialize.call(this, 0, 0, 0, 0);	
+	window.addEventListener("resize", function(){
+		_this.requestRedraw();
+	});	
 }
 
 Window_UpgradeUnitSelection.prototype.getCurrentSelection = function(){

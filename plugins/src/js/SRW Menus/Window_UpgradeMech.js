@@ -10,6 +10,7 @@ Window_UpgradeMech.prototype = Object.create(Window_CSS.prototype);
 Window_UpgradeMech.prototype.constructor = Window_UpgradeMech;
 
 Window_UpgradeMech.prototype.initialize = function() {	
+	const _this = this;
 	this._layoutId = "upgrade_mech";	
 	this.resetDeltas();
 	this._upgradeTypes = {
@@ -41,6 +42,9 @@ Window_UpgradeMech.prototype.initialize = function() {
 	this._maxFUBSelection = this._genericFUBInfo.length;
 	
 	Window_CSS.prototype.initialize.call(this, 0, 0, 0, 0);	
+	window.addEventListener("resize", function(){
+		_this.requestRedraw();
+	});
 }
 
 Window_UpgradeMech.prototype.resetSelection = function(){
