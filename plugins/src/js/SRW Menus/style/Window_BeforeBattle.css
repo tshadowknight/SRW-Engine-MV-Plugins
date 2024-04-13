@@ -274,7 +274,7 @@
 	color: #FFFFFF;
 	position: absolute;
 	top: 0%;
-    right: 1%;
+    right: 7%;
 }
 
 .participant_block .main_row .main_content .pilot_stats .label{ 
@@ -414,7 +414,7 @@
 }
 
 .participant_block.enemy .main_row .main_content .pilot_stats  {
-	right: 27%;
+	right: 33%;
 	left: auto;
 }
 
