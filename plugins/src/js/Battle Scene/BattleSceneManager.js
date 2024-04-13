@@ -6585,12 +6585,19 @@ BattleSceneManager.prototype.preloadSceneAssets = function(){
 				}
 				
 				preloadDefaultFrames(nextAction.ref);
+				if(nextAction.ref.subTwin){
+					preloadDefaultFrames(nextAction.ref.subTwin);
+				}
 				if(nextAction.originalTarget){
 					preloadDefaultFrames(nextAction.originalTarget.ref);
 				}
 				if(nextAction.attacked){
 					preloadDefaultFrames(nextAction.attacked.ref);
+					if(nextAction.attacked.ref.subTwin){
+						preloadDefaultFrames(nextAction.attacked.ref.subTwin);
+					}
 				}
+				
 				
 
 			
