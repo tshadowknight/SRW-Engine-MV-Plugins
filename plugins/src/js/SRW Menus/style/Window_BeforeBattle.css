@@ -261,10 +261,11 @@
 
 .participant_block .main_row .main_content .pilot_name{
 	--fontsize: 2.2px;
-	--widthscaling: 12;
+	--widthscaling: 15;
 	position: absolute;
 	top: 0%;
     left: 27%;
+	white-space: nowrap;
 }
 
 .participant_block .main_row .main_content .pilot_stats {
@@ -274,7 +275,7 @@
 	color: #FFFFFF;
 	position: absolute;
 	top: 0%;
-    right: 7%;
+    right: 1%;
 }
 
 .participant_block .main_row .main_content .pilot_stats .label{ 
@@ -285,15 +286,15 @@
 .participant_block .main_row .main_content .pilot_stats .level{
 	display: flex;
 	align-items: center;
-	--widthscaling: 8;
+	--widthscaling: 6;
 	margin-left: 10%;
 }
 
 .participant_block .main_row .main_content .pilot_stats .will{
 	display: flex;
 	align-items: center;
-	--widthscaling: 12;
-	margin-left: 10%;
+	--widthscaling: 10;
+	margin-left: 5%;
 }
 
 .participant_block .main_row .main_content .mech_hp_en_container {
@@ -414,7 +415,7 @@
 }
 
 .participant_block.enemy .main_row .main_content .pilot_stats  {
-	right: 33%;
+	right: 27%;
 	left: auto;
 }
 

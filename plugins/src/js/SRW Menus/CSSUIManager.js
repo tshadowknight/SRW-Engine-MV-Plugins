@@ -18,7 +18,7 @@ CSSUIManager.prototype.updateLayer = function(dimensions){
 	}	
 }
 
-CSSUIManager.prototype.updateScaledText = function(windowId){
+CSSUIManager.prototype.updateScaledText = function(windowId, bustCache){
 	if(this.customUILayer){
 		
 		function getElemCacheIdx(elem){

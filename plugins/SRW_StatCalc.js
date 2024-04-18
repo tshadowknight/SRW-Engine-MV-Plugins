@@ -7766,41 +7766,43 @@ StatCalc.prototype.getActorStatMods = function(actor, excludedSkills){
 								} else {
 									mods = $abilityZoneManager.getEnemyMod(actor, zoneInfo.abilityId, unitZoneInfo.length);
 								}
-								
-								for(let statMod of mods){
-									var targetList;	
-									if(statMod.modType == "mult"){
-										targetList = tileMods.mult;
-									} else if(statMod.modType == "addPercent"){
-										targetList = tileMods.addPercent;
-									} else if(statMod.modType == "addFlat"){
-										targetList = tileMods.addFlat;
-									} else if(statMod.modType == "mult_ceil"){
-										targetList = tileMods.mult_ceil;
+								if(mods){
+									for(let statMod of mods){
+										var targetList;	
+										if(statMod.modType == "mult"){
+											targetList = tileMods.mult;
+										} else if(statMod.modType == "addPercent"){
+											targetList = tileMods.addPercent;
+										} else if(statMod.modType == "addFlat"){
+											targetList = tileMods.addFlat;
+										} else if(statMod.modType == "mult_ceil"){
+											targetList = tileMods.mult_ceil;
+										}
+										
+										statMod.rangeInfo = {min: 0, max: 0, targets: "own"};
+										
+										statMod.stackId = "zone_ability";
+										statMod.canStack = true;
+										
+										statMod.appliesTo = null;
+										
+										statMod.slotType = "main";
+										
+										statMod.originType = zoneSetter.isActor() ? "actor" : "enemy";
+										statMod.originId = zoneSetter.SRWStats.pilot.id;
+										
+										if(targetList){
+											targetList.push(statMod);
+										}
+										var listEntry = structuredClone(statMod);
+										if(!listEntry.name){
+											listEntry.name = "Zone Ability";
+										}
+										
+										tileMods.list.push(listEntry);
 									}
-									
-									statMod.rangeInfo = {min: 0, max: 0, targets: "own"};
-									
-									statMod.stackId = "zone_ability";
-									statMod.canStack = true;
-									
-									statMod.appliesTo = null;
-									
-									statMod.slotType = "main";
-									
-									statMod.originType = zoneSetter.isActor() ? "actor" : "enemy";
-									statMod.originId = zoneSetter.SRWStats.pilot.id;
-									
-									if(targetList){
-										targetList.push(statMod);
-									}
-									var listEntry = structuredClone(statMod);
-									if(!listEntry.name){
-										listEntry.name = "Zone Ability";
-									}
-									
-									tileMods.list.push(listEntry);
-								}						
+								}
+														
 							}					
 						}
 					}

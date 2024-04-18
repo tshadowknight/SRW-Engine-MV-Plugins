@@ -521,7 +521,8 @@
 				params.attribute2,
 				params.boxDrop,
 				params.targetBox,
-				params.AIFlags
+				params.AIFlags,
+				params.kills
 			);
 		}
 		
@@ -580,12 +581,13 @@
 					squadId: getParamSetting("squadId", eventId),
 					targetRegion: getParamSetting("targetRegion", eventId),
 					AIFlags: getParamSetting("AIFlags", eventId),
+					kills: getParamSetting("kills", eventId) || 0,
 				});
 			}
 		}
 
 		// 新規エネミーを追加する（増援）
-		Game_Interpreter.prototype.addEnemy = function(toAnimQueue, eventId, enemyId, mechClass, level, mode, targetId, items, squadId, targetRegion, factionId, counterBehavior, attackBehavior, noUpdateCount, attribute1, attribute2, boxDrop, targetBox, AIFlags) {
+		Game_Interpreter.prototype.addEnemy = function(toAnimQueue, eventId, enemyId, mechClass, level, mode, targetId, items, squadId, targetRegion, factionId, counterBehavior, attackBehavior, noUpdateCount, attribute1, attribute2, boxDrop, targetBox, AIFlags, kills) {
 			if(!$dataEnemies[enemyId] || !$dataEnemies[enemyId].meta || !Object.keys($dataEnemies[enemyId].meta).length){
 				throw("Attempted to create an enemy pilot with id '"+enemyId+"' which does not have SRW data.");
 			}
@@ -652,6 +654,7 @@
 					$statCalc.applyBattleStartWill(enemy_unit);
 					$statCalc.updateSuperState(enemy_unit, false, true);
 					
+					enemy_unit.SRWStats.pilot.kills = kills || 0;
 					
 					if(!noUpdateCount){
 						
@@ -1344,23 +1347,38 @@
 			return result;
 		}
 
-		Game_Interpreter.prototype.isActorInBattle = function(actorId) {
+		Game_Interpreter.prototype.isActorInBattle = function(actorId, checkSubPilots) {
 			var result = false;
+			
+			function checkActorSubPilots(actor){
+				if(actor && checkSubPilots){
+					const subPilots = $statCalc.getSubPilots(actor);
+					for(let subPilotId of subPilots){
+						if(subPilotId == actorId){
+							result = true;
+						}
+					}	
+				}				
+			}
 			if($gameTemp.currentBattleActor && $gameTemp.currentBattleActor.isActor()){
 				if($gameTemp.currentBattleActor.actorId() == actorId){
 					result = true;
 				}		
+				checkActorSubPilots($gameTemp.currentBattleActor);
 				if($gameTemp.currentBattleActor.subTwin && $gameTemp.currentBattleActor.subTwin.actorId() == actorId){
 					result = true;
 				}
+				checkActorSubPilots($gameTemp.currentBattleActor.subTwin);
 			}
 			if($gameTemp.currentBattleEnemy && $gameTemp.currentBattleEnemy.isActor()){
 				if($gameTemp.currentBattleEnemy.actorId() == actorId){
 					result = true;
 				}
+				checkActorSubPilots($gameTemp.currentBattleEnemy);
 				if($gameTemp.currentBattleEnemy.subTwin && $gameTemp.currentBattleEnemy.subTwin.actorId() == actorId){
 					result = true;
 				}
+				checkActorSubPilots($gameTemp.currentBattleEnemy.subTwin);
 			}
 			return result;
 		}

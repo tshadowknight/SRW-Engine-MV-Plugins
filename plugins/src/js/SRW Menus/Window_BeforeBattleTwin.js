@@ -1298,19 +1298,19 @@ Window_BeforebattleTwin.prototype.createParticipantBlock = function(ref, action,
 		content+="</div>";
 		
 		content+="<div class='pilot_stats scaled_text'>";	
-		content+="<div class='level scaled_width'>";
-		content+="<div class='label'>";
+		content+="<div class='level scaled_width level_container'>";
+		content+="<div class='label label_level'>";
 		content+=APPSTRINGS.GENERAL.label_level;
 		content+="</div>";
-		content+="<div class='value'>";
+		content+="<div class='value value_level'>";
 		content+=$statCalc.getCurrentLevel(ref);
 		content+="</div>";
 		content+="</div>";
-		content+="<div class='will scaled_width'>";
-		content+="<div class='label'>";
+		content+="<div class='will scaled_width will_container'>";
+		content+="<div class='label label_will'>";
 		content+=APPSTRINGS.GENERAL.label_will;
 		content+="</div>";
-		content+="<div class='value'>";
+		content+="<div class='value value_will'>";
 		content+=$statCalc.getCurrentWill(ref);
 		content+="</div>";
 		content+="</div>";

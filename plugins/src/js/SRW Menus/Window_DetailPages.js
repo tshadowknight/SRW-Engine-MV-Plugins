@@ -900,7 +900,7 @@ Window_DetailPages.prototype.drawPilotStats2 = function() {
 		}
 		
 		
-		detailContent+="<div "+descriptionData+" class='pilot_stat_container "+descriptionClass+" scaled_text scaled_width fitted_text "+displayClass+"'>";
+		detailContent+="<div "+descriptionData+" class='pilot_stat_container "+descriptionClass+" scaled_text scaled_width fitted_text "+displayClass+" "+i+"'>";
 		detailContent+="<div class='unique_skill_mark scaled_width'>"+uniqueString+"</div>";
 		detailContent+="<div class='stat_value'>"+displayName+"</div>";
 		detailContent+="</div>";		
@@ -937,7 +937,7 @@ Window_DetailPages.prototype.drawPilotStats2 = function() {
 			displayName = "<div class='scaled_width spirit_label'>"+displayInfo.name+"</div>("+spiritList[i].cost+")" ;
 		}
 		
-		detailContent+="<div "+descriptionData+" class='pilot_stat_container "+descriptionClass+" scaled_text scaled_width fitted_text spirit_list_entry'>";
+		detailContent+="<div "+descriptionData+" class='pilot_stat_container "+descriptionClass+" scaled_text scaled_width fitted_text spirit_list_entry' "+i+">";
 		detailContent+="<div class='stat_value'>"+displayName+"</div>";
 		detailContent+="</div>";		
 		
@@ -1015,7 +1015,7 @@ Window_DetailPages.prototype.drawPilotStats2 = function() {
 				displayName = "<div class='scaled_width spirit_label'>"+displayInfo.name+"</div>";
 			}
 			
-			detailContent+="<div "+descriptionData+" class='pilot_stat_container "+descriptionClass+" scaled_text scaled_width fitted_text spirit_list_entry'>";
+			detailContent+="<div "+descriptionData+" class='pilot_stat_container "+descriptionClass+" scaled_text scaled_width fitted_text spirit_list_entry' "+i+">";
 			detailContent+="<div class='stat_value'>"+displayName+"</div>";
 			detailContent+="</div>";		
 			

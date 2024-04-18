@@ -31,7 +31,7 @@
 }
 
 .ability_block_row .pilot_stat_container {
-	--widthscaling: 8px;
+	--widthscaling: 12px;
 }
 
 .ability_block_row.terrain .pilot_stat_container {

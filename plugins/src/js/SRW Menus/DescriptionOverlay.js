@@ -113,6 +113,6 @@ DescriptionOverlay.prototype.redraw = function() {
 	}
 	this.updateScaledDiv(_this._container);
 	this.updateScaledDiv(_this._text);
-	
-	Graphics._updateCanvas();
+	CSSUIManager.bumpScaleCache();
+	Graphics._updateCanvas(null, true);
 }

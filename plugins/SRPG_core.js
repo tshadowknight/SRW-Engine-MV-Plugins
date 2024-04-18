@@ -2060,9 +2060,11 @@ SceneManager.isInSaveScene = function(){
 		} else if($gameTemp.deathQueue.length){
 			$gameSystem.setSubBattlePhase("process_death_queue");
 			this.eventBeforeDestruction();
-		} else {
+		} else if($gameTemp.isEnemyAttack){
 			$gameSystem.setSubBattlePhase("enemy_hit_and_away");
-			//this.srpgAfterAction();
+			//
+		} else {
+			this.srpgAfterAction();
 		}
     };
 
