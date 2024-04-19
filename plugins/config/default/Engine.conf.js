@@ -198,6 +198,7 @@ var ENGINE_SETTINGS = {
 	MAX_DEPLOY_SIZE: 36, //the number of slots shown in the deploy window if TWIN mode is not enabled
 	MAX_DEPLOY_SIZE_TWIN: 40, //the number of slots shown in the deploy window if TWIN mode is enabled
 	SINGLE_BATTLE_SPRITE_MODE: false,
+	ENABLE_TWEAKS_OPTION: false,
 	MERGE_ATTACK_UPGRADES: false,
 	ENABLE_ATTRIBUTE_SYSTEM: false,
 	USE_WEAPON_ATTRIBUTE: false,

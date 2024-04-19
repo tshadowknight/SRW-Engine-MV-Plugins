@@ -209,7 +209,7 @@ CSSUIManager.prototype.initAllWindows = function(){
 	this.initWindow("opening_crawl");
 	this.initWindow("text_log");
 	this.initWindow("zone_status");
-	
+	this.initWindow("game_modes");
 }
 
 CSSUIManager.prototype.initWindow = function(id){

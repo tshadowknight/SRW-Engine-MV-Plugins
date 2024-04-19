@@ -401,7 +401,17 @@ APPSTRINGS.OPTIONS = {
 	label_bgm_unit: "Unit",
 	label_bgm_vol: "BGM Volume",
 	label_sfx_vol: "SFX Volume",
-	label_battle_speed: "Action Speed"
+	label_battle_speed: "Action Speed",
+	label_tweaks: "Game Tweaks"
+}
+
+APPSTRINGS.GAME_MODES = {
+	title: "Game Tweaks",
+	label_on: "On",
+	label_off: "Off",
+	label_infinite_funds: "Infinite Funds",
+	label_infinite_PP: "Infinite PP",
+	resources: "Resources"
 }
 
 APPSTRINGS.MAP_BUTTONS = {

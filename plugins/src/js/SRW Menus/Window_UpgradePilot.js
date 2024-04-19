@@ -443,7 +443,7 @@ Window_UpgradePilot.prototype.update = function() {
 			} else if(this._currentUIState == "upgrading_pilot_stats"){			
 				var cost = this.currentCost();		
 				var pilotData = this.getCurrentSelection();
-				if(cost <= $statCalc.getCurrentPP(pilotData)){
+				if(cost <= $statCalc.getCurrentPP(pilotData) || $gameSystem.optionInfinitePP){
 					SoundManager.playOk();
 					$statCalc.applyPilotUpgradeDeltas(pilotData, this._currentUpgradeDeltas);
 					$statCalc.subtractPP(pilotData, cost);
@@ -466,7 +466,7 @@ Window_UpgradePilot.prototype.update = function() {
 						level = learnedAbilities[current.idx].level;
 					}
 					var cost = current.info.cost[level];
-					if(!Number.isNaN(cost) && (cost <= $statCalc.getCurrentPP(pilotData))){
+					if(!Number.isNaN(cost) && (cost <= $statCalc.getCurrentPP(pilotData) || $gameSystem.optionInfinitePP)){
 						SoundManager.playOk();
 						this._currentUIState = "ability_purchase_selection";
 					} else {
@@ -687,6 +687,9 @@ Window_UpgradePilot.prototype.redraw = function() {
 	fundDisplayContent+="<div class='fund_entry'>";
 	fundDisplayContent+="<div class='fund_entry_label scaled_text'>"+APPSTRINGS.PILOTUPGRADES.label_remaining_PP+"</div>";
 	var remaining = $statCalc.getCurrentPP(pilotData) - this.currentCost();
+	if($gameSystem.optionInfinitePP){
+		remaining = 999;
+	}
 	fundDisplayContent+="<div class='fund_entry_value scaled_text "+(remaining < 0 ? "underflow" : "")+"'>"+remaining+"</div>";
 	fundDisplayContent+="</div>";
 	
@@ -712,6 +715,9 @@ Window_UpgradePilot.prototype.redraw = function() {
 	pointsDisplayContent+="<div class='fund_entry'>";
 	pointsDisplayContent+="<div class='fund_entry_label scaled_text'>"+APPSTRINGS.PILOTUPGRADES.label_remaining_points+"</div>";
 	var remaining = $gameSystem.getCurrentFavPoints() - this.currentPointCost();
+	if($gameSystem.optionInfinitePP){
+		remaining = 999;
+	}
 	pointsDisplayContent+="<div class='fund_entry_value scaled_text "+(remaining < 0 ? "underflow" : "")+"'>"+remaining+"</div>";
 	pointsDisplayContent+="</div>";
 	
@@ -1045,7 +1051,7 @@ Window_UpgradePilot.prototype.redraw = function() {
 	});
 	var cost = this.currentCost();					
 	var pilotData = this.getCurrentSelection();
-	if(cost > 0 && cost <= $statCalc.getCurrentPP(pilotData)){
+	if(cost > 0 && (cost <= $statCalc.getCurrentPP(pilotData) || $gameSystem.optionInfinitePP)){
 		windowNode.querySelector("#btn_apply").classList.remove("disabled");		
 	} else {
 		windowNode.querySelector("#btn_apply").classList.add("disabled");

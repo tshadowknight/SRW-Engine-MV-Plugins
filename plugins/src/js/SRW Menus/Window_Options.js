@@ -22,10 +22,16 @@ Window_Options.prototype.initialize = function() {
 			
 		}
 	});*/
+	this._wasStacked = false;
 	
 	this._titleInfo = {};
 	this._titleInfo[0] = APPSTRINGS.OPTIONS.label_game_options;
-	this._titleInfo[6] = APPSTRINGS.OPTIONS.label_sound_options;
+	if(ENGINE_SETTINGS.ENABLE_TWEAKS_OPTION){
+		this._titleInfo[7] = APPSTRINGS.OPTIONS.label_sound_options;
+	} else {
+		this._titleInfo[6] = APPSTRINGS.OPTIONS.label_sound_options;
+	}
+	
 	
 
 
@@ -121,8 +127,18 @@ Window_Options.prototype.initialize = function() {
 			}
 		}
 	});
-	
-	
+	if(ENGINE_SETTINGS.ENABLE_TWEAKS_OPTION){
+		this._optionInfo.push({
+			name: APPSTRINGS.OPTIONS.label_tweaks,
+			isSubMenu: true,
+			display: function(){
+				return "";
+			},
+			update: function(){
+				$gameTemp.pushMenu = "game_modes";
+			}
+		});
+	}
 	
 	this._optionInfo.push({
 		name: APPSTRINGS.OPTIONS.label_battle_bgm,
@@ -204,9 +220,11 @@ Window_Options.prototype.initialize = function() {
 }
 
 
-Window_Options.prototype.resetSelection = function(){	
-	this._currentSelection = 0;
-		
+Window_Options.prototype.resetSelection = function(){		
+	if(!this._wasStacked){
+		this._currentSelection = 0;
+		this._wasStacked = false;
+	}
 }
 
 Window_Options.prototype.getCurrentSelection = function(){
@@ -270,7 +288,9 @@ Window_Options.prototype.update = function() {
 		}
 		
 		function toggleOption(direction){
-			_this._optionInfo[_this._currentSelection].update(direction);
+			if(!_this._optionInfo[_this._currentSelection].isSubMenu){
+				_this._optionInfo[_this._currentSelection].update(direction);
+			}			
 		}					
 
 		if(Input.isTriggered('left') || Input.isRepeated('left')){
@@ -304,7 +324,10 @@ Window_Options.prototype.update = function() {
 		} 	
 		
 		if(Input.isTriggered('ok')){
-			//toggleOption("up");
+			if(_this._optionInfo[_this._currentSelection].isSubMenu){
+				_this._wasStacked = true;
+				_this._optionInfo[_this._currentSelection].update();
+			}
 		}
 		
 		if(Input.isTriggered('menu')){

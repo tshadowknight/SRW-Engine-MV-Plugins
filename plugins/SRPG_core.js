@@ -682,6 +682,7 @@ SceneManager.isInSaveScene = function(){
 		this.createDeploySelectionWindow();
 		this.createSearchWindow();
 		this.createOptionsWindow();
+		this.createGameModesWindow();
 		this.createMapButtonsWindow();
 		this.createOpeningCrawlWindow();
 		this.createTextLogWindow();
@@ -1209,6 +1210,20 @@ SceneManager.isInSaveScene = function(){
 		this.addWindow(this._optionsWindow);
 		this._optionsWindow.hide();
 		this.idToMenu["options"] = this._optionsWindow;
+    };
+	
+	Scene_Map.prototype.createGameModesWindow = function() {
+		var _this = this;
+		this._gameModeWindow = new Window_Game_Modes(0, 0, Graphics.boxWidth, Graphics.boxHeight);
+		this._gameModeWindow.registerCallback("closed", function(){
+			if($gameTemp.optionsWindowCancelCallback){
+				$gameTemp.optionsWindowCancelCallback();
+			}
+		});
+		this._gameModeWindow.close();
+		this.addWindow(this._gameModeWindow);
+		this._gameModeWindow.hide();
+		this.idToMenu["game_modes"] = this._gameModeWindow;
     };
 
     // アクターコマンドウィンドウを作る

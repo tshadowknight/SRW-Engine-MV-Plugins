@@ -4143,6 +4143,9 @@ StatCalc.prototype.getCurrentMP = function(actor){
 }
 
 StatCalc.prototype.getCurrentPP = function(actor){
+	if($gameSystem.optionInfinitePP){
+		return 999;
+	}
 	if(this.isActorSRWInitialized(actor)){
 		return actor.SRWStats.pilot.PP;
 	} else {
@@ -6283,7 +6286,7 @@ StatCalc.prototype.addPP = function(actor, amount){
 }
 
 StatCalc.prototype.subtractPP = function(actor, amount){		
-	if(this.isActorSRWInitialized(actor)){			
+	if(this.isActorSRWInitialized(actor) && !$gameSystem.optionInfinitePP){			
 		actor.SRWStats.pilot.PP-=amount;
 	} 	
 }

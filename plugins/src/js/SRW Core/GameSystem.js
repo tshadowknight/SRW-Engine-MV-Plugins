@@ -49,6 +49,12 @@
 			if(this.optionAfterBattleBGM == null){
 				this.optionAfterBattleBGM = true;
 			}
+			if(this.optionInfiniteFunds == null){
+				this.optionInfiniteFunds = false;
+			}
+			if(this.optionInfinitePP == null){
+				this.optionInfinitePP = false;
+			}
 		};
 
 	//変数関係の処理
@@ -1469,7 +1475,7 @@
 					var autoSpirits = $statCalc.getModDefinitions(battlerArray[1], ["auto_spirit"]);
 					
 					autoSpirits.forEach(function(autoSpirit){	
-						$statCalc.setAbilityUsed(actor, "auto_spirit_"+autoSpirit.stackId);
+						$statCalc.setAbilityUsed(battlerArray[1], "auto_spirit_"+autoSpirit.stackId);
 						spiritActivations.push({actor: battlerArray[1], spirit: autoSpirit.value});				
 					});	
 				}
@@ -1499,10 +1505,10 @@
 			
 			if(spiritActivations.length){					
 				_this.setSubBattlePhase('auto_spirits');
-			} //else if($gameTemp.AIActors.length){
+			} else if($gameTemp.AIActors.length){
 				_this.setBattlePhase('AI_phase');
 				_this.setSubBattlePhase('enemy_command');
-			//}
+			}
 			
 			//this.setSubBattlePhase('enemy_command');
 		};

@@ -1000,18 +1000,18 @@
 			return ENGINE_SETTINGS.RPG_MAKER_INV_LIMIT || 99;
 		};
 
-	/*
-		// アイテム・スキルの使用条件
-		var _SRPG_Game_Party_canUse = Game_Party.prototype.canUse;
-		Game_Party.prototype.canUse = function(item) {
-			if ($gameSystem.isSRPGMode() == true) {
-				var actor = $gameSystem.EventToUnit($gameTemp.activeEvent().eventId())[1];
-				return actor.canUse(item);
-			} else {
-				return _SRPG_Game_Party_canUse.call(this, item);
+		Game_Party.prototype.gold = function() {
+			if($gameSystem.optionInfiniteFunds){
+				return this.maxGold();
 			}
+			return this._gold;
+		};	
+		
+		Game_Party.prototype.loseGold = function(amount) {
+			if(!$gameSystem.optionInfiniteFunds){
+				this.gainGold(-amount);
+			}			
 		};
-	*/
 	//====================================================================
 	// ●Game_Troop
 	//====================================================================

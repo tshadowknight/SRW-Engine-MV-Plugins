@@ -494,7 +494,7 @@ BattleCalc.prototype.performDamageCalculation = function(attackerInfo, defenderI
 		}
 		
 		result.barrierNames = [];
-		if(!noBarrier && (!$statCalc.applyStatModsToValue(attackerInfo.actor, 0, ["pierce_barrier"]) && !$statCalc.applyStatModsToValue(defenderInfo.actor, 0, ["always_barrier"])) && !activeAttackerSpirits.fury){			
+		if(!noBarrier && (!$statCalc.applyStatModsToValue(attackerInfo.actor, 0, ["pierce_barrier"]) || $statCalc.applyStatModsToValue(defenderInfo.actor, 0, ["always_barrier"])) && !activeAttackerSpirits.fury){			
 			var totalBarrierCost = 0;
 			
 			
