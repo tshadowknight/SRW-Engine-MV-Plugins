@@ -392,7 +392,7 @@
 				let terrainDefs = $terrainTypeManager.getDefinitions();
 				for(let i = 0; i < $gameMap.width(); i++){
 					this._moveBudgets[i] = [];
-					for(let j = 0; j < $gameMap.width(); j++){
+					for(let j = 0; j < $gameMap.height(); j++){
 						this._moveBudgets[i][j] = {
 							freshFor: this._moveBudgetFreshCtr,
 							budgets: {}

@@ -6143,7 +6143,9 @@ StatCalc.prototype.addExp = function(actor, amount){
 		if(actor.SRWStats.pilot.exp > ENGINE_SETTINGS.LEVEL_CAP * 500){
 			actor.SRWStats.pilot.exp = ENGINE_SETTINGS.LEVEL_CAP * 500;
 		}
+		$statCalc.invalidateAbilityCache(actor);
 		this.calculateSRWActorStats(actor);
+		this.calculateSRWMechStats(actor.SRWStats.mech, true, actor);
 		this.getCalculatedPilotStats(actor).currentSP = oldStats.currentSP;
 		this.getCalculatedPilotStats(actor).currentMP = oldStats.currentMP;
 		var newLevel = this.getCurrentLevel(actor);		

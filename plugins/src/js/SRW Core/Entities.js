@@ -1340,29 +1340,29 @@
 						if (isPassableTile(x, y, newX,newY, actor)) {							
 							let isUpgrade = false;			
 							let targetBudget = visitedNodes[newX][newY];
-							
-							for(let terrainId in moveBudget.budgets){
-								if(moveBudget.budgets[terrainId].extra > 0 && terrainId == extraBudgetRefTerrain){
-									let newVal = Math.max(0, moveBudget.budgets[terrainId].extra - moveCost);
-									if(newVal > 0){
-										if(newVal > targetBudget.budgets[terrainId].extra || moveBudget.freshFor > targetBudget.freshFor){
-											targetBudget.budgets[terrainId].extra = newVal;
-											isUpgrade = true;
+							if(targetBudget){								
+								for(let terrainId in moveBudget.budgets){
+									if(moveBudget.budgets[terrainId].extra > 0 && terrainId == extraBudgetRefTerrain){
+										let newVal = Math.max(0, moveBudget.budgets[terrainId].extra - moveCost);
+										if(newVal > 0){
+											if(newVal > targetBudget.budgets[terrainId].extra || moveBudget.freshFor > targetBudget.freshFor){
+												targetBudget.budgets[terrainId].extra = newVal;
+												isUpgrade = true;
+											}
 										}
-									}
-																		
-								} else {
-									let newVal = Math.max(0, moveBudget.budgets[terrainId].standard - moveCost);
-									if(newVal > 0){
-										if(newVal > targetBudget.budgets[terrainId].standard || moveBudget.freshFor > targetBudget.freshFor){
-											targetBudget.budgets[terrainId].standard = newVal;
-											isUpgrade = true;
+																			
+									} else {
+										let newVal = Math.max(0, moveBudget.budgets[terrainId].standard - moveCost);
+										if(newVal > 0){
+											if(newVal > targetBudget.budgets[terrainId].standard || moveBudget.freshFor > targetBudget.freshFor){
+												targetBudget.budgets[terrainId].standard = newVal;
+												isUpgrade = true;
+											}
 										}
-									}
-								}				
-								
-							}	
-							
+									}				
+									
+								}	
+							}
 							if(isUpgrade){				
 								targetBudget.freshFor = freshFor;
 								stack.push({x: newX, y: newY});

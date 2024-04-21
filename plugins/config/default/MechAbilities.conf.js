@@ -902,6 +902,40 @@ $SRWConfig.mechAbilties = function(){
 	
 	
 	
+	this.addDefinition(
+		58, 
+		"Boost Mech based on pilot level example", 
+		"Boost mech base stats based on pilot's level.", 
+		false,
+		false,
+		function(actor, level){
+			const pilotLevel = actor.SRWStats.pilot.level;
+			const upgradeTables = [
+				{stat: "maxHP", amount: 100},
+				{stat: "maxEN", amount: 3},
+				{stat: "base_arm", amount: 10},
+				{stat: "base_mob", amount: 0.5},
+				{stat: "base_acc", amount: 0.5},
+				
+			];
+			
+			function applyStatUpgrade(stat, amount){
+				//stat currently unused, but can be used to use different calculations methods for different stats
+				return Math.floor(amount * pilotLevel);
+			}
+			
+			let statMods = [];
+			for(let entry of upgradeTables){
+				const upgradeValue = applyStatUpgrade(entry.stat, entry.amount);
+				statMods.push({type: entry.stat, modType: "addFlat", value: upgradeValue});
+			}
+			
+			return statMods;
+		},
+		function(actor, level){
+			return true;
+		}
+	);
 	
 	/*Insert new ability here*/
 	
