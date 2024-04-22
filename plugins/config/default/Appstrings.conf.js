@@ -246,7 +246,8 @@ APPSTRINGS.MECHUPGRADES = {
 	label_generic_fub_accuracy: "Accuracy +10%",
 	label_generic_fub_movement: "Movement +1",
 	label_generic_fub_item_slot: "Item Slot +1",
-	label_apply: "OK"
+	label_apply: "OK",
+	label_no_upgrade: "This unit does not upgrade using funds."
 }
 
 APPSTRINGS.PILOTUPGRADES = {
@@ -771,6 +772,7 @@ EDITORSTRINGS.MECH = {
 	label_enabled: "Enabled",
 	label_move_penalty: "With Movement Penalty",
 	label_terrain_rank: "Rank",
+	label_can_upgrade: "Can Upgrade",
 	
 	label_exp_yield: "Exp. Yield",
 	label_pp_yield: "PP Yield",

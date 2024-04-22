@@ -1966,7 +1966,29 @@ MechUI.prototype.initPropertyHandlers = function(){
 					});
 				});
 			}	
-		}
+		},
+		no_upgrade: {
+			createControls(entry){
+				var content = "";
+				content+="<div class='row'>";
+				content+="<div class='cell'>";
+				content+=EDITORSTRINGS.MECH.label_can_upgrade;
+				content+="</div>";
+				content+="<div class='cell'>";
+				content+="<input id='no_upgrade' type=checkbox "+(_this.getMetaValue("mechNoUpgrade")*1 ? "" : "checked")+"></input>";
+				content+="</div>";
+				content+="</div>";
+				return content;
+			},
+			hook(entry){
+				entry = _this.getCurrentEntry();
+				containerNode.querySelector("#no_upgrade").addEventListener("change", function(){
+					_this.setMetaValue("mechNoUpgrade", this.checked ? 0 : 1);
+					_this.show();
+					_this._mainUIHandler.setModified();
+				});
+			}
+		},
 	};	
 	
 	var terrains = [
@@ -2073,6 +2095,7 @@ MechUI.prototype.show = async function(){
 	
 	
 	content+="<div class='table'>";
+	content+=_this._propertyHandlers.no_upgrade.createControls();	
 	content+=_this._propertyHandlers.stats.createControls();
 	
 	content+="<div class='row'>";

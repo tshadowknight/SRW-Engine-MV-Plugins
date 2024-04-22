@@ -172,6 +172,25 @@ Window_UpgradeMech.prototype.update = function() {
 	Window_Base.prototype.update.call(this);
 	
 	if(this.isOpen() && !this._handlingInput){
+		
+		if(Input.isTriggered('cancel') || TouchInput.isCancelled()){
+			if(this._UIState == "upgrades"){
+				this.resetDeltas();
+				SoundManager.playCancel();
+				$gameTemp.popMenu = true;	
+			}
+			this.refresh();
+			return;		
+		}	
+		
+		var mechData = this.getCurrentSelection();
+		var refData = this.createReferenceData(mechData);
+		if(refData.SRWStats.mech.noUpgrade){
+			this.resetTouchState();
+			this.refresh();
+			return;
+		}
+		
 		if(Input.isTriggered('down') || Input.isRepeated('down')){
 			SoundManager.playCursor();
 			this.requestRedraw();
@@ -279,15 +298,7 @@ Window_UpgradeMech.prototype.update = function() {
 			this.refresh();
 			return;				
 		}
-		if(Input.isTriggered('cancel')|| TouchInput.isCancelled()){
-			if(this._UIState == "upgrades"){
-				this.resetDeltas();
-				SoundManager.playCancel();
-				$gameTemp.popMenu = true;	
-			}
-			this.refresh();
-			return;		
-		}		
+			
 		this.resetTouchState();
 		this.refresh();
 	}		
@@ -358,20 +369,27 @@ Window_UpgradeMech.prototype.redraw = function() {
 		return content;
 	}	
 	
-	upgradeControlContent+="<div class='weapon_upgrade_container'>";
-	upgradeControlContent+="<div class='upgrade_entry "+(_this._currentSelection == 0 ? "selected" : "")+"'>";
-	upgradeControlContent+="<div class='upgrade_entry_label scaled_text'>"+APPSTRINGS.MECHUPGRADES.label_weapons+"</div>";
-	upgradeControlContent+="<div class='upgrade_entry_current scaled_text'>"+upgradeLevels.weapons+"</div>";
-	upgradeControlContent+="<div class='chevron_right scaled_width'><img src='svg/chevron_right.svg'></div>";
-	upgradeControlContent+="<div class='upgrade_entry_new scaled_text'>"+(upgradeLevels.weapons + this._currentUpgradeDeltas.weapons)+"</div>";
-	upgradeControlContent+="<div class='upgrade_entry_bar'>"+this.createUpgradeBar(upgradeLevels.weapons, this._currentUpgradeDeltas.weapons, 0)+"</div>";
-	upgradeControlContent+="</div>";
-	upgradeControlContent+="</div>";
-	upgradeControlContent+="<div class='stat_upgrade_container'>";	
-	for(var i = 1; i < this._maxSelection; i++){
-		upgradeControlContent+=createStatUpgradeBlock(i);
-	}	
-	upgradeControlContent+="</div>";
+	if(refData.SRWStats.mech.noUpgrade){
+		upgradeControlContent+="<div class='no_upgrade_label scaled_text'>";
+		upgradeControlContent+=APPSTRINGS.MECHUPGRADES.label_no_upgrade;
+		upgradeControlContent+="</div>";
+	} else {
+		upgradeControlContent+="<div class='weapon_upgrade_container'>";
+		upgradeControlContent+="<div class='upgrade_entry "+(_this._currentSelection == 0 ? "selected" : "")+"'>";
+		upgradeControlContent+="<div class='upgrade_entry_label scaled_text'>"+APPSTRINGS.MECHUPGRADES.label_weapons+"</div>";
+		upgradeControlContent+="<div class='upgrade_entry_current scaled_text'>"+upgradeLevels.weapons+"</div>";
+		upgradeControlContent+="<div class='chevron_right scaled_width'><img src='svg/chevron_right.svg'></div>";
+		upgradeControlContent+="<div class='upgrade_entry_new scaled_text'>"+(upgradeLevels.weapons + this._currentUpgradeDeltas.weapons)+"</div>";
+		upgradeControlContent+="<div class='upgrade_entry_bar'>"+this.createUpgradeBar(upgradeLevels.weapons, this._currentUpgradeDeltas.weapons, 0)+"</div>";
+		upgradeControlContent+="</div>";
+		upgradeControlContent+="</div>";
+		upgradeControlContent+="<div class='stat_upgrade_container'>";	
+		for(var i = 1; i < this._maxSelection; i++){
+			upgradeControlContent+=createStatUpgradeBlock(i);
+		}	
+		upgradeControlContent+="</div>";
+	}
+	
 	this._upgradeControls.innerHTML = upgradeControlContent;
 	
 	var fundDisplayContent = "";

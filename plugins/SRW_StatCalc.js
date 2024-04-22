@@ -1920,6 +1920,8 @@ StatCalc.prototype.getMechData = function(mech, forActor, items, previousWeapons
 		
 		result.stats.base.size = sizeString;
 		
+		result.noUpgrade = mechProperties.mechNoUpgrade * 1;
+		
 
 		result.stats.upgradeCostTypes.maxHP = parseInt(mechProperties.mechUpgradeHPCost);
 		//result.currentHP = mechProperties.mechHP;

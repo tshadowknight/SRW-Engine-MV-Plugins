@@ -229,3 +229,13 @@
 #upgrade_mech #attack_list_control {
 	z-index: 1;
 }
+
+#upgrade_mech .no_upgrade_label {
+	width: 100%;
+	height: 100%;
+	display: flex;
+	align-items: center;
+	justify-content: center;
+	--fontsize: 2px;
+	color: var(--text-color-highlight2);
+}
