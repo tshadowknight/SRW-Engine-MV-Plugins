@@ -3375,8 +3375,8 @@ Sprite_Character.prototype._ultraMode7PreUpdate = function()
 Sprite_Character.prototype._ultraMode7Update = function()
 {
 	const scale = this._character.screenScale();
-	this.scale.x *= scale;
-	this.scale.y *= scale;
+	this.scale.x = Math.floor(this.scale.x * scale * 10000) / 10000;
+	this.scale.y = Math.floor(this.scale.y * scale * 10000) / 10000;
 	this.rotation += Math.PI * $gameMap.ultraMode7Roll / 180;
 };
 

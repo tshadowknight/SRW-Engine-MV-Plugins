@@ -5,6 +5,7 @@ export default function DescriptionOverlay(container, selectionProvider, exclude
 	this._container = container;	
 	this._sourceContainer;
 	this._elementIdx = 0;
+	this._isVisible = false;
 	this._abilityManagerLookup = {
 		pilot: $pilotAbilityManager,
 		mech: $mechAbilityManager,
@@ -28,6 +29,7 @@ DescriptionOverlay.prototype.show = function(sourceContainer){
 	this._container.style.display = "block";	
 	this._sourceContainer = sourceContainer;
 	this._elementIdx = 0;
+	this._isVisible = true;
 	this.redraw();
 }
 
@@ -55,6 +57,7 @@ DescriptionOverlay.prototype.decrementSelection = function(sourceContainer){
 }
 
 DescriptionOverlay.prototype.hide = function(){
+	this._isVisible = false;
 	this._container.style.display = "none";	
 	if(this._sourceContainer){
 		var describedElements = this._sourceContainer.querySelectorAll(".described_element");
@@ -67,6 +70,9 @@ DescriptionOverlay.prototype.hide = function(){
 
 DescriptionOverlay.prototype.redraw = function() {
 	var _this = this;	
+	if(!this._isVisible){
+		return;
+	}
 	this._text.innerHTML = "";
 	if(_this._sourceContainer){
 		var describedElements = _this._sourceContainer.querySelectorAll(".described_element");
@@ -113,6 +119,6 @@ DescriptionOverlay.prototype.redraw = function() {
 	}
 	this.updateScaledDiv(_this._container);
 	this.updateScaledDiv(_this._text);
-	CSSUIManager.bumpScaleCache();
-	Graphics._updateCanvas(null, true);
+	//CSSUIManager.bumpScaleCache();
+	Graphics._updateCanvas(null);
 }

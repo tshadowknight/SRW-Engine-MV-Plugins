@@ -744,8 +744,14 @@
 		Sprite_Character.prototype.updateCharacterFrame = function() {
 			var pw = this.patternWidth();
 			var ph = this.patternHeight();
-			var sx = (this.characterBlockX() + this.characterPatternX()) * pw;
-			var sy = (this.characterBlockY() + this.characterPatternY()) * ph;
+			if(ENGINE_SETTINGS.USE_SINGLE_MAP_SPRITE){
+				sx = (this.characterBlockX() + 0) * pw;
+				sy = (this.characterBlockY() + 0) * ph;
+			} else {
+				sx = (this.characterBlockX() + this.characterPatternX()) * pw;
+				sy = (this.characterBlockY() + this.characterPatternY()) * ph;
+			}
+			
 			
 			let isMode7 = (typeof UltraMode7 != "undefined") && UltraMode7.isActive();
 			
@@ -943,7 +949,8 @@
 				}
 				this.y = this.y + (floatOffset * ratio);
 			}
-		}	
+		}
+		this.y-=(ENGINE_SETTINGS.CURSOR_OFFSET || 0);
 	};
 	
 //====================================================================
