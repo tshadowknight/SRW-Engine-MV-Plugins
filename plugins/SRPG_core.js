@@ -1926,12 +1926,17 @@ SceneManager.isInSaveScene = function(){
 			}		
 		}
 		
-		if(!$SRWGameState.update(this)) {
-			return;
+		
+		/*_SRPG_SceneMap_update.call(this);*/
+		
+		this.updateDestination();
+		this.updateMainMultiply();
+		if (this.isSceneChangeOk()) {
+			this.updateScene();
+		} else if (SceneManager.isNextScene(Scene_Battle)) {
+			this.updateEncounterEffect();
 		}
-		
-		
-		_SRPG_SceneMap_update.call(this);
+		this.updateWaitCount();
 		
 		this.processMenuStack();
 		
@@ -2007,8 +2012,14 @@ SceneManager.isInSaveScene = function(){
 		}
 		
 	
+		let SRWStateResult = $SRWGameState.update(this);
 		
+		//update of scene base updates menus etc.
+		Scene_Base.prototype.update.call(this);
 		
+		if(!SRWStateResult){
+			return;
+		}
 		
 		if($gameTemp.continueLoaded){
 			$gameTemp.continueLoaded = false;
