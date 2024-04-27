@@ -228,9 +228,13 @@ Window_DeploymentTwin.prototype.decrementColumn = function() {
 	}		
 }
 
+
+
 Window_DeploymentTwin.prototype.update = function() {
 	var _this = this;
 	Window_Base.prototype.update.call(this);
+	
+	
 	
 	if(this.isOpen() && !this._handlingInput){
 		if(Input.isTriggered('down') || Input.isRepeated('down')){
@@ -595,6 +599,7 @@ Window_DeploymentTwin.prototype.onCancel = function() {
 		this.requestRedraw();
 	} else {
 		$gameTemp.popMenu = true;
+		$gameTemp.buttonHintManager.hide();
 		this._slotLookup = null;
 		this._availableUnits = null;
 	}
@@ -668,8 +673,29 @@ Window_DeploymentTwin.prototype.getSlotLookup = function() {
 	return this._slotLookup;
 }
 
+Window_DeploymentTwin.prototype.setButtonHints = function() {
+	let items = [];
+	if(this._swapSource != -1 || this._twinSwapSource != -1){
+		items.push(["select_deploy_target_slot"]);
+		items.push(["confirm_deploy_unit"]);	
+		if(this.isTwinMode()){
+			items.push(["select_deploy_twin"]);
+		}
+	} else {
+		items.push(["select_deploy_slot"]);
+		items.push(["select_deploy_unit"]);
+	}
+	
+	items.push(["move_to_front", "move_to_back"]);
+	return items;
+}
+
 Window_DeploymentTwin.prototype.redraw = function() {
 	var _this = this;
+	const hints = this.setButtonHints();
+	$gameTemp.buttonHintManager.setHelpButtons(hints);	
+	$gameTemp.buttonHintManager.show();	
+	
 	var windowNode = this.getWindowNode();
 	var deployInfo = $gameSystem.getDeployInfo();
 	var slotLookup = _this.getSlotLookup();

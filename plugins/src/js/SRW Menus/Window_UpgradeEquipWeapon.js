@@ -279,13 +279,15 @@ Window_UpgradeEquipWeapon.prototype.update = function() {
 		if(Input.isTriggered('cancel') || TouchInput.isCancelled()){	
 			this.refreshAllUnits();
 			SoundManager.playCancel();		
-			this.requestRedraw();
+			
 			if(this._currentUIState == "item_selection"){
 				this._currentSelection = 0;
 				$gameTemp.popMenu = true;	
+				$gameTemp.buttonHintManager.hide();	
 			} else if(this._currentUIState == "item_upgrade"){
 				this.resetDeltas();
-				this._currentUIState = "item_selection"				
+				this._currentUIState = "item_selection"		
+				this.requestRedraw();	
 			}
 			
 			this.refresh();
@@ -319,6 +321,14 @@ Window_UpgradeEquipWeapon.prototype.currentCost = function() {
 
 Window_UpgradeEquipWeapon.prototype.redraw = function() {
 	var _this = this;
+	
+	if(this._currentUIState == "item_selection"){
+		$gameTemp.buttonHintManager.setHelpButtons([["select_weapon"], ["page_nav"], ["confirm_weapon"]]);
+	} else if(this._currentUIState == "item_upgrade"){				
+		$gameTemp.buttonHintManager.setHelpButtons([["select_weapon_upgrade"], ["confirm_upgrade"]]);
+	}
+	$gameTemp.buttonHintManager.show();	
+	
 	var mechData = this.getCurrentSelection();
 	var inventoryInfo = $inventoryManager.getCurrentInventory();
 	const windowNode = this.getWindowNode();	

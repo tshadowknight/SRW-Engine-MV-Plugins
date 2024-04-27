@@ -125,6 +125,7 @@ Window_UpgradeUnitSelection.prototype.update = function() {
 		if(Input.isTriggered('cancel') || TouchInput.isCancelled()){	
 			SoundManager.playCancel();		
 			$gameTemp.popMenu = true;
+			$gameTemp.buttonHintManager.hide();	
 			this.refresh();
 			return;				
 		}		
@@ -135,7 +136,10 @@ Window_UpgradeUnitSelection.prototype.update = function() {
 
 Window_UpgradeUnitSelection.prototype.redraw = function() {
 	this._mechList.redraw();
-	this._DetailBarMechUpgrades.redraw();		
+	this._DetailBarMechUpgrades.redraw();	
+
+	$gameTemp.buttonHintManager.setHelpButtons([["select_mech", "page_nav"], ["upgrade_unit"], ["det_page_nav", "det_page_sort"], ["det_sort_order"]]);
+	$gameTemp.buttonHintManager.show();	
 	
 	this.loadImages();
 	Graphics._updateCanvas();

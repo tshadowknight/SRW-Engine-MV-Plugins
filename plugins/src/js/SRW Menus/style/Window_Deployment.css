@@ -40,7 +40,7 @@
 }
 
 .deployment.twin .deployed_list {	
-    top: 71%;
+    top: 67%;
     height: 24.5%;  
 	left: 8%;
 	width: 84%;
@@ -48,8 +48,8 @@
 }
 
 .available_list {	
-    top: 16%;
-    height: 53.5%;
+    top: 13%;
+    height: 52.5%;
     width: 64.5%;
     overflow-y: auto;
     overflow-x: hidden;
@@ -68,7 +68,7 @@
 }
 
 .available_list_label {	
-    top: 10.5%;  
+    top: 7.5%;  
 	right: 30%;
 }
 
@@ -156,9 +156,9 @@
 .deployment .pilot_info {
 	position: absolute;
     border: 0.1vw solid #FFFFFF;
-    height: 53.5%;
+    height: 52.5%;
     width: 19%;
-    top: 16%;
+    top: 13%;
     left: 73%;
     background-color: var(--section-bg-color);
     border-radius: 1vw;

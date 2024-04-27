@@ -295,6 +295,17 @@ Window_EquipItem.prototype.currentCost = function() {
 
 Window_EquipItem.prototype.redraw = function() {
 	var _this = this;
+	
+	if(this._currentUIState == "slot_selection"){
+		$gameTemp.buttonHintManager.setHelpButtons([["select_slot"], ["confirm_slot"]]);
+	} else if(this._currentUIState == "item_selection"){
+		$gameTemp.buttonHintManager.setHelpButtons([["select_item", "page_nav"], ["confirm_item"]]);
+	} else if(this._currentUIState == "item_transfer"){
+		$gameTemp.buttonHintManager.setHelpButtons([["select_transfer_slot"], ["confirm_transfer"]]);
+	}	
+	
+	$gameTemp.buttonHintManager.show();	
+	
 	var mechData = this.getCurrentSelection();
 	var inventoryInfo = $inventoryManager.getCurrentInventory();
 

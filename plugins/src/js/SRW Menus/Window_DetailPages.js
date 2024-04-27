@@ -426,6 +426,7 @@ Window_DetailPages.prototype.update = function() {
 			SoundManager.playCancel();
 			if(this._uiState == "normal"){
 				$gameTemp.popMenu = true;	
+				$gameTemp.buttonHintManager.hide();
 			
 				if(this._callbacks["closed"]){
 					this._callbacks["closed"]();
@@ -1034,6 +1035,29 @@ Window_DetailPages.prototype.drawPilotStats2 = function() {
 Window_DetailPages.prototype.redraw = function() {
 	//this._mechList.redraw();
 	var _this = this;
+	
+	if(this._selectedTab == 0){
+		if(ENGINE_SETTINGS.ENABLE_TWIN_SYSTEM){
+			$gameTemp.buttonHintManager.setHelpButtons([["previous_twin_pilot", "previous_sub_pilot"], ["tab_nav"], ["abi_details"]]);
+		} else {
+			$gameTemp.buttonHintManager.setHelpButtons([["previous_sub_pilot"], ["tab_nav"], ["abi_details"]]);
+		}		
+	} else if(this._selectedTab == 1){
+		if(ENGINE_SETTINGS.ENABLE_TWIN_SYSTEM){
+			$gameTemp.buttonHintManager.setHelpButtons([["tab_nav"], ["abi_details"]]);
+		} else {
+			$gameTemp.buttonHintManager.setHelpButtons([["tab_nav"], ["abi_details"]]);
+		}		
+	} else if(this._selectedTab == 2){
+		if(ENGINE_SETTINGS.ENABLE_TWIN_SYSTEM){
+			$gameTemp.buttonHintManager.setHelpButtons([["tab_nav"], ["inspect_weap"]]);
+		} else {
+			$gameTemp.buttonHintManager.setHelpButtons([["tab_nav"], ["inspect_weap"]]);
+		}		
+	} else {
+		$gameTemp.buttonHintManager.setHelpButtons([]);
+	}
+	$gameTemp.buttonHintManager.show();
 	
 	this._mapAttackPreview.classList.remove("active");	
 	if(this.getCurrentSelection().mech.id != -1){

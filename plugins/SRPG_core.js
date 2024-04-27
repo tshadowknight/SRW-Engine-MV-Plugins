@@ -169,19 +169,115 @@ var _defaultPlayerSpeed = parameters['defaultPlayerSpeed'] || 4;
 		return false;
 	};
 	
-	/*Input._pollGamepads = function() {
-		if (navigator.getGamepads) {
-			var gamepads = navigator.getGamepads();
-			if (gamepads) {
-				for (var i = 0; i < gamepads.length; i++) {
-					var gamepad = gamepads[i];
-					if (gamepad && gamepad.connected && gamepad.id == "Xbox 360 Controller (XInput STANDARD GAMEPAD)") {
-						this._updateGamepadState(gamepad);
-					}
+	Input.getActionKey = function(action){
+		let result = [];
+		for(let key in this.keyMapper){
+			if(this.keyMapper[key] == action){
+				result.push(key);
+			}
+		}
+		return result;
+	}
+	
+	Input.getActionGlyphs = function(action){
+		return this.getActionKey(action).map(x => this.keyToGlyph[x]);
+	}
+	
+	Input.getActionPadInput = function(action){		
+		let result = [];
+		for(let key in this.gamepadMapper){
+			if(this.gamepadMapper[key] == action){
+				result.push(key);
+			}
+		}
+		return result;
+	}
+	
+	Input.getPadGlyphs = function(action){
+		return this.getActionPadInput(action).map(x => this.padToGlyph[x]);
+	}
+	
+	Input.getGlyphDefinition = function(set, glyphs){
+		let result = [];
+		for(let glyph of glyphs){
+			result.push(this.glyphDefintions[set][glyph]);
+		}
+		return result;
+	}
+	
+	/**
+	 * @static
+	 * @method _updateGamepadState
+	 * @param {Gamepad} gamepad
+	 * @param {Number} index
+	 * @private
+	 */
+	Input._updateGamepadState = function(gamepad) {
+		var lastState = this._gamepadStates[gamepad.index] || [];
+		var newState = [];
+		var buttons = gamepad.buttons;
+		var axes = gamepad.axes;
+		var threshold = 0.5;
+		newState[12] = false;
+		newState[13] = false;
+		newState[14] = false;
+		newState[15] = false;
+		for (var i = 0; i < buttons.length; i++) {
+			newState[i] = buttons[i].pressed;
+		}
+		if (axes[1] < -threshold) {
+			newState[12] = true;    // up
+		} else if (axes[1] > threshold) {
+			newState[13] = true;    // down
+		}
+		if (axes[0] < -threshold) {
+			newState[14] = true;    // left
+		} else if (axes[0] > threshold) {
+			newState[15] = true;    // right
+		}
+		for (var j = 0; j < newState.length; j++) {
+			if (newState[j] !== lastState[j]) {
+				var buttonName = this.gamepadMapper[j];
+				if (buttonName) {
+					this._currentState[buttonName] = newState[j];
+					this._wasKeyboardUpdate = true;
 				}
 			}
 		}
-	};*/
+		this._gamepadStates[gamepad.index] = newState;
+	};
+	
+	/**
+	 * Updates the input data.
+	 *
+	 * @static
+	 * @method update
+	 */
+	Input.update = function() {
+		this._wasKeyboardUpdate = false;
+		this._pollGamepads();
+		if (this._currentState[this._latestButton]) {
+			this._pressedTime++;
+		} else {
+			this._latestButton = null;
+		}
+		for (var name in this._currentState) {
+			if (this._currentState[name] && !this._previousState[name]) {
+				if($gameSystem){
+					if(this._wasKeyboardUpdate){
+						$gameSystem.setControlSet("controller");
+					} else {
+						$gameSystem.setControlSet("mkb");
+					}
+				}				
+				this._latestButton = name;
+				this._pressedTime = 0;
+				this._date = Date.now();
+			}
+			this._previousState[name] = this._currentState[name];
+		}
+		this._updateDirection();
+	};
 	
 	TouchInput._onWheel = function(event) {
 		
@@ -687,6 +783,7 @@ SceneManager.isInSaveScene = function(){
 		this.createOpeningCrawlWindow();
 		this.createTextLogWindow();
 		this.createZoneStatusWindow();
+		this.createButtonHintsWindow();
 		this.createZoneSummaryWindow();
 		$battleSceneManager.init();	
     };
@@ -954,6 +1051,18 @@ SceneManager.isInSaveScene = function(){
 		this._zoneStatusWindow.hide();
 		this.idToMenu["zone_status"] = this._zoneStatusWindow;
     };
+	
+	Scene_Map.prototype.createButtonHintsWindow = function() {
+		var _this = this;
+		this._buttonHintsWindow = new Window_ButtonHints(0, 0, Graphics.boxWidth, Graphics.boxHeight);
+		this._buttonHintsWindow.close();
+		this.addWindow(this._buttonHintsWindow);
+	
+		this._buttonHintsWindow.hide();
+		this.idToMenu["button_hints"] = this._buttonHintsWindow;
+		
+		$gameTemp.buttonHintManager = this._buttonHintsWindow;
+    };	
 	
 	Scene_Map.prototype.createMechListDeployedWindow = function() {
 		var _this = this;
@@ -1686,6 +1795,8 @@ SceneManager.isInSaveScene = function(){
 		}		
 		
 		if($gameTemp.killMenus && Object.keys($gameTemp.killMenus).length){
+			
+			$gameTemp.buttonHintManager.hide(); //hacky fix for hiding buttons hint window when a kill menu is executed
 			var tmp = [];
 			for(var i = 0; i < menuStack.length; i++){
 				var menu = menuStack[i];
@@ -1890,6 +2001,8 @@ SceneManager.isInSaveScene = function(){
 				$gameSystem.setSubBattlePhase("popup_anim");
 			}				
 		}
+		
+	
 		
 		if(!$SRWGameState.update(this)) {
 			return;

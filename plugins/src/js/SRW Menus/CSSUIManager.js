@@ -210,6 +210,7 @@ CSSUIManager.prototype.initAllWindows = function(){
 	this.initWindow("text_log");
 	this.initWindow("zone_status");
 	this.initWindow("game_modes");
+	this.initWindow("button_hints");
 }
 
 CSSUIManager.prototype.initWindow = function(id){

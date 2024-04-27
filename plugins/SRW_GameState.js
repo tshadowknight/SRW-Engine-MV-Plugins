@@ -111,6 +111,15 @@ function GameStateManager(){
 	});
 }
 
+GameStateManager.prototype.updateStateButtonPrompts = function(items, displayKey){
+	if($gameTemp && $gameTemp.buttonHintManager){		
+		if($gameSystem && $gameSystem.getOptionMapHints()){
+			$gameTemp.buttonHintManager.setHelpButtons(items);
+			$gameTemp.buttonHintManager.show("GameState_normal_summary");
+		}		
+	}	
+}
+
 GameStateManager.prototype.getActiveStateName = function(){
 	return this._currentState;
 }
@@ -177,7 +186,16 @@ GameStateManager.prototype.canShowPopUpAnim = function(){
 
 GameStateManager.prototype.requestNewState = function(state){
 	if(this._stateObjMapping[state]){
+		//hacky fix for making the hint window shown in the normal game state go away when leaving that state
+		if($gameTemp && $gameTemp.buttonHintManager){
+			if(this._currentState == "normal"){
+				$gameTemp.buttonHintManager.clearDisplayKey(); //make sure the hint window can reappear when returning to the normal state
+				$gameTemp.buttonHintManager.hide();
+			}
+		}
+		
 		this._currentState = state;
+		
 	} else {
 		//while transitioning to the new system allow the stage manager to be left on an empty state
 		this._currentState = null;
@@ -1641,6 +1659,20 @@ GameState_normal.prototype.update = function(scene){
 				$gameTemp.showEnemyDefendIndicator = true;
 			}
 		}
+	
+		let items = [];
+		if(summaryUnit.isActor()){
+			if(summaryUnit.canInput()){
+				items = [["actor_menu"], ["move_cursor", "speed_up_cursor"], ["navigate_units"]];
+			} else {
+				items = [["show_actor"], ["move_cursor", "speed_up_cursor"], ["navigate_units"]];
+			}			
+		} else {
+			items = [["show_enemy"], ["move_cursor", "speed_up_cursor"], ["navigate_units"]];
+		}		
+
+		
+		$SRWGameState.updateStateButtonPrompts(items, "GameState_normal_summary");
 		
 	} else {
 		$gameTemp.summaryUnit = null;
@@ -1660,6 +1692,7 @@ GameState_normal.prototype.update = function(scene){
 			scene.showPauseMenu();
 			$gameSystem.setSubBattlePhase('pause_menu');		
 			scene._mapButtonsWindow.requestRedraw();	
+			return;	
 		} else {
 			$gameTemp.OKHeld = false;
 		}
@@ -1667,6 +1700,8 @@ GameState_normal.prototype.update = function(scene){
 		if(Input.isTriggered('menu') && !hasActiveZones){
 			$gameSystem.showWillIndicator = !$gameSystem.showWillIndicator;
 		}
+
+		$SRWGameState.updateStateButtonPrompts([["pause_menu"], ["move_cursor", "speed_up_cursor"], ["navigate_units"]], "GameState_normal_empty");
 	}	
 	
 	var regionId = $gameMap.regionId(currentPosition.x, currentPosition.y);

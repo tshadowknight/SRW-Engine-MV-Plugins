@@ -7329,9 +7329,7 @@ StatCalc.prototype.createActiveAbilityLookup = function(){
 		$gameTemp.abiLookupDebug = {};
 	}
 	
-	function processActor(actor, eventId, isEnemy, sourceX, sourceY, type, slot){
-		//hack to prevent nested ability checks from causing abilities to be registered multiple times
-		
+	function processActor(actor, eventId, isEnemy, sourceX, sourceY, type, slot){		
 		let key = _this.createActorAbiCacheTrackingKey(actor);
 			
 		if(!$gameTemp.abiLookupDebug[key]){

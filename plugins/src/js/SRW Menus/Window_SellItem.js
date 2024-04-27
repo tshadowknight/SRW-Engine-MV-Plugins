@@ -277,13 +277,15 @@ Window_SellItem.prototype.update = function() {
 		if(Input.isTriggered('cancel') || TouchInput.isCancelled()){	
 			this.refreshAllUnits();
 			SoundManager.playCancel();		
-			this.requestRedraw();
+			//
 			if(this._currentUIState == "item_selection"){			
 				this._currentSelection = 0;
-				$gameTemp.popMenu = true;								
+				$gameTemp.popMenu = true;	
+				$gameTemp.buttonHintManager.hide();	
 			} else if(this._currentUIState == "sell_selection"){	
 				this._sellInfo[this._itemList.getCurrentSelection().idx] = 0;
-				this._currentUIState = "item_selection";								
+				this._currentUIState = "item_selection";	
+				this.requestRedraw();	
 			} 	
 			this.refresh();
 			return;	
@@ -316,6 +318,12 @@ Window_SellItem.prototype.redraw = function() {
 	var _this = this;
 	var inventoryInfo = $inventoryManager.getCurrentInventory();
 
+	if(this._currentUIState == "item_selection"){
+		$gameTemp.buttonHintManager.setHelpButtons([["select_item", "page_nav"], ["confirm_item_select"], ["confirm_sale"]]);
+	} else if(this._currentUIState == "sell_selection"){	
+		$gameTemp.buttonHintManager.setHelpButtons([["select_sell_amount"], ["confirm_sale"]]);					
+	} 
+	$gameTemp.buttonHintManager.show();	
 	
 	this._itemList.setSellInfo(this._sellInfo);
 	this._itemList.redraw();

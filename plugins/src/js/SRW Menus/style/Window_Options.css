@@ -7,7 +7,7 @@
     align-items: center;
 	background-color: var(--section-bg-color);
 	overflow: hidden;
-	padding: 2%;
+	padding: 1%;
 }
 
 #options .entry {
@@ -15,7 +15,7 @@
     align-items: center;
     justify-content: center;
     width: 95%;
-    --fontsize: 2px;
+    --fontsize: 1.8px;
     margin-left: auto;
     margin-right: auto;
 	color: #FFFFFF;
@@ -28,7 +28,7 @@
 
 #options .entry.title{
 	color: var(--text-color-highlight2);
-	--fontsize: 2.2px;
+	--fontsize: 2px;
 }
 
 #options .entry .label {

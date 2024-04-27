@@ -300,7 +300,7 @@ APPSTRINGS.SELLITEMS = {
 	label_current_funds: "Current Funds",
 	label_funds_gained: "Funds gained",
 	label_funds_result: "Result",
-	label_sell: "Sell(Start)",
+	label_sell: "Sell",
 	label_sell_hint: "Select the amount to sell"
 }
 
@@ -366,7 +366,7 @@ APPSTRINGS.DEPLOYMENT = {
 	available: "Available",
 	label_selected: "selected",
 	title_selection: "Deploy a unit",
-	label_in_stage: "Deploy!(start)",
+	label_in_stage: "Deploy!",
 	label_will_deploy: "will be deployed."
 }
 
@@ -403,7 +403,9 @@ APPSTRINGS.OPTIONS = {
 	label_bgm_vol: "BGM Volume",
 	label_sfx_vol: "SFX Volume",
 	label_battle_speed: "Action Speed",
-	label_tweaks: "Game Tweaks"
+	label_tweaks: "Game Tweaks",
+	label_button_set: "Button Display",
+	label_show_map_buttons: "Map Button Hints"
 }
 
 APPSTRINGS.GAME_MODES = {
@@ -416,7 +418,7 @@ APPSTRINGS.GAME_MODES = {
 }
 
 APPSTRINGS.MAP_BUTTONS = {
-	label_deploy: "Deploy!(start)",
+	label_deploy: "Deploy!",
 	
 }
 
@@ -478,6 +480,114 @@ APPSTRINGS.ZONE_STATUS = {
 	label_player: "Player",
 	label_enemy: "Enemy"
 }
+
+APPSTRINGS.BUTTON_HINTS = {
+	test: {text: "This is a test action", action: 'menu'},
+	test2: {text: "This is a test action2", action: 'ok'},
+	test3: {text: "This is a test action3", action: 'escape'},
+	abi_details: {text: "Show Ability Details", action: 'menu'},
+	tab_nav: {text: "Navigate Tabs", action: "d:left_right"},
+	previous_sub_pilot: {text: "Navigate Sub Pilot", action: "d:shoulder_triggers"},
+	//next_sub_pilot: {text: "Next Sub Pilot", action: "right_trigger"},
+	previous_twin_pilot: {text: "Navigate Twin Pilots", action: "d:shoulder_buttons"},
+	//next_twin_pilot: {text: "Next Twin Pilot", action: "pagedown"},
+	inspect_weap: {text: "View Weapon Info", action: "d:up_down"},
+	
+	//options
+	select_option: {text: "Select an Option", action: "d:up_down"},
+	toggle_option: {text: "Toggle Current Option", action: "d:left_right"},
+	enter_sub_menu: {text: "Enter Sub-menu", action: "ok"},
+	
+	//lists
+	select_mech: {text: "Select a Mech", action: "d:up_down"}, 
+	page_nav: {text: "Navigate Pages", action: "d:left_right"}, 
+	det_page_nav: {text: "Change Details", action: "d:shoulder_triggers"}, 
+	det_page_sort: {text: "Change Sort Field", action: "d:shoulder_buttons"}, 
+	det_sort_order: {text: "Change Sort Order", action: "L3"}, 
+	
+	select_pilot: {text: "Select a Pilot", action: "d:up_down"}, 
+	
+	//list_actions
+	generic_list_mech:  {text: "Confirm Mech", action: "ok"},
+	generic_list_pilot:  {text: "Confirm Pilot", action: "ok"},
+	highlight_map: {text: "Show on Map", action: "ok"},
+	upgrade_unit: {text: "Upgrade Unit", action: "ok"},
+	upgrade_pilot: {text: "Upgrade Pilot", action: "ok"},
+	
+	//Search
+	tab_selection: {text: "Select a Tab", action: "ok"},
+	navigate_entries: {text: "Select an Entry", action: "up"},
+	search_select_abi: {text: "Show Units with Ability", action: "ok"},
+	search_select_spirit: {text: "Show Units with Spirit", action: "ok"},
+	
+	//upgrade mech
+	select_mech_stat: {text: "Select a Stat", action: "d:up_down"}, 
+	select_stat_upgrade: {text: "Select Upgrade Amount", action: "d:left_right"}, 
+	confirm_upgrade: {text: "Confirm Upgrade", action: "ok"}, 
+	select_generic_FUB: {text: "Select a Bonus", action: "d:up_down"}, 
+	
+	//equips
+	change_equips:  {text: "Change Equipables", action: "ok"}, 
+	select_slot: {text: "Select a Slot", action: "d:up_down"}, 
+	confirm_slot: {text: "Confirm Slot", action: "ok"},
+	select_item: {text: "Select an Equipable", action: "d:up_down"}, 	
+	confirm_item: {text: "Confirm Item", action: "ok"},
+	select_transfer_slot: {text: "Select a Unit", action: "up"}, 
+	confirm_transfer: {text: "Confirm Transfer", action: "ok"}, 
+	
+	//sell items
+	confirm_sale: {text: "Confirm Sale of All Selected", action: "menu"}, 
+	select_sell_amount: {text: "Select Amount to Sell", action: "d:left_right"}, 
+	confirm_item_select: {text: "Select Equipable", action: "ok"},
+	
+	//equipable Weapons
+	upgrade_unit: {text: "Change Weapons", action: "ok"},
+	confirm_weapon: {text: "Confirm Weapon", action: "ok"},
+	select_weapon: {text: "Select Weapon", action: "ok"},
+	
+	select_weapon_upgrade: {text: "Select Upgrade Amount", action: "d:left_right"}, 
+	
+	//pilot Upgrades
+	select_pilot_stat: {text: "Select a Stat", action: "d:up_down"}, 
+	select_pilot_stat_upgrade: {text: "Select Upgrade Amount", action: "d:left_right"}, 
+	confirm_pilot_upgrade: {text: "Confirm Upgrade", action: "ok"}, 
+	select_ability: {text: "Select an Ability", action: "d:up_down"}, 
+	confirm_ability_selection: {text: "Confirm Ability", action: "ok"},
+	confirm_ability_purchase: {text: "Confirm Ability Purchase and Equip", action: "ok"},
+	confirm_ability_equip: {text: "Confirm Ability Equip", action: "ok"},
+	select_fav: {text: "Select an Ability", action: "d:up_down"}, 
+	togle_fav: {text: "Toggle for Purchase", action: "d:left_right"},
+	
+	//deployment
+	select_deploy_slot: {text: "Select a Unit", action: "up"}, 
+	select_deploy_unit: {text: "Confirm Unit", action: "ok"}, 
+	select_deploy_twin: {text: "Confirm Twin", action: "shift"}, 
+	
+	select_deploy_target_slot: {text: "Select a Slot", action: "up"}, 
+	confirm_deploy_unit: {text: "Place Unit", action: "ok"}, 
+	
+	move_to_front:  {text: "Move to Front", action: "pageup"}, 
+	move_to_back:  {text: "Move to Back", action: "pagedown"}, 
+	
+	deploy: {text: "Deploy", action: "menu"},  
+	
+	//spirits
+	select_spirit: {text: "Select a Spirit/Switch Pilot", action: "up"}, 
+	to_sub_pilot: {text: "Switch Pilot", action: "d:shoulder_buttons"}, 
+	multi_select: {text: "Select Multiple", action: "shift"}, 
+	confirm_spirits: {text: "Apply", action: "ok"}, 
+	
+	//Map
+	move_cursor: {text: "Move Cursor", action: "up"},
+	speed_up_cursor: {text: "Faster Cursor", action: "shift"}, 	
+	pause_menu: {text: "Map Menu", action: "ok"}, 
+	show_enemy: {text: "Show Move/Status", action: "ok"}, 
+	navigate_units: {text: "Next/Prev. Unit", action: "d:shoulder_buttons"},
+	show_actor: {text: "Show Status", action: "ok"},
+	actor_menu: {text: "Actor Menu", action: "ok"},
+};
+
+
 
 function EDITORSTRINGS(){
 	

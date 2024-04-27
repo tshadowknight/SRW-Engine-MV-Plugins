@@ -125,6 +125,9 @@ window.Window_UpgradeEquipWeapon= Window_UpgradeEquipWeapon;
 import Window_Game_Modes from "./Window_Game_Modes.js";
 window.Window_Game_Modes= Window_Game_Modes;
 
+import Window_ButtonHints from "./Window_ButtonHints.js";
+window.Window_ButtonHints= Window_ButtonHints;
+
 import "./style/SRW_Menus.css";
 
 

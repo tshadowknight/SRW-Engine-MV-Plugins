@@ -135,6 +135,7 @@ Window_UpgradePilotSelection.prototype.update = function() {
 		if(Input.isTriggered('cancel') || TouchInput.isCancelled()){	
 			SoundManager.playCancel();
 			$gameTemp.popMenu = true;		
+			$gameTemp.buttonHintManager.hide();	
 			this.refresh();
 			return;	
 		}		
@@ -144,6 +145,10 @@ Window_UpgradePilotSelection.prototype.update = function() {
 };
 
 Window_UpgradePilotSelection.prototype.redraw = function() {
+	
+	$gameTemp.buttonHintManager.setHelpButtons([["select_pilot", "page_nav"], ["upgrade_pilot"], ["det_page_nav", "det_page_sort"], ["det_sort_order"]]);
+	$gameTemp.buttonHintManager.show();
+	
 	this._mechList.redraw();
 	this._detailBarPilotDetail.redraw();		
 	this.loadImages();

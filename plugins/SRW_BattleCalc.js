@@ -681,11 +681,6 @@ BattleCalc.prototype.prepareBattleCache = function(actionObject, type){
 	var actor = actionObject.actor;
 	
 
-	/*if(actor.isActor()){
-		actor._cacheReference = "a_"+actor.actorId();
-	} else {
-		actor._cacheReference = "e_"+actor.enemyId();
-	}*/
 	var ref;
 	if(type == "initiator" || type == "defender" || type == "twin attack" || type == "twin defend"){
 		ref = $statCalc.getReferenceEventId(actor);

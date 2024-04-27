@@ -269,14 +269,15 @@ Window_SpiritSelection.prototype.update = function() {
 				}	
 				
 				$gameTemp.popMenu = true;	
+				$gameTemp.buttonHintManager.hide();	
 				this._handlingInput = true;
 				
 			}
 			this.refresh();
 			return;	
 		} else if(Input.isTriggered('cancel') || TouchInput.isCancelled()){				
-			//$gameTemp.popMenu = true;	
 			$gameTemp.popMenu = true;	
+			$gameTemp.buttonHintManager.hide();	
 			
 			if(this._callbacks["closed"]){
 				this._callbacks["closed"]();
@@ -556,6 +557,10 @@ Window_SpiritSelection.prototype.getCurrentBatchedSpirits = function(slot) {
 
 Window_SpiritSelection.prototype.redraw = function() {	
 	var _this = this;
+	
+	$gameTemp.buttonHintManager.setHelpButtons([["select_spirit"], ["to_sub_pilot"], ["multi_select"], ["confirm_spirits"]]);
+	$gameTemp.buttonHintManager.show();
+	
 	var content = "";	
 	var isTwinDisplay = $gameTemp.currentMenuUnit.actor.subTwin != null;
 	this._isTwinDisplay = isTwinDisplay;

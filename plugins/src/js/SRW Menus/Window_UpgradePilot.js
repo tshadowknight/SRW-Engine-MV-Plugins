@@ -564,6 +564,7 @@ Window_UpgradePilot.prototype.update = function() {
 				this._currentSelection = 0;
 				this.resetDeltas();	
 				$gameTemp.popMenu = true;	
+				$gameTemp.buttonHintManager.hide();
 			} else if(this._currentUIState == "upgrading_pilot_stats" || this._currentUIState == "ability_selection" || this._currentUIState == "fav_point_selection"){			
 				this._currentUIState = "tab_selection";							
 				this._currentFavSkillsPending = {};	
@@ -635,6 +636,22 @@ Window_UpgradePilot.prototype.currentPointCost = function() {
 
 Window_UpgradePilot.prototype.redraw = function() {
 	var _this = this;
+	
+	if(this._currentUIState == "tab_selection"){
+		$gameTemp.buttonHintManager.setHelpButtons([["tab_nav"], ["tab_selection"]]);
+	} else if(this._currentUIState == "upgrading_pilot_stats"){			
+		$gameTemp.buttonHintManager.setHelpButtons([["select_pilot_stat"], ["select_pilot_stat_upgrade"], ["confirm_pilot_upgrade"]]);
+	} else if(this._currentUIState == "ability_selection"){					
+		$gameTemp.buttonHintManager.setHelpButtons([["select_ability"], ["page_nav"], ["confirm_ability_selection"]]);			
+	} else if(this._currentUIState == "ability_purchase_selection"){	
+		$gameTemp.buttonHintManager.setHelpButtons([["select_slot"], ["confirm_ability_purchase"]]);			
+	} else if(this._currentUIState == "ability_equip_selection"){		
+		$gameTemp.buttonHintManager.setHelpButtons([["select_slot"], ["confirm_ability_equip"]]);	
+	} else if(this._currentUIState == "fav_point_selection"){				
+		$gameTemp.buttonHintManager.setHelpButtons([["select_fav"], ["togle_fav"], ["confirm_pilot_upgrade"]]);							
+	}
+	$gameTemp.buttonHintManager.show();
+	
 	var pilotData = this.getCurrentSelection();
 	var abilityList = $statCalc.getPilotAbilityList(pilotData);
 	var currentLevel = $statCalc.getCurrentLevel(pilotData);

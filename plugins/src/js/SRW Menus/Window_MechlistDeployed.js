@@ -156,6 +156,7 @@ Window_MechListDeployed.prototype.update = function() {
 			var event = $statCalc.getReferenceEvent(selectedActor);
 			$gamePlayer.locate(event.posX(), event.posY(), false);		
 			$gameTemp.popMenu = true;
+			$gameTemp.buttonHintManager.hide();
 			this._mechList.setCurrentSelection(0);
 			Input.clear();
 			
@@ -172,6 +173,7 @@ Window_MechListDeployed.prototype.update = function() {
 		if(Input.isTriggered('cancel') || TouchInput.isCancelled()){		
 			SoundManager.playCancel();		
 			$gameTemp.popMenu = true;
+			$gameTemp.buttonHintManager.hide();
 			this._mechList.setCurrentSelection(0);
 			Input.clear();
 			if(this._callbacks["closed"]){
@@ -189,6 +191,9 @@ Window_MechListDeployed.prototype.redraw = function() {
 	this._mechList.redraw();
 	this._detailBarMech.redraw();		
 	this._detailBarPilot.redraw();
+	
+	$gameTemp.buttonHintManager.setHelpButtons([["select_mech", "page_nav"], ["highlight_map"], ["det_page_nav", "det_page_sort"], ["det_sort_order"]]);
+	$gameTemp.buttonHintManager.show();
 	
 	if(this._mechList.getCurrentInfoPage() == 0){
 		this._detailBarPilot.hide();

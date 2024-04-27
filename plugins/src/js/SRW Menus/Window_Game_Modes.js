@@ -166,7 +166,8 @@ Window_Game_Modes.prototype.update = function() {
 		
 		if(Input.isTriggered('cancel') || TouchInput.isCancelled()){	
 			SoundManager.playCancel();			
-			$gameTemp.popMenu = true;				
+			$gameTemp.popMenu = true;	
+			$gameTemp.buttonHintManager.hide();			
 			if(this._callbacks["closed"]){
 				this._callbacks["closed"]();
 			}		
@@ -180,6 +181,10 @@ Window_Game_Modes.prototype.update = function() {
 
 Window_Game_Modes.prototype.redraw = function() {
 	var _this = this;
+	
+	$gameTemp.buttonHintManager.setHelpButtons([["select_option"], ["toggle_option"]]);
+	$gameTemp.buttonHintManager.show();
+		
 	var content = "";
 	var ctr = 0;
 	this._optionInfo.forEach(function(option){

@@ -8,18 +8,19 @@
 }
 
 #terrain_details .bg_fade_container {
-    -webkit-mask-image: none;   
-    justify-content: center;  
-    --fontsize: 2.4px;   
-	--widthpixels: 250;
-	--heightpixels: 120;
+     -webkit-mask-image: none;
+    justify-content: center;
+    --fontsize: 2.4px;
+    --widthpixels: 250;
+    --heightpixels: 120;
     padding: 0;
     margin: 0;
-	background-color: rgba(38, 172, 165, 0.9);
-	position: absolute;
-	bottom: 0;
-	right: 0;
-	border-top-left-radius: 1vw;
+    background-color: rgba(38, 172, 165, 0.75);
+    position: absolute;
+    bottom: 8%;
+    right: 0;
+    border-top-left-radius: 1vw;
+    border-bottom-left-radius: 1vw;
 }
 
 #terrain_details .bg_fade_container.enemy {

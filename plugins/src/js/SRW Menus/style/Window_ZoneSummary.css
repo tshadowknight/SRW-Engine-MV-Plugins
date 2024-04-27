@@ -15,11 +15,12 @@
 	--heightpixels: 120;
     padding: 0;
     margin: 0;
-	background-color: rgba(38, 110, 172, 0.9);
+	background-color: rgba(38, 110, 172, 0.75);
 	position: absolute;
-	bottom: 0;
+	bottom: 8%;
 	left: 0;
 	border-top-right-radius: 1vw;
+	border-bottom-right-radius: 1vw;
 }
 
 #zone_summary .bg_fade_container.enemy {

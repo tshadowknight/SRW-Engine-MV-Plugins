@@ -13,7 +13,7 @@
 	position: absolute;
     width: 45%;
     height: 48%;
-    top: 18%;
+    top: 16%;
     left: 50%;
     opacity: 0.5;
     background-color: rgba(0,0,0,0);
@@ -34,11 +34,11 @@
 #equip_weapon .tool_tip{
 	border: 0.1vw solid #FFFFFF;
     border-radius: 1vw;
-    top: 64%;
+    top: 61%;
     left: 4%;
     padding: 0%;
     width: 91%;
-    height: 32%;
+    height: 31%;
     position: absolute;
     background-color: var(--section-bg-color);
     color: #FFFFFF;
@@ -390,7 +390,7 @@
 #equip_weapon .slot_selection {
 	border: 0.1vw solid #FFFFFF;
     border-radius: 1vw;
-    top: 24%;
+    top: 22%;
     left: 4%;
     padding: 0.5%;
     width: 44.4%;
@@ -566,7 +566,7 @@
 #equip_weapon .weight_limit_display {
 	--fontsize: 2px;
     position: absolute;
-    top: 19%;
+    top: 17%;
     left: 34%;
     display: flex;
     align-items: center;
@@ -593,3 +593,10 @@
 	text-align: right;
 }
 
+#equip_weapon .attribute_block_entry {
+	height: 1px;
+}
+
+#equip_weapon .attack_list_row.header {
+	
+}

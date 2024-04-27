@@ -722,3 +722,93 @@ Window_CSS.prototype.createAttributeBlock = function(attack) {
 	content+="</div>";
 	return content;
 }
+
+
+Window_CSS.prototype.populatHintContainer = function(elem, list) {
+	let content = "";
+	let iconInfo = [];
+	let iconCtr = 0;
+	for(let entry of list){
+		content+="<div class='hint_block'>";
+		for(let row of entry){
+			let hintDef = APPSTRINGS.BUTTON_HINTS[row];
+			if(hintDef){
+				content+="<div class='hint'>";
+				content+="<div class='hint_text scaled_text'>";
+				content+=hintDef.text;
+				content+="</div>"
+				content+="<div class='action_icon_container'>";
+				let icons = $gameSystem.getActionGlyphs(hintDef.action);
+				for(let icon of icons){
+					if(icon){
+						content+="<div class='action_icon' data-icon='"+iconCtr+"'>";
+						content+="</div>"
+						iconInfo[iconCtr] = icon;						
+					}
+					iconCtr++;
+				}				
+				content+="</div>"
+				content+="</div>"
+			}
+		}
+		content+="</div>"
+	}
+	elem.innerHTML = content;
+	return iconInfo;
+}
+
+
+Window_CSS.prototype.constructButtonIcon = function(iconCtr, iconDef) {	
+	const _this = this;
+	const parentElem = this._centerContainer.querySelector(".action_icon[data-icon='"+iconCtr+"']");
+	
+	
+	//elem.appendChild(this._iconsBitmap.canvas);	
+	const initialMultiplier = 1;	
+	const tileSize = 16;
+	const bgWidth = 544;
+	const bgHeight = 384;
+	
+	let offsetX = 0;
+	let offsetY = 0;
+	
+	let width = 0;
+	let height = 0;
+	
+	for(let i = 0; i < 4; i++){
+		let suffix = "";
+		if(i > 0){//compat with original format
+			suffix = i;
+		}
+		let tiles = iconDef["tiles"+suffix];
+		if(tiles){
+			const elem = document.createElement("div");
+			parentElem.appendChild(elem);
+			
+			height = tiles.length;
+			
+			for(let y = 0; y < tiles.length; y ++){
+				width = tiles[y].length;
+				for(let x = 0; x < tiles[y].length; x ++){
+					if(x == 0 && y == 0){
+						offsetX = tiles[y][x][0];
+						offsetY = tiles[y][x][1];
+					}			
+				}
+			}
+			
+			const mutiplier = initialMultiplier * Graphics.getScale();
+			const size = tileSize * mutiplier;
+			
+			offsetX = offsetX * size;
+			offsetY = offsetY * size;
+			
+			elem.style.height = size * height + "px";
+			elem.style.width = size * width + "px";
+			elem.style.backgroundSize = bgWidth * mutiplier + "px " + bgHeight * mutiplier + "px";
+			elem.style.backgroundImage = "url(" + _this._iconsBitmap._image.src + ")";
+			elem.style.backgroundPosition =  offsetX * -1 + "px " + offsetY * -1 + "px"
+		}
+	}
+	
+}

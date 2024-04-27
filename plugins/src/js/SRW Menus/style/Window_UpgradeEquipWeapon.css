@@ -13,7 +13,7 @@
 	position: absolute;
     width: 45%;
     height: 48%;
-    top: 18%;
+    top: 15%;
     left: 50%;
     opacity: 0.5;
     background-color: rgba(0,0,0,0);
@@ -34,7 +34,7 @@
 #upgrade_equip_weapon .tool_tip{
 	border: 0.1vw solid #FFFFFF;
     border-radius: 1vw;
-    top: 64%;
+    top: 60%;
     left: 4%;
     padding: 0%;
     width: 91%;
@@ -102,16 +102,7 @@
 	padding: 0.2%;
 }
 
-#upgrade_equip_weapon .fund_display {
-	position: absolute;
-    height: 20%;
-    top: 66%;
-    border: 0.1vw solid #FFFFFF;
-    border-radius: 1vw;
-    width: 20%;
-    left: 5%;
-	background-color: var(--section-bg-color);
-}
+
 
 #upgrade_equip_weapon .fund_entries {
 	height: 90%;
@@ -517,7 +508,7 @@
 #upgrade_equip_weapon .fund_display {
 	position: absolute;
     height: 44%;
-    top: 18%;
+    top: 15%;
     border: 0.1vw solid #FFFFFF;
     border-radius: 1vw;
     width: 45%;

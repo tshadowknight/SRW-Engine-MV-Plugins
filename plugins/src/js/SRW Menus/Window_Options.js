@@ -27,14 +27,11 @@ Window_Options.prototype.initialize = function() {
 	this._titleInfo = {};
 	this._titleInfo[0] = APPSTRINGS.OPTIONS.label_game_options;
 	if(ENGINE_SETTINGS.ENABLE_TWEAKS_OPTION){
-		this._titleInfo[7] = APPSTRINGS.OPTIONS.label_sound_options;
+		this._titleInfo[8] = APPSTRINGS.OPTIONS.label_sound_options;
 	} else {
-		this._titleInfo[6] = APPSTRINGS.OPTIONS.label_sound_options;
+		this._titleInfo[7] = APPSTRINGS.OPTIONS.label_sound_options;
 	}
 	
-	
-
-
 	this._optionInfo.push({
 		name: APPSTRINGS.OPTIONS.label_fullscreen,
 		display: function(){
@@ -51,6 +48,39 @@ Window_Options.prototype.initialize = function() {
 			ConfigManager.save();
 		}
 	});
+	
+	const buttonImgs = {"xbox": "XBox", "ds": "Playstation", "nin": "Nintendo"};
+	
+	this._optionInfo.push({
+		name: APPSTRINGS.OPTIONS.label_button_set,
+		display: function(){
+			return buttonImgs[$gameSystem.getOptionPadSet()];
+		},
+		update: function(){
+			const padSet = $gameSystem.getOptionPadSet();
+			if(padSet == "xbox"){
+				$gameSystem.optionPadSet = "ds";
+			} else if(padSet == "ds"){
+				$gameSystem.optionPadSet = "nin";
+			} else if(padSet == "nin"){
+				$gameSystem.optionPadSet = "xbox";
+			}
+			if($gameTemp.buttonHintManager){
+				$gameTemp.buttonHintManager.redraw();
+			}
+		}
+	});
+
+	this._optionInfo.push({
+		name: APPSTRINGS.OPTIONS.label_show_map_buttons,
+		display: function(){
+			return $gameSystem.getOptionMapHints() ? "ON" : "OFF";
+		},
+		update: function(){
+			$gameSystem.setOptionMapHints(!$gameSystem.getOptionMapHints())
+		}
+	});
+	
 	
 	this._optionInfo.push({
 		name: APPSTRINGS.OPTIONS.label_grid,
@@ -336,7 +366,8 @@ Window_Options.prototype.update = function() {
 		
 		if(Input.isTriggered('cancel') || TouchInput.isCancelled()){	
 			SoundManager.playCancel();			
-			$gameTemp.popMenu = true;				
+			$gameTemp.popMenu = true;		
+			$gameTemp.buttonHintManager.hide();	
 			if(this._callbacks["closed"]){
 				this._callbacks["closed"]();
 			}		
@@ -350,6 +381,14 @@ Window_Options.prototype.update = function() {
 
 Window_Options.prototype.redraw = function() {
 	var _this = this;
+	
+	if(ENGINE_SETTINGS.ENABLE_TWEAKS_OPTION){
+		$gameTemp.buttonHintManager.setHelpButtons([["select_option"], ["toggle_option"], ["enter_sub_menu"]]);
+	} else {
+		$gameTemp.buttonHintManager.setHelpButtons([["select_option"], ["toggle_option"]]);
+	}
+	$gameTemp.buttonHintManager.show();
+	
 	var content = "";
 	var ctr = 0;
 	this._optionInfo.forEach(function(option){

@@ -744,6 +744,8 @@
 		Sprite_Character.prototype.updateCharacterFrame = function() {
 			var pw = this.patternWidth();
 			var ph = this.patternHeight();
+			var sx;
+			var sy;
 			if(ENGINE_SETTINGS.USE_SINGLE_MAP_SPRITE){
 				sx = (this.characterBlockX() + 0) * pw;
 				sy = (this.characterBlockY() + 0) * ph;

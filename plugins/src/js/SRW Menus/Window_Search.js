@@ -268,7 +268,8 @@ Window_Search.prototype.update = function() {
 			SoundManager.playCancel();
 			$gameTemp.searchInfo = null;
 			if(this._uiState == "tab_selection"){
-				$gameTemp.popMenu = true;				
+				$gameTemp.popMenu = true;			
+				$gameTemp.buttonHintManager.hide();		
 				if(this._callbacks["closed"]){
 					this._callbacks["closed"]();
 				}					
@@ -343,8 +344,26 @@ Window_Search.prototype.createEntryList = function(list) {
 }
 
 Window_Search.prototype.redraw = function() {
-	//this._mechList.redraw();
+
 	var _this = this;
+	
+	if(this._uiState == "tab_selection"){
+		$gameTemp.buttonHintManager.setHelpButtons([["tab_nav"], ["tab_selection"]]);
+	} 
+	if(this._uiState == "entry_selection"){
+		if(this._selectedTab == 0){
+			$gameTemp.buttonHintManager.setHelpButtons([["navigate_entries"], ["search_select_spirit"]]);
+		}
+		if(this._selectedTab == 1){
+			$gameTemp.buttonHintManager.setHelpButtons([["navigate_entries"], ["search_select_abi"]]);
+		}
+		if(this._selectedTab == 2){
+			$gameTemp.buttonHintManager.setHelpButtons([["navigate_entries"], ["search_select_abi"]]);
+		}
+		
+	}
+	$gameTemp.buttonHintManager.show();
+	
 	this._spiritTabButton.classList.remove("selected");
 	this._pilotTabButton.classList.remove("selected");
 	this._mechTabButton.classList.remove("selected");

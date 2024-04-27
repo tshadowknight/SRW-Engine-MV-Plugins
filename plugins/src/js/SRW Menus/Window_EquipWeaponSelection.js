@@ -142,7 +142,8 @@ Window_EquipWeaponSelection.prototype.update = function() {
 		}
 		if(Input.isTriggered('cancel') || TouchInput.isCancelled()){		
 			SoundManager.playCancel();
-			$gameTemp.popMenu = true;	
+			$gameTemp.popMenu = true;
+			$gameTemp.buttonHintManager.hide();				
 			this.refresh();
 			return;	
 		}		
@@ -152,6 +153,9 @@ Window_EquipWeaponSelection.prototype.update = function() {
 };
 
 Window_EquipWeaponSelection.prototype.redraw = function() {
+	$gameTemp.buttonHintManager.setHelpButtons([["select_mech", "page_nav"], ["upgrade_unit"], ["det_page_sort"], ["det_sort_order"]]);
+	$gameTemp.buttonHintManager.show();	
+	
 	this._mechList.redraw();
 	this._detailBarMechDetail.redraw();		
 	this.loadImages();

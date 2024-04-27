@@ -335,6 +335,14 @@ Window_UpgradeMech.prototype.currentCost = function() {
 
 Window_UpgradeMech.prototype.redraw = function() {
 	var _this = this;
+	if(this._UIState == "fub_selection"){
+		$gameTemp.buttonHintManager.setHelpButtons([["select_generic_FUB"], ["confirm_upgrade"]]);
+	} else {
+		$gameTemp.buttonHintManager.setHelpButtons([["select_mech_stat"], ["select_stat_upgrade"], ["confirm_upgrade"]]);
+	}
+
+	$gameTemp.buttonHintManager.show();	
+	
 	if(_this._redrawAttackList){
 		_this._attackList.redraw();
 		_this._redrawAttackList = false;

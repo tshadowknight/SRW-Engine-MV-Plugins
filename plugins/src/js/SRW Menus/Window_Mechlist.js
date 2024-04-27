@@ -163,7 +163,7 @@ Window_MechList.prototype.update = function() {
 			$gameTemp.listContext = "actor"; //lazy way to manage this as mech context is much rarer than actor context		
 			SoundManager.playCancel();		
 			$gameTemp.popMenu = true;
-
+			$gameTemp.buttonHintManager.hide();	
 			if(this._callbacks["closed"]){
 				this._callbacks["closed"]();
 			}	
@@ -183,6 +183,9 @@ Window_MechList.prototype.redraw = function() {
 	this._mechList.redraw();
 	this._detailBarMech.redraw();		
 	this._detailBarPilot.redraw();
+	
+	$gameTemp.buttonHintManager.setHelpButtons([["select_mech", "page_nav"], ["generic_list_mech"], ["det_page_nav", "det_page_sort"], ["det_sort_order"]]);
+	$gameTemp.buttonHintManager.show();
 	
 	if(this._mechList.getCurrentInfoPage() == 0){
 		this._detailBarPilot.hide();

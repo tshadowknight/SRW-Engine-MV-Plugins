@@ -27,7 +27,7 @@
 			this._pilotFallbackInfo = {};
 			this.initOptions();
 			
-			
+			this._controlSet = "mkb";
 		};
 		
 		Game_System.prototype.initOptions = function() {
@@ -55,7 +55,63 @@
 			if(this.optionInfinitePP == null){
 				this.optionInfinitePP = false;
 			}
+			if(this.optionPadSet == null){
+				this.optionPadSet = "xbox";
+			}
+			if(this.optionPadSet == null){
+				this.optionPadSet = "xbox";
+			}
+			if(this.optionMapHints == null){
+				this.optionMapHints = true;
+			}
 		};
+		
+		Game_System.prototype.getOptionMapHints = function() {
+			if(this.optionMapHints == null){
+				this.optionMapHints = true;
+			}
+			return this.optionMapHints;
+		}
+		
+		Game_System.prototype.setOptionMapHints = function(value) {			
+			this.optionMapHints = value;		
+		}
+		
+		Game_System.prototype.getControllerIconSets = function() {
+			return ["xbox", "ds", "nin"];
+		}
+		
+		Game_System.prototype.getOptionPadSet = function() {
+			return this.optionPadSet || "xbox";
+		}
+		
+		Game_System.prototype.setControlSet = function(newSet) {
+			this._controlSet = newSet;
+			if($gameTemp.buttonHintManager){
+				$gameTemp.buttonHintManager.redraw();
+			}
+		}
+		
+		Game_System.prototype.getActiveGlyphSet = function() {
+			if(this._controlSet == "mkb"){
+				return this._controlSet;
+			}
+			if(this._controlSet == "controller"){
+				return this.optionPadSet || "xbox";
+			}
+			return "mkb";
+		}
+		
+		Game_System.prototype.getActionGlyphs = function(action) {
+			const activeSet = this.getActiveGlyphSet();
+			let glyphs;
+			if(activeSet == "mkb"){
+				glyphs = Input.getActionGlyphs(action);
+			} else {
+				glyphs = Input.getPadGlyphs(action);
+			}
+			return Input.getGlyphDefinition(activeSet, glyphs);
+		}
 
 	//変数関係の処理
 		//戦闘中かどうかのフラグを返す
@@ -1508,9 +1564,11 @@
 			} else if($gameTemp.AIActors.length){
 				_this.setBattlePhase('AI_phase');
 				_this.setSubBattlePhase('enemy_command');
+			} else {
+				this.setSubBattlePhase('enemy_command');
 			}
 			
-			//this.setSubBattlePhase('enemy_command');
+			//
 		};
 
 		//ターン終了

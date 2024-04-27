@@ -55,6 +55,12 @@ Window_DeploymentInStage.prototype.onCancel = function() {
 
 }
 
+Window_DeploymentInStage.prototype.setButtonHints = function() {	
+	const items = Window_Deployment.prototype.setButtonHints.call(this);
+	items.push(["deploy"]);
+	return items;
+}
+
 Window_DeploymentInStage.prototype.onMenu = function(){
 	//Input.clear();	
 	var deployInfo = $gameSystem.getDeployInfo();
@@ -82,10 +88,12 @@ Window_DeploymentInStage.prototype.onMenu = function(){
 			$gameSystem.setActiveDeployList(activeDeployList);
 			$gameSystem.setSubBattlePhase("rearrange_deploys_init");
 			$gameSystem.highlightDeployTiles();
+			$gameTemp.buttonHintManager.hide();
 			$gameSystem.redeployActors(false, true);
 		} else {			
 			$gameSystem.setActiveShipDeployList(activeDeployList);
 			$gameTemp.popMenu = true;
+			$gameTemp.buttonHintManager.hide();
 			$gameSystem.deployShips(true);
 			
 			$gameMap._interpreter.setWaitMode("enemy_appear");
