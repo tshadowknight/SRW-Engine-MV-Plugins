@@ -86,10 +86,12 @@
 		}
 		
 		Game_System.prototype.setControlSet = function(newSet) {
-			this._controlSet = newSet;
-			if($gameTemp.buttonHintManager){
-				$gameTemp.buttonHintManager.redraw();
+			if(this._controlSet != newSet){
+				if($gameTemp.buttonHintManager){
+					$gameTemp.buttonHintManager.redraw();
+				}
 			}
+			this._controlSet = newSet;		
 		}
 		
 		Game_System.prototype.getActiveGlyphSet = function() {

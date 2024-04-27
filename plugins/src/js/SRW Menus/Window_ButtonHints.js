@@ -15,7 +15,7 @@ Window_ButtonHints.prototype.initialize = function() {
 	window.addEventListener("resize", function(){
 		_this.redraw();
 	});	
-	
+	this._requestCtr = 0;
 	this._hints = [];
 }
 
@@ -68,11 +68,19 @@ Window_ButtonHints.prototype.show = function(displayKey) {
 	}
 };
 
+
+Window_ButtonHints.prototype.hide = function() {
+	this.clearDisplayKey();
+    this.visible = false;
+	this._visibility = "none";
+	this.refresh();
+};
+
 Window_ButtonHints.prototype.update = function() {
 	var _this = this;
 	Window_Base.prototype.update.call(this);
-	
-	if($gameMap && $gameMap._interpreter && $gameMap._interpreter.isRunning()){
+	//hacky workaround for issue where the hints don't show up for the deployment in stage window, since that is a window that is shown while the event interpreter is active
+	if($gameSystem.isSubBattlePhase() != "deploy_selection_window" && $gameMap && $gameMap._interpreter && $gameMap._interpreter.isRunning()){
 		this.hide();
 	}
 	
@@ -95,8 +103,17 @@ Window_ButtonHints.prototype.refresh = function() {
 Window_ButtonHints.prototype.redraw = async function() {	
 	var _this = this;
 	
-	_this._iconsBitmap = await ImageManager.loadBitmapPromise('', "UI/GlyphTiles.png", true);
-		
+	this._requestCtr++;
+	let currentCtr = this._requestCtr;
+	
+	
+	if(!_this._iconsBitmap){
+		_this._iconsBitmap = await ImageManager.loadBitmapPromise('', "UI/GlyphTiles.png", true, 0, false, true);
+	}
+
+	if(currentCtr != this._requestCtr) {
+		return;
+	}
 	
 	const iconInfo = this.populatHintContainer(this._centerContainer, this._hints);
 	for(let i = 0; i < iconInfo.length; i++){

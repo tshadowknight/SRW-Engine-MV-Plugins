@@ -637,6 +637,7 @@ Window_DeploymentTwin.prototype.show = function() {
 	Graphics._updateCanvas(this._layoutId);
 }
 
+
 Window_DeploymentTwin.prototype.getAvailableUnits = function() {
 	const _this = this;
 	if(!this._cachedUnits){

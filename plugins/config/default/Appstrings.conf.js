@@ -580,11 +580,31 @@ APPSTRINGS.BUTTON_HINTS = {
 	//Map
 	move_cursor: {text: "Move Cursor", action: "up"},
 	speed_up_cursor: {text: "Faster Cursor", action: "shift"}, 	
+	toggle_detail_icons: {text: "Toggle Will Display", action: "menu"}, 	
 	pause_menu: {text: "Map Menu", action: "ok"}, 
-	show_enemy: {text: "Show Move/Status", action: "ok"}, 
+	show_enemy: {text: "Show Move", action: "ok"}, 
 	navigate_units: {text: "Next/Prev. Unit", action: "d:shoulder_buttons"},
 	show_actor: {text: "Show Status", action: "ok"},
 	actor_menu: {text: "Actor Menu", action: "ok"},
+	
+	select_list_weapon: {text: "Select Weapon", action: "d:up_down"},
+	
+	select_space: {text: "Select Space", action: "ok"},
+	quick_select_space: {text: "Quick Select", action: "shift"},
+	
+	select_action: {text: "Select Action", action: "d:up_down"},
+	confirm_action: {text: "Confirm Action", action: "ok"},
+	
+	
+	select_target: {text: "Select Target", action: "ok"},
+	prev_target:  {text: "Previous Target", action: "pageup"}, 
+	next_target:  {text: "Next Target", action: "pagedown"},
+	
+	confirm_recipient: {text: "Confirm Recipient", action: "ok"},
+	
+	choose_direction: {text: "Choose Direction", action: "up"},
+	confirm_attack: {text: "Confirm Attack", action: "ok"},
+	choose_position: {text: "Choose Position", action: "up"},
 };
 
 

@@ -189,7 +189,7 @@ Window_AttackList.prototype.update = function() {
 Window_AttackList.prototype.redraw = function() {
 	//this._mechList.redraw();	
 
-	$gameTemp.buttonHintManager.setHelpButtons([["select_weapon"],["page_nav"], ["confirm_weapon"]]);
+	$gameTemp.buttonHintManager.setHelpButtons([["select_list_weapon"],["page_nav"], ["confirm_weapon"]]);
 	$gameTemp.buttonHintManager.show();
 
 	this._attackList.redraw();

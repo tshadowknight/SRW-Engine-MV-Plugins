@@ -27,9 +27,9 @@ Window_Options.prototype.initialize = function() {
 	this._titleInfo = {};
 	this._titleInfo[0] = APPSTRINGS.OPTIONS.label_game_options;
 	if(ENGINE_SETTINGS.ENABLE_TWEAKS_OPTION){
-		this._titleInfo[8] = APPSTRINGS.OPTIONS.label_sound_options;
+		this._titleInfo[9] = APPSTRINGS.OPTIONS.label_sound_options;
 	} else {
-		this._titleInfo[7] = APPSTRINGS.OPTIONS.label_sound_options;
+		this._titleInfo[8] = APPSTRINGS.OPTIONS.label_sound_options;
 	}
 	
 	this._optionInfo.push({

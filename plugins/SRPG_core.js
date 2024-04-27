@@ -1324,11 +1324,7 @@ SceneManager.isInSaveScene = function(){
 	Scene_Map.prototype.createGameModesWindow = function() {
 		var _this = this;
 		this._gameModeWindow = new Window_Game_Modes(0, 0, Graphics.boxWidth, Graphics.boxHeight);
-		this._gameModeWindow.registerCallback("closed", function(){
-			if($gameTemp.optionsWindowCancelCallback){
-				$gameTemp.optionsWindowCancelCallback();
-			}
-		});
+		
 		this._gameModeWindow.close();
 		this.addWindow(this._gameModeWindow);
 		this._gameModeWindow.hide();

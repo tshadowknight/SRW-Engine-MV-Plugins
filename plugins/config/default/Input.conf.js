@@ -60,8 +60,8 @@ Input.padToGlyph = {
 	1: 'face_right',    // B
 	2: 'face_left',     // X
 	3: 'face_up',      // Y
-	4: 'rb',    // LB
-	5: 'lb',  // RB
+	4: 'lb',    // LB
+	5: 'rb',  // RB
 	8: 'directions',	// Select
 	12: 'directions',       // D-pad up
 	13: 'directions',     // D-pad down

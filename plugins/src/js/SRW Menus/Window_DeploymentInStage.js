@@ -56,7 +56,7 @@ Window_DeploymentInStage.prototype.onCancel = function() {
 }
 
 Window_DeploymentInStage.prototype.setButtonHints = function() {	
-	const items = Window_Deployment.prototype.setButtonHints.call(this);
+	const items = Window_DeploymentTwin.prototype.setButtonHints.call(this);
 	items.push(["deploy"]);
 	return items;
 }
