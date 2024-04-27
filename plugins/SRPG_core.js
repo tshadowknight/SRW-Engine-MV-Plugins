@@ -1926,6 +1926,10 @@ SceneManager.isInSaveScene = function(){
 			}		
 		}
 		
+		if(!$SRWGameState.update(this)) {
+			return;
+		}
+		
 		
 		_SRPG_SceneMap_update.call(this);
 		
@@ -2004,9 +2008,7 @@ SceneManager.isInSaveScene = function(){
 		
 	
 		
-		if(!$SRWGameState.update(this)) {
-			return;
-		}
+		
 		
 		if($gameTemp.continueLoaded){
 			$gameTemp.continueLoaded = false;

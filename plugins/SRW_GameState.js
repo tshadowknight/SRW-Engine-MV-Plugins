@@ -1595,10 +1595,10 @@ GameState_normal.prototype.constructor = GameState_normal;
 GameState_normal.prototype.update = function(scene){
 	
 	//hacky workaround for issue where transitioning into the save scene runs this state for a frame, popping open the button prompts
-	if($gameTemp.isPendingSaveMenu){
+	/*if($gameTemp.isPendingSaveMenu){
 		$gameTemp.isPendingSaveMenu = false;
 		return;
-	}
+	}*/
 	
 	$gameTemp.activeShip = null;
 	$gameTemp.actorAction = {};
