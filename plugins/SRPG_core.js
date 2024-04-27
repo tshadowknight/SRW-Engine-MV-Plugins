@@ -1956,6 +1956,7 @@ SceneManager.isInSaveScene = function(){
 			if(!menu.visible){
 				menu.visible = true;
 			}
+			Scene_Base.prototype.update.call(this);
 			return;			
 		} else {
 			if(this._intermissionWindowOpen){
