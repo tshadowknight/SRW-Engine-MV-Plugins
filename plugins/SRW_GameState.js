@@ -1624,7 +1624,7 @@ GameState_normal.prototype.update = function(scene){
 	
 	if (!$gameSystem.isSRPGMode()){
 		if(Input.isTriggered('menu')){
-			scene.showPauseMenu();
+			//scene.showPauseMenu();
 			$gameSystem.setSubBattlePhase('pause_menu');		
 			scene._mapButtonsWindow.requestRedraw();	
 		}
@@ -1723,7 +1723,7 @@ GameState_normal.prototype.update = function(scene){
 		$gameTemp.showEnemyDefendIndicator = false;
 		
 		if(Input.isTriggered('ok')){			
-			scene.showPauseMenu();
+			//scene.showPauseMenu();
 			$gameSystem.setSubBattlePhase('pause_menu');		
 			scene._mapButtonsWindow.requestRedraw();	
 			return;	
