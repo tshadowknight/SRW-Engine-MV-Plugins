@@ -1494,7 +1494,7 @@
 		//エネミーターンの開始
 		Game_System.prototype.srpgStartEnemyTurn = function(factionId) {
 			var _this = this;
-			
+			$gameTemp.buttonHintManager.hide();
 			
 			
 			$gameTemp.showAllyAttackIndicator = false;

@@ -923,6 +923,10 @@ SceneManager.isInSaveScene = function(){
 			$gameTemp.onMapSaving = true;
 			this._mapButtonsWindow.hide();
 			this._mapButtonsWindow.close();
+			//hacks to hide button prompts in the save window
+			$gameTemp.isPendingSaveMenu = true;
+			$gameTemp.buttonHintManager.hide();
+			
 			$gameSystem.setSubBattlePhase('normal');
 			SceneManager.push(Scene_Save);
 			DataManager.saveContinueSlot();	

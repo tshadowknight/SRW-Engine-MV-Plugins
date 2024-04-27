@@ -1232,7 +1232,7 @@
 		var width = this.windowWidth();
 		var height = this.windowHeight();
 		var x = 0;
-		var y =  SceneManager._screenHeight - height;
+		var y =  SceneManager._screenHeight - height - 50;
 		Window_Base.prototype.initialize.call(this, x, y, width, height);
 		this.refresh();
 	};

@@ -605,6 +605,7 @@ APPSTRINGS.BUTTON_HINTS = {
 	choose_direction: {text: "Choose Direction", action: "up"},
 	confirm_attack: {text: "Confirm Attack", action: "ok"},
 	choose_position: {text: "Choose Position", action: "up"},
+	confirm_boarding: {text: "Confirm Boarding", action: "ok"},
 };
 
 

@@ -112,9 +112,10 @@ function GameStateManager(){
 }
 
 GameStateManager.prototype.updateStateButtonPrompts = function(items, displayKey){
+	let hasBlockingMenu = ($gameTemp.menuStack && $gameTemp.menuStack.length > 0);
 	if($gameTemp && $gameTemp.buttonHintManager){		
 		if($gameSystem && $gameSystem.getOptionMapHints()){
-			if($gameTemp.menuStack && $gameTemp.menuStack.length == 0){
+			if(!hasBlockingMenu){
 				$gameTemp.buttonHintManager.setHelpButtons(items);
 				$gameTemp.buttonHintManager.show(displayKey);
 			}			
@@ -189,10 +190,10 @@ GameStateManager.prototype.canShowPopUpAnim = function(){
 GameStateManager.prototype.requestNewState = function(state){
 	if(this._stateObjMapping[state]){
 		//hacky fix for making the hint window shown in the normal game state go away when leaving that state
-		if($gameTemp && $gameTemp.buttonHintManager){			
-			$gameTemp.buttonHintManager.clearDisplayKey(); //make sure the hint window can reappear when returning to the normal state
-			$gameTemp.buttonHintManager.hide();			
-		}
+		//if($gameTemp && $gameTemp.buttonHintManager){			
+		//	$gameTemp.buttonHintManager.clearDisplayKey(); //make sure the hint window can reappear when returning to the normal state
+		//	$gameTemp.buttonHintManager.hide();			
+		//}
 		
 		this._currentState = state;
 		
@@ -1592,6 +1593,13 @@ GameState_normal.prototype.constructor = GameState_normal;
 
 
 GameState_normal.prototype.update = function(scene){
+	
+	//hacky workaround for issue where transitioning into the save scene runs this state for a frame, popping open the button prompts
+	if($gameTemp.isPendingSaveMenu){
+		$gameTemp.isPendingSaveMenu = false;
+		return;
+	}
+	
 	$gameTemp.activeShip = null;
 	$gameTemp.actorAction = {};
 	$gameTemp.enemyAction = {};
@@ -1867,6 +1875,13 @@ function GameState_confirm_boarding(){
 
 GameState_confirm_boarding.prototype = Object.create(GameState.prototype);
 GameState_confirm_boarding.prototype.constructor = GameState_confirm_boarding;
+
+
+GameState_confirm_boarding.prototype.update = function(scene){	
+	$SRWGameState.updateStateButtonPrompts([["confirm_boarding"]], "confirm_boarding");
+	return true;
+}
+
 
 function GameState_confirm_end_turn(){
 	GameState.call(this);
@@ -2344,6 +2359,7 @@ GameState_pause_menu.prototype = Object.create(GameState.prototype);
 GameState_pause_menu.prototype.constructor = GameState_pause_menu;
 
 GameState_pause_menu.prototype.update = function(scene){
+	$SRWGameState.updateStateButtonPrompts([["select_action"], ["confirm_action"]], "pause_menu");
 	if(!scene._mapButtonsWindow.visible){
 		scene._mapButtonsWindow.open();
 		scene._mapButtonsWindow.show();

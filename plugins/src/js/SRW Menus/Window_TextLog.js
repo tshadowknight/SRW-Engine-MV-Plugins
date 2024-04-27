@@ -69,7 +69,8 @@ Window_TextLog.prototype.update = function() {
 Window_TextLog.prototype.redraw = function() {	
 	var _this = this;
 	var content = "";
-
+	$gameTemp.buttonHintManager.hide();
+	
 	if($gameSystem.textLog){
 		content+="<div class='log_container styled_scroll'>";		
 		

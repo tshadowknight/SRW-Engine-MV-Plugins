@@ -1544,6 +1544,9 @@ Window_BeforebattleTwin.prototype.setupHasUnseenMove = function() {
 
 Window_BeforebattleTwin.prototype.redraw = function() {
 	var _this = this;
+	
+	$gameTemp.buttonHintManager.hide();
+	
 	if(this._battleStarting){
 		return;
 	}
