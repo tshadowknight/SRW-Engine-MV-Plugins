@@ -69,6 +69,7 @@ Window_ZoneStatus.prototype.update = function() {
 	
 		if(Input.isTriggered('cancel') || TouchInput.isCancelled() || !$gameSystem.textLog){				
 			$gameTemp.popMenu = true;	
+			$gameTemp.buttonHintManager.hide();
 			$gameSystem.setSubBattlePhase('normal');
 		}		
 		
@@ -78,6 +79,10 @@ Window_ZoneStatus.prototype.update = function() {
 
 Window_ZoneStatus.prototype.redraw = function() {	
 	var _this = this;	
+	
+	$gameTemp.buttonHintManager.setHelpButtons([["scroll_list"]]);
+	$gameTemp.buttonHintManager.show();
+	
 	let zoneInfo = $gameSystem.getActiveZonesAtTile({x: $gamePlayer.posX(), y: $gamePlayer.posY()});
 	let stackCount = zoneInfo.length;
 	let content = "";

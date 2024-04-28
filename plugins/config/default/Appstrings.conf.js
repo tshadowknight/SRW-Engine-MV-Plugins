@@ -606,6 +606,10 @@ APPSTRINGS.BUTTON_HINTS = {
 	confirm_attack: {text: "Confirm Attack", action: "ok"},
 	choose_position: {text: "Choose Position", action: "up"},
 	confirm_boarding: {text: "Confirm Boarding", action: "ok"},
+	
+	scroll_list: {text: "Scroll List", action: "d:up_down"},
+	show_zone_info: {text: "Show Zone Details", action: "menu"},
+	show_status: {text: "Show Status", action: "menu"},
 };
 
 

@@ -235,7 +235,14 @@ Window_CSS.prototype.loadMechMiniSprite = function(mechClass, elem) {
 			var targetBitmap = new Bitmap(pw, ph);
 			
 			var n = big ? 0: characterIndex;
-			var sx = (n % 4 * 3 + 1) * pw;
+			var sx;
+
+			if(ENGINE_SETTINGS.USE_SINGLE_MAP_SPRITE){
+				sx = (n % 4 * 3) * pw;
+			} else {
+				sx = (n % 4 * 3 + 1) * pw;
+			}
+			
 			var sy = (Math.floor(n / 4) * 4) * ph;
 			
 			targetBitmap.blt(bitmap, sx, sy, pw, ph, 0, 0); 

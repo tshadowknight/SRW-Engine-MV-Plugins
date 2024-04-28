@@ -19,6 +19,12 @@ CSSUIManager.prototype.updateLayer = function(dimensions){
 }
 
 CSSUIManager.prototype.updateScaledText = function(windowId, bustCache){
+	if($gameTemp){
+		$gameTemp.scaledTextUpdateRequested = true;	
+	}	
+}
+
+CSSUIManager.prototype.doUpdateScaledText = function(windowId, forceAll){
 	if(this.customUILayer){
 		
 		function getElemCacheIdx(elem){
@@ -47,78 +53,84 @@ CSSUIManager.prototype.updateScaledText = function(windowId, bustCache){
 		var referenceWidth = Graphics._getCurrentWidth();
 		var textElements = sourceContainer.querySelectorAll(".scaled_text");	
 		textElements.forEach(function(textElement){
-			const cacheKey = "scaled_text:" + getElemCacheIdx(textElement);
-			if(CSSUIManager.textScaleCache[cacheKey]){
-				textElement.style.fontSize = CSSUIManager.textScaleCache[cacheKey].fontSize;
-				if(ENGINE_SETTINGS.FONT_LINE_HEIGHT_SCALE){
-					textElement.style.lineHeight = CSSUIManager.textScaleCache[cacheKey].lineHeight;
+			if(forceAll || textElement.offsetParent != null){		
+				const cacheKey = "scaled_text:" + getElemCacheIdx(textElement);
+				if(CSSUIManager.textScaleCache[cacheKey]){
+					textElement.style.fontSize = CSSUIManager.textScaleCache[cacheKey].fontSize;
+					if(ENGINE_SETTINGS.FONT_LINE_HEIGHT_SCALE){
+						textElement.style.lineHeight = CSSUIManager.textScaleCache[cacheKey].lineHeight;
+					}
+					return;
 				}
-				return;
+				var fontPercent = textElement.getAttribute("data-font-percent");
+				if(!fontPercent){
+					fontPercent = window.getComputedStyle(textElement, null).getPropertyValue('--fontsize');
+					fontPercent = parseFloat(fontPercent.replace("px", ""));
+					textElement.setAttribute("data-font-percent", fontPercent);
+				}
+				
+				textElement.style.fontSize = Math.floor(referenceWidth/100 * fontPercent) * (ENGINE_SETTINGS.FONT_SCALE || 1) + "px";
+				if(ENGINE_SETTINGS.FONT_LINE_HEIGHT_SCALE){
+					textElement.style.lineHeight = Math.floor(referenceWidth/100 * fontPercent) * (ENGINE_SETTINGS.FONT_SCALE || 1) * ENGINE_SETTINGS.FONT_LINE_HEIGHT_SCALE + "px";
+				}
+				CSSUIManager.textScaleCache[cacheKey] = {
+					fontSize: textElement.style.fontSize,
+					lineHeight: textElement.style.lineHeight
+				};
 			}
-			var fontPercent = textElement.getAttribute("data-font-percent");
-			if(!fontPercent){
-				fontPercent = window.getComputedStyle(textElement, null).getPropertyValue('--fontsize');
-				fontPercent = parseFloat(fontPercent.replace("px", ""));
-				textElement.setAttribute("data-font-percent", fontPercent);
-			}
-			
-			textElement.style.fontSize = Math.floor(referenceWidth/100 * fontPercent) * (ENGINE_SETTINGS.FONT_SCALE || 1) + "px";
-			if(ENGINE_SETTINGS.FONT_LINE_HEIGHT_SCALE){
-				textElement.style.lineHeight = Math.floor(referenceWidth/100 * fontPercent) * (ENGINE_SETTINGS.FONT_SCALE || 1) * ENGINE_SETTINGS.FONT_LINE_HEIGHT_SCALE + "px";
-			}
-			CSSUIManager.textScaleCache[cacheKey] = {
-				fontSize: textElement.style.fontSize,
-				lineHeight: textElement.style.lineHeight
-			};
 		});
 		var scaledWidthElements = sourceContainer.querySelectorAll(".scaled_width");	
 		scaledWidthElements.forEach(function(scaledElement){
-			const cacheKey = "scaled_width:" + getElemCacheIdx(scaledElement);
-			if(CSSUIManager.textScaleCache[cacheKey]){
-				scaledElement.style.width = CSSUIManager.textScaleCache[cacheKey].width;
-				return;
-			}
-			var scalePercent = window.getComputedStyle(scaledElement, null).getPropertyValue('--widthscaling');
-			if(!scalePercent){
-				scalePercent = scaledElement.getAttribute("data-original-width");
-			}			
-			if(!scalePercent){				
+			if(forceAll || scaledElement.offsetParent != null){			
+				const cacheKey = "scaled_width:" + getElemCacheIdx(scaledElement);
+				if(CSSUIManager.textScaleCache[cacheKey]){
+					scaledElement.style.width = CSSUIManager.textScaleCache[cacheKey].width;
+					return;
+				}
+				var scalePercent = window.getComputedStyle(scaledElement, null).getPropertyValue('--widthscaling');
 				if(!scalePercent){
-					scalePercent = window.getComputedStyle(scaledElement, null).getPropertyValue('width');
-				}								
-				scaledElement.setAttribute("data-original-width", scalePercent);
-			}
-			
-			scalePercent = parseFloat(scalePercent.replace("px", ""));
-			
-			scaledElement.style.width = Math.floor(referenceWidth/100 * scalePercent) + "px";
-			CSSUIManager.textScaleCache[cacheKey] = {
-				width: scaledElement.style.width
+					scalePercent = scaledElement.getAttribute("data-original-width");
+				}			
+				if(!scalePercent){				
+					if(!scalePercent){
+						scalePercent = window.getComputedStyle(scaledElement, null).getPropertyValue('width');
+					}								
+					scaledElement.setAttribute("data-original-width", scalePercent);
+				}
+				
+				scalePercent = parseFloat(scalePercent.replace("px", ""));
+				
+				scaledElement.style.width = Math.floor(referenceWidth/100 * scalePercent) + "px";
+				CSSUIManager.textScaleCache[cacheKey] = {
+					width: scaledElement.style.width
+				}
 			}
 		});
 		
 		var scaledHeightElements = sourceContainer.querySelectorAll(".scaled_height");	
 		scaledHeightElements.forEach(function(scaledElement){
-			const cacheKey = "scaled_height:" + getElemCacheIdx(scaledElement);
-			if(CSSUIManager.textScaleCache[cacheKey]){
-				scaledElement.style.height = CSSUIManager.textScaleCache[cacheKey].height;
-				return;
-			}
-			var scalePercent = window.getComputedStyle(scaledElement, null).getPropertyValue('--heightscaling');
-			if(!scalePercent){
-				scalePercent = scaledElement.getAttribute("data-original-height");
-			}
-			if(!scalePercent){
+			if(forceAll || scaledElement.offsetParent != null){			
+				const cacheKey = "scaled_height:" + getElemCacheIdx(scaledElement);
+				if(CSSUIManager.textScaleCache[cacheKey]){
+					scaledElement.style.height = CSSUIManager.textScaleCache[cacheKey].height;
+					return;
+				}
+				var scalePercent = window.getComputedStyle(scaledElement, null).getPropertyValue('--heightscaling');
 				if(!scalePercent){
-					scalePercent = window.getComputedStyle(scaledElement, null).getPropertyValue('height');
-				}				
-				scaledElement.setAttribute("data-original-height", scalePercent);
-			}
-			scalePercent = parseFloat(scalePercent.replace("px", ""));
-			
-			scaledElement.style.height = Math.floor(referenceWidth/100 * scalePercent) + "px";
-			CSSUIManager.textScaleCache[cacheKey] = {
-				height: scaledElement.style.height
+					scalePercent = scaledElement.getAttribute("data-original-height");
+				}
+				if(!scalePercent){
+					if(!scalePercent){
+						scalePercent = window.getComputedStyle(scaledElement, null).getPropertyValue('height');
+					}				
+					scaledElement.setAttribute("data-original-height", scalePercent);
+				}
+				scalePercent = parseFloat(scalePercent.replace("px", ""));
+				
+				scaledElement.style.height = Math.floor(referenceWidth/100 * scalePercent) + "px";
+				CSSUIManager.textScaleCache[cacheKey] = {
+					height: scaledElement.style.height
+				}
 			}
 		});
 		
@@ -129,14 +141,16 @@ CSSUIManager.prototype.updateScaledText = function(windowId, bustCache){
 		let elemId = 0;
 		let fittedElemInfo = {};
 		fittedTextElements.forEach(function(textElement){
-			const currentFontSize = textElement.style.fontSize.replace("px", "");
-			fittedElemInfo[elemId] = {
-				elem: textElement,
-				currentFontSize: currentFontSize,
-				minFontSize: Math.floor(currentFontSize / 10),
-				isValid: true
+			if(forceAll || textElement.offsetParent != null){			
+				const currentFontSize = textElement.style.fontSize.replace("px", "");
+				fittedElemInfo[elemId] = {
+					elem: textElement,
+					currentFontSize: currentFontSize,
+					minFontSize: Math.floor(currentFontSize / 10),
+					isValid: true
+				}
+				elemId++;	
 			}
-			elemId++;	
 		});
 		
 		for(const elemId in fittedElemInfo){

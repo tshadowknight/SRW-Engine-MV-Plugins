@@ -1658,9 +1658,22 @@ GameState_normal.prototype.update = function(scene){
 	var currentPosition = {x: $gamePlayer.posX(), y: $gamePlayer.posY()};
 	$gameTemp.previousCursorPosition = currentPosition;			
 
-	let hasActiveZones = $gameSystem.isZoneActiveAtTile(currentPosition);		
-	
+	let hasActiveZones = $gameSystem.isZoneActiveAtTile(currentPosition);
+
 	var summaryUnit = $statCalc.activeUnitAtPosition(currentPosition);
+
+	let menuAction;
+	if(hasActiveZones){
+		menuAction = "show_zone_info";
+	} else {
+		if(summaryUnit){
+			menuAction = "show_status";
+		} else {
+			menuAction = "toggle_detail_icons";
+		}		
+	}
+	
+	
 	if(summaryUnit && $gameTemp.summariesTimeout <= 0){
 		var previousUnit = $gameTemp.summaryUnit;
 		$gameTemp.summaryUnit = summaryUnit;	
@@ -1694,19 +1707,19 @@ GameState_normal.prototype.update = function(scene){
 		let displayKey = "GameState_normal_";
 		if(summaryUnit.isActor()){
 			if(summaryUnit.canInput()){
-				items = [["actor_menu"], ["move_cursor", "speed_up_cursor"], ["navigate_units"], ["toggle_detail_icons"]];
+				items = [["actor_menu"], ["move_cursor", "speed_up_cursor"], ["navigate_units"], [menuAction]];
 				displayKey+="acting_unit";
 			} else {
-				items = [["show_actor"], ["move_cursor", "speed_up_cursor"], ["navigate_units"], ["toggle_detail_icons"]];
+				items = [["show_actor"], ["move_cursor", "speed_up_cursor"], ["navigate_units"], [menuAction]];
 				displayKey+="waiting_unit";
 			}			
 		} else {
-			items = [["show_enemy"], ["move_cursor", "speed_up_cursor"], ["navigate_units"], ["toggle_detail_icons"]];
+			items = [["show_enemy"], ["move_cursor", "speed_up_cursor"], ["navigate_units"], [menuAction]];
 			displayKey+="enemy";
 		}		
 
 		
-		$SRWGameState.updateStateButtonPrompts(items, displayKey);
+		$SRWGameState.updateStateButtonPrompts(items, displayKey+menuAction);
 		
 	} else {
 		$gameTemp.summaryUnit = null;
@@ -1735,7 +1748,7 @@ GameState_normal.prototype.update = function(scene){
 			$gameSystem.showWillIndicator = !$gameSystem.showWillIndicator;
 		}
 
-		$SRWGameState.updateStateButtonPrompts([["pause_menu"], ["move_cursor", "speed_up_cursor"], ["navigate_units"], ["toggle_detail_icons"]], "GameState_normal_empty");
+		$SRWGameState.updateStateButtonPrompts([["pause_menu"], ["move_cursor", "speed_up_cursor"], ["navigate_units"], [menuAction]], "GameState_normal_empty"+menuAction);
 	}	
 	
 	var regionId = $gameMap.regionId(currentPosition.x, currentPosition.y);

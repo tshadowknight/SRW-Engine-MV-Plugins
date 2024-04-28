@@ -1957,6 +1957,10 @@ SceneManager.isInSaveScene = function(){
 				menu.visible = true;
 			}
 			Scene_Base.prototype.update.call(this);
+			if($gameTemp.scaledTextUpdateRequested){
+				$gameTemp.scaledTextUpdateRequested = false;
+				$CSSUIManager.doUpdateScaledText();
+			}
 			return;			
 		} else {
 			if(this._intermissionWindowOpen){
@@ -2017,6 +2021,10 @@ SceneManager.isInSaveScene = function(){
 		
 		//update of scene base updates menus etc.
 		Scene_Base.prototype.update.call(this);
+		if($gameTemp.scaledTextUpdateRequested){
+			$gameTemp.scaledTextUpdateRequested = false;
+			$CSSUIManager.doUpdateScaledText();
+		}
 		
 		if(!SRWStateResult){
 			return;
@@ -5114,10 +5122,12 @@ SceneManager.onKeyDown = function(event) {
 		switch (event.keyCode) {
 		case 116:   // F5
 			if (Utils.isNwjs()) {
-				if($battleSceneManager){
-					$battleSceneManager.dispose();
-				}
-				location.reload();
+				if(process.versions["nw-flavor"] === "sdk"){
+					if($battleSceneManager){
+						$battleSceneManager.dispose();
+					}
+					location.reload();	
+				}				
 			}
 			break;
 		case 119:   // F8
