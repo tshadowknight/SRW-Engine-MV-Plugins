@@ -108,7 +108,7 @@ Window_ButtonHints.prototype.redraw = async function() {
 	
 	
 	if(!_this._iconsBitmap){
-		_this._iconsBitmap = await ImageManager.loadBitmapPromise('', "UI/GlyphTiles.png", true, 0, false, true);
+		_this._iconsBitmap = await ImageManager.loadBitmapPromise('', ENGINE_SETTINGS.MAP_BUTTON_CONFIG.SPRITE_SHEET.PATH, true, 0, false, true);
 	}
 
 	if(currentCtr != this._requestCtr) {

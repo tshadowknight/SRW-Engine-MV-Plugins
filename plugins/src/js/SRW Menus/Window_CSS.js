@@ -771,10 +771,10 @@ Window_CSS.prototype.constructButtonIcon = function(iconCtr, iconDef) {
 	
 	
 	//elem.appendChild(this._iconsBitmap.canvas);	
-	const initialMultiplier = 1;	
-	const tileSize = 16;
-	const bgWidth = 544;
-	const bgHeight = 384;
+	const initialMultiplier = ENGINE_SETTINGS.MAP_BUTTON_CONFIG.BUTTON_SCALE * 1;	
+	const tileSize = ENGINE_SETTINGS.MAP_BUTTON_CONFIG.SPRITE_SHEET.TILE_SIZE * 1;
+	const bgWidth = ENGINE_SETTINGS.MAP_BUTTON_CONFIG.SPRITE_SHEET.WIDTH * 1;
+	const bgHeight = ENGINE_SETTINGS.MAP_BUTTON_CONFIG.SPRITE_SHEET.HEIGHT * 1;
 	
 	let offsetX = 0;
 	let offsetY = 0;
