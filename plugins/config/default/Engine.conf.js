@@ -42,7 +42,7 @@ var ENGINE_SETTINGS = {
 	MAP_BUTTON_CONFIG: {
 		SPRITE_SHEET: {
 			PATH: "UI/GlyphTiles.png", //the path of the sprite sheet file, CHANGE THIS IF YOU USE A CUSTOM ONE!
-			TILE_SIZE: 16, //the size of one tile on the sprite sheet
+			TILE_SIZE: 16, //the size of one tile on the sprite sheet(pixels)
 			WIDTH: 544, //the width of the sprite sheet file(pixels)
 			HEIGHT: 384 //the height of the sprite sheet file(pixels)
 		},

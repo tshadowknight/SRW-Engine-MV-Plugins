@@ -2605,6 +2605,16 @@ SceneManager.isInSaveScene = function(){
         $gameTemp.clearTargetEvent();
         $gameParty.clearSrpgBattleActors();
         $gameTroop.clearSrpgBattleEnemys();
+		
+		//delete stale battle cache references from previous participants
+		for(let refKey in $gameTemp.battleEffectCache){
+			const ref = $gameTemp.battleEffectCache[refKey].ref;
+			if(ref){
+				delete ref._cacheReference;
+				delete ref._supportCacheReference;
+			}
+		}
+		
 		$gameTemp.battleEffectCache = null;
        
 	   $gameSystem.setSubBattlePhase('check_item_pickup');	

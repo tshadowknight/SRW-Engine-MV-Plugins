@@ -755,6 +755,7 @@ Window_BeforebattleTwin.prototype.update = function() {
 							$gameTemp.allAttackSelectionRequired = false;
 						}	
 						$gameTemp.pushMenu = "attack_list";
+						return;
 					}  else {
 						$gameTemp.twinSupportAttack = null;
 					}		
@@ -1208,7 +1209,13 @@ Window_BeforebattleTwin.prototype.createParticipantBlock = function(ref, action,
 	var content = "";
 	content+="<div class='participant_block "+allyOrEnemy+"'>";
 	
-	var effectRef = ref._cacheReference || ref._supportCacheReference;
+	var effectRef;
+
+	if(ref._cacheReference && $gameTemp.battleEffectCache[ref._cacheReference]){
+		effectRef = ref._cacheReference;
+	} else if(ref._supportCacheReference && $gameTemp.battleEffectCache[ref._supportCacheReference]){
+		effectRef = ref._supportCacheReference;
+	}
 	
 	if(allyOrEnemy == "ally"){
 		content+="<div data-participantid='"+participantId+"' class='mech_icon pilot'>";
@@ -1352,7 +1359,13 @@ Window_BeforebattleTwin.prototype.createParticipantBlock = function(ref, action,
 				content+="<img class='attack_list_type scaled_width' src='svg/crosshair.svg'>";
 			}
 			if(ENGINE_SETTINGS.ENABLE_ATTRIBUTE_SYSTEM){
-				content+=_this.createAttributeEffectivenessBlock(ref, "attribute1", attack, $gameTemp.battleEffectCache[effectRef].attacked.ref);
+				const aCache = $gameTemp.battleEffectCache[effectRef];
+				if(aCache){
+					const attacked = aCache.attacked;
+					if(attacked){
+						content+=_this.createAttributeEffectivenessBlock(ref, "attribute1", attack, attacked.ref);
+					}	
+				}								
 			}
 			
 			content+="<div class=''>"+attack.name+"</div>";
