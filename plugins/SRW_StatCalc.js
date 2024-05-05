@@ -5682,12 +5682,12 @@ StatCalc.prototype.getSearchedActors = function(type, searchInfo){
 					var currentLevel = _this.getCurrentLevel(actor);
 					var regularSpirits = _this.getSpiritList(actor);
 					regularSpirits.forEach(function(spirit){
-						if(spirit.level <= currentLevel && spirit.idx == searchInfo.value){
+						if(spirit.idx != "" && spirit.level <= currentLevel && spirit.idx == searchInfo.value){
 							isValid = true;
 						}
 					});
 					var twinSpirit = _this.getTwinSpirit(actor);
-					if(twinSpirit && twinSpirit.idx == searchInfo.value){
+					if(twinSpirit.idx != "" && twinSpirit && twinSpirit.idx == searchInfo.value){
 						isValid = true;
 					}
 				} else if(searchInfo.type == "pilot"){

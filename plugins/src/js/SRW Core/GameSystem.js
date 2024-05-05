@@ -351,6 +351,10 @@
 				$statCalc.applyBattleStartWill(actor);
 			}
 			
+			this._availableUnits.forEach(function(actor){		
+				actor.event = null									
+			});
+			
 			if(!noReload){
 				//main twin must be initialized first to ensure a reference event is available for their sub twin
 				this._availableUnits.forEach(function(actor){

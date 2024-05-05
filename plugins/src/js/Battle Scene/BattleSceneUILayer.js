@@ -530,6 +530,11 @@ BattleSceneUILayer.prototype.clearPopupNotifications = function(){
 	this._enemyBarrierNotification.innerHTML = "";
 }
 
+BattleSceneUILayer.prototype.updateCanvas = function(side, barriers, additionalClass){
+	Graphics._updateCanvas();
+	$CSSUIManager.doUpdateScaledText();//this window must call this function directly instead of the deferred one because it runs in a context where the main map_scene is not running(it is the one to apply text scaling at the end of the frame)
+}
+
 BattleSceneUILayer.prototype.setPopupNotification = function(side, barriers, additionalClass){
 	var _this = this;
 	var text = "";
@@ -554,7 +559,7 @@ BattleSceneUILayer.prototype.setPopupNotification = function(side, barriers, add
 	barrierNames.forEach(function(barrierName){
 		_this.updateScaledDiv(barrierName);
 	});
-	Graphics._updateCanvas();
+	this.updateCanvas();
 }
 
 BattleSceneUILayer.prototype.showDamage = function(entityType, amount, offsets, displayNum){
@@ -681,7 +686,7 @@ BattleSceneUILayer.prototype.showTextLines = function(lines, callback) {
 			
 		} 
 		
-		Graphics._updateCanvas();
+		this.updateCanvas();
 		var duration = 90 * 1000/60;
 		if(line.duration){
 			duration = line.duration * 1000/60;
@@ -906,8 +911,6 @@ BattleSceneUILayer.prototype.redraw = function() {
 	icons.forEach(function(icon){
 		_this.updateScaledDiv(icon);
 	});
-	
-	
-	
-	Graphics._updateCanvas();
+		
+	this.updateCanvas();
 }

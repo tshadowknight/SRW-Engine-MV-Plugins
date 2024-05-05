@@ -27,7 +27,21 @@ Window_MechListDeployed.prototype.getAvailableUnits = function(){
 }
 
 Window_MechListDeployed.prototype.rowEnabled = function(actor){
-	return !actor.srpgTurnEnd();
+	if($gameTemp.searchInfo && $gameTemp.searchInfo.type == "spirit"){
+		const spirits = $statCalc.getSpiritList(actor);
+		const currentSP = $statCalc.getCurrentSP(actor);
+		let result = false;
+		for(const spirit of spirits){
+			if(spirit.idx == $gameTemp.searchInfo.value){
+				if(spirit.cost <= currentSP){
+					result = true;
+				}
+			}
+		}
+		return result;
+	} else {
+		return !actor.srpgTurnEnd();
+	}	
 }
 
 Window_MechListDeployed.prototype.getCurrentSelection = function(){

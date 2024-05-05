@@ -119,6 +119,9 @@
 
 		//行動終了かどうかを返す
 		Game_BattlerBase.prototype.srpgTurnEnd = function() {
+			if(this.isSubPilot && this.mainPilot){
+				return this.mainPilot._srpgTurnEnd;
+			}
 			return this._srpgTurnEnd;
 		};
 
