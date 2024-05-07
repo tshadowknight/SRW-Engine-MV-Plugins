@@ -1466,6 +1466,7 @@ BattleCalc.prototype.generateBattleResult = function(isPrediction){
 				expGain = $statCalc.applyStatModsToValue(gainRecipient, expGain, ["exp"]);
 				if($statCalc.getActiveSpirits(gainRecipient).gain && !aCache.isBuffingAttack){
 					expGain*=2;
+					aCache.isGainBoosted = true;
 				}
 				
 				var ppGain = _this.performPPCalculation(gainRecipient, gainDonor);

@@ -498,8 +498,10 @@ Window_DetailPages.prototype.drawPilotStats1 = function() {
 	}
 	detailContent+="</div>";
 	
-	detailContent+="<div data-offset=-1 data-type=twin class='left twin selection_icon'></div>";//icon 
-	detailContent+="<div data-offset=1 data-type=twin class='right twin selection_icon'></div>";//icon 
+	if(ENGINE_SETTINGS.ENABLE_TWIN_SYSTEM){
+		detailContent+="<div data-offset=-1 data-type=twin class='left twin selection_icon'></div>";//icon 
+		detailContent+="<div data-offset=1 data-type=twin class='right twin selection_icon'></div>";//icon 
+	}
 	
 	detailContent+="<div class='pilot_type scaled_text fitted_text type_indicator'>";
 	if(!actor.isSubPilot){
@@ -530,12 +532,13 @@ Window_DetailPages.prototype.drawPilotStats1 = function() {
 	detailContent+="<div class='stat_value'>"+currentLevel+"</div>";
 	detailContent+="</div>";
 	
-	if(actor.SRWStats.pilot.stats.base.MP){
-		detailContent+="<div class='pilot_stat_container scaled_text scaled_width'>";		
+	detailContent+="<div class='pilot_stat_container scaled_text scaled_width'>";	
+	if(actor.SRWStats.pilot.stats.base.MP){		
 		detailContent+="<div class='stat_label'>"+APPSTRINGS.DETAILPAGES.label_pilot_MP+"</div>";
 		detailContent+="<div class='stat_value'>"+calculatedStats.currentMP+"/"+calculatedStats.MP+"</div>";
-		detailContent+="</div>";
 	}
+	detailContent+="</div>";
+	
 	
 	detailContent+="</div>";
 	

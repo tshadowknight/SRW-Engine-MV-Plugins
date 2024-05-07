@@ -2258,6 +2258,9 @@ SceneManager.isInSaveScene = function(){
 					if(!gainDonor.isDestroyed){
 						gain = Math.floor(gain/10);
 					}
+					if(battleEffect.isGainBoosted){
+						gain*=2;
+					}
 					entry.expGain+=gain;
 				});
 			});	

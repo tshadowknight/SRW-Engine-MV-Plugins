@@ -285,13 +285,19 @@ BattleSceneManager.prototype.initContainer = async function(){
 	this._PIXIContainer.id = "battle_scene_pixi_layer";	
 	document.body.appendChild(this._PIXIContainer);
 	
-	let bitmap = await ImageManager.loadBitmapPromise("", "img/SRWBattleScene/battleFade.png");	
-	this._swipeImage.setAttribute("src", bitmap.canvas.toDataURL());
+	
 }
 
-BattleSceneManager.prototype.init = async function(attachControl){
+BattleSceneManager.prototype.loadStaticImages = async function(){
+	let bitmap = await ImageManager.loadBitmapPromise("", "img/SRWBattleScene/battleFade.png");	
+	this._swipeImage.setAttribute("src", bitmap.canvas.toDataURL());
+	
+}
+
+BattleSceneManager.prototype.init = function(attachControl){
 	var _this = this;
-	if(!this._initialized){
+	if(!this._initialized){		
+		this.loadStaticImages();
 		this._initialized = true;
 		BABYLON.RenderingManager.MAX_RENDERINGGROUPS = 8;
 		this._UILayerManager = new BattleSceneUILayer("battle_scene_ui_layer");	
@@ -351,6 +357,8 @@ BattleSceneManager.prototype.init = async function(attachControl){
 		
 		this._UILayerManager.redraw();
 		//await _this.initEffekseerParticles();
+		
+		
 	}
 }
 
