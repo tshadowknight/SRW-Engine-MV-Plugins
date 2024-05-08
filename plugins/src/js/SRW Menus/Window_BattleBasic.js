@@ -894,7 +894,7 @@ Window_BattleBasic.prototype.setUpRMMVAnim = function(component, animId, rate, c
 	var sprite = new Sprite_Animation_BasicBattle();
 	sprite.setup(
 		animation, 
-		component.side == "actor" ? false: true, //mirror
+		component.side == "actor" ? true: false, //mirror
 		0, //delay
 		false, //loop
 		true, //noFlash
