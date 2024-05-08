@@ -3558,11 +3558,14 @@ StatCalc.prototype.getWeaponDamageUpgradeAmount = function(attack, levels){
 	var type = attack.upgradeType;
 	var increasesTable = ENGINE_SETTINGS.WEAPON_UPGRADE_TYPES[type];
 	var amount = 0;
-	for(var i = 0; i < levels.length; i++){
-		if(levels[i] < this.getMaxUpgradeLevel()){			
-			amount+=increasesTable[levels[i]];			
-		}				
+	if(increasesTable){
+		for(var i = 0; i < levels.length; i++){
+			if(levels[i] < this.getMaxUpgradeLevel()){			
+				amount+=increasesTable[levels[i]];			
+			}				
+		}
 	}
+	
 	return amount;
 }
 
@@ -3832,7 +3835,7 @@ StatCalc.prototype.isWeaponUnlocked = function(actor, weapon){
 
 
 
-StatCalc.prototype.getCurrentWeapons = function(actor){
+StatCalc.prototype.getCurrentWeapons = function(actor, noEquips){
 	if(this.isActorSRWInitialized(actor)){
 		var tmp = [];
 		var allWeapons = actor.SRWStats.mech.weapons;	
@@ -3842,26 +3845,28 @@ StatCalc.prototype.getCurrentWeapons = function(actor){
 			}
 		}
 		
-		const equipables = this.getActorMechEquipables(actor.SRWStats.mech.id);
-		for(let weapon of equipables){
-			if(weapon){
-				if(this.getWeaponValidHolders(weapon.weaponId)[actor.SRWStats.mech.id]){				
-					var weaponDefinition = $dataWeapons[weapon.weaponId];
-					var weaponProperties = weaponDefinition.meta;
-					
-					let wep = this.parseWeaponDef(actor, false, weaponDefinition, weaponProperties);
-					wep.isEquipable = true;
-					//let levels = [];
-					//for(let i = 0; i < weapon.upgrades; i++){
-					//	levels.push(i)
-					//}
-					//wep.power+=this.getWeaponDamageUpgradeAmount(wep, levels);
-					wep.upgrades = weapon.upgrades;
-					wep.tempKey = "eWeap_"+weapon.weaponId+"_"+weapon.slot;
-					tmp.push(wep);
-				}
-			}			
-		}
+		if(!noEquips){
+			const equipables = this.getActorMechEquipables(actor.SRWStats.mech.id);
+			for(let weapon of equipables){
+				if(weapon){
+					if(this.getWeaponValidHolders(weapon.weaponId)[actor.SRWStats.mech.id]){				
+						var weaponDefinition = $dataWeapons[weapon.weaponId];
+						var weaponProperties = weaponDefinition.meta;
+						
+						let wep = this.parseWeaponDef(actor, false, weaponDefinition, weaponProperties);
+						wep.isEquipable = true;
+						//let levels = [];
+						//for(let i = 0; i < weapon.upgrades; i++){
+						//	levels.push(i)
+						//}
+						//wep.power+=this.getWeaponDamageUpgradeAmount(wep, levels);
+						wep.upgrades = weapon.upgrades;
+						wep.tempKey = "eWeap_"+weapon.weaponId+"_"+weapon.slot;
+						tmp.push(wep);
+					}
+				}			
+			}
+		}		
 		
 		let addedWeaponMods =  $statCalc.getModDefinitions(actor, ["add_weapon"]);
 		for(let mod of addedWeaponMods){			

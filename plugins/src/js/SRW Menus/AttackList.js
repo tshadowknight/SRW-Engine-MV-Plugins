@@ -1,7 +1,7 @@
 import Window_CSS from "./Window_CSS.js";
 import "./style/AttackList.css";
 
-export default function AttackList(container, weaponModProvider){
+export default function AttackList(container, weaponModProvider, excludeEquipables){
 	this._container = container;	
 	this._currentPage = 0;
 	this._currentSelection = 0;
@@ -10,6 +10,7 @@ export default function AttackList(container, weaponModProvider){
 	this._view = "upgrades";
 	this._selectionEnabled = false;
 	this._attackValidator;
+	this._excludeEquipables = excludeEquipables;
 }
 
 
@@ -17,7 +18,11 @@ AttackList.prototype = Object.create(Window_CSS.prototype);
 AttackList.prototype.constructor = AttackList;
 
 AttackList.prototype.getAvailableUnits = function(){
-	return $statCalc.getCurrentWeapons(this.createReferenceData($gameTemp.currentMenuUnit.mech, true));
+	return $statCalc.getCurrentWeapons(this.createReferenceData($gameTemp.currentMenuUnit.mech, true), this._excludeEquipables);
+}
+
+AttackList.prototype.hasSelection = function(){
+	return this.getAvailableUnits().length > 0;
 }
 
 AttackList.prototype.setView = function(view){
@@ -55,7 +60,7 @@ AttackList.prototype.getCurrentSelection = function(){
 
 AttackList.prototype.getCurrentPageAmount = function(){
 	var refData = this.createReferenceData($gameTemp.currentMenuUnit.mech, true);
-	var totalAttacks = $statCalc.getCurrentWeapons(refData).length;
+	var totalAttacks = $statCalc.getCurrentWeapons(refData, this._excludeEquipables).length;
 	var start = this._currentPage * this._maxPageSize;
 	if(start + this._maxPageSize >= totalAttacks){
 		return totalAttacks - start;
@@ -202,7 +207,7 @@ AttackList.prototype.redrawUpgrades = function() {
 		refData = this.createReferenceData($gameTemp.currentMenuUnit.mech);
 	}
 	
-	var attacks = $statCalc.getCurrentWeapons(refData);	
+	var attacks = $statCalc.getCurrentWeapons(refData, this._excludeEquipables);	
 	
 	var pageOffset = this._currentPage * this._maxPageSize;
 	var start = pageOffset;
@@ -223,7 +228,7 @@ AttackList.prototype.redraw = function(softRefresh) {
 	} else {
 		refData = this.createReferenceData($gameTemp.currentMenuUnit.mech);
 	}
-	var attacks = $statCalc.getCurrentWeapons(refData);	
+	var attacks = $statCalc.getCurrentWeapons(refData, this._excludeEquipables);	
 	var maxPage = Math.ceil(attacks.length / this._maxPageSize);
 	if(maxPage < 1){
 		maxPage = 1;

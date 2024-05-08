@@ -297,7 +297,7 @@ Window_BattleBasic.prototype.loadRequiredImages = function(){
 			}
 			for(const timing of animData.timings){
 				if(timing.se){
-					AudioManager.loadStaticSe({name: timing.se.name});
+					//TODO: Figure out a way to actually preload sound effects
 				}
 			}
 		}
@@ -590,6 +590,7 @@ Window_BattleBasic.prototype.animateDamage = function(type, special) {
 
 Window_BattleBasic.prototype.showWeaponAnimation = function(type, special) {
 	var _this = this;
+
 	var containerInfo = this._participantComponents[type];	
 	
 	containerInfo.rmmvAnim.style.transform = "scale("+(special.scale || 1)+")";	
@@ -740,50 +741,55 @@ Window_BattleBasic.prototype.setUpAnimations = function(nextAction) {
 	function processBattleAnimations(attackRef, target){
 		
 		var weaponAnimation;
-		if(nextAction.action && nextAction.action.type == "attack"){
-			if(!nextAction.isBuffingAttack){
-				const animId = nextAction.action.attack.BBAnimId;
-				if(animId != -1){
-					weaponAnimation = {
-						target: target,
-						type: "no_damage", 
-						special: {
-							weaponAnim: {
-								animId: animId, 
-								target: target, 
-								scale: nextAction.action.attack.BBAnimIdScale,
-								rate: nextAction.action.attack.BBAnimIdRate,
-								offsets: {
-									x: nextAction.action.attack.BBAnimIdXOff,
-									y: nextAction.action.attack.BBAnimIdYOff,
+		
+		if(ENGINE_SETTINGS.BASIC_BATTLE_ANIM_MODE == "normal"){
+			if(nextAction.action && nextAction.action.type == "attack"){
+				if(!nextAction.isBuffingAttack){
+					const animId = nextAction.action.attack.BBAnimId;
+					if(animId != -1){
+						weaponAnimation = {
+							target: target,
+							type: "no_damage", 
+							special: {
+								weaponAnim: {
+									animId: animId, 
+									target: target, 
+									scale: nextAction.action.attack.BBAnimIdScale,
+									rate: nextAction.action.attack.BBAnimIdRate,
+									offsets: {
+										x: nextAction.action.attack.BBAnimIdXOff,
+										y: nextAction.action.attack.BBAnimIdYOff,
+									}
 								}
 							}
-						}
-					};
-				}
-				
-			} else {
-				const animId = nextAction.action.attack.vsAllyBBAnimId;
-				if(animId != -1){
-					weaponAnimation = {
-						target: target,
-						type: "no_damage", 
-						special: {
-							weaponAnim: {
-								animId: animId, 
-								target: target, 
-								scale: nextAction.action.attack.vsAllyBBAnimIdScale,
-								rate: nextAction.action.attack.vsAllyBBAnimIdRate,
-								offsets: {
-									x: nextAction.action.attack.vsAllyBBAnimIdXOff,
-									y: nextAction.action.attack.vsAllyBBAnimIdYOff,
+						};
+					}
+					
+				} else {
+					const animId = nextAction.action.attack.vsAllyBBAnimId;
+					if(animId != -1){
+						weaponAnimation = {
+							target: target,
+							type: "no_damage", 
+							special: {
+								weaponAnim: {
+									animId: animId, 
+									target: target, 
+									scale: nextAction.action.attack.vsAllyBBAnimIdScale,
+									rate: nextAction.action.attack.vsAllyBBAnimIdRate,
+									offsets: {
+										x: nextAction.action.attack.vsAllyBBAnimIdXOff,
+										y: nextAction.action.attack.vsAllyBBAnimIdYOff,
+									}
 								}
 							}
-						}
-					};
-				}
-			}			
+						};
+					}
+				}			
+			}
 		}
+		
+		
 		
 			
 		attackAnimationSubQueue.weaponAnimation = weaponAnimation;

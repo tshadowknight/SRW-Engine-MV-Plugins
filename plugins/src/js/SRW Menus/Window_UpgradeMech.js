@@ -99,6 +99,11 @@ Window_UpgradeMech.prototype.decrementSelection = function(){
 
 Window_UpgradeMech.prototype.incrementUpgradeLevel = function(){
 	if(this._UIState == "upgrades"){
+		if(this._currentSelection == 0 && !this._attackList.hasSelection()){
+			SoundManager.playBuzzer();
+			return;
+		}
+		
 		var mechData = this.getCurrentSelection();
 		var calculatedStats = mechData.stats.calculated;
 		var upgradeLevels = mechData.stats.upgradeLevels;
@@ -113,6 +118,10 @@ Window_UpgradeMech.prototype.incrementUpgradeLevel = function(){
 
 Window_UpgradeMech.prototype.decrementUpgradeLevel = function(){	
 	if(this._UIState == "upgrades"){
+		if(this._currentSelection == 0 && !this._attackList.hasSelection()){
+			SoundManager.playBuzzer();
+			return;
+		}
 		var upgradeId = this._upgradeTypes[this._currentSelection].id;	
 		if(this._currentUpgradeDeltas[upgradeId] > 0){
 			this._currentUpgradeDeltas[upgradeId]--;
@@ -154,7 +163,7 @@ Window_UpgradeMech.prototype.createComponents = function() {
 	
 	this._attackListDisplay = document.createElement("div");	
 	this._attackListDisplay.classList.add("attack_list_container");	
-	this._attackList = new AttackList(this._attackListDisplay, this);
+	this._attackList = new AttackList(this._attackListDisplay, this, true);
 	this._attackList.createComponents();
 	windowNode.appendChild(this._attackListDisplay);
 	

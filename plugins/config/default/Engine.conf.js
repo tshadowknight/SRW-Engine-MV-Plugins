@@ -11,6 +11,7 @@ var ENGINE_SETTINGS = {
 	DISABLE_TOUCH: false,
 	PRELOAD_AUDIO: true,
 	DEFAULT_BASIC_ANIM_RATE: 4,
+	BASIC_BATTLE_ANIM_MODE: "normal", //normal = use anims set in editor, none = do not use, attribute = use animation linked to weapon attribute
 	RPG_MAKER_INV_LIMIT: 1,
 	ENABLE_EQUIPABLES: true,
 	ALLOW_DUPLICATE_EQUIPS: false,

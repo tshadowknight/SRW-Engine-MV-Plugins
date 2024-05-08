@@ -332,11 +332,13 @@ Window_UpgradeEquipWeapon.prototype.redraw = function() {
 	var mechData = this.getCurrentSelection();
 	var inventoryInfo = $inventoryManager.getCurrentInventory();
 	const windowNode = this.getWindowNode();	
-	this._attackSummary.redraw();
+	
 
 	
 	
 	this._itemList.redraw();
+	
+	this._attackSummary.redraw();
 	
 	this._itemListContainer.classList.remove("active");
 	this._itemListContainer.style.display = "none";
