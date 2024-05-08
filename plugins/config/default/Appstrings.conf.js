@@ -831,7 +831,11 @@ EDITORSTRINGS.WEAPON = {
 	label_ALL: "ALL Weapon",
 	label_animation: "Animation",
 	label_animation_ally: "Animation(Ally)",
+	label_basic_animation: "Basic Battle Anim.",
+	label_basic_animation_ally: "Basic Battle Anim.(Ally)",
 	label_invalid_target_tags: "Invalid Target Tags",
+	label_basic_animation_scale: "Animation Scale",
+	label_basic_animation_scale_ally: "Animation Scale",
 	
 	hint_effects: "Only the first two effects are shown in the UI",
 	

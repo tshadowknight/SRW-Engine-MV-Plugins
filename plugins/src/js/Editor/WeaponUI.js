@@ -286,6 +286,51 @@ WeaponUI.prototype.initPropertyHandlers = function(){
 				content+="</select>";
 				content+="</div>";
 				content+="</div>";
+				
+				
+				
+				content+="<div class='row '>";
+				content+="<div class='cell'>";
+				content+=EDITORSTRINGS.WEAPON.label_basic_animation;
+				content+="</div>";
+				content+="<div class='cell'>";
+				content+="<select id='anim_bb_select'>";
+				var value = _this.getMetaValue("weaponBBAnimId");
+				content+="<option title='' value='-1'>None</option>";
+				var options = $dataAnimations;
+				for(var j = 1; j < options.length; j++){					
+					content+="<option "+(options[j].id == value ? "selected" : "")+" value='"+options[j].id+"'>"+String(j).padStart(4, "0")+" "+options[j].name+"</option>";										
+				}
+				
+				content+="</select>";
+				content+="</div>";
+				content+="</div>";
+				
+				content+="<div class='row '>";
+				content+=_this.createValueInput("weaponBBAnimId_scale", EDITORSTRINGS.WEAPON.label_basic_animation_scale);
+				content+="</div>";
+				
+				content+="<div class='row '>";
+				content+="<div class='cell'>";
+				content+=EDITORSTRINGS.WEAPON.label_basic_animation_ally;
+				content+="</div>";
+				content+="<div class='cell'>";
+				content+="<select id='anim_bb_ally_select'>";
+				var value = _this.getMetaValue("weaponBBVSAllyAnimId");
+				content+="<option title='' value='-1'>None</option>";
+				var options = $dataAnimations;
+				for(var j = 1; j < options.length; j++){					
+					content+="<option "+(options[j].id == value ? "selected" : "")+" value='"+options[j].id+"'>"+String(j).padStart(4, "0")+" "+options[j].name+"</option>";										
+				}
+				
+				content+="</select>";
+				content+="</div>";
+				content+="</div>";
+				
+				content+="<div class='row '>";
+				content+=_this.createValueInput("weaponBBVSAllyAnimId_scale", EDITORSTRINGS.WEAPON.label_basic_animation_scale_ally);
+				content+="</div>";
+				
 				return content;				
 			},
 			hook(){
@@ -299,7 +344,29 @@ WeaponUI.prototype.initPropertyHandlers = function(){
 					_this.setMetaValue("weaponVSAllyAnimId", this.value);
 					//_this.show();
 					_this._mainUIHandler.setModified();
-				});					
+				});		
+
+				containerNode.querySelector("#anim_bb_select").addEventListener("change", function(){
+					_this.setMetaValue("weaponBBAnimId", this.value);
+					//_this.show();
+					_this._mainUIHandler.setModified();
+				});		
+				containerNode.querySelector("#anim_bb_ally_select").addEventListener("change", function(){
+					_this.setMetaValue("weaponBBVSAllyAnimId", this.value);
+					//_this.show();
+					_this._mainUIHandler.setModified();
+				});	
+				
+				containerNode.querySelector("#prop_weaponBBAnimId_scale").addEventListener("change", function(){
+					_this.setMetaValue("weaponBBAnimId_scale", this.value);
+					_this._mainUIHandler.setModified();
+				});
+				
+				containerNode.querySelector("#prop_weaponBBVSAllyAnimId_scale").addEventListener("change", function(){
+					_this.setMetaValue("weaponBBVSAllyAnimId_scale", this.value);
+					_this._mainUIHandler.setModified();
+				});
+			
 			}
 		},
 		effects: {

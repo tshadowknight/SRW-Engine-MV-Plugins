@@ -581,6 +581,25 @@ StatCalc.prototype.parseWeaponDef = function(actor, isLocked, weaponDefinition, 
 	if(isNaN(vsAllyAnimId)){
 		vsAllyAnimId = -1;
 	}
+	
+	let BBAnimId = parseInt(weaponProperties.weaponBBAnimId);
+	if(isNaN(BBAnimId)){
+		BBAnimId = -1;
+	}
+	let vsAllyBBAnimId = parseInt(weaponProperties.weaponBBVSAllyAnimId);
+	if(isNaN(vsAllyBBAnimId)){
+		vsAllyBBAnimId = -1;
+	}
+	
+	let BBAnimIdScale = parseFloat(weaponProperties.weaponBBAnimId_scale);
+	if(isNaN(BBAnimIdScale)){
+		BBAnimIdScale = 1;
+	}
+	let vsAllyBBAnimIdScale = parseFloat(weaponProperties.weaponBBVSAllyAnimId_scale);
+	if(isNaN(vsAllyBBAnimIdScale)){
+		vsAllyBBAnimIdScale = 1;
+	}
+	
 	let invalidTargetTags = {};
 	if(weaponProperties.weaponInvalidTags){					
 		var parts = weaponProperties.weaponInvalidTags.split(",");
@@ -610,6 +629,10 @@ StatCalc.prototype.parseWeaponDef = function(actor, isLocked, weaponDefinition, 
 		particleType: (weaponProperties.weaponCategory || "").trim(), //missile, funnel, beam, gravity, physical or "".
 		animId: animId,
 		vsAllyAnimId: vsAllyAnimId,
+		BBAnimId: BBAnimId,
+		vsAllyBBAnimId: vsAllyBBAnimId,
+		BBAnimIdScale: BBAnimIdScale,
+		vsAllyBBAnimIdScale: vsAllyBBAnimIdScale,
 		isMap: isMap, 
 		mapId: mapId,
 		ignoresFriendlies: ignoresFriendlies,

@@ -906,6 +906,22 @@
 	display: block;
 }
 
+.participant_container .rmmv_container {
+	
+	position: absolute;
+	display: flex;
+	align-items: center;
+	justify-content: center;
+	width: 100%;
+	height: 100%;
+}
+
+.participant_container .rmmv_container .rmmv_anim {
+	
+	--widthpixels: 1000;
+    --heightpixels: 1000;
+}
+
 .participant_container .buff_container {
 	--widthpixels: 192;
     --heightpixels: 192;

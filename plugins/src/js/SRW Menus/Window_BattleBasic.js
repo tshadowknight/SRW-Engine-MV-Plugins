@@ -1,5 +1,6 @@
 import Window_CSS from "./Window_CSS.js";
 import "./style/Window_BattleBasic.css";
+import Sprite_Animation_BasicBattle from "./Sprites/Sprite_Animation_BasicBattle.js";
 
 export default function Window_BattleBasic() {
 	this.initialize.apply(this, arguments);	
@@ -60,6 +61,10 @@ Window_BattleBasic.prototype.initialize = function() {
 	
 	this._finishing = false;
 	this._finishTimer = 0;
+	
+	this._RMMVSpriteInfo = [];
+	this._lastFrameTime = -1;
+	this._deltaTime = -1;
 }
 
 Window_BattleBasic.prototype.getCurrentSelection = function(){
@@ -193,6 +198,19 @@ Window_BattleBasic.prototype.createParticipantComponents = function(componentId,
 	buff.setAttribute("data-img", this.makeImageURL("buff"));
 	buffContainer.appendChild(buff);
 	component.buff = buff;
+	
+	var rmmvAnimContainer = document.createElement("div");
+	rmmvAnimContainer.classList.add("rmmv_container");
+	container.appendChild(rmmvAnimContainer);
+	component.rmmvAnimContainer = rmmvAnimContainer;
+	
+	var rmmvAnim = document.createElement("canvas");
+	rmmvAnim.classList.add("rmmv_anim");
+	rmmvAnim.setAttribute("width", 1000);
+	rmmvAnim.setAttribute("height", 1000);
+	rmmvAnimContainer.appendChild(rmmvAnim);
+	component.rmmvAnim = rmmvAnim;
+	
 	
 	this._participantComponents[componentId] = component;
 }
@@ -531,7 +549,22 @@ Window_BattleBasic.prototype.animateDamage = function(type, special) {
 	se.pitch = 100;
 	se.volume = 80;
 	AudioManager.playSe(se);
+	
+	
 }
+
+Window_BattleBasic.prototype.showWeaponAnimation = function(type, special) {
+	var _this = this;
+	var containerInfo = this._participantComponents[type];	
+	
+	containerInfo.rmmvAnim.style.transform = "scale("+(special.scale || 1)+")";	
+	
+	_this._processingAnimationCount++;
+	_this.setUpRMMVAnim(containerInfo, special.animId, function(){
+		_this._processingAnimationCount--;
+	});
+}
+
 
 Window_BattleBasic.prototype.animateDestroy = function(type) {
 	var containerInfo = this._participantComponents[type];
@@ -602,6 +635,7 @@ Window_BattleBasic.prototype.setUpAnimations = function(nextAction) {
 	
 	var attackAnimationSubQueue = {
 		supportDefendAnimation: null,
+		weaponAnimation: null,
 		damageAnimation: [],
 		hpBarAnimation: [],
 		destroyAnimation: [],
@@ -631,6 +665,10 @@ Window_BattleBasic.prototype.setUpAnimations = function(nextAction) {
 		this._animationQueue.push([attackAnimationSubQueue.supportDefendAnimation]);
 	}
 	
+	if(attackAnimationSubQueue.weaponAnimation){
+		this._animationQueue.push([attackAnimationSubQueue.weaponAnimation]);
+	}
+	
 	this._animationQueue.push(attackAnimationSubQueue.damageAnimation.concat(attackAnimationSubQueue.evadeAnimation));
 	
 	if(attackAnimationSubQueue.hpBarAnimation.length){
@@ -649,6 +687,26 @@ Window_BattleBasic.prototype.setUpAnimations = function(nextAction) {
 	
 	
 	function processBattleAnimations(attackRef, target){
+		
+		var weaponAnimation;
+		if(nextAction.action && nextAction.action.type == "attack"){
+			if(!nextAction.isBuffingAttack){
+				const animId = nextAction.action.attack.BBAnimId;
+				if(animId != -1){
+					weaponAnimation = {target: target, type: "no_damage", special: {weaponAnim: {animId: animId, target: target, scale: nextAction.action.attack.BBAnimIdScale}}};
+				}
+				
+			} else {
+				const animId = nextAction.action.attack.vsAllyBBAnimId;
+				if(animId != -1){
+					weaponAnimation = {target: target, type: "no_damage", special: {weaponAnim: {animId: animId, target: target, scale: nextAction.action.attack.vsAllyBBAnimIdScale}}};
+				}
+			}			
+		}
+		
+			
+		attackAnimationSubQueue.weaponAnimation = weaponAnimation;
+		
 		if(nextAction["hits"+attackRef]){
 			if(nextAction["attacked"+attackRef].type == "support defend"){
 				if(nextAction["attacked"+attackRef].ref.isSubTwin){
@@ -785,9 +843,46 @@ Window_BattleBasic.prototype.setUpAnimations = function(nextAction) {
 	}
 }
 
+Window_BattleBasic.prototype.setUpRMMVAnim = function(component, animId, callback) {
+	
+	var renderer =  new PIXI.CanvasRenderer(1000, 1000, {view: component.rmmvAnim,  transparent: true });
+	
+	var stage = new PIXI.Container();
+	var animation = $dataAnimations[animId];
+	var sprite = new Sprite_Animation_BasicBattle();
+	sprite.setup(
+		animation, 
+		component.side == "actor" ? false: true, //mirror
+		0, //delay
+		false, //loop
+		true, //noFlash
+		false, //noSfx
+		2,//rate
+		callback
+	);
+	sprite.anchor.x = 0.5;
+	sprite.anchor.y = 0.5;
+
+	stage.addChild(sprite);
+	this._RMMVSpriteInfo.push({
+		RMMVSprite: sprite,
+		renderer: renderer,
+		stage: stage
+	});
+}
+
+
 Window_BattleBasic.prototype.update = function() {
 	var _this = this;
 	Window_Base.prototype.update.call(this);
+	
+	if(this._lastFrameTime == -1){
+		this._lastFrameTime = Date.now();
+		this._deltaTime = 0;
+	} else {
+		this._deltaTime = Date.now() - this._lastFrameTime;
+		this._lastFrameTime = Date.now();
+	}
 	
 	if(this.isOpen() && !this._handlingInput){
 		//return;
@@ -796,7 +891,15 @@ Window_BattleBasic.prototype.update = function() {
 			return;
 		}
 		
-		
+		var tmp = [];
+		_this._RMMVSpriteInfo.forEach(function(RMMVBg){
+			if(!RMMVBg.RMMVSprite.hasEnded()){			
+				RMMVBg.RMMVSprite.update(_this._deltaTime / Math.max(_this.getAnimTimeRatio(), 0.5));				
+				RMMVBg.renderer.render(RMMVBg.stage);	
+				tmp.push(RMMVBg);
+			}			
+		});
+		_this._RMMVSpriteInfo = tmp;
 		
 		if(this._finishing){
 			if(this._finishTimer <= 0 && !$gameTemp.pauseBasicBattle){
@@ -808,6 +911,8 @@ Window_BattleBasic.prototype.update = function() {
 			this._finishTimer--;
 			return;
 		}
+		
+		
 		
 		if(!this._processingAction){
 			var nextAction = this._actionQueue.shift();
@@ -865,6 +970,12 @@ Window_BattleBasic.prototype.update = function() {
 							if(nextAnimation.special.damage){
 								_this.animateDamage(nextAnimation.special.damage.target, nextAnimation.special.damage);		
 							}
+							
+							if(nextAnimation.special.weaponAnim){
+								_this.showWeaponAnimation(nextAnimation.special.weaponAnim.target, nextAnimation.special.weaponAnim);		
+							}
+							
+							
 							
 							if(nextAnimation.special.buff){
 								_this.animateBuff(nextAnimation.special.buff.target);		
@@ -1038,6 +1149,7 @@ Window_BattleBasic.prototype.redraw = async function() {
 			_this.updateScaledDiv(containerInfo.buffContainer);
 			_this.updateScaledImage(containerInfo.buff);
 			_this.updateScaledImage(containerInfo.barrier);
+			_this.updateScaledDiv(containerInfo.rmmvAnim);
 		}			
 	});	
 	
