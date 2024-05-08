@@ -600,6 +600,33 @@ StatCalc.prototype.parseWeaponDef = function(actor, isLocked, weaponDefinition, 
 		vsAllyBBAnimIdScale = 1;
 	}
 	
+	let BBAnimIdRate = parseFloat(weaponProperties.weaponBBAnimId_rate);
+	if(isNaN(BBAnimIdRate)){
+		BBAnimIdRate = ENGINE_SETTINGS.DEFAULT_BASIC_ANIM_RATE || 4;
+	}
+	let vsAllyBBAnimIdRate = parseFloat(weaponProperties.weaponBBVSAllyAnimId_rate);
+	if(isNaN(vsAllyBBAnimIdRate)){
+		vsAllyBBAnimIdRate = ENGINE_SETTINGS.DEFAULT_BASIC_ANIM_RATE || 4;
+	}
+	
+	let BBAnimIdXOff = parseFloat(weaponProperties.weaponBBAnimId_XOff);
+	if(isNaN(BBAnimIdXOff)){
+		BBAnimIdXOff = 0;
+	}
+	let vsAllyBBAnimIdXOff = parseFloat(weaponProperties.weaponBBVSAllyAnimId_XOff);
+	if(isNaN(vsAllyBBAnimIdXOff)){
+		vsAllyBBAnimIdXOff = 0;
+	}
+	
+	let BBAnimIdYOff = parseFloat(weaponProperties.weaponBBAnimId_YOff);
+	if(isNaN(BBAnimIdYOff)){
+		BBAnimIdYOff = 0;
+	}
+	let vsAllyBBAnimIdYOff = parseFloat(weaponProperties.weaponBBVSAllyAnimId_YOff);
+	if(isNaN(vsAllyBBAnimIdYOff)){
+		vsAllyBBAnimIdYOff = 0;
+	}
+	
 	let invalidTargetTags = {};
 	if(weaponProperties.weaponInvalidTags){					
 		var parts = weaponProperties.weaponInvalidTags.split(",");
@@ -633,6 +660,12 @@ StatCalc.prototype.parseWeaponDef = function(actor, isLocked, weaponDefinition, 
 		vsAllyBBAnimId: vsAllyBBAnimId,
 		BBAnimIdScale: BBAnimIdScale,
 		vsAllyBBAnimIdScale: vsAllyBBAnimIdScale,
+		BBAnimIdRate: BBAnimIdRate,
+		vsAllyBBAnimIdRate: vsAllyBBAnimIdRate,
+		BBAnimIdXOff: BBAnimIdXOff,
+		vsAllyBBAnimIdXOff: vsAllyBBAnimIdXOff,
+		BBAnimIdYOff: BBAnimIdYOff,
+		vsAllyBBAnimIdYOff: vsAllyBBAnimIdYOff,
 		isMap: isMap, 
 		mapId: mapId,
 		ignoresFriendlies: ignoresFriendlies,

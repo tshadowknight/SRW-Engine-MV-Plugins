@@ -802,6 +802,7 @@ EDITORSTRINGS.WEAPON = {
 	label_cost_type: "Cost Type",
 	label_upgrade_amount: "Upgrade Amount",
 	label_weight: "Weight",
+	label_animation: "Animation",
 	
 	label_banned_mechs: "Banned on ids",
 	label_allowed_mechs: "Allowed on ids",
@@ -836,6 +837,12 @@ EDITORSTRINGS.WEAPON = {
 	label_invalid_target_tags: "Invalid Target Tags",
 	label_basic_animation_scale: "Animation Scale",
 	label_basic_animation_scale_ally: "Animation Scale",
+	label_basic_animation_rate: "Rate",
+	label_basic_animation_x_off: "X Offset",
+	label_basic_animation_y_off: "Y Offset",
+	label_percent: "%",
+	label_frames: "frames/tick",
+	label_width_units: "adjusted pixels",
 	
 	hint_effects: "Only the first two effects are shown in the UI",
 	

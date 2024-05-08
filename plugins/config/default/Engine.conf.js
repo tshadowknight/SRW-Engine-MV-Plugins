@@ -10,6 +10,7 @@ var ENGINE_SETTINGS = {
 	MSG_LINE_HEIGHT_SCALE: 1,//scaling factor for the line height of lines in the message window. Use this to adjust if you are not using the default FONT_SIZE
 	DISABLE_TOUCH: false,
 	PRELOAD_AUDIO: true,
+	DEFAULT_BASIC_ANIM_RATE: 4,
 	RPG_MAKER_INV_LIMIT: 1,
 	ENABLE_EQUIPABLES: true,
 	ALLOW_DUPLICATE_EQUIPS: false,
@@ -41,7 +42,7 @@ var ENGINE_SETTINGS = {
 	USE_SINGLE_MAP_SPRITE: false,
 	MAP_BUTTON_CONFIG: {
 		SPRITE_SHEET: {
-			PATH: "UI/GlyphTiles.png", //the path of the sprite sheet file, CHANGE THIS IF YOU USE A CUSTOM ONE!
+			PATH: "img/system/GlyphTiles.png", //the path of the sprite sheet file, CHANGE THIS IF YOU USE A CUSTOM ONE!
 			TILE_SIZE: 16, //the size of one tile on the sprite sheet(pixels)
 			WIDTH: 544, //the width of the sprite sheet file(pixels)
 			HEIGHT: 384 //the height of the sprite sheet file(pixels)

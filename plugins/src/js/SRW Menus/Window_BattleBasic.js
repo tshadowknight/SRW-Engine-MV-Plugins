@@ -559,8 +559,20 @@ Window_BattleBasic.prototype.showWeaponAnimation = function(type, special) {
 	
 	containerInfo.rmmvAnim.style.transform = "scale("+(special.scale || 1)+")";	
 	
+	if(special.offsets.x){
+		containerInfo.rmmvAnim.style.marginLeft = (special.offsets.x * Graphics.getScale()) + "%";
+	} else {
+		containerInfo.rmmvAnim.style.marginLeft = "0%";
+	}
+	
+	if(special.offsets.y){
+		containerInfo.rmmvAnim.style.marginTop = (special.offsets.y * Graphics.getScale()) + "%";
+	} else {
+		containerInfo.rmmvAnim.style.marginTop = "0%";
+	}
+	
 	_this._processingAnimationCount++;
-	_this.setUpRMMVAnim(containerInfo, special.animId, function(){
+	_this.setUpRMMVAnim(containerInfo, special.animId, special.rate, function(){
 		_this._processingAnimationCount--;
 	});
 }
@@ -693,13 +705,43 @@ Window_BattleBasic.prototype.setUpAnimations = function(nextAction) {
 			if(!nextAction.isBuffingAttack){
 				const animId = nextAction.action.attack.BBAnimId;
 				if(animId != -1){
-					weaponAnimation = {target: target, type: "no_damage", special: {weaponAnim: {animId: animId, target: target, scale: nextAction.action.attack.BBAnimIdScale}}};
+					weaponAnimation = {
+						target: target,
+						type: "no_damage", 
+						special: {
+							weaponAnim: {
+								animId: animId, 
+								target: target, 
+								scale: nextAction.action.attack.BBAnimIdScale,
+								rate: nextAction.action.attack.BBAnimIdRate,
+								offsets: {
+									x: nextAction.action.attack.BBAnimIdXOff,
+									y: nextAction.action.attack.BBAnimIdYOff,
+								}
+							}
+						}
+					};
 				}
 				
 			} else {
 				const animId = nextAction.action.attack.vsAllyBBAnimId;
 				if(animId != -1){
-					weaponAnimation = {target: target, type: "no_damage", special: {weaponAnim: {animId: animId, target: target, scale: nextAction.action.attack.vsAllyBBAnimIdScale}}};
+					weaponAnimation = {
+						target: target,
+						type: "no_damage", 
+						special: {
+							weaponAnim: {
+								animId: animId, 
+								target: target, 
+								scale: nextAction.action.attack.vsAllyBBAnimIdScale,
+								rate: nextAction.action.attack.vsAllyBBAnimIdRate,
+								offsets: {
+									x: nextAction.action.attack.vsAllyBBAnimIdXOff,
+									y: nextAction.action.attack.vsAllyBBAnimIdYOff,
+								}
+							}
+						}
+					};
 				}
 			}			
 		}
@@ -843,7 +885,7 @@ Window_BattleBasic.prototype.setUpAnimations = function(nextAction) {
 	}
 }
 
-Window_BattleBasic.prototype.setUpRMMVAnim = function(component, animId, callback) {
+Window_BattleBasic.prototype.setUpRMMVAnim = function(component, animId, rate, callback) {
 	
 	var renderer =  new PIXI.CanvasRenderer(1000, 1000, {view: component.rmmvAnim,  transparent: true });
 	
@@ -857,7 +899,7 @@ Window_BattleBasic.prototype.setUpRMMVAnim = function(component, animId, callbac
 		false, //loop
 		true, //noFlash
 		false, //noSfx
-		2,//rate
+		rate,//rate
 		callback
 	);
 	sprite.anchor.x = 0.5;

@@ -250,6 +250,7 @@ WeaponUI.prototype.initPropertyHandlers = function(){
 		animation: {
 			createControls(){		
 				var content = "";			
+				content+="<div class='table sub_section'>";	
 				content+="<div class='row '>";
 				content+="<div class='cell'>";
 				content+=EDITORSTRINGS.WEAPON.label_animation;
@@ -287,7 +288,9 @@ WeaponUI.prototype.initPropertyHandlers = function(){
 				content+="</div>";
 				content+="</div>";
 				
+				content+="</div>";
 				
+				content+="<div class='table sub_section'>";	
 				
 				content+="<div class='row '>";
 				content+="<div class='cell'>";
@@ -307,8 +310,24 @@ WeaponUI.prototype.initPropertyHandlers = function(){
 				content+="</div>";
 				
 				content+="<div class='row '>";
-				content+=_this.createValueInput("weaponBBAnimId_scale", EDITORSTRINGS.WEAPON.label_basic_animation_scale);
+				content+=_this.createValueInput("weaponBBAnimId_scale", EDITORSTRINGS.WEAPON.label_basic_animation_scale, "", EDITORSTRINGS.WEAPON.label_percent);
 				content+="</div>";
+				
+				content+="<div class='row '>";
+				content+=_this.createValueInput("weaponBBAnimId_rate", EDITORSTRINGS.WEAPON.label_basic_animation_rate, "", EDITORSTRINGS.WEAPON.label_frames);
+				content+="</div>";
+				
+				content+="<div class='row '>";
+				content+=_this.createValueInput("weaponBBAnimId_XOff", EDITORSTRINGS.WEAPON.label_basic_animation_x_off, "", EDITORSTRINGS.WEAPON.label_percent);
+				content+="</div>";
+				
+				content+="<div class='row '>";
+				content+=_this.createValueInput("weaponBBAnimId_YOff", EDITORSTRINGS.WEAPON.label_basic_animation_y_off, "", EDITORSTRINGS.WEAPON.label_percent);
+				content+="</div>";
+				
+				content+="</div>";
+				
+				content+="<div class='table sub_section'>";	
 				
 				content+="<div class='row '>";
 				content+="<div class='cell'>";
@@ -328,7 +347,21 @@ WeaponUI.prototype.initPropertyHandlers = function(){
 				content+="</div>";
 				
 				content+="<div class='row '>";
-				content+=_this.createValueInput("weaponBBVSAllyAnimId_scale", EDITORSTRINGS.WEAPON.label_basic_animation_scale_ally);
+				content+=_this.createValueInput("weaponBBVSAllyAnimId_scale", EDITORSTRINGS.WEAPON.label_basic_animation_scale_ally, "", EDITORSTRINGS.WEAPON.label_percent);
+				content+="</div>";
+				
+				content+="<div class='row '>";
+				content+=_this.createValueInput("weaponBBVSAllyAnimId_rate", EDITORSTRINGS.WEAPON.label_basic_animation_rate, "", EDITORSTRINGS.WEAPON.label_frames);
+				content+="</div>";
+				
+				content+="<div class='row '>";
+				content+=_this.createValueInput("weaponBBVSAllyAnimId_XOff", EDITORSTRINGS.WEAPON.label_basic_animation_x_off, "", EDITORSTRINGS.WEAPON.label_percent);
+				content+="</div>";
+				
+				content+="<div class='row '>";
+				content+=_this.createValueInput("weaponBBVSAllyAnimId_YOff", EDITORSTRINGS.WEAPON.label_basic_animation_y_off, "", EDITORSTRINGS.WEAPON.label_percent);
+				content+="</div>";
+				
 				content+="</div>";
 				
 				return content;				
@@ -357,16 +390,23 @@ WeaponUI.prototype.initPropertyHandlers = function(){
 					_this._mainUIHandler.setModified();
 				});	
 				
-				containerNode.querySelector("#prop_weaponBBAnimId_scale").addEventListener("change", function(){
-					_this.setMetaValue("weaponBBAnimId_scale", this.value);
-					_this._mainUIHandler.setModified();
-				});
+				const handledProps = [
+					"weaponBBVSAllyAnimId_scale",
+					"weaponBBAnimId_scale",
+					"weaponBBAnimId_rate",
+					"weaponBBVSAllyAnimId_rate",
+					"weaponBBAnimId_XOff",
+					"weaponBBVSAllyAnimId_XOff",
+					"weaponBBAnimId_YOff",
+					"weaponBBVSAllyAnimId_YOff"
+				];
 				
-				containerNode.querySelector("#prop_weaponBBVSAllyAnimId_scale").addEventListener("change", function(){
-					_this.setMetaValue("weaponBBVSAllyAnimId_scale", this.value);
-					_this._mainUIHandler.setModified();
-				});
-			
+				for(const prop of handledProps){
+					containerNode.querySelector("#prop_"+prop).addEventListener("change", function(){
+						_this.setMetaValue(prop, this.value);
+						_this._mainUIHandler.setModified();
+					});
+				}			
 			}
 		},
 		effects: {
@@ -919,7 +959,7 @@ WeaponUI.prototype.show = async function(){
 	content+="<div class='table'>";
 	content+=_this._propertyHandlers.name.createControls();
 
-	content+=_this._propertyHandlers.animation.createControls();
+	
 
 	content+="<div class='row'>";
 	content+=_this._propertyHandlers.type.createControls();
@@ -1029,6 +1069,22 @@ WeaponUI.prototype.show = async function(){
 	content+="<div class='content' style='display: block;'>";
 	content+="<div class='table'>";		
 	content+=_this._propertyHandlers.effects.createControls();
+	content+="</div>";	
+	
+	
+	content+="</div>";	
+	content+="</div>";
+	
+	
+	
+	
+	content+="<div class='section'>";
+	content+="<div class='title abilities'>";
+	content+=EDITORSTRINGS.WEAPON.label_animation;	
+	content+="</div>";
+	content+="<div class='content' style='display: block;'>";
+	content+="<div class='table'>";		
+	content+=_this._propertyHandlers.animation.createControls();
 	content+="</div>";	
 	
 	
