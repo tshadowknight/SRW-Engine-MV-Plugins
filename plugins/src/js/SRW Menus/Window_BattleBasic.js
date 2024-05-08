@@ -559,8 +559,12 @@ Window_BattleBasic.prototype.showWeaponAnimation = function(type, special) {
 	
 	containerInfo.rmmvAnim.style.transform = "scale("+(special.scale || 1)+")";	
 	
-	if(special.offsets.x){
-		containerInfo.rmmvAnim.style.marginLeft = (special.offsets.x * Graphics.getScale()) + "%";
+	let xOffset = special.offsets.x;
+	if(xOffset){
+		if(containerInfo.side == "enemy"){
+			xOffset*=-1; 
+		}
+		containerInfo.rmmvAnim.style.marginLeft = (xOffset * Graphics.getScale()) + "%";
 	} else {
 		containerInfo.rmmvAnim.style.marginLeft = "0%";
 	}
