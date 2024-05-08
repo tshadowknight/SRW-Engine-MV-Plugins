@@ -286,6 +286,41 @@ Window_BattleBasic.prototype.loadRequiredImages = function(){
 		promises.push(ImageManager.loadBitmapPromise(_this.makeImageURL("destroyed")));
 		promises.push(ImageManager.loadBitmapPromise(_this.makeImageURL("damage")));
 		promises.push(ImageManager.loadBitmapPromise(_this.makeImageURL("barrier")));
+		
+		function preloadRMMVAnimation(animId){
+			const animData = $dataAnimations[animId];
+			if(animData.animation1Name){
+				promises.push(ImageManager.loadBitmapPromise("img/animations/"+animData.animation1Name));
+			}
+			if(animData.animation2Name){
+				promises.push(ImageManager.loadBitmapPromise("img/animations/"+animData.animation2Name));
+			}
+			for(const timing of animData.timings){
+				if(timing.se){
+					AudioManager.loadStaticSe({name: timing.se.name});
+				}
+			}
+		}
+		
+		Object.keys($gameTemp.battleEffectCache).forEach(function(cacheRef){
+			var battleEffect = $gameTemp.battleEffectCache[cacheRef];
+			if(battleEffect.action && battleEffect.action.type == "attack"){
+				if(!battleEffect.isBuffingAttack){
+					const animId = battleEffect.action.attack.BBAnimId;
+					if(animId != -1){
+						preloadRMMVAnimation(animId);
+					}
+					
+				} else {
+					const animId = nextAction.action.attack.vsAllyBBAnimId;
+					if(animId != -1){
+						preloadRMMVAnimation(animId);
+					}
+				}			
+			}
+		});
+		
+		
 		Promise.all(promises).then(function(){
 			resolve();
 		});

@@ -20,6 +20,7 @@ Sprite_Animation_BasicBattle.prototype.setup = function(animation, mirror, delay
 		this.createSprites();
 	}
 	this._callback = callback;
+	this._lastTimingFrame = -1;
 };
 
 Sprite_Animation_BasicBattle.prototype.setupRate = function(rate) {
@@ -122,6 +123,20 @@ Sprite_Animation_BasicBattle.prototype.updateMain = function() {
 				this._callback();
 			}
 		}        
+    }
+};
+
+Sprite_Animation_BasicBattle.prototype.updateFrame = function() {
+	const _this = this;
+    if (this._duration > 0) {
+        var frameIndex = this.currentFrameIndex();
+        this.updateAllCellSprites(this._animation.frames[frameIndex]);
+        this._animation.timings.forEach(function(timing) {
+            if (timing.frame <= frameIndex && timing.frame > _this._lastTimingFrame) {
+                this.processTimingData(timing);
+            }
+        }, this);
+		_this._lastTimingFrame = frameIndex;
     }
 };
 
