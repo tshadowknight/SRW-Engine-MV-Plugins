@@ -246,15 +246,42 @@ Window_BattleBasic.prototype.createComponents = async function() {
 	this._activeZoneContainer = document.createElement("div");
 	this._activeZoneContainer.id = this.createId("active_zone_container");
 	
+	this._activeZoneInnerContainer = document.createElement("div");
+	this._activeZoneInnerContainer.classList.add("active_zone_inner_container");
+	this._activeZoneInnerContainer.id = this.createId("active_zone_inner_ally");
+	
 	this._activeZone = document.createElement("div");
-	this._activeZone.id = this.createId("active_zone");
-		
+	this._activeZone.classList.add("active_zone");
+	this._activeZone.id = this.createId("active_zone_ally");
+	this._activeZoneInnerContainer.appendChild(this._activeZone);
+	
+	this._activeZoneEnemyInnerContainer = document.createElement("div");
+	this._activeZoneEnemyInnerContainer.classList.add("active_zone_inner_container");
+	this._activeZoneEnemyInnerContainer.id = this.createId("active_zone_inner_enemy");
+	
+	this._activeZoneEnemy = document.createElement("div");
+	this._activeZoneEnemy.classList.add("active_zone");
+	this._activeZoneEnemy.id = this.createId("active_zone_enemy")
+	this._activeZoneEnemyInnerContainer.appendChild(this._activeZoneEnemy);
+	
+	/*	
 	Object.keys(_this._participantComponents).forEach(function(type){
 		_this._activeZone.appendChild(_this._participantComponents[type].container);
-	});
+	});*/
+	_this._activeZone.appendChild(_this._participantComponents["actor"].container);
+	_this._activeZone.appendChild(_this._participantComponents["actor_twin"].container);
+	_this._activeZone.appendChild(_this._participantComponents["actor_supporter"].container);
+	_this._activeZone.appendChild(_this._participantComponents["actor_supporter_twin"].container);
 	
-	this._activeZoneContainer.appendChild(this._activeZone);	
+	_this._activeZoneEnemy.appendChild(_this._participantComponents["enemy"].container);
+	_this._activeZoneEnemy.appendChild(_this._participantComponents["enemy_twin"].container);
+	_this._activeZoneEnemy.appendChild(_this._participantComponents["enemy_supporter"].container);
+	_this._activeZoneEnemy.appendChild(_this._participantComponents["enemy_supporter_twin"].container);
 	
+	
+	this._activeZoneContainer.appendChild(this._activeZoneInnerContainer);	
+	this._activeZoneContainer.appendChild(this._activeZoneEnemyInnerContainer);	
+	/*
 	this._activeZoneContainerGradient = document.createElement("div");
 	this._activeZoneContainerGradient.id = this.createId("active_zone_container_gradient");
 	this._activeZoneContainer.appendChild(this._activeZoneContainerGradient);
@@ -274,7 +301,7 @@ Window_BattleBasic.prototype.createComponents = async function() {
 	this._activeZoneContainerShadowRight = document.createElement("div");
 	this._activeZoneContainerShadowRight.id = this.createId("active_zone_container_shadow_right");
 	this._activeZoneContainer.appendChild(this._activeZoneContainerShadowRight);
-	
+	*/
 	
 	this._bgFadeContainer.appendChild(this._activeZoneContainer);	
 	
@@ -309,21 +336,45 @@ Window_BattleBasic.prototype.createComponents = async function() {
 	this._enemySideTerrain.id = this.createId("enemy_terrain");
 	this._enemySideTerrainOuter.appendChild(this._enemySideTerrain);
 	
+	if(!this._overlayBitmap){
+		this._overlayBitmap = await ImageManager.loadBitmapPromise("", "img/SRWBattlebacks/basic_battle_overlay.png", true, 0, false, true);
+	}
+		
 	this._terrainViewOverlay = document.createElement("img");
 	this._terrainViewOverlay.id = this.createId("terrain_overlay");
-	this._terrainViewOverlay.src = "img/SRWBattlebacks/basic_battle_overlay.png";
+	this._terrainViewOverlay.src = this._overlayBitmap._image.src;
 	this._terrainViewContainer.appendChild(this._terrainViewOverlay);
 	
-	let bitmap = await ImageManager.loadBitmapPromise("", "img/SRWBattlebacks/terrain_view_mask.png", true, 0, false, true)
+	if(!this._terrainMaskBitmap){
+		this._terrainMaskBitmap = await ImageManager.loadBitmapPromise("", "img/SRWBattlebacks/terrain_view_mask.png", true, 0, false, true);		
+	}
 	
-	this._allySideTerrainOuter.style.webkitMaskImage = "url('" + bitmap._image.src + "')";
+	
+	this._allySideTerrainOuter.style.webkitMaskImage = "url('" + this._terrainMaskBitmap._image.src + "')";
 	this._allySideTerrainOuter.style.webkitMaskSize = "cover";
 	
-	let bitmapEnemy = await ImageManager.loadBitmapPromise("", "img/SRWBattlebacks/terrain_view_mask_enemy.png", true, 0, false, true) 
-	
-	this._enemySideTerrainOuter.style.webkitMaskImage = "url('" + bitmapEnemy._image.src + "')";
+	if(!this._terrainMaskEnemyBitmap){
+		this._terrainMaskEnemyBitmap = await ImageManager.loadBitmapPromise("", "img/SRWBattlebacks/terrain_view_mask_enemy.png", true, 0, false, true);	
+	}
+
+	this._enemySideTerrainOuter.style.webkitMaskImage = "url('" + this._terrainMaskEnemyBitmap._image.src + "')";
 	this._enemySideTerrainOuter.style.webkitMaskSize = "cover";
+	
+	
+	if(!this._BBMaskBitmap){
+		this._BBMaskBitmap = await ImageManager.loadBitmapPromise("", "img/SRWBattlebacks/bb_ally_mask.png", true, 0, false, true);	
+	}
+	this._activeZoneInnerContainer.style.webkitMaskImage = "url('" + this._BBMaskBitmap._image.src + "')";
+	this._activeZoneInnerContainer.style.webkitMaskSize = "cover";
+	
+	
+	if(!this._BBMaskEnemyBitmap){
+		this._BBMaskEnemyBitmap = await ImageManager.loadBitmapPromise("", "img/SRWBattlebacks/bb_enemy_mask.png", true, 0, false, true);	
+	}
+	this._activeZoneEnemyInnerContainer.style.webkitMaskImage = "url('" + this._BBMaskEnemyBitmap._image.src + "')";
+	this._activeZoneEnemyInnerContainer.style.webkitMaskSize = "cover";
 }	
+
 
 Window_BattleBasic.prototype.loadRequiredImages = function(){
 	var _this = this;
@@ -486,8 +537,6 @@ Window_BattleBasic.prototype.show = function() {
 	_this.initTimer = 18;
 	_this.createComponents();
 	_this.readBattleCache();
-	_this.assignFactionColorClass(_this._activeZoneContainerLeft, _this._participantInfo.enemy.ref);
-	_this.assignFactionColorClass(_this._activeZoneContainerRight, _this._participantInfo.actor.ref);
 	
 	
 	_this.loadRequiredImages().then(function(){

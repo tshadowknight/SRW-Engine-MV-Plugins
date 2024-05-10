@@ -513,7 +513,7 @@
 			$gameSystem.defaultBattleEnv = null;
 			$gameSystem.skyBattleEnv = null;
 			$gameSystem.superStateBattleEnv = {};
-			$gameSystem.regionBattleEnv = {};
+			$gameSystem.regionBattleEnv = structuredClone(ENGINE_SETTINGS.DEFAULT_REGION_ENVS || {});
 			$gameSystem.regionSkyBattleEnv = {};
 			$gameSystem.regionSuperStateBattleEnv = {};
 			$gameSystem.stageTextId = null;
@@ -2256,6 +2256,9 @@
 					}
 					if($gameSystem.superStateBattleEnv[superState]){
 						return $gameSystem.superStateBattleEnv[superState];
+					}
+					if($gameSystem.regionBattleEnv[region] != null){
+						return $gameSystem.regionBattleEnv[region];
 					}
 				}				
 				return $gameSystem.defaultBattleEnv;						

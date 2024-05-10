@@ -128,7 +128,7 @@ DetailBarMechDetail.prototype.redraw = function(){
 	detailContent+="</div>";
 	
 	detailContent+="<div class='center_items'>";
-	detailContent+="<div class='ability_block_label scaled_text scaled_width'>";
+	detailContent+="<div class='ability_block_label scaled_text scaled_width label_abi'>";
 	detailContent+=APPSTRINGS.GENERAL.label_abilities;
 	detailContent+="</div>";
 	
@@ -162,7 +162,7 @@ DetailBarMechDetail.prototype.redraw = function(){
 				displayName = displayInfo.name;
 			}			
 		}		
-		detailContent+="<div "+descriptionData+" class='pilot_stat_container "+descriptionClass+" scaled_text scaled_width fitted_text "+displayClass+"'>";
+		detailContent+="<div "+descriptionData+" class='pilot_stat_container "+descriptionClass+" scaled_text scaled_width fitted_text "+displayClass+" "+i+"'>";
 		detailContent+="<div class='stat_value'>"+displayName+"</div>";
 		detailContent+="</div>";		
 		
@@ -174,7 +174,7 @@ DetailBarMechDetail.prototype.redraw = function(){
 	detailContent+="</div>";
 	
 	detailContent+="<div class='right_items'>";
-	detailContent+="<div class='ability_block_label scaled_text scaled_width'>";
+	detailContent+="<div class='ability_block_label scaled_text scaled_width label_parts'>";
 	detailContent+=APPSTRINGS.GENERAL.label_parts;
 	detailContent+="</div>";
 	
@@ -195,7 +195,7 @@ DetailBarMechDetail.prototype.redraw = function(){
 			
 		}		
 		detailContent+="<div class='ability_block_row scaled_height'>";	
-		detailContent+="<div "+descriptionData+" class='pilot_stat_container "+descriptionClass+" scaled_text fitted_text "+displayClass+"'>";
+		detailContent+="<div "+descriptionData+" class='pilot_stat_container "+descriptionClass+" scaled_text fitted_text "+displayClass+" "+i+"'>";
 		detailContent+=displayName;
 		detailContent+="</div>";		
 		detailContent+="</div>";	
