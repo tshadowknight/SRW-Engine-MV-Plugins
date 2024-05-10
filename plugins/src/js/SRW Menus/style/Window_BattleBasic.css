@@ -1,10 +1,10 @@
 :root {
-	--main-offset-horz: 60%;	
+	--main-offset-horz: 67%;	
 	--main-offset-vert: 45%;	
 	--main-twin-offset-horz: 69%;	
-	--main-twin-offset-vert: 14%;
+	--main-twin-offset-vert: 15%;
 	--support-offset-horz: 91%;
-	--support-offset-vert: 14%;
+	--support-offset-vert: 28%;
 	--supporting-offset-horz: 47%;
 	--supporting-offset-vert: 44%;
 	
@@ -44,6 +44,9 @@
 	
 	--enemy-support-horz: 79%;
 	--actor-support-horz: 99%;
+	--enemy-offset-horz: 60%;
+	
+	--enemy-twin-offset-horz: 52%;
 }
 
 #battle_basic {
@@ -99,16 +102,16 @@
 }
 
 #battle_basic_active_zone_container {
+	height: 44%;
 	width: 100%;
-	height: 40%;
-	width: 100%;
-    height: 40%;
     display: flex;
 	position: relative;
     align-items: center;
     justify-content: center;
-	background-color: white;
+	background-color: rgba(0,0,0,0);
 	overflow: hidden;
+	z-index: 50;
+	
 }
 
 #battle_basic.beforeView #battle_basic_active_zone_container {
@@ -122,6 +125,7 @@
 	z-index: 2;
     transform: rotate(22.5deg);
     position: absolute;
+	display: none;
 }
 
 #battle_basic.beforeView #battle_basic_active_zone_container_left{
@@ -147,6 +151,7 @@
 	z-index: 2;
     transform: rotate(22.5deg);
     position: absolute;
+	display: none;
 	
 }
 
@@ -175,6 +180,7 @@
 	background: -webkit-linear-gradient(left,  rgba(255,255,255,1) 0%,rgba(0,0,0,1) 94%);
 	background: linear-gradient(to right,  rgba(255,255,255,1) 0%,rgba(0,0,0,1) 94%);
 	filter: progid:DXImageTransform.Microsoft.gradient( startColorstr='#ffffff', endColorstr='#000000',GradientType=1 );*/
+	display: none;
 }
 
 #battle_basic.beforeView #battle_basic_active_zone_container_shadow_left{
@@ -194,6 +200,7 @@
 	background: -webkit-linear-gradient(left,  rgba(0,0,0,1) 6%,rgba(255,255,255,1) 100%);
 	background: linear-gradient(to right,  rgba(0,0,0,1) 6%,rgba(255,255,255,1) 100%);
 	filter: progid:DXImageTransform.Microsoft.gradient( startColorstr='#000000', endColorstr='#ffffff',GradientType=1 );*/
+	display: none;
 }
 
 #battle_basic.beforeView #battle_basic_active_zone_container_shadow_right{
@@ -209,6 +216,7 @@
 	background: -webkit-linear-gradient(top,  rgba(0,0,0,0) 0%,rgba(0,0,0,0) 50%,rgba(0,0,0,0.65) 100%);
 	background: linear-gradient(to bottom,  rgba(0,0,0,0) 0%,rgba(0,0,0,0) 50%,rgba(0,0,0,0.65) 100%);
 	filter: progid:DXImageTransform.Microsoft.gradient( startColorstr='#00000000', endColorstr='#a6000000',GradientType=0 );
+	display: none;
 }
 
 #battle_basic.beforeView #battle_basic_active_zone_container_gradient{
@@ -845,10 +853,9 @@
 
 .participant_container .unit_pic{
 	width: 100%;
-	filter: var(--shadow-actor);
 }
 
-.participant_container.actor .unit_pic{
+.participant_container.actor .unit_pic {
 	
 }
 
@@ -859,6 +866,14 @@
 .participant_container .barrier {
 	position: absolute;
 	display: none;
+}
+
+.participant_container .shadow {
+	position: absolute;
+	bottom: 0;
+	bottom: -11%;
+    width: 99%;
+	z-index: -1;
 }
 
 
@@ -971,7 +986,7 @@
 
 #battle_basic_enemy {
 	top: var(--main-offset-vert);
-    right: 55%;
+    right: var(--enemy-offset-horz);
 	z-index: 1;	
 	position: absolute;
 }
@@ -1000,7 +1015,7 @@
 
 #battle_basic_enemy_twin {	
 	top: var(--main-twin-offset-vert);
-    right: 48%;
+    right: var(--enemy-twin-offset-horz);
 	z-index: 0;	
 	position: absolute;
 }
@@ -1064,6 +1079,7 @@
 .participant_container .unit_pic_container{
 	width: 100%;
 	height: 100%;
+
 }
 
 .participant_container.damage .unit_pic_container{
@@ -1203,4 +1219,97 @@
 #battle_basic_actor_supporter_twin.double_image {
 	left: var(--supporting-offset-horz); 
 	top: var(--supporting-offset-vert);
+}
+
+#battle_basic_terrain_view {
+	width: 100%;
+	height: 100%;
+	display: flex;
+	align-items: center;
+	justify-content: center;
+	position: absolute;
+	pointer-events: none;
+}
+
+#battle_basic .terrain_scroll_container {
+	position: absolute;
+    width: 55%;
+    overflow: hidden;
+    height: 44%;
+}
+
+#battle_basic #battle_basic_ally_container {
+	right: -2%;
+}
+
+#battle_basic_enemy_container {
+	left: -3%;
+}
+
+#battle_basic .terrain_scroll {
+	position: relative;
+	width: 100%;
+	height: 100%;
+}
+
+#battle_basic .terrain_scroll .layer{
+	position: absolute;
+	top: 0;
+	bottom: 0;
+	width: 100%;
+	height: 100%;
+}
+
+#battle_basic_terrain_overlay {
+	z-index: 100;
+    width: 100%;
+	pointer-events: none;
+}
+
+#battle_basic_loader {
+	z-index: 10;
+	background-color: rgba(0,0,0,1);
+	width: 100%;
+	height: 100%;
+	position: absolute;
+	top: 0;
+	left: 0;
+}
+
+#battle_basic_loader.out{
+	animation-name: fadeOut;
+	animation-duration: 0.3s;
+	animation-fill-mode: forwards;
+	animation-timing-function: ease-in;
+}
+
+@keyframes fadeOut {
+	0% { opacity: 1;}
+  100% { opacity: 0; }
+}
+
+.participant_container.actor.intro {
+	transition: 0.25s;
+	animation-name: actorIn;
+	animation-duration: 0.5s;
+	animation-fill-mode: forwards;
+	animation-timing-function: ease-out;
+}
+
+@keyframes actorIn {
+	0% { transform:  translate(200%,0);}
+  100% { transform:  translate(0,0); }
+}
+
+.participant_container.enemy.intro {
+	transition: 0.25s;
+	animation-name: enemyIn;
+	animation-duration: 0.5s;
+	animation-fill-mode: forwards;
+	animation-timing-function: ease-out;
+}
+
+@keyframes enemyIn {
+	0% { transform:  translate(-200%,0);}
+  100% { transform:  translate(0,0); }
 }

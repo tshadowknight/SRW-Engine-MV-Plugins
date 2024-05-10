@@ -179,6 +179,11 @@ Graphics.getScale = function(){
 	}
 }
 
+Graphics.getVerticalScale = function(){
+	return this._realScale * (this._height / 624);	
+}
+
+
 Graphics._createErrorPrinter = function() {
     this._errorPrinter = document.createElement('p');
     this._errorPrinter.id = 'ErrorPrinter';

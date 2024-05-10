@@ -2667,6 +2667,8 @@ SRWEditor.prototype.showEnvironmentEditorControls = function(){
 		
 		content+="</div>";
 		
+		
+		
 		containerNode.querySelector(".edit_controls").innerHTML = content;
 		
 		containerNode.querySelector(".commands_scroll").scrollTop = _this._editorScrollTop;		

@@ -211,11 +211,17 @@ Window_BattleBasic.prototype.createParticipantComponents = function(componentId,
 	rmmvAnimContainer.appendChild(rmmvAnim);
 	component.rmmvAnim = rmmvAnim;
 	
+	var shadow = document.createElement("img");
+	shadow.classList.add("shadow");
+	shadow.setAttribute("data-img", "img/system/Shadow1.png");
+	container.appendChild(shadow);
+	component.shadow = shadow;
+	
 	
 	this._participantComponents[componentId] = component;
 }
 
-Window_BattleBasic.prototype.createComponents = function() {
+Window_BattleBasic.prototype.createComponents = async function() {
 	var _this = this;
 	Window_CSS.prototype.createComponents.call(this);
 	var windowNode = this.getWindowNode();
@@ -271,6 +277,52 @@ Window_BattleBasic.prototype.createComponents = function() {
 	
 	
 	this._bgFadeContainer.appendChild(this._activeZoneContainer);	
+	
+	/*Redesign component*/
+	
+	this._loader = document.createElement("div");
+	this._loader.id = this.createId("loader");
+	this._activeZoneContainer.appendChild(this._loader);
+	this._loader.addEventListener("animationend", () => {this._isLoading = false;})	
+	
+	this._terrainViewContainer = document.createElement("div");
+	this._terrainViewContainer.id = this.createId("terrain_view");
+	this._bgFadeContainer.appendChild(this._terrainViewContainer);
+	
+	this._allySideTerrainOuter = document.createElement("div");
+	this._allySideTerrainOuter.classList.add("terrain_scroll_container");
+	this._allySideTerrainOuter.id = this.createId("ally_container");
+	this._terrainViewContainer.appendChild(this._allySideTerrainOuter);
+	
+	this._allySideTerrain = document.createElement("div");
+	this._allySideTerrain.classList.add("terrain_scroll");
+	this._allySideTerrain.id = this.createId("ally_terrain");
+	this._allySideTerrainOuter.appendChild(this._allySideTerrain);
+	
+	this._enemySideTerrainOuter = document.createElement("div");
+	this._enemySideTerrainOuter.classList.add("terrain_scroll_container");
+	this._enemySideTerrainOuter.id = this.createId("enemy_container");
+	this._terrainViewContainer.appendChild(this._enemySideTerrainOuter);
+	
+	this._enemySideTerrain = document.createElement("div");
+	this._enemySideTerrain.classList.add("terrain_scroll");
+	this._enemySideTerrain.id = this.createId("enemy_terrain");
+	this._enemySideTerrainOuter.appendChild(this._enemySideTerrain);
+	
+	this._terrainViewOverlay = document.createElement("img");
+	this._terrainViewOverlay.id = this.createId("terrain_overlay");
+	this._terrainViewOverlay.src = "img/SRWBattlebacks/basic_battle_overlay.png";
+	this._terrainViewContainer.appendChild(this._terrainViewOverlay);
+	
+	let bitmap = await ImageManager.loadBitmapPromise("", "img/SRWBattlebacks/terrain_view_mask.png", true, 0, false, true)
+	
+	this._allySideTerrainOuter.style.webkitMaskImage = "url('" + bitmap._image.src + "')";
+	this._allySideTerrainOuter.style.webkitMaskSize = "cover";
+	
+	let bitmapEnemy = await ImageManager.loadBitmapPromise("", "img/SRWBattlebacks/terrain_view_mask_enemy.png", true, 0, false, true) 
+	
+	this._enemySideTerrainOuter.style.webkitMaskImage = "url('" + bitmapEnemy._image.src + "')";
+	this._enemySideTerrainOuter.style.webkitMaskSize = "cover";
 }	
 
 Window_BattleBasic.prototype.loadRequiredImages = function(){
@@ -289,17 +341,20 @@ Window_BattleBasic.prototype.loadRequiredImages = function(){
 		
 		function preloadRMMVAnimation(animId){
 			const animData = $dataAnimations[animId];
-			if(animData.animation1Name){
-				promises.push(ImageManager.loadBitmapPromise("img/animations/"+animData.animation1Name));
-			}
-			if(animData.animation2Name){
-				promises.push(ImageManager.loadBitmapPromise("img/animations/"+animData.animation2Name));
-			}
-			for(const timing of animData.timings){
-				if(timing.se){
-					//TODO: Figure out a way to actually preload sound effects
+			if(animData){
+				if(animData.animation1Name){
+					promises.push(ImageManager.loadBitmapPromise("img/animations/"+animData.animation1Name));
+				}
+				if(animData.animation2Name){
+					promises.push(ImageManager.loadBitmapPromise("img/animations/"+animData.animation2Name));
+				}
+				for(const timing of animData.timings){
+					if(timing.se){
+						//TODO: Figure out a way to actually preload sound effects
+					}
 				}
 			}
+			
 		}
 		
 		Object.keys($gameTemp.battleEffectCache).forEach(function(cacheRef){
@@ -427,17 +482,18 @@ Window_BattleBasic.prototype.show = function() {
 	windowNode.classList.remove("fadeIn");	
 	windowNode.classList.add("fadeIn");
 	
-	setTimeout(function(){
-		windowNode.classList.remove("beforeView");
-		windowNode.classList.add("beginView");
-	}, 300);
+	
 	_this.initTimer = 18;
 	_this.createComponents();
 	_this.readBattleCache();
 	_this.assignFactionColorClass(_this._activeZoneContainerLeft, _this._participantInfo.enemy.ref);
 	_this.assignFactionColorClass(_this._activeZoneContainerRight, _this._participantInfo.actor.ref);
 	
+	
 	_this.loadRequiredImages().then(function(){
+		_this._isLoading = true;
+		_this.createTerrainScrolls();
+		
 		_this._handlingInput = false;
 		_this.visible = true;
 		_this._redrawRequested = true;
@@ -445,7 +501,64 @@ Window_BattleBasic.prototype.show = function() {
 		_this.refresh();	
 		Graphics._updateCanvas();
 	});	
+	
+	
 };
+
+Window_BattleBasic.prototype.getTerrainScrollInfo = function(participantInfo) {
+	//debug
+	const environmentId = $gameSystem.getUnitSceneBgId(participantInfo.ref);
+	if(BASIC_BATTLE_BGS[environmentId]){
+		return BASIC_BATTLE_BGS[environmentId];
+	}
+	return BASIC_BATTLE_BGS["default"];
+}
+
+Window_BattleBasic.prototype.createTerrainScrolls = function() {
+	this.createTerrainScroll("actor");
+	this.createTerrainScroll("enemy");
+}
+
+Window_BattleBasic.prototype.createTerrainScroll = function(side) {
+	const _this = this;
+	let direction;
+	let participantInfo;
+	let targetContainer;
+	if(side == "actor"){
+		direction = 1;
+		participantInfo = _this._participantInfo.actor;
+		targetContainer = _this._allySideTerrain;
+	} else {
+		direction = -1;
+		participantInfo = _this._participantInfo.enemy;
+		targetContainer = _this._enemySideTerrain;
+	}
+	
+	const scrollInfo = _this.getTerrainScrollInfo(participantInfo);
+	const scrollMod = scrollInfo.scrollMod || 1;
+	let content = "";
+	let ctr = 0;
+	for(let entry of scrollInfo.layers){
+		content+="<div class='layer img_bg' data-side='"+side+"' data-scrollduration='"+entry.scroll * scrollMod+"' data-imgscale='"+(scrollInfo.scale || 1)+"' data-img='"+("img/SRWBattlebacks/"+entry.path)+".png' style='z-index: "+(ctr++)+";' data-xoff='"+(scrollInfo.offsets.x || 0)+"' data-yoff='"+(scrollInfo.offsets.y || 0)+"'></div>"
+	}
+	targetContainer.innerHTML = content;	
+	
+	const shadowDisplay = scrollInfo.showShadows ? "block" : "none";
+	
+	if(side == "actor"){
+		this._participantComponents["actor"].shadow.style.display = shadowDisplay;
+		this._participantComponents["actor_twin"].shadow.style.display = shadowDisplay;
+		this._participantComponents["actor_supporter"].shadow.style.display = shadowDisplay;
+		this._participantComponents["actor_supporter_twin"].shadow.style.display = shadowDisplay;		
+		
+	} else {
+		this._participantComponents["enemy"].shadow.style.display = shadowDisplay;
+		this._participantComponents["enemy_twin"].shadow.style.display = shadowDisplay;
+		this._participantComponents["enemy_supporter"].shadow.style.display = shadowDisplay;
+		this._participantComponents["enemy_supporter_twin"].shadow.style.display = shadowDisplay;
+		
+	}
+}
 
 Window_BattleBasic.prototype.getHPAnimInfo = function(action, attackRef) {
 	var targetMechStats = $statCalc.getCalculatedMechStats(action["attacked"+attackRef].ref);
@@ -936,6 +1049,9 @@ Window_BattleBasic.prototype.setUpRMMVAnim = function(component, animId, rate, c
 	
 	var stage = new PIXI.Container();
 	var animation = $dataAnimations[animId];
+	if(!animation){
+		return;
+	}
 	var sprite = new Sprite_Animation_BasicBattle();
 	sprite.setup(
 		animation, 
@@ -972,7 +1088,16 @@ Window_BattleBasic.prototype.update = function() {
 	}
 	
 	if(this.isOpen() && !this._handlingInput){
-		//return;
+		//debug:
+		/*if(Input.isTriggered('pageup')){
+			this.show();
+		} 
+		
+		this.refresh();
+		return;//debug*/
+		if(_this._isLoading){
+			return;
+		}
 		if(_this.initTimer > 0){
 			_this.initTimer--;
 			return;
@@ -1049,10 +1174,14 @@ Window_BattleBasic.prototype.update = function() {
 						componentInfo.image.style["animation-duration"] = "";*/
 						
 						_this.applyDoubleTime(target);
-						target.addEventListener("animationend", function(){
-							//nextAnimation.target.className = "";
-							_this._processingAnimationCount--;
-						});
+						if(!target.endHooked){
+							target.addEventListener("animationend", function(){
+								//nextAnimation.target.className = "";
+								_this._processingAnimationCount--;
+							});	
+							target.endHooked = true;
+						}
+						
 						if(nextAnimation.special){
 							if(nextAnimation.special.damage){
 								_this.animateDamage(nextAnimation.special.damage.target, nextAnimation.special.damage);		
@@ -1248,6 +1377,74 @@ Window_BattleBasic.prototype.redraw = async function() {
 	windowNode.addEventListener("mouseup", function(){
 		_this._touchDoubleSpeed = false;
 	})
+	
+	const imgBgs = windowNode.querySelectorAll(".layer");
+	
+	const introLength = 1000;
+	const introSpeed = 20;
+	
+	for(let imgBg of imgBgs){
+		this.updateScaledImageBg(imgBg, true);
+		const side = imgBg.getAttribute("data-side");
+		const direction = side == "actor" ? 1 : -1;
+		
+		const scrollSpeed = imgBg.getAttribute("data-bgwidth") / (imgBg.getAttribute("data-scrollduration") * 1000); //pixels/millisecond
+		const startPos = (scrollSpeed * introLength * introSpeed);
+		
+		imgBg.animate(
+		  [
+			{ "backgroundPositionX": startPos * direction * -1 + "px" },
+			{ "backgroundPositionX": "0px" },
+		  ],
+		  {
+			duration: 500,
+			easing: "ease-out",
+			iterations: 1,
+		  },
+		).onfinish = function(){
+			imgBg.animate(
+			  [
+				{ "backgroundPositionX": "0px" },
+				{ "backgroundPositionX": imgBg.getAttribute("data-bgwidth") * direction + "px" },
+			  ],
+			  {
+				duration: imgBg.getAttribute("data-scrollduration") * 1000,
+				iterations: Infinity,
+			  },
+			)
+		};
+	}
+	
+	if(_this._isLoading){
+		_this._loader.classList.add("out");
+
+
+		this._participantComponents["actor"].container.classList.remove("intro");
+		this._participantComponents["actor_twin"].container.classList.remove("intro");
+		this._participantComponents["actor_supporter"].container.classList.remove("intro");
+		this._participantComponents["actor_supporter_twin"].container.classList.remove("intro");		
+			
+		this._participantComponents["enemy"].container.classList.remove("intro");
+		this._participantComponents["enemy_twin"].container.classList.remove("intro");
+		this._participantComponents["enemy_supporter"].container.classList.remove("intro");
+		this._participantComponents["enemy_supporter_twin"].container.classList.remove("intro");
+		
+		this._participantComponents["actor"].container.classList.add("intro");
+		this._participantComponents["actor_twin"].container.classList.add("intro");
+		this._participantComponents["actor_supporter"].container.classList.add("intro");
+		this._participantComponents["actor_supporter_twin"].container.classList.add("intro");		
+			
+		this._participantComponents["enemy"].container.classList.add("intro");
+		this._participantComponents["enemy_twin"].container.classList.add("intro");
+		this._participantComponents["enemy_supporter"].container.classList.add("intro");
+		this._participantComponents["enemy_supporter_twin"].container.classList.add("intro");
+		
+		setTimeout(function(){
+			windowNode.classList.remove("beforeView");
+			windowNode.classList.add("beginView");
+		}, 400);
+	}
+	
 	Graphics._updateCanvas();
 }
 

@@ -275,7 +275,8 @@
 				"RelationshipBonuses",
 				"Constants",
 				"AbilityZones",
-				"TerrainTypes"
+				"TerrainTypes",
+				"BasicBattleBGs"
 			];
 			
 			

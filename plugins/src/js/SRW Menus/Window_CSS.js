@@ -133,6 +133,11 @@ Window_CSS.prototype.loadImages = async function() {
 				img.setAttribute("src", bitmaps[imgNameLookup[imgPath]]._image.src);
 			} else {
 				img.style.background = "url('" + bitmaps[imgNameLookup[imgPath]]._image.src + "')";
+				img.setAttribute("data-naturalwidth", bitmaps[imgNameLookup[imgPath]]._image.naturalWidth);
+				img.setAttribute("data-naturalheight", bitmaps[imgNameLookup[imgPath]]._image.naturalHeight);
+				let xOff = img.getAttribute("data-xoff") || 0;
+				let yOff = img.getAttribute("data-yoff") || 0;
+				img.style.backgroundPositionY  = yOff + "%";
 			}
 			
 		}	
@@ -471,6 +476,24 @@ Window_CSS.prototype.updateScaledImage = function(img) {
 		//img.style.width = "0px";
 		return true;
 	}	
+}
+
+Window_CSS.prototype.updateScaledImageBg = function(imgBg, bgSizeOnly) {
+	const multiplier = imgBg.getAttribute("data-imgscale") || 1;
+	
+	if(!bgSizeOnly){
+		imgBg.style.width = (imgBg.getAttribute("data-naturalwidth") * Graphics.getScale() * multiplier) + "px";
+		imgBg.style.height = (imgBg.getAttribute("data-naturalheight") * Graphics.getVerticalScale()* multiplier) + "px";
+	}
+	
+	const bgWidth = imgBg.getAttribute("data-naturalwidth") * Graphics.getScale() * multiplier;
+	const bgHeight = imgBg.getAttribute("data-naturalheight") * Graphics.getVerticalScale() * multiplier;
+	imgBg.style.backgroundSize =  bgWidth + "px " + bgHeight + "px";
+	
+	imgBg.setAttribute("data-bgwidth", bgWidth);
+	imgBg.setAttribute("data-bgheight", bgHeight);
+	//img.style.width = "0px";
+	return true;		
 }
 
 Window_CSS.prototype.updateScaledDiv = function(div, noWidth, noHeight, ignoreOriginalDimensions) {
