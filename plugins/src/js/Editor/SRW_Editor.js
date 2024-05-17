@@ -2969,10 +2969,12 @@ SRWEditor.prototype.showAttackEditor = function(){
 	content+="<div title='"+EDITORSTRINGS.ATTACKS.hint_attack+"' class='extra_control'>";
 	content+="<div class='editor_label'>"+EDITORSTRINGS.ATTACKS.label_attack+"</div>";
 	content+="<select class='has_preference' id='quote_set'>";
+	let ctr = 0;
 	$dataWeapons.forEach(function(weapon){
 		if(weapon && weapon.name){
-			content+="<option value='"+weapon.id+"'>"+weapon.name+"</option>"
+			content+="<option value='"+weapon.id+"'>["+String(ctr).padStart(3, "0")+"] "+weapon.name+"</option>"
 		}
+		ctr++;
 	});
 	content+="</select>"
 
@@ -4273,7 +4275,8 @@ SRWEditor.prototype.playBattleScene = function(){
 			mapId: -1,
 			isCombination: 0,
 			combinationWeapons: null,
-			combinationType: null
+			combinationType: null,
+			textAlias: parseInt($dataWeapons[_this._currentQuoteSet].meta["weaponTextAlias"] || -1)
 		}			
 		
 		if(_this._currentQuoteSet){

@@ -686,7 +686,8 @@ StatCalc.prototype.parseWeaponDef = function(actor, isLocked, weaponDefinition, 
 		alliesInteraction: weaponProperties.weaponAllyInteraction || "damage_and_status",
 		invalidTargetTags: invalidTargetTags,
 		costType: parseInt(weaponProperties.weaponCostType)|| 0,
-		weight: parseInt(weaponProperties.weaponWeight)|| 0,		
+		weight: parseInt(weaponProperties.weaponWeight)|| 0,	
+		textAlias: parseInt(weaponProperties.weaponTextAlias || -1)
 	};
 }
 

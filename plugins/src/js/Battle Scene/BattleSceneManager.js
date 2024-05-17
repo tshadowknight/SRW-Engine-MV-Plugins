@@ -2422,6 +2422,7 @@ BattleSceneManager.prototype.disposeEffekseerInstances = function(){
 		if(effekInfo.handle){
 			effekInfo.handle.stop();
 			effekInfo.context.releaseEffect(effekInfo.effect);
+			effekInfo.context.activeCount = 0;
 		}		
 	});
 	this._effekseerInfo = [];
@@ -2591,7 +2592,7 @@ BattleSceneManager.prototype.startScene = function(){
 		
 		//console.log("_effksContext.update");
 
-	})
+	});
 	
 	//foreground layer
 	this._scene.onAfterDrawPhaseObservable.add(() => {//onAfterRenderObservable 
@@ -2599,7 +2600,10 @@ BattleSceneManager.prototype.startScene = function(){
 		_this._effksContext.setProjectionMatrix(projectionMatrix);
 		let worldMatrix = new BABYLON.Matrix().copyFrom(BABYLON.Matrix.Invert(_this._camera.getWorldMatrix())).m;		
 		_this._effksContext.setCameraMatrix(worldMatrix);
-		_this._effksContext.draw();
+		if(_this._effksContext.activeCount > 0){
+			_this._effksContext.draw();
+		}
+		
 		
 		projectionMatrix = new BABYLON.Matrix().copyFrom(_this._camera.getProjectionMatrix()).m;
 		//projectionMatrix[0]*=-1;
@@ -2611,7 +2615,9 @@ BattleSceneManager.prototype.startScene = function(){
 		worldMatrix[2]*=-1;
 		//worldMatrix[3]*=-1;
 		_this._effksContextMirror.setCameraMatrix(worldMatrix);
-		_this._effksContextMirror.draw();		
+		if(_this._effksContextMirror.activeCount > 0){
+			_this._effksContextMirror.draw();		
+		}	
 		
 		_this._effksContextAttached.setProjectionMatrix(_this._camera.getProjectionMatrix().m);
 		_this._effksContextAttached.setCameraMatrix(BABYLON.Matrix.Invert(_this._camera.getWorldMatrix()).m);
@@ -2625,7 +2631,9 @@ BattleSceneManager.prototype.startScene = function(){
 			_this._effksContextBg.setProjectionMatrix(projectionMatrix);
 			let worldMatrix = new BABYLON.Matrix().copyFrom(BABYLON.Matrix.Invert(_this._camera.getWorldMatrix())).m;		
 			_this._effksContextBg.setCameraMatrix(worldMatrix);
-			_this._effksContextBg.draw();
+			if(_this._effksContextBg.activeCount > 0){
+				_this._effksContextBg.draw();
+			}
 			
 			projectionMatrix = new BABYLON.Matrix().copyFrom(_this._camera.getProjectionMatrix()).m;
 			//projectionMatrix[0]*=-1;
@@ -2637,7 +2645,9 @@ BattleSceneManager.prototype.startScene = function(){
 			worldMatrix[2]*=-1;
 			//worldMatrix[3]*=-1;
 			_this._effksContextBgMirror.setCameraMatrix(worldMatrix);
-			_this._effksContextBgMirror.draw();		
+			if(_this._effksContextBg.activeCount > 0){
+				_this._effksContextBg.draw();		
+			}			
 		}
 		
 	});
@@ -3501,7 +3511,14 @@ BattleSceneManager.prototype.executeAnimation = function(animation, startTick){
 			var action = _this._currentAnimatedAction;
 			var entityType = action.isActor ? "actor" : "enemy";
 			var entityId = action.ref.SRWStats.pilot.id;
-			var battleText = _this._battleTextManager.getText(entityType, action.ref, "attacks", action.isActor ? "enemy" : "actor", _this.getBattleTextId(_this._currentAnimatedAction), params.id, action.action.attack.id);
+			var attackTextProviderId;
+			if(action.action.attack.textAlias != -1){
+				attackTextProviderId = action.action.attack.textAlias;
+			} else {
+				attackTextProviderId = action.action.attack.id;
+			}
+			
+			var battleText = _this._battleTextManager.getText(entityType, action.ref, "attacks", action.isActor ? "enemy" : "actor", _this.getBattleTextId(_this._currentAnimatedAction), params.id, attackTextProviderId);
 			_this._awaitingText = true;
 			_this._UILayerManager.setTextBox(entityType, entityId, action.ref.SRWStats.pilot.name, battleText, false, true).then(function(){
 				_this._awaitingText = false;
@@ -4400,11 +4417,14 @@ BattleSceneManager.prototype.executeAnimation = function(animation, startTick){
 					targetContext = _this._effksContext;
 				}
 			}
-			
-			
+			if(targetContext.activeCount == null){
+				targetContext.activeCount = 0;
+			}	
+					
 			_this._glContext.pixelStorei(_this._glContext.UNPACK_FLIP_Y_WEBGL, 0);
 			_this._isLoading++;
 			var effect = targetContext.loadEffect("effekseer/"+params.path+".efk", 1.0, function(){
+				targetContext.activeCount++;
 				var info;
 				// Play the loaded effect				
 				var handle = targetContext.play(effect, position.x, position.y, position.z);
@@ -4581,6 +4601,8 @@ BattleSceneManager.prototype.executeAnimation = function(animation, startTick){
 				targetObj.setShown(false);
 				targetObj.context.update();
 				targetObj.stop();
+				targetObj.context.releaseEffect(targetObj.handle);
+				targetObj.context.activeCount--;
 			}
 		},
 		send_effekseer_trigger: function(target, params){
@@ -6337,11 +6359,20 @@ BattleSceneManager.prototype.preloadEffekseerParticles = async function(){
 							
 							promises.push(new Promise(function(resolve, reject){
 								_this._effksContext.loadEffect("effekseer/"+params.path+".efk", 1.0, resolve);	
+							}));	
+							promises.push(new Promise(function(resolve, reject){
 								_this._effksContextMirror.loadEffect("effekseer/"+params.path+".efk", 1.0, resolve);	
+							}));	
+							promises.push(new Promise(function(resolve, reject){
 								_this._effksContextBg.loadEffect("effekseer/"+params.path+".efk", 1.0, resolve);	
+							}));	
+							promises.push(new Promise(function(resolve, reject){
 								_this._effksContextBgMirror.loadEffect("effekseer/"+params.path+".efk", 1.0, resolve);	
+							}));	
+							promises.push(new Promise(function(resolve, reject){
 								_this._effksContextAttached.loadEffect("effekseer/"+params.path+".efk", 1.0, resolve);	
-							}));
+							}));		
+							
 						}								
 					});
 				});				
@@ -6376,12 +6407,20 @@ BattleSceneManager.prototype.preloadEffekseerParticles = async function(){
 								
 								promises.push(new Promise(function(resolve, reject){
 									_this._effksContext.loadEffect("effekseer/"+params.path+".efk", 1.0, resolve);	
+								}));	
+								promises.push(new Promise(function(resolve, reject){
 									_this._effksContextMirror.loadEffect("effekseer/"+params.path+".efk", 1.0, resolve);	
+								}));	
+								promises.push(new Promise(function(resolve, reject){
 									_this._effksContextBg.loadEffect("effekseer/"+params.path+".efk", 1.0, resolve);	
+								}));	
+								promises.push(new Promise(function(resolve, reject){
 									_this._effksContextBgMirror.loadEffect("effekseer/"+params.path+".efk", 1.0, resolve);	
+								}));	
+								promises.push(new Promise(function(resolve, reject){
 									_this._effksContextAttached.loadEffect("effekseer/"+params.path+".efk", 1.0, resolve);	
 								}));
-							}								
+								}								
 						});
 					});				
 				});	
@@ -6389,6 +6428,7 @@ BattleSceneManager.prototype.preloadEffekseerParticles = async function(){
 			
 			
 			await Promise.all(promises);	
+			
 		}	
 	}		
 }

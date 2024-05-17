@@ -892,6 +892,39 @@ WeaponUI.prototype.initPropertyHandlers = function(){
 		weight: handleDefaultProp("weaponWeight", EDITORSTRINGS.WEAPON.label_weight),
 		bannedMechs: handleDefaultProp("weaponBannedOn", EDITORSTRINGS.WEAPON.label_banned_mechs),
 		allowedMechs: handleDefaultProp("weaponAllowedOn", EDITORSTRINGS.WEAPON.label_allowed_mechs),
+		alias: {
+			createControls(){		
+				var content = "";			
+
+				var abilityDefs = $dataWeapons;
+				var value = _this.getMetaValue("weaponTextAlias");
+				
+				content+="<div class='row'>";
+				content+="<div class='cell'>";
+				content+=EDITORSTRINGS.MECH.lavel_text_alias;
+				content+="</div>";
+				content+="<div class='cell'>";
+				
+				content+="<select id='weapon_text_alias'>";
+				content+="<option title='None' value='-1'></option>";
+				for(var i = 1; i < abilityDefs.length; i++){
+					if(abilityDefs[i]){
+						content+="<option "+(i == value ? "selected" : "")+" title='"+_this.escapeAttribute(abilityDefs[i].description)+"' value='"+i+"'>["+String(i).padStart(3, "0")+"] "+abilityDefs[i].name+"</option>";
+					}					
+				}
+				content+="</select>";
+				content+="</div>";
+				content+="</div>";
+				return content;				
+			},
+			hook(){				
+				containerNode.querySelector("#weapon_text_alias").addEventListener("change", function(){
+					_this.setMetaValue("weaponTextAlias", this.value);
+					//_this.show();
+					_this._mainUIHandler.setModified();
+				});				
+			}
+		},
 	};	
 	
 	var terrains = [
@@ -959,7 +992,7 @@ WeaponUI.prototype.show = async function(){
 	content+="<div class='table'>";
 	content+=_this._propertyHandlers.name.createControls();
 
-	
+	content+=_this._propertyHandlers.alias.createControls();
 
 	content+="<div class='row'>";
 	content+=_this._propertyHandlers.type.createControls();

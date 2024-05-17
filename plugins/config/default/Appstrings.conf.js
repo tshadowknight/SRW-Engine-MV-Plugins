@@ -910,6 +910,7 @@ EDITORSTRINGS.MECH = {
 	label_stats_label: "Stats Label",
 	label_is_ship: "Is Ship",
 	label_can_equip: "Can Equip",
+	lavel_text_alias: "Text Alias",
 	label_can_hover: "Can Hover",
 	label_sync_parts: "Sync Parts With",
 	label_sync_equips: "Sync Equips With",
