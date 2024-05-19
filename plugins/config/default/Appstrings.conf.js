@@ -405,7 +405,8 @@ APPSTRINGS.OPTIONS = {
 	label_battle_speed: "Action Speed",
 	label_tweaks: "Game Tweaks",
 	label_button_set: "Button Display",
-	label_show_map_buttons: "Map Button Hints"
+	label_show_map_buttons: "Map Button Hints",
+	label_intermission_only: "Edit in Intermission"
 }
 
 APPSTRINGS.GAME_MODES = {
@@ -414,6 +415,7 @@ APPSTRINGS.GAME_MODES = {
 	label_off: "Off",
 	label_infinite_funds: "Infinite Funds",
 	label_infinite_PP: "Infinite PP",
+	label_difficulty: "Difficulty",
 	resources: "Resources"
 }
 

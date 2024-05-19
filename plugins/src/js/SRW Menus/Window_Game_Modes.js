@@ -25,28 +25,54 @@ Window_Game_Modes.prototype.initialize = function() {
 	
 	this._titleInfo = {};
 	this._titleInfo[0] = APPSTRINGS.GAME_MODES.resources;
-	
+	if(ENGINE_SETTINGS.DIFFICULTY_MODS && ENGINE_SETTINGS.DIFFICULTY_MODS.enabled){
+		this._optionInfo.push({
+			name: APPSTRINGS.GAME_MODES.label_difficulty,
+			display: function(){
+				const current = $gameSystem.getCurrentDifficultyLevel();				
+				return ENGINE_SETTINGS.DIFFICULTY_MODS.levels[current].name;
+			},
+			update: function(direction){
+				const current = $gameSystem.getCurrentDifficultyLevel();				
+				const max =  ENGINE_SETTINGS.DIFFICULTY_MODS.levels.length;
+				let newVal;
+				if(direction == "up"){
+					newVal = current + 1;
+					if(newVal >= max){
+						newVal = 0;
+					}
+				} else {
+					newVal = current - 1;
+					if(newVal < 0){
+						newVal = max - 1;
+					}
+				}
+				$gameSystem.setCurrentDifficultyLevel(newVal);
+			}
+		});
+	}
 
-	this._optionInfo.push({
-		name: APPSTRINGS.GAME_MODES.label_infinite_funds,
-		display: function(){
-			return $gameSystem.optionInfiniteFunds ? "ON" : "OFF";
-		},
-		update: function(){
-			$gameSystem.optionInfiniteFunds = !$gameSystem.optionInfiniteFunds;
-		}
-	});
-	
-	this._optionInfo.push({
-		name: APPSTRINGS.GAME_MODES.label_infinite_PP,
-		display: function(){
-			return $gameSystem.optionInfinitePP ? "ON" : "OFF";
-		},
-		update: function(){
-			$gameSystem.optionInfinitePP = !$gameSystem.optionInfinitePP;
-		}
-	});
-
+	if(ENGINE_SETTINGS.ENABLE_TWEAKS_OPTION){
+		this._optionInfo.push({
+			name: APPSTRINGS.GAME_MODES.label_infinite_funds,
+			display: function(){
+				return $gameSystem.optionInfiniteFunds ? "ON" : "OFF";
+			},
+			update: function(){
+				$gameSystem.optionInfiniteFunds = !$gameSystem.optionInfiniteFunds;
+			}
+		});
+		
+		this._optionInfo.push({
+			name: APPSTRINGS.GAME_MODES.label_infinite_PP,
+			display: function(){
+				return $gameSystem.optionInfinitePP ? "ON" : "OFF";
+			},
+			update: function(){
+				$gameSystem.optionInfinitePP = !$gameSystem.optionInfinitePP;
+			}
+		});
+	}
 
 	
 	Window_CSS.prototype.initialize.call(this, 0, 0, 0, 0);	

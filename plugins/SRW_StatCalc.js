@@ -3269,6 +3269,34 @@ StatCalc.prototype.calculateSRWActorStats = function(actor, preserveVolatile){
 			}
 		});
 		
+		if(!actor.isActor()){
+			if(ENGINE_SETTINGS.DIFFICULTY_MODS && ENGINE_SETTINGS.DIFFICULTY_MODS.enabled){
+				let targetMods;
+				const modSet = ENGINE_SETTINGS.DIFFICULTY_MODS.levels[$gameSystem.getCurrentDifficultyLevel()].mods.pilot;
+				if(modSet){
+					if(modSet[actor.SRWStats.pilot.id]){
+						targetMods = modSet[actor.SRWStats.pilot.id];
+					} else {
+						targetMods = modSet[-1];
+					}
+					if(targetMods){
+						calculatedStats.SP+=(targetMods.SP || 0);
+						if(calculatedStats.MP && calculatedStats.MP > 0){
+							calculatedStats.MP+=(targetMods.MP || 0);
+						}					
+						
+						calculatedStats.melee+=(targetMods.melee || 0);
+						calculatedStats.ranged+=(targetMods.ranged || 0);
+						calculatedStats.skill+=(targetMods.skill || 0);
+						calculatedStats.defense+=(targetMods.defense || 0);
+						calculatedStats.evade+=(targetMods.evade || 0);
+						calculatedStats.hit+=(targetMods.hit || 0);
+					}
+				}
+				
+			}
+		}
+		
 		if(ENGINE_SETTINGS.SP_CAP != -1){
 			if(calculatedStats.SP > ENGINE_SETTINGS.SP_CAP){
 				calculatedStats.SP = ENGINE_SETTINGS.SP_CAP;
@@ -3718,6 +3746,32 @@ StatCalc.prototype.calculateSRWMechStats = function(targetStats, preserveVolatil
 		
 		calculatedStats.move = $statCalc.applyStatModsToValue(mechData, calculatedStats.move, ["base_move"]);
 		
+		if(!actor.isActor()){
+			if(ENGINE_SETTINGS.DIFFICULTY_MODS && ENGINE_SETTINGS.DIFFICULTY_MODS.enabled){
+				let targetMods;
+				const modSet = ENGINE_SETTINGS.DIFFICULTY_MODS.levels[$gameSystem.getCurrentDifficultyLevel()].mods.mech;
+				if(modSet){
+					if(modSet[actor.SRWStats.mech.id]){
+						targetMods = modSet[actor.SRWStats.mech.id];
+					} else {
+						targetMods = modSet[-1];
+					}
+					if(targetMods){
+						calculatedStats.maxHP+=(targetMods.HP || 0)
+						calculatedStats.maxEN+=(targetMods.EN || 0)
+						calculatedStats.currentHP+=(targetMods.HP || 0)
+						calculatedStats.currentEN+=(targetMods.EN || 0)
+						
+						calculatedStats.armor+=(targetMods.armor || 0)
+						calculatedStats.mobility+=(targetMods.mobility || 0)
+						calculatedStats.accuracy+=(targetMods.accuracy || 0)
+						
+						calculatedStats.move+=(targetMods.move || 0)
+					}
+				}
+				
+			}
+		}
 		
 		if(!preserveVolatile){
 			calculatedStats.currentHP = calculatedStats.maxHP;

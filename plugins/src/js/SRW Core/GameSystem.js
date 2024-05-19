@@ -2994,5 +2994,18 @@
 			}
 		}
 		
+		Game_System.prototype.getCurrentDifficultyLevel = function() {
+			if(this._currentDifficulty == null){
+				if(ENGINE_SETTINGS.DIFFICULTY_MODS){
+					this._currentDifficulty = ENGINE_SETTINGS.DIFFICULTY_MODS.default;
+				}
+			}
+			return this._currentDifficulty;
+		}	
+		
+		Game_System.prototype.setCurrentDifficultyLevel = function(value) {
+			this._currentDifficulty = value;
+		}	
+		
 		
 	}

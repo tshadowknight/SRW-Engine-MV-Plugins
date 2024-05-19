@@ -26,7 +26,7 @@ Window_Options.prototype.initialize = function() {
 	
 	this._titleInfo = {};
 	this._titleInfo[0] = APPSTRINGS.OPTIONS.label_game_options;
-	if(ENGINE_SETTINGS.ENABLE_TWEAKS_OPTION){
+	if(ENGINE_SETTINGS.ENABLE_TWEAKS_MENU){
 		this._titleInfo[9] = APPSTRINGS.OPTIONS.label_sound_options;
 	} else {
 		this._titleInfo[8] = APPSTRINGS.OPTIONS.label_sound_options;
@@ -157,15 +157,20 @@ Window_Options.prototype.initialize = function() {
 			}
 		}
 	});
-	if(ENGINE_SETTINGS.ENABLE_TWEAKS_OPTION){
+	if(ENGINE_SETTINGS.ENABLE_TWEAKS_MENU){
 		this._optionInfo.push({
 			name: APPSTRINGS.OPTIONS.label_tweaks,
 			isSubMenu: true,
 			display: function(){
+				if(!$gameSystem._isIntermission){
+					return APPSTRINGS.OPTIONS.label_intermission_only;
+				}
 				return "";
 			},
 			update: function(){
-				$gameTemp.pushMenu = "game_modes";
+				if($gameSystem._isIntermission){
+					$gameTemp.pushMenu = "game_modes";
+				}
 			}
 		});
 	}
@@ -382,7 +387,7 @@ Window_Options.prototype.update = function() {
 Window_Options.prototype.redraw = function() {
 	var _this = this;
 	
-	if(ENGINE_SETTINGS.ENABLE_TWEAKS_OPTION){
+	if(ENGINE_SETTINGS.ENABLE_TWEAKS_MENU){
 		$gameTemp.buttonHintManager.setHelpButtons([["select_option"], ["toggle_option"], ["enter_sub_menu"]]);
 	} else {
 		$gameTemp.buttonHintManager.setHelpButtons([["select_option"], ["toggle_option"]]);

@@ -211,6 +211,7 @@ var ENGINE_SETTINGS = {
 	MAX_DEPLOY_SIZE: 36, //the number of slots shown in the deploy window if TWIN mode is not enabled
 	MAX_DEPLOY_SIZE_TWIN: 40, //the number of slots shown in the deploy window if TWIN mode is enabled
 	SINGLE_BATTLE_SPRITE_MODE: false,
+	ENABLE_TWEAKS_MENU: true,
 	ENABLE_TWEAKS_OPTION: false,
 	MERGE_ATTACK_UPGRADES: false,
 	ENABLE_ATTRIBUTE_SYSTEM: false,
@@ -413,5 +414,71 @@ var ENGINE_SETTINGS = {
 		
 		//example return value, optional. This example makes every unit in the game deal double the regular damage.
 		//return [{type: "final_damage", modType: "mult", value: 2}];
+	},
+	DIFFICULTY_MODS: {
+		enabled: true,
+		default: 1,//idx into levels
+		levels: [
+			{
+				name: "Normal",
+				description: "A difficulty recommended for beginner players.",
+				mods: {				
+					mech: {//only applied to enemy side mechs, this includes faction 3/4 units!
+						"-1": {//global
+							HP: -2000,
+							EN: -60,
+							weapon: -300,
+							armor: -200,
+							mobility: -20,
+							accuracy: -20,
+							move: -1	
+						},
+						"10": {
+							HP: -500,
+							EN: -20,
+							weapon: -300,
+							armor: -0,
+							mobility: -20,
+							accuracy: -20,
+							move: -2	
+						}
+					},
+					pilot: {//only applied to enemy side pilots
+						"-1": {//global
+							SP: -10,
+							MP: -10,
+							melee: -20,
+							ranged: -20,
+							skill: -10,
+							defense: -30,
+							evade: -30,
+							hit: -20
+						},
+						"3": {
+							SP: -15,
+							MP: -15,
+							melee: -25,
+							ranged: -25,
+							skill: -15,
+							defense: -35,
+							evade: -35,
+							hit: -25
+						}
+					}
+				}
+			},
+			{
+				name: "Hard",
+				description: "A difficulty recommended experienced players.",
+				mods: {				
+					mech: {//only applied to enemy side mechs, this includes faction 3/4 units!
+						
+					},
+					pilot: {//only applied to enemy side pilots
+						
+					}
+				}
+			}
+		]
 	}
 }
