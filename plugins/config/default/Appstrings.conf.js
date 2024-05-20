@@ -60,7 +60,8 @@ APPSTRINGS.GENERAL = {
 	label_will: "Will",
 	label_level: "Lv",
 	label_HP: "HP",
-	label_EN: "EN"
+	label_EN: "EN",
+	label_mode: "Mode",
 }
 
 APPSTRINGS.MAINMENU = {
@@ -416,6 +417,8 @@ APPSTRINGS.GAME_MODES = {
 	label_infinite_funds: "Infinite Funds",
 	label_infinite_PP: "Infinite PP",
 	label_difficulty: "Difficulty",
+	label_auto: "Automatic",
+	desc_auto: "The difficulty level is set according to the number of SR points obtained.",
 	resources: "Resources"
 }
 

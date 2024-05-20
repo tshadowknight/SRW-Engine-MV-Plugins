@@ -3270,7 +3270,7 @@ StatCalc.prototype.calculateSRWActorStats = function(actor, preserveVolatile){
 		});
 		
 		if(!actor.isActor()){
-			if(ENGINE_SETTINGS.DIFFICULTY_MODS && ENGINE_SETTINGS.DIFFICULTY_MODS.enabled){
+			if(ENGINE_SETTINGS.DIFFICULTY_MODS && ENGINE_SETTINGS.DIFFICULTY_MODS.enabled > 0){
 				let targetMods;
 				const modSet = ENGINE_SETTINGS.DIFFICULTY_MODS.levels[$gameSystem.getCurrentDifficultyLevel()].mods.pilot;
 				if(modSet){
@@ -3747,7 +3747,7 @@ StatCalc.prototype.calculateSRWMechStats = function(targetStats, preserveVolatil
 		calculatedStats.move = $statCalc.applyStatModsToValue(mechData, calculatedStats.move, ["base_move"]);
 		
 		if(!actor.isActor()){
-			if(ENGINE_SETTINGS.DIFFICULTY_MODS && ENGINE_SETTINGS.DIFFICULTY_MODS.enabled){
+			if(ENGINE_SETTINGS.DIFFICULTY_MODS && ENGINE_SETTINGS.DIFFICULTY_MODS.enabled > 0){
 				let targetMods;
 				const modSet = ENGINE_SETTINGS.DIFFICULTY_MODS.levels[$gameSystem.getCurrentDifficultyLevel()].mods.mech;
 				if(modSet){

@@ -337,8 +337,13 @@ Window_Intermission.prototype.createComponents = function() {
 	this._turnInfo = document.createElement("div");
 	this._turnInfo.classList.add("turn_info");
 	this._stageAndTurnInfo.appendChild(this._turnInfo);
-	
 	windowNode.appendChild(this._stageAndTurnInfo);
+	
+	this._modeInfo = document.createElement("div");
+	this._modeInfo.id = this.createId("mode_info");
+	this._modeInfo.classList.add("scaled_text");
+	windowNode.appendChild(this._modeInfo);
+	
 	
 	this._aceDisplay = document.createElement("div");
 	this._aceDisplay.id = this.createId("ace_display");
@@ -363,6 +368,7 @@ Window_Intermission.prototype.createComponents = function() {
 	this._aceName.classList.add("ace_name");
 	this._aceName.classList.add("scaled_text");
 	this._aceDisplayInner.appendChild(this._aceName);
+	
 
 	
 	this._aceDisplay.appendChild(this._aceDisplayInner);
@@ -506,6 +512,13 @@ Window_Intermission.prototype.redraw = function() {
 	var stageInfo = $SRWStageInfoManager.getStageInfo($gameVariables.value(_lastStageIdVariable));
 	this._stageInfo.innerHTML = APPSTRINGS.INTERMISSION.stage_label+" "+stageInfo.displayId+" \""+stageInfo.name+"\" "+APPSTRINGS.INTERMISSION.cleared_label;		
 	this._turnInfo.innerHTML = $gameVariables.value(_turnCountVariable)+" "+APPSTRINGS.INTERMISSION.turns_label;	
+	
+	
+	if(ENGINE_SETTINGS.DIFFICULTY_MODS && ENGINE_SETTINGS.DIFFICULTY_MODS.displayInMenus){
+		const modeInfo = ENGINE_SETTINGS.DIFFICULTY_MODS.levels[$gameSystem.getCurrentDifficultyLevel()];
+		this._modeInfo.innerHTML = modeInfo.name + " " +APPSTRINGS.GENERAL.label_mode;
+		this._modeInfo.style.color = modeInfo.color;
+	}
 	
 	if(!this._aceFacePicsLoaded && $gameSystem._availableUnits){
 		var ace = $statCalc.getTopAce();

@@ -229,3 +229,12 @@
 	white-space: nowrap;
 	width: 100%;
 }
+
+
+#intermission_menu_mode_info {
+    position: absolute;
+    right: 35.6%;
+    bottom: 2.6%;
+    padding: 1%;
+    font-style: italic;
+}

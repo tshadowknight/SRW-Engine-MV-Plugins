@@ -25,16 +25,35 @@ Window_Game_Modes.prototype.initialize = function() {
 	
 	this._titleInfo = {};
 	this._titleInfo[0] = APPSTRINGS.GAME_MODES.resources;
-	if(ENGINE_SETTINGS.DIFFICULTY_MODS && ENGINE_SETTINGS.DIFFICULTY_MODS.enabled){
+	
+	const includeAuto = ENGINE_SETTINGS.DIFFICULTY_MODS.enabled & 2;
+	if(ENGINE_SETTINGS.DIFFICULTY_MODS && ENGINE_SETTINGS.DIFFICULTY_MODS.enabled & 1){
 		this._optionInfo.push({
 			name: APPSTRINGS.GAME_MODES.label_difficulty,
 			display: function(){
-				const current = $gameSystem.getCurrentDifficultyLevel();				
-				return ENGINE_SETTINGS.DIFFICULTY_MODS.levels[current].name;
+				if(includeAuto){
+					if($gameSystem.isManualSetDifficulty()){
+						const current = $gameSystem.getCurrentDifficultyLevel();				
+						return ENGINE_SETTINGS.DIFFICULTY_MODS.levels[current].name;
+					} else {
+						return APPSTRINGS.GAME_MODES.label_auto;
+					}
+				} else {
+					const current = $gameSystem.getCurrentDifficultyLevel();				
+					return ENGINE_SETTINGS.DIFFICULTY_MODS.levels[current].name;
+				}				
 			},
 			update: function(direction){
-				const current = $gameSystem.getCurrentDifficultyLevel();				
-				const max =  ENGINE_SETTINGS.DIFFICULTY_MODS.levels.length;
+				let current = $gameSystem.getCurrentDifficultyLevel();				
+				let max =  ENGINE_SETTINGS.DIFFICULTY_MODS.levels.length;
+				if(includeAuto){
+					max++;
+					if($gameSystem.isManualSetDifficulty()){
+						current++;
+					} else {
+						current = 0;
+					}					
+				}
 				let newVal;
 				if(direction == "up"){
 					newVal = current + 1;
@@ -47,7 +66,16 @@ Window_Game_Modes.prototype.initialize = function() {
 						newVal = max - 1;
 					}
 				}
-				$gameSystem.setCurrentDifficultyLevel(newVal);
+				if(includeAuto){
+					if(newVal == 0){
+						$gameSystem.clearManualSetDifficulty();
+						$gameSystem.setAutomaticDifficultyLevel();
+					} else {
+						$gameSystem.setCurrentDifficultyLevel(newVal - 1);
+					}			
+				} else {
+					$gameSystem.setCurrentDifficultyLevel(newVal);
+				}				
 			}
 		});
 	}

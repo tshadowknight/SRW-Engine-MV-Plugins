@@ -442,7 +442,8 @@
 			this.updateAvailableUnits();
 			$gameTemp.summaryUnit = null;
 			$statCalc.invalidateAbilityCache();
-			$gameTemp.deployMode = "";			
+			$gameTemp.deployMode = "";		
+			this.setAutomaticDifficultyLevel();	
 		}
 		
 		Game_System.prototype.isIntermission = function(id){
@@ -554,6 +555,8 @@
 			SceneManager._scene.createPauseWindow(); //ensure pause menu is updated to reflect the new mode
 			
 			this.untargetableAllies = {};
+			
+			$SRWSaveManager.initMapSRPoint($gameMap.mapId());
 			
 			if($gameMap){
 				$gameMap.clearRegionTiles();
@@ -3003,9 +3006,28 @@
 			return this._currentDifficulty;
 		}	
 		
+		Game_System.prototype.isManualSetDifficulty = function(value) {
+			return this._difficultyWasManuallySet;
+		}
+		
+		Game_System.prototype.clearManualSetDifficulty = function(value) {
+			this._difficultyWasManuallySet = false;
+		}
+		
 		Game_System.prototype.setCurrentDifficultyLevel = function(value) {
+			this._difficultyWasManuallySet = true;
 			this._currentDifficulty = value;
 		}	
 		
+		Game_System.prototype.setAutomaticDifficultyLevel = function() {			
+			if(!this._difficultyWasManuallySet ){
+				if(ENGINE_SETTINGS.DIFFICULTY_MODS && ENGINE_SETTINGS.DIFFICULTY_MODS.enabled & 2 && ENGINE_SETTINGS.DIFFICULTY_MODS.autoLevelFunc){
+					const newVal = ENGINE_SETTINGS.DIFFICULTY_MODS.autoLevelFunc();
+					if(newVal != null){
+						this._currentDifficulty = newVal;
+					}					
+				}				
+			}
+		}
 		
 	}

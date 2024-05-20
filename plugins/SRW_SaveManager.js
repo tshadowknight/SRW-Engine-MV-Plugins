@@ -253,6 +253,15 @@ SRWSaveManager.prototype.hasMapSRPoint = function(mapId){
 	return $gameSystem.awardedSRPoints[mapId];
 }
 
+SRWSaveManager.prototype.initMapSRPoint = function(mapId){
+	if(!$gameSystem.awardedSRPoints){
+		$gameSystem.awardedSRPoints = {};
+	}
+	if($gameSystem.awardedSRPoints[mapId] == null){
+		$gameSystem.awardedSRPoints[mapId] = false;
+	}	
+}
+
 SRWSaveManager.prototype.awardMapSRPoint = function(mapId){	
 	if(!$gameSystem.lockedSRPoints){
 		$gameSystem.lockedSRPoints = {};

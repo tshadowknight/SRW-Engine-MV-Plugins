@@ -1085,7 +1085,7 @@
 
 	Window_StageInfo.prototype.windowHeight = function() {
 		if($gameSystem.isSRPGMode()){
-			return this.fittingHeight(4);
+			return this.fittingHeight(5);
 		} else {
 			return this.fittingHeight(1);
 		}		
@@ -1098,33 +1098,45 @@
 		var y = 0;
 		var width = this.contents.width - this.textPadding() * 2;
 		this.contents.clear();
-		this.changeTextColor("#FFFFFF");
-		//this.drawCurrencyValue(this.value(), this.currencyUnit(), x, 0, width);
-		this.drawText(APPSTRINGS.MAPMENU.label_funds, x, 0, width);
-		this.drawText(this.value(), x + columnOffset , 0, width);
 		
-		this.drawText(APPSTRINGS.MAPMENU.label_turn, x,  lineheight, width);
+		//this.drawCurrencyValue(this.value(), this.currencyUnit(), x, 0, width);
+		let currentHeight = 0;
+		if(ENGINE_SETTINGS.DIFFICULTY_MODS && ENGINE_SETTINGS.DIFFICULTY_MODS.displayInMenus){
+			const modeInfo = ENGINE_SETTINGS.DIFFICULTY_MODS.levels[$gameSystem.getCurrentDifficultyLevel()];
+			this.changeTextColor(modeInfo.color);
+			this.drawText(modeInfo.name + " " +APPSTRINGS.GENERAL.label_mode, x, currentHeight, width);
+			currentHeight+=lineheight;
+		}
+		
+		this.changeTextColor("#FFFFFF");
+		this.drawText(APPSTRINGS.MAPMENU.label_funds, x, currentHeight, width);
+		this.drawText(this.value(), x + columnOffset , currentHeight, width);
+		
+		currentHeight+=lineheight;
+		this.drawText(APPSTRINGS.MAPMENU.label_turn, x,  currentHeight, width);
 		/*--text-color-highlight: #f9e343;	
 	 	--text-color-highlight2: #43dbf9;	*/
 		this.changeTextColor("#43dbf9");
-		this.drawText($gameVariables.value(_turnVarID), x + columnOffset, lineheight, width);
+		this.drawText($gameVariables.value(_turnVarID), x + columnOffset, currentHeight, width);
 		this.changeTextColor("#FFFFFF");
-		this.drawText(APPSTRINGS.MAPMENU.label_enemy, x,  lineheight * 2, width);
+		currentHeight+=lineheight;
+		this.drawText(APPSTRINGS.MAPMENU.label_enemy, x,  currentHeight, width);
 		this.changeTextColor("#AA2222");
-		this.drawText($gameVariables.value(_enemiesDestroyed), x + columnOffset,  lineheight * 2, width);
+		this.drawText($gameVariables.value(_enemiesDestroyed), x + columnOffset,  currentHeight, width);
 		this.changeTextColor("#FFFFFF");
-		this.drawText("/", x + columnOffset + 30,  lineheight * 2, width);
+		this.drawText("/", x + columnOffset + 30, currentHeight, width);
 		this.changeTextColor("#43dbf9");
-		this.drawText($gameVariables.value(_enemiesDestroyed) + $gameVariables.value(_existEnemyVarID), x + columnOffset + 45,  lineheight * 2, width);
+		this.drawText($gameVariables.value(_enemiesDestroyed) + $gameVariables.value(_existEnemyVarID), x + columnOffset + 45,  currentHeight, width);
 		this.changeTextColor("#FFFFFF");
 		
-		this.drawText(APPSTRINGS.MAPMENU.label_ally, x,  lineheight * 3, width);
+		currentHeight+=lineheight;
+		this.drawText(APPSTRINGS.MAPMENU.label_ally, x,  currentHeight, width);
 		this.changeTextColor("#AA2222");
-		this.drawText($gameVariables.value(_actorsDestroyed), x + columnOffset,  lineheight * 3, width);
+		this.drawText($gameVariables.value(_actorsDestroyed), x + columnOffset,  currentHeight, width);
 		this.changeTextColor("#FFFFFF");
-		this.drawText("/", x + columnOffset + 30,  lineheight * 3, width);
+		this.drawText("/", x + columnOffset + 30,  currentHeight, width);
 		this.changeTextColor("#43dbf9");
-		this.drawText($gameVariables.value(_actorsDestroyed) + $gameVariables.value(_existActorVarID), x + columnOffset + 45,  lineheight * 3, width);
+		this.drawText($gameVariables.value(_actorsDestroyed) + $gameVariables.value(_existActorVarID), x + columnOffset + 45,  currentHeight, width);
 		this.changeTextColor("#FFFFFF");
 		
 	};

@@ -416,12 +416,38 @@ var ENGINE_SETTINGS = {
 		//return [{type: "final_damage", modType: "mult", value: 2}];
 	},
 	DIFFICULTY_MODS: {
-		enabled: true,
+		enabled: 3,//0: off, 1: selectable, 2: enable automatic scaling with SR points, 3: enable both
+		displayInMenus: true,
+		autoLevelFunc: function(){
+			const padding = 10; //the amount to pad the ref count to, to avoid putting the player on hard mode after doing one stage
+			let awarded = 0;
+			let missed = 0;
+			let total = 0;
+			for(let mapId in $gameSystem.awardedSRPoints){
+				if($gameSystem.awardedSRPoints[mapId] != null){
+					total++;
+					if($gameSystem.awardedSRPoints[mapId]){
+						awarded++;
+					} else {
+						missed++;
+					}
+				}
+			}
+			if(total < padding){
+				total = padding;
+			}
+			const ratio = awarded / total;
+			if(ratio >= 0.6){
+				return 1;//hard
+			}
+			return 0;//normal
+		},
 		default: 1,//idx into levels
 		levels: [
 			{
 				name: "Normal",
 				description: "A difficulty recommended for beginner players.",
+				color: "#FFFFFF",
 				mods: {				
 					mech: {//only applied to enemy side mechs, this includes faction 3/4 units!
 						"-1": {//global
@@ -470,6 +496,7 @@ var ENGINE_SETTINGS = {
 			{
 				name: "Hard",
 				description: "A difficulty recommended experienced players.",
+				color: "#FF2222",
 				mods: {				
 					mech: {//only applied to enemy side mechs, this includes faction 3/4 units!
 						

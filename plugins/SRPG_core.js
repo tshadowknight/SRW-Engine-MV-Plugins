@@ -812,8 +812,12 @@ SceneManager.isInSaveScene = function(){
 		//hacky way to restore compatibility with plugins that still rely on scene_menu being used for the map menu		
 		Scene_Map.prototype.createCommandWindow.call(this)
 			
+		if(ENGINE_SETTINGS.DIFFICULTY_MODS && ENGINE_SETTINGS.DIFFICULTY_MODS.displayInMenus){
+			this._commandWindow.y = 34;
+		} else {
+			this._commandWindow.y = 50;
+		}
 		
-		this._commandWindow.y = 50;
 		this._commandWindow.x = 800;
 		this.addWindow(this._commandWindow);	
 		this._goldWindow = new Window_StageInfo(0, 0);
