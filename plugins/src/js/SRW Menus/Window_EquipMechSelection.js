@@ -27,7 +27,7 @@ Window_EquipMechSelection.prototype.getAvailableUnits = function(){
 	var availableMechs = Window_CSS.prototype.getAvailableUnits.call(this);
 	var tmp = [];
 	availableMechs.forEach(function(candidate){
-		if(!candidate.SRWStats.mech.inheritsPartsFrom){
+		if(!candidate.SRWStats.mech.inheritsPartsFrom && !candidate.isSubPilot){
 			tmp.push(candidate);
 		}
 	});

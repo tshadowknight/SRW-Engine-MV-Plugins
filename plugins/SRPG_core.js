@@ -1963,6 +1963,7 @@ SceneManager.isInSaveScene = function(){
 			Scene_Base.prototype.update.call(this);
 			if($gameTemp.scaledTextUpdateRequested){
 				$gameTemp.scaledTextUpdateRequested = false;
+				CSSUIManager.cacheKeyCtr = 0;
 				$CSSUIManager.doUpdateScaledText();
 			}
 			return;			
@@ -2027,6 +2028,7 @@ SceneManager.isInSaveScene = function(){
 		Scene_Base.prototype.update.call(this);
 		if($gameTemp.scaledTextUpdateRequested){
 			$gameTemp.scaledTextUpdateRequested = false;
+			CSSUIManager.cacheKeyCtr = 0;
 			$CSSUIManager.doUpdateScaledText();
 		}
 		

@@ -18,6 +18,24 @@ Window_UpgradeUnitSelection.prototype.initialize = function() {
 	});	
 }
 
+Window_UpgradeUnitSelection.prototype.rowEnabled = function(actor){
+	return true;
+}
+
+
+Window_UpgradeUnitSelection.prototype.getAvailableUnits = function(){
+	var _this = this;
+	
+	var availableMechs = Window_CSS.prototype.getAvailableUnits.call(this);
+	var tmp = [];
+	availableMechs.forEach(function(candidate){
+		if(!candidate.isSubPilot){
+			tmp.push(candidate);
+		}
+	});
+	return tmp;
+}
+
 Window_UpgradeUnitSelection.prototype.getCurrentSelection = function(){
 	return this._mechList.getCurrentSelection();	
 }
@@ -46,7 +64,7 @@ Window_UpgradeUnitSelection.prototype.createComponents = function() {
 	this._detailContainer.classList.add("list_detail");
 	windowNode.appendChild(this._detailContainer);	
 
-	this._mechList = new MechList(this._listContainer, [0, 4]);
+	this._mechList = new MechList(this._listContainer, [0, 4], this);
 	this._mechList.createComponents();
 	this._mechList.registerTouchObserver("ok", function(){_this._touchOK = true;});
 	this._mechList.registerTouchObserver("left", function(){_this._touchLeft = true;});
