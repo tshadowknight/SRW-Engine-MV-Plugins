@@ -1612,6 +1612,9 @@ StatCalc.prototype.initSRWStats = function(actor, level, itemIds, preserveVolati
 		actor.SRWStats = _this.createEmptySRWStats(level);
 	}
 	
+	if(actor.originalLevel == null){//support for existing save files
+		actor.originalLevel = origLevel;
+	}
 	
 	actor.SRWInitialized = true;
 	if(!preserveVolatile && !isReload){
@@ -1743,14 +1746,15 @@ StatCalc.prototype.initSRWStats = function(actor, level, itemIds, preserveVolati
 			}
 			actor.SRWStats.mech = this.getMechData(mech, isForActor, items, previousWeapons);
 			actor.SRWStats.dropBoxItems = boxDropIds || [];
-			if(!isForActor && $gameSystem.enemyUpgradeLevel){
+			const upgradeLevel = $gameSystem.getEnemyUpgradeLevel();
+			if(!isForActor && upgradeLevel){
 				var levels = actor.SRWStats.mech.stats.upgradeLevels;
-				levels.maxHP = $gameSystem.enemyUpgradeLevel;
-				levels.maxEN = $gameSystem.enemyUpgradeLevel;
-				levels.armor = $gameSystem.enemyUpgradeLevel;
-				levels.mobility = $gameSystem.enemyUpgradeLevel;			
-				levels.accuracy = $gameSystem.enemyUpgradeLevel;
-				levels.weapons = $gameSystem.enemyUpgradeLevel;			
+				levels.maxHP = upgradeLevel;
+				levels.maxEN = upgradeLevel;
+				levels.armor = upgradeLevel;
+				levels.mobility = upgradeLevel;			
+				levels.accuracy = upgradeLevel;
+				levels.weapons = upgradeLevel;			
 			}		
 			this.invalidateAbilityCache(actor);
 			this.calculateSRWMechStats(actor.SRWStats.mech, preserveVolatile, actor);	
@@ -4095,7 +4099,7 @@ StatCalc.prototype.getWeaponPowerWithMods = function(actor, weapon){
 }
 
 StatCalc.prototype.getMaxPilotStat = function(){
-	return 400;
+	return $gameSystem.getMaxPilotStat();
 }
 
 StatCalc.prototype.getMaxTerrainLevelNumeric = function(){
@@ -4111,7 +4115,7 @@ StatCalc.prototype.getUnlockedUpgradeLevel = function(){
 }
 
 StatCalc.prototype.getMaxUpgradeLevel = function(){
-	return 10;
+	return $gameSystem.getMaxUpgradeLevel();
 }
 
 StatCalc.prototype.getMinModificationLevel = function(actor){

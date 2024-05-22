@@ -558,6 +558,13 @@
 			
 			$SRWSaveManager.initMapSRPoint($gameMap.mapId());
 			
+			if(ENGINE_SETTINGS.DIFFICULTY_MODS && ENGINE_SETTINGS.DIFFICULTY_MODS.enabled > 0){
+				const modSet = ENGINE_SETTINGS.DIFFICULTY_MODS.levels[$gameSystem.getCurrentDifficultyLevel()];
+				if(modSet && modSet.autoUpgradesFunc){
+					this.setEnemyUpgradeLevelGlobal(modSet.autoUpgradesFunc($gameMap.mapId()) || 0);
+				}
+			}
+			
 			if($gameMap){
 				$gameMap.clearRegionTiles();
 				$gameMap._SRWTileProperties = null;
@@ -865,6 +872,7 @@
 			delete event.dropBoxItems;
 			_this.pushSrpgAllActors(event.eventId());
 			event.isDeployed = true;
+			event.manuallyErased = false;
 			event.isScriptedDeploy = isScriptedDeploy ? true : false;
 			var bitmap = ImageManager.loadFace(actor_unit.faceName()); //顔グラフィックをプリロードする
 			var oldValue = $gameVariables.value(_existActorVarID);
@@ -3030,4 +3038,31 @@
 			}
 		}
 		
+		Game_System.prototype.getMaxUpgradeLevel = function(value) {
+			return this._maxUpgradeLevel || 10;
+		}
+		
+		Game_System.prototype.setMaxUpgradeLevel = function(value) {
+			this._maxUpgradeLevel = value;
+		}
+		
+		Game_System.prototype.getMaxPilotStat = function(value) {
+			return this._maxPilotStat || 400;
+		}
+		
+		Game_System.prototype.setMaxPilotStat = function(value) {
+			this._maxPilotStat = value;
+		}
+		
+		Game_System.prototype.setEnemyUpgradeLevelGlobal = function(value) {
+			this.globalEnemyUpgradeLevel = value;
+		}		
+		
+		Game_System.prototype.setEnemyUpgradeLevel = function(value) {
+			this.enemyUpgradeLevel = value;
+		}
+		
+		Game_System.prototype.getEnemyUpgradeLevel = function() {
+			return (this.globalEnemyUpgradeLevel || 0) + (this.enemyUpgradeLevel || 0);
+		}
 	}

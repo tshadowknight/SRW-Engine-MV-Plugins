@@ -433,6 +433,9 @@
 				var json = StorageManager.load(savefileId);
 				this.createGameObjects();
 				this.extractSaveContents(JsonEx.parse(json).content);
+				if(ENGINE_SETTINGS.SAVE_UPDATE_FUNCTION){
+					ENGINE_SETTINGS.SAVE_UPDATE_FUNCTION();
+				}
 				$statCalc.softRefreshUnits();
 				SceneManager._scene.fadeOutAll()
 				SceneManager.goto(Scene_Map);
@@ -700,6 +703,7 @@
 				addFunds: true,
 				setEventHP: true,
 				addSubPilot: true,
+				removeSubPilot: true,
 				setPortraitOverlay: true,
 				hidePortraitOverlay: true,
 				hideAllPortraitOverlays: true,

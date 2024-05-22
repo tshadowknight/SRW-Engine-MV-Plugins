@@ -55,8 +55,30 @@ BattleCalc.prototype.isTargetInRange = function(originPos, targetPos, range, min
 BattleCalc.prototype.performPPCalculation = function(attacker, defender){
 	var attackerLevel = attacker.SRWStats.pilot.level;
 	var defenderLevel = defender.SRWStats.pilot.level;
+	
+	if(ENGINE_SETTINGS.DIFFICULTY_MODS && ENGINE_SETTINGS.DIFFICULTY_MODS.enabled > 0){
+		const modSet = ENGINE_SETTINGS.DIFFICULTY_MODS.levels[$gameSystem.getCurrentDifficultyLevel()];
+		if(modSet && modSet.useOrigLevelForExp){
+			//only apply original level considerations to enemies. Works around issues where ally levels are not always set on init(like with sub pilots) and where ally pilot levels can update mid stage due to leveling up.
+			if(!attacker.isActor()){
+				attackerLevel = attacker.originalLevel;
+			}	
+			if(!defender.isActor()){
+				defenderLevel = defender.originalLevel;
+			}			
+		}
+	}
+	
 	var defenderTotalYield = defender.SRWStats.pilot.PPYield + defender.SRWStats.mech.PPYield ;
 	var totalExp = defenderTotalYield * (defenderLevel/attackerLevel);
+	
+	if(ENGINE_SETTINGS.DIFFICULTY_MODS && ENGINE_SETTINGS.DIFFICULTY_MODS.enabled > 0){
+		const modSet = ENGINE_SETTINGS.DIFFICULTY_MODS.levels[$gameSystem.getCurrentDifficultyLevel()];
+		if(modSet && modSet.PPMultiplier != null){
+			totalExp*=modSet.PPMultiplier;
+		}
+	}
+	
 	if(totalExp < 1){
 		totalExp = 1;
 	}
@@ -72,8 +94,13 @@ BattleCalc.prototype.performExpCalculation = function(attacker, defender){
 	if(ENGINE_SETTINGS.DIFFICULTY_MODS && ENGINE_SETTINGS.DIFFICULTY_MODS.enabled > 0){
 		const modSet = ENGINE_SETTINGS.DIFFICULTY_MODS.levels[$gameSystem.getCurrentDifficultyLevel()];
 		if(modSet && modSet.useOrigLevelForExp){
-			attackerLevel = attacker.originalLevel;
-			defenderLevel = defender.originalLevel;
+			//only apply original level considerations to enemies. Works around issues where ally levels are not always set on init(like with sub pilots) and where ally pilot levels can update mid stage due to leveling up.
+			if(!attacker.isActor()){
+				attackerLevel = attacker.originalLevel;
+			}	
+			if(!defender.isActor()){
+				defenderLevel = defender.originalLevel;
+			}			
 		}
 	}
 	var defenderTotalYield = defender.SRWStats.pilot.expYield + defender.SRWStats.mech.expYield ;
@@ -1491,7 +1518,16 @@ BattleCalc.prototype.generateBattleResult = function(isPrediction){
 					fundGain = 0;
 				} else {
 					fundGain = $statCalc.applyStatModsToValue(gainRecipient, fundGain, ["fund_gain_destroy"]);
+					
+					if(ENGINE_SETTINGS.DIFFICULTY_MODS && ENGINE_SETTINGS.DIFFICULTY_MODS.enabled > 0){
+						const modSet = ENGINE_SETTINGS.DIFFICULTY_MODS.levels[$gameSystem.getCurrentDifficultyLevel()];
+						if(modSet && modSet.fundsMultiplier != null){
+							fundGain*=modSet.fundsMultiplier;
+						}
+					}
 				}
+				
+				
 				
 				aCache.expGain+= expGain;
 				aCache.ppGain+= ppGain;

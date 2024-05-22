@@ -26,6 +26,7 @@ CSSUIManager.prototype.updateScaledText = function(windowId, bustCache){
 }
 
 CSSUIManager.prototype.doUpdateScaledText = function(windowId, forceAll){
+	CSSUIManager.bumpScaleCache();
 	if(this.customUILayer){
 		
 		var sourceContainer;
@@ -38,7 +39,10 @@ CSSUIManager.prototype.doUpdateScaledText = function(windowId, forceAll){
 		
 		const mainCacheId = sourceContainer.id || "global";
 		
+		let cacheCtr = 0;
 		function getElemCacheIdx(elem){
+			return cacheCtr++;
+			
 			let resultParts = [];
 			resultParts.push(elem.id+"::"+Array.from(elem.classList).join("__"));
 			let ctr = 0;

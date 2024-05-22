@@ -433,6 +433,11 @@ body {
 	display: inline-block;
 }
 
+.upgrade_bar_part.parts_15 {
+	margin-left: 1%;
+	margin-right: 1%;
+}
+
 .upgrade_bar_part.active {
 	background-color: #e5406e;
 }

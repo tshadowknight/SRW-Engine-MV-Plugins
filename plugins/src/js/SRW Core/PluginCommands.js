@@ -1270,6 +1270,17 @@
 					$gameSystem.overwritePilotFallbackInfo(actor);
 				}	
 				
+				if (command === 'removeSubPilot') {					
+					var targetMech = $statCalc.getMechData($dataClasses[args[0] * 1], true);
+					targetMech.subPilots[args[1] * 1] = null;
+					$statCalc.storeMechData(targetMech);
+					$gameSystem.overwriteMechFallbackInfo(args[0] * 1, targetMech.subPilots);
+					let actor = $gameActors.actor(args[2] * 1)
+					actor.isSubPilot = false;
+					//actor._intermissionClassId = args[1] * 1; 
+					$gameSystem.overwritePilotFallbackInfo(actor);
+				}
+				
 				if (command === 'setPortraitOverlay') {		
 					if(!$gameTemp.portraitOverlays){
 						$gameTemp.portraitOverlays = [];

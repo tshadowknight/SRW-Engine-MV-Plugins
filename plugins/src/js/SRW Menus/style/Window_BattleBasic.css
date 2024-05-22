@@ -1109,8 +1109,20 @@
 	animation-fill-mode: forwards;
 }
 
+.participant_container.actor.evade .shadow {
+	animation-name: evade_actor;
+	animation-duration: 0.2s;
+	animation-fill-mode: forwards;
+}
+
 .participant_container.enemy.evade .unit_pic {
 	animation-name: evade_enemy;
+	animation-duration: 0.2s;
+	animation-fill-mode: forwards;
+}
+
+.participant_container.enemy.evade .shadow {
+	animation-name: evade_actor;
 	animation-duration: 0.2s;
 	animation-fill-mode: forwards;
 }

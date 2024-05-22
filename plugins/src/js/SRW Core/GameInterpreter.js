@@ -622,6 +622,7 @@
 				event._lastModsPosition = null;
 				event.isDropBox = false;
 				event.isShip = false;
+				event.manuallyErased = false;
 				delete event.dropBoxItems;
 
 				enemy_unit._mechClass = mechClass;	

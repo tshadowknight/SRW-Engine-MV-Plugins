@@ -280,7 +280,7 @@ Window_CSS.prototype.createUpgradeBar = function(level, pending, context) {
 		} else if(pending && i < (level + pending)) {
 			cssClass = "pending";
 		}
-		content+="<div data-context='"+context+"' data-idx='"+i+"' class='upgrade_bar_part "+cssClass+"'>";
+		content+="<div data-context='"+context+"' data-idx='"+i+"' class='upgrade_bar_part "+cssClass+" parts_"+parts+"'>";
 		content+="</div>";
 	}
 	content+="</div>";
@@ -298,7 +298,7 @@ Window_CSS.prototype.createUpgradeBarScaled = function(level, pending) {
 		} else if(pending && i < (level + pending)) {
 			cssClass = "pending";
 		}
-		content+="<div class='upgrade_bar_part scaled_width "+cssClass+"'>";
+		content+="<div class='upgrade_bar_part scaled_width "+cssClass+" parts_"+parts+"'>";
 		content+="</div>";
 	}
 	content+="</div>";
