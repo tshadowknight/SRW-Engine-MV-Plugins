@@ -1585,9 +1585,31 @@ StatCalc.prototype.initSRWStats = function(actor, level, itemIds, preserveVolati
 		}
 	}
 	
+	const origLevel = level;
+	if(!actor.isActor()){
+		if(ENGINE_SETTINGS.DIFFICULTY_MODS && ENGINE_SETTINGS.DIFFICULTY_MODS.enabled > 0){
+		const modSet = ENGINE_SETTINGS.DIFFICULTY_MODS.levels[$gameSystem.getCurrentDifficultyLevel()].mods.pilot;
+			if(modSet){
+				if(modSet[actor.enemyId()]){
+					targetMods = modSet[actor.enemyId()];
+				} else {
+					targetMods = modSet[-1];
+				}
+				if(targetMods){
+					level+=(targetMods.level || 0);
+				}
+				
+			}
+		}
+	}	
+	
 	if(!actor.SRWStats){
+		//setting the originalLevel is only done the first time a unit is initialized, to avoid the modified level from propagating as the original level on save load
+		actor.originalLevel = origLevel;
 		actor.SRWStats = _this.createEmptySRWStats(level);
 	}
+	
+	
 	actor.SRWInitialized = true;
 	if(!preserveVolatile && !isReload){
 		this.resetBattleTemp(actor);
@@ -1605,6 +1627,8 @@ StatCalc.prototype.initSRWStats = function(actor, level, itemIds, preserveVolati
 		actorProperties = $dataEnemies[actorId].meta;
 		actor.SRWStats.pilot.name = actor.name();
 	}
+	
+	
 	
 	actor.SRWStats.pilot.grantsGainsTo = null;//actorProperties.pilotGrantsGainsTo;
 	
@@ -4001,7 +4025,26 @@ StatCalc.prototype.getWeaponPower = function(actor, weapon){
 				levels.push(i);
 			}
 		}		
-		return weapon.power + this.getWeaponDamageUpgradeAmount(weapon, levels) - this.isAttackDown(actor);
+		
+		let difficultyMod = 0;
+		if(!actor.isActor()){
+			if(ENGINE_SETTINGS.DIFFICULTY_MODS && ENGINE_SETTINGS.DIFFICULTY_MODS.enabled > 0){
+				let targetMods;
+				const modSet = ENGINE_SETTINGS.DIFFICULTY_MODS.levels[$gameSystem.getCurrentDifficultyLevel()].mods.mech;
+				if(modSet){
+					if(modSet[actor.SRWStats.mech.id]){
+						targetMods = modSet[actor.SRWStats.mech.id];
+					} else {
+						targetMods = modSet[-1];
+					}
+					if(targetMods){
+						difficultyMod = targetMods.weapon;
+					}
+				}
+			}
+		}
+		
+		return weapon.power + this.getWeaponDamageUpgradeAmount(weapon, levels) - this.isAttackDown(actor) + difficultyMod;
 	} else {
 		return 0;
 	}

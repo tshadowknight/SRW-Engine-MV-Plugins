@@ -448,6 +448,7 @@ var ENGINE_SETTINGS = {
 				name: "Normal",
 				description: "A difficulty recommended for beginner players.",
 				color: "#FFFFFF",
+				useOrigLevelForExp: true,
 				mods: {				
 					mech: {//only applied to enemy side mechs, this includes faction 3/4 units!
 						"-1": {//global
@@ -488,7 +489,8 @@ var ENGINE_SETTINGS = {
 							skill: -15,
 							defense: -35,
 							evade: -35,
-							hit: -25
+							hit: -25,
+							//level: 10
 						}
 					}
 				}
@@ -497,6 +499,7 @@ var ENGINE_SETTINGS = {
 				name: "Hard",
 				description: "A difficulty recommended experienced players.",
 				color: "#FF2222",
+				useOrigLevelForExp: true,
 				mods: {				
 					mech: {//only applied to enemy side mechs, this includes faction 3/4 units!
 						

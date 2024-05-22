@@ -69,6 +69,13 @@ BattleCalc.prototype.performPPCalculation = function(attacker, defender){
 BattleCalc.prototype.performExpCalculation = function(attacker, defender){
 	var attackerLevel = attacker.SRWStats.pilot.level;
 	var defenderLevel = defender.SRWStats.pilot.level;
+	if(ENGINE_SETTINGS.DIFFICULTY_MODS && ENGINE_SETTINGS.DIFFICULTY_MODS.enabled > 0){
+		const modSet = ENGINE_SETTINGS.DIFFICULTY_MODS.levels[$gameSystem.getCurrentDifficultyLevel()];
+		if(modSet && modSet.useOrigLevelForExp){
+			attackerLevel = attacker.originalLevel;
+			defenderLevel = defender.originalLevel;
+		}
+	}
 	var defenderTotalYield = defender.SRWStats.pilot.expYield + defender.SRWStats.mech.expYield ;
 	
 	var totalExp = eval(ENGINE_SETTINGS.EXP_YIELD.LEVEL_SCALING_FORMULA);
