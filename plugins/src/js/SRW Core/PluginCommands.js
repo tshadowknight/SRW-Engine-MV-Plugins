@@ -954,8 +954,11 @@
 				
 				if (command === 'setUnlockedUpgradeLevel') {
 					var tmp = parseInt(args[0]);
+					var onlyUpgrade = args[1] * 1;
 					if(!isNaN(tmp)){
-						$gameSystem.unlockedUpgradeLevel = tmp;
+						if($gameSystem.unlockedUpgradeLevel == null || !onlyUpgrade || tmp > $gameSystem.unlockedUpgradeLevel){
+							$gameSystem.unlockedUpgradeLevel = tmp;
+						}						
 					}			
 				}
 				
