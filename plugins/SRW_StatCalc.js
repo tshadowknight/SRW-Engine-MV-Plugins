@@ -1597,6 +1597,9 @@ StatCalc.prototype.initSRWStats = function(actor, level, itemIds, preserveVolati
 				}
 				if(targetMods){
 					level+=(targetMods.level || 0);
+					if(level < 1){
+						level = 1;
+					}
 				}
 				
 			}
