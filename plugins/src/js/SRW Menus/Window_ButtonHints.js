@@ -80,7 +80,8 @@ Window_ButtonHints.prototype.update = function() {
 	var _this = this;
 	Window_Base.prototype.update.call(this);
 	//hacky workaround for issue where the hints don't show up for the deployment in stage window, since that is a window that is shown while the event interpreter is active
-	if($gameSystem.isSubBattlePhase() != "deploy_selection_window" && $gameMap && $gameMap._interpreter && $gameMap._interpreter.isRunning()){
+	//exception for when $gameTemp.doingModeSelection is true, so the hints can be displayed in the mode selection window which is shown while the interpreter is running
+	if(!$gameTemp.doingModeSelection && $gameSystem.isSubBattlePhase() != "deploy_selection_window" && $gameMap && $gameMap._interpreter && $gameMap._interpreter.isRunning()){
 		this.hide();
 	}
 	

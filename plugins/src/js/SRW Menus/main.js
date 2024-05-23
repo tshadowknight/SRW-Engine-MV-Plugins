@@ -128,6 +128,9 @@ window.Window_Game_Modes= Window_Game_Modes;
 import Window_ButtonHints from "./Window_ButtonHints.js";
 window.Window_ButtonHints= Window_ButtonHints;
 
+import Window_ModeSelection from "./Window_ModeSelection.js";
+window.Window_ModeSelection= Window_ModeSelection;
+
 import "./style/SRW_Menus.css";
 
 

@@ -1,0 +1,97 @@
+#mode_selection .list_container {
+	height: 61.5%;
+    border: 0px;
+    border-radius: 1vw;
+    display: block;
+    width: 77%;
+    align-items: center;
+    background-color: rgba(0,0,0,0);
+    overflow: hidden;
+    padding: 1%;
+    top: 26%;
+}
+
+#mode_selection .difficulty_entry {
+	width: 100%;
+	display: flex;
+	align-items: center;
+	justify-content: center;
+}
+
+#mode_selection .difficulty_entry .content{
+	width: 98%;
+	height: 80%;
+	background-color: var(--section-bg-color);
+	border: 0.2vw solid rgba(0,0,0,0);
+	border-radius: 1vw;
+	padding: 1%;
+	color: #FFFFFF;
+}
+
+#mode_selection .difficulty_entry.selected .content{
+	border: 0.2vw solid #FFFFFF;
+}
+
+#mode_selection .difficulty_entry.selected .content .title{
+	
+}
+
+#mode_selection .difficulty_entry .content .description{
+	--fontsize: 1.3px;
+}
+
+#mode_selection .instruction_container {
+	height: 7%;
+    border: 0.1vw solid #FFFFFF;
+    border-radius: 1vw;
+    display: block;
+    width: 81%;
+    align-items: center;
+    background-color: var(--section-bg-color);
+    overflow: hidden;
+    padding: 1%;
+    left: 8%;
+    position: absolute;
+    top: 14%;
+	color: #FFFFFF;
+	--fontsize: 1.3px;
+}
+
+#mode_selection_header {
+	--fontsize: 3px;
+}
+
+#mode_selection .entry {
+	display: flex;
+    align-items: center;
+    justify-content: center;
+    width: 95%;
+    --fontsize: 1.8px;
+    margin-left: auto;
+    margin-right: auto;
+	color: #FFFFFF;
+}
+
+#mode_selection .entry.selected {
+	background-color: var(--selected-color);
+	
+}
+
+#mode_selection .entry.title{
+	color: var(--text-color-highlight2);
+	--fontsize: 2px;
+}
+
+#mode_selection .entry .label {
+	width: 50%;
+	margin-left: 5%;
+	margin-right: 5%;
+	text-align: left;
+}
+
+#mode_selection .entry .value {
+	width: 30%;
+	margin-left: 5%;
+	margin-right: 5%;
+	text-align: center;
+}

@@ -410,6 +410,13 @@ APPSTRINGS.OPTIONS = {
 	label_intermission_only: "Edit in Intermission"
 }
 
+APPSTRINGS.MODE_SELECTION = {
+	title: "Select Difficulty",
+	instructions: "Please select a Difficulty Mode to start the game with.<br>You can always change the difficulty later from the Options > Game Tweaks menu during the Intermission.",
+	label_automatic: "Automatic",
+	desc_automatic: "The difficulty will start at the lowest setting and increase based on how many Mastery Conditions are met.",
+}
+
 APPSTRINGS.GAME_MODES = {
 	title: "Game Tweaks",
 	label_on: "On",
@@ -500,6 +507,7 @@ APPSTRINGS.BUTTON_HINTS = {
 	
 	//options
 	select_option: {text: "Select an Option", action: "d:up_down"},
+	confirm_option: {text: "Confirm", action: "ok"},
 	toggle_option: {text: "Toggle Current Option", action: "d:left_right"},
 	enter_sub_menu: {text: "Enter Sub-menu", action: "ok"},
 	

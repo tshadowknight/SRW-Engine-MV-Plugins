@@ -919,6 +919,9 @@
 			case 'manual_deploy':
 				waiting = $gameTemp.doingManualDeploy;
 				break;	
+			case 'mode_selection':
+				waiting = $gameTemp.doingModeSelection;
+				break;		
 			case 'move_to_point':
 				waiting = $gameSystem.srpgWaitMoving();
 				break;	
@@ -1179,6 +1182,12 @@
 			$gameSystem.setSubBattlePhase("deploy_selection_window");
 			$gameTemp.pushMenu = "in_stage_deploy";
 			$gameTemp.originalDeployInfo = JSON.parse(JSON.stringify($gameSystem.getDeployList()));
+		}
+		
+		Game_Interpreter.prototype.showModeSelection = function(){
+			this.setWaitMode("mode_selection");
+			$gameTemp.doingModeSelection = true;
+			$gameTemp.pushMenu = "mode_selection";
 		}
 		
 		Game_Interpreter.prototype.showTextCrawl = function(id, canCancel, speed){

@@ -785,6 +785,7 @@ SceneManager.isInSaveScene = function(){
 		this.createZoneStatusWindow();
 		this.createButtonHintsWindow();
 		this.createZoneSummaryWindow();
+		this.createModeSelectionWindow();
 		$battleSceneManager.init();	
     };
 	
@@ -1071,6 +1072,17 @@ SceneManager.isInSaveScene = function(){
 		
 		$gameTemp.buttonHintManager = this._buttonHintsWindow;
     };	
+	
+	Scene_Map.prototype.createModeSelectionWindow = function() {
+		var _this = this;
+		this._modeSelectionWindow = new Window_ModeSelection(0, 0, Graphics.boxWidth, Graphics.boxHeight);
+		this._modeSelectionWindow.close();
+		this.addWindow(this._modeSelectionWindow);
+	
+		this._modeSelectionWindow.hide();
+		this.idToMenu["mode_selection"] = this._modeSelectionWindow;
+    };
+	
 	
 	Scene_Map.prototype.createMechListDeployedWindow = function() {
 		var _this = this;
