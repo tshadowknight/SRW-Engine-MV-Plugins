@@ -21,6 +21,22 @@ Window_ModeSelection.prototype.initialize = function() {
 	});	
 }
 
+Window_ModeSelection.prototype.show = function(){		
+	this.resetSelection();
+	
+    this.visible = true;
+	this._redrawRequested = true;
+	this._visibility = "";
+	this.refresh();	
+	this.triggerCustomBgCreate();
+	
+	//lock input until loader has faded away
+	this._handlingInput = true;
+	setTimeout(() => {this._handlingInput = false}, 1000);
+	this._loader.classList.add("doFade");
+	
+	Graphics._updateCanvas();
+}
 
 Window_ModeSelection.prototype.resetSelection = function(){		
 	if(!this._wasStacked){
@@ -57,6 +73,10 @@ Window_ModeSelection.prototype.createComponents = function() {
 	this._instructionContainer.classList.add("scaled_text");
 	this._instructionContainer.innerHTML = APPSTRINGS.MODE_SELECTION.instructions;
 	windowNode.appendChild(this._instructionContainer);	
+	
+	this._loader = document.createElement("div");
+	this._loader.classList.add("loader");
+	windowNode.appendChild(this._loader);
 	
 }	
 

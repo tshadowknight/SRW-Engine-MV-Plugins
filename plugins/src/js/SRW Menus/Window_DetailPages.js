@@ -40,6 +40,7 @@ Window_DetailPages.prototype.resetSelection = function(){
 	this._currentSelection = 0;
 	this._currentPage = 0;
 	this._selectedTab = 0;
+	this._isPilotAbiOverflow = false;
 	this._uiState = "normal";
 	this._subPilotIdx = 0;
 	this.validateTab();
@@ -190,8 +191,13 @@ Window_DetailPages.prototype.createComponents = function() {
 	this._terrainSummary.id = "combined_terrain_card";
 	this._pilotInfoTab.appendChild(this._terrainSummary);	
 	
+	this._fullPilotAbiContainer = document.createElement("div");
+	this._fullPilotAbiContainer.id = "pilot_abi_container";
+	this._pilotInfoTab.appendChild(this._fullPilotAbiContainer);	
 		
-	
+	this._fullPilotAbiList = document.createElement("div");
+	this._fullPilotAbiList.id = "pilot_abi_list";	
+	this._fullPilotAbiContainer.appendChild(this._fullPilotAbiList);	
 	
 	this._pilotStatsTabButton = document.createElement("div");	
 	this._pilotStatsTabButton.classList.add("tab_button");	
@@ -407,7 +413,10 @@ Window_DetailPages.prototype.update = function() {
 		} 	
 		
 		if(Input.isTriggered('ok')){
-			
+			if(this._uiState == "normal" && this._selectedTab == 0 && this._isPilotAbiOverflow){
+				this._uiState = "pilot_abi_detail";
+				this.requestRedraw();
+			}
 		}
 		
 		if(Input.isTriggered('menu')){
@@ -431,10 +440,13 @@ Window_DetailPages.prototype.update = function() {
 				if(this._callbacks["closed"]){
 					this._callbacks["closed"]();
 				}					
-			} else {
+			} else if(this._uiState == "pilot_abi_detail"){
+				this._uiState = "normal";
+				this.requestRedraw();
+			} else if(this._uiState == "description"){
 				this._descriptionOverlay.hide();
 				this._uiState = "normal";
-			}			
+			} 			
 		}				
 		this.resetTouchState();
 		this.validateTab();		
@@ -867,33 +879,38 @@ Window_DetailPages.prototype.drawPilotStats2 = function() {
 	detailContent+="<div class='ability_block_row scaled_height'>";
 	var descriptionCounter = 0;
 	var rowCounter = 0;
-	for(var i = 0; i < 6; i++){
-		if(rowCounter >= 2){
-			rowCounter = 0;
-			detailContent+="</div>";
-			detailContent+="<div class='ability_block_row scaled_height'>";
-		}		
-		
+	let abilityDisplayList = [];
+	for(let i = 0; i < abilityList.length; i++){
+		if(typeof abilityList[i] != "undefined" && abilityList[i].requiredLevel <= currentLevel){
+			abilityDisplayList.push(abilityList[i]);
+		}
+	}
+	let isOverflow = abilityDisplayList.length > 6;
+	this._isPilotAbiOverflow = isOverflow;
+	const abilityDisplaySlots = 6;
+	
+	function createAbiBlockContent(abilityDef, nameOverride){
+		let content = "";
 		var displayName = "---";
 		var displayClass = "";
 		var uniqueString = "";
 		var descriptionData = "";
 		var descriptionClass = "";
-		if(typeof abilityList[i] != "undefined" && abilityList[i].requiredLevel <= currentLevel){
+		if(typeof abilityDef != "undefined" && abilityDef.requiredLevel <= currentLevel){
 			descriptionClass = "described_element";
-			descriptionData = "data-type='pilot' data-idx='"+abilityList[i].idx+"'";
-			var displayInfo = $pilotAbilityManager.getAbilityDisplayInfo(abilityList[i].idx);
+			descriptionData = "data-type='pilot' data-idx='"+abilityDef.idx+"'";
+			var displayInfo = $pilotAbilityManager.getAbilityDisplayInfo(abilityDef.idx);
 			
 			if(displayInfo.isHighlightedHandler){
-				displayClass = displayInfo.isHighlightedHandler(actor, abilityList[i].level);
+				displayClass = displayInfo.isHighlightedHandler(actor, abilityDef.level);
 			}
 			
-			if($gameSystem.isHiddenActorAbility(actor, abilityList[i].idx)){
+			if($gameSystem.isHiddenActorAbility(actor, abilityDef.idx)){
 				displayName = "?????";
 			} else {			
 				displayName = displayInfo.name;
 				if(displayInfo.hasLevel){
-					displayName+="L"+abilityList[i].level;
+					displayName+="L"+abilityDef.level;
 				}
 				if(displayInfo.isUnique){
 					uniqueString = "*";
@@ -902,12 +919,55 @@ Window_DetailPages.prototype.drawPilotStats2 = function() {
 				}
 			}
 		}
+		content+="<div "+descriptionData+" class='pilot_stat_container "+descriptionClass+" scaled_text scaled_width fitted_text "+displayClass+" "+i+"'>";
+		content+="<div class='unique_skill_mark scaled_width'>"+uniqueString+"</div>";
+		content+="<div class='stat_value'>"+(nameOverride || displayName)+"</div>";
+		content+="</div>";
+		return content;
+	}
+	
+		
+	let content = "";
+	content+="<div class='ability_block_label scaled_text'>";
+	content+=APPSTRINGS.GENERAL.label_abilities;
+	content+="</div>";
+	let ctr = 0;
+	let columnCount = 2;
+	let columnContentCount = 20;
+	const maxPilotAbilities = $gameSystem.getMaxPilotAbilities();
+	content+="<div class='columns_container'>";
+	for(let i = 0; i < columnCount; i++){
+		content+="<div class='column'>";
+		for(let j = 0; j < columnContentCount; j++){
+			if(ctr < maxPilotAbilities){
+				content+="<div class='entry scaled_text'>";			
+				content+=createAbiBlockContent(abilityDisplayList[ctr]);			
+				content+="</div>";
+			}
+			ctr++;
+		}
+		content+="</div>";
+	}
+	content+="</div>";
+	this._fullPilotAbiList.innerHTML = content;	
+	
+	
+	
+	for(var i = 0; i < abilityDisplaySlots; i++){
+		const abilityDef = abilityDisplayList[i];
+		if(rowCounter >= 2){
+			rowCounter = 0;
+			detailContent+="</div>";
+			detailContent+="<div class='ability_block_row scaled_height'>";
+		}		
 		
 		
-		detailContent+="<div "+descriptionData+" class='pilot_stat_container "+descriptionClass+" scaled_text scaled_width fitted_text "+displayClass+" "+i+"'>";
-		detailContent+="<div class='unique_skill_mark scaled_width'>"+uniqueString+"</div>";
-		detailContent+="<div class='stat_value'>"+displayName+"</div>";
-		detailContent+="</div>";		
+		if(i == (abilityDisplaySlots - 1) && isOverflow){
+			detailContent+=createAbiBlockContent(abilityDef, "...");
+		} else {
+			detailContent+=createAbiBlockContent(abilityDef);
+		}	
+				
 		
 		rowCounter++;
 	}
@@ -1032,35 +1092,14 @@ Window_DetailPages.prototype.drawPilotStats2 = function() {
 	detailContent+="</div>";
 	this._pilotStats2.innerHTML = detailContent;
 	
-
+	return isOverflow;
 }
 
 Window_DetailPages.prototype.redraw = function() {
 	//this._mechList.redraw();
 	var _this = this;
 	
-	if(this._selectedTab == 0){
-		if(ENGINE_SETTINGS.ENABLE_TWIN_SYSTEM){
-			$gameTemp.buttonHintManager.setHelpButtons([["previous_twin_pilot", "previous_sub_pilot"], ["tab_nav"], ["abi_details"]]);
-		} else {
-			$gameTemp.buttonHintManager.setHelpButtons([["previous_sub_pilot"], ["tab_nav"], ["abi_details"]]);
-		}		
-	} else if(this._selectedTab == 1){
-		if(ENGINE_SETTINGS.ENABLE_TWIN_SYSTEM){
-			$gameTemp.buttonHintManager.setHelpButtons([["tab_nav"], ["abi_details"]]);
-		} else {
-			$gameTemp.buttonHintManager.setHelpButtons([["tab_nav"], ["abi_details"]]);
-		}		
-	} else if(this._selectedTab == 2){
-		if(ENGINE_SETTINGS.ENABLE_TWIN_SYSTEM){
-			$gameTemp.buttonHintManager.setHelpButtons([["tab_nav"], ["inspect_weap"]]);
-		} else {
-			$gameTemp.buttonHintManager.setHelpButtons([["tab_nav"], ["inspect_weap"]]);
-		}		
-	} else {
-		$gameTemp.buttonHintManager.setHelpButtons([]);
-	}
-	$gameTemp.buttonHintManager.show();
+	
 	
 	this._mapAttackPreview.classList.remove("active");	
 	if(this.getCurrentSelection().mech.id != -1){
@@ -1136,6 +1175,39 @@ Window_DetailPages.prototype.redraw = function() {
 		this.drawPilotStats2();	
 	}
 	
+	
+	
+	if(this._selectedTab == 0){
+		if(this._isPilotAbiOverflow){
+			if(ENGINE_SETTINGS.ENABLE_TWIN_SYSTEM){
+				$gameTemp.buttonHintManager.setHelpButtons([["previous_twin_pilot", "previous_sub_pilot"], ["tab_nav"],  ["inspect_pilot_abilities"],["abi_details"]]);
+			} else {
+				$gameTemp.buttonHintManager.setHelpButtons([["previous_sub_pilot"], ["tab_nav"],  ["inspect_pilot_abilities"],["abi_details"]]);
+			}	
+		} else {
+			if(ENGINE_SETTINGS.ENABLE_TWIN_SYSTEM){
+				$gameTemp.buttonHintManager.setHelpButtons([["previous_twin_pilot", "previous_sub_pilot"], ["tab_nav"], ["abi_details"]]);
+			} else {
+				$gameTemp.buttonHintManager.setHelpButtons([["previous_sub_pilot"], ["tab_nav"], ["abi_details"]]);
+			}	
+		}
+			
+	} else if(this._selectedTab == 1){
+		if(ENGINE_SETTINGS.ENABLE_TWIN_SYSTEM){
+			$gameTemp.buttonHintManager.setHelpButtons([["tab_nav"], ["abi_details"]]);
+		} else {
+			$gameTemp.buttonHintManager.setHelpButtons([["tab_nav"], ["abi_details"]]);
+		}		
+	} else if(this._selectedTab == 2){
+		if(ENGINE_SETTINGS.ENABLE_TWIN_SYSTEM){
+			$gameTemp.buttonHintManager.setHelpButtons([["tab_nav"], ["inspect_weap"]]);
+		} else {
+			$gameTemp.buttonHintManager.setHelpButtons([["tab_nav"], ["inspect_weap"]]);
+		}		
+	} else {
+		$gameTemp.buttonHintManager.setHelpButtons([]);
+	}
+	$gameTemp.buttonHintManager.show();
 	
 	this.updateScaledDiv(this._actorBattleImg);
 	
@@ -1224,5 +1296,12 @@ Window_DetailPages.prototype.redraw = function() {
 		this._attribute2Display.style.display = "block";		
 	}
 	this.loadImages();
+	
+	if(this._uiState == "pilot_abi_detail"){
+		this._fullPilotAbiContainer.classList.add("active");
+	} else {
+		this._fullPilotAbiContainer.classList.remove("active");
+	}
+	
 	Graphics._updateCanvas();
 }

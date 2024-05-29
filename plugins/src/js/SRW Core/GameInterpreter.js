@@ -2085,8 +2085,14 @@
 							} else if(activeDefender.params.referenceEventId){
 								var unitInfo = $gameSystem.EventToUnit(activeDefender.params.referenceEventId);
 								if(unitInfo){
-									var stats = $statCalc.getCalculatedMechStats(unitInfo[1]);
-									startHP = Math.floor(stats.currentHP / stats.maxHP) * 100;
+									mechStats = $statCalc.getCalculatedMechStats(unitInfo[1]);//replace mechstats with live value
+									startHP = Math.floor(mechStats.currentHP / mechStats.maxHP * 100);
+									dCache.currentAnimHP = mechStats.currentHP;
+									dCache.currentAnimEN = mechStats.currentEN;
+									
+									//hack to ensure displayed stats during the battle scene match the stats feteched from the reference event
+									dCache.ref.SRWStats.mech.stats.calculated.maxHP = mechStats.maxHP;
+									dCache.ref.SRWStats.mech.stats.calculated.maxEN = mechStats.maxEN;
 								}								
 							}
 							var damagePercent = startHP - this._attacker.params.targetEndHP;

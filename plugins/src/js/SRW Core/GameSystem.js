@@ -438,6 +438,7 @@
 		
 		Game_System.prototype.startIntermission = function(){
 			this._isIntermission = true;
+			ImageManager.clearFullCache();
 			//$statCalc.reloadSRWActors();
 			this.updateAvailableUnits();
 			$gameTemp.summaryUnit = null;
@@ -3064,5 +3065,29 @@
 		
 		Game_System.prototype.getEnemyUpgradeLevel = function() {
 			return (this.globalEnemyUpgradeLevel || 0) + (this.enemyUpgradeLevel || 0);
+		}
+		
+		Game_System.prototype.getMaxPilotAbilities = function() {
+			return this._maxPilotAbilities || ENGINE_SETTINGS.DEFAULT_PILOT_ABI_COUNT || 6;
+		}
+		
+		Game_System.prototype.setMaxPilotAbilities = function(value) {
+			return this._maxPilotAbilities  = value;
+		}
+		
+		//note: null is a meaningful return value and indicates the database value should be used as there is no override defined
+		//returns the overriding value, NOT whether an override exists. So false=override value == false, true=override value == true
+		Game_System.prototype.getPilotAbilityUniqueOverrideValue = function(abilityId) {
+			if(!this._pilotAbilityUniqueOverrides){
+				this._pilotAbilityUniqueOverrides = {};
+			}
+			return this._pilotAbilityUniqueOverrides[abilityId];
+		}
+		
+		Game_System.prototype.setPilotAbilityUniqueOverrideValue = function(abilityId, state) {
+			if(!this._pilotAbilityUniqueOverrides){
+				this._pilotAbilityUniqueOverrides = {};
+			}
+			this._pilotAbilityUniqueOverrides[abilityId] = state;
 		}
 	}

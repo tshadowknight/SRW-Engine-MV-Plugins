@@ -440,6 +440,8 @@ var _defaultPlayerSpeed = parameters['defaultPlayerSpeed'] || 4;
 		return bitmap;
 	};
 	
+	ImageCache.limit = 100 * 1000 * 1000;
+	
 	ImageCache.prototype.removeBlobs = function(key, value){
 		let tmp = {};
 		for(let key in this._items){
@@ -453,6 +455,10 @@ var _defaultPlayerSpeed = parameters['defaultPlayerSpeed'] || 4;
 	
 	ImageManager.resetBlobCache = async function() {
 		this._imageCache.removeBlobs();
+	}
+	
+	ImageManager.clearFullCache = async function() {
+		this._imageCache._truncateCache(true);
 	}
 		
 	ImageCache.prototype._truncateCache = function(force){

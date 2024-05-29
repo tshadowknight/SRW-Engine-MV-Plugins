@@ -220,7 +220,7 @@ APPSTRINGS.DETAILPAGES = {
 	label_pilot_spirits: "Pilot Spirits",
 	label_pilot_stats: "Pilot Stats",
 	label_ability: "Ability",
-	label_cost: "Ability",
+	label_cost: "Cost",
 	label_attribute_1: "Attribute 1",
 	label_attribute_2: "Attribute 2",
 	label_pilot_level: "Lv",
@@ -504,6 +504,7 @@ APPSTRINGS.BUTTON_HINTS = {
 	previous_twin_pilot: {text: "Navigate Twin Pilots", action: "d:shoulder_buttons"},
 	//next_twin_pilot: {text: "Next Twin Pilot", action: "pagedown"},
 	inspect_weap: {text: "View Weapon Info", action: "d:up_down"},
+	inspect_pilot_abilities: {text: "View All Abilities", action: "ok"},
 	
 	//options
 	select_option: {text: "Select an Option", action: "d:up_down"},

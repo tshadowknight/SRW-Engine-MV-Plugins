@@ -3,13 +3,16 @@ function AbilityManager(){
 	//this.initDefinitions();	
 }
 
-AbilityManager.prototype.addDefinition = function(idx, name, desc, hasLevel, isUnique, statmodHandler, isActiveHandler, cost, maxLevel, isHighlightedHandler, rangeDef, canStack){
+AbilityManager.prototype.addDefinition = function(idx, name, desc, hasLevel, isUnique, statmodHandler, isActiveHandler, cost, maxLevel, isHighlightedHandler, rangeDef, canStack, refId){
 	var _this = this;
 	if(!rangeDef){
 		rangeDef = function(){return {min: 0, max: 0, targets: "own"}};
 	}
 	if(canStack == null){
 		canStack = true;
+	}
+	if(refId == null){
+		refId = idx;
 	}
 	this._abilityDefinitions[idx] = {
 		name: name,
@@ -21,7 +24,8 @@ AbilityManager.prototype.addDefinition = function(idx, name, desc, hasLevel, isU
 		cost: cost,
 		maxLevel: maxLevel,
 		rangeDef: rangeDef,
-		canStack: canStack
+		canStack: canStack,
+		refId: refId
 	};
 	if(statmodHandler){
 		this._abilityDefinitions[idx].statmodHandler = statmodHandler;
@@ -137,6 +141,34 @@ PilotAbilityManager.prototype.constructor = PilotAbilityManager;
 
 PilotAbilityManager.prototype.initDefinitions = function(){
 	$SRWConfig.pilotAbilties.call(this);
+}
+
+PilotAbilityManager.prototype.getAbilityDisplayInfo = function(idx){
+	var abilityDef = this._abilityDefinitions[this.getUpgradeIdx(idx)];
+	var result = {
+		name: "",
+		desc: "",
+		hasLevel: false,
+		isUnique: false,
+		isActiveHandler: function(){return false;},
+		cost: 0,
+		maxLevel: 1
+	};
+	let isUnique = $gameSystem.getPilotAbilityUniqueOverrideValue(idx);
+	if(isUnique == null){
+		isUnique = abilityDef.isUnique;
+	}
+	if(abilityDef){
+		result.name = abilityDef.name;
+		result.desc = abilityDef.desc;
+		result.hasLevel = abilityDef.hasLevel;
+		result.isUnique = isUnique;
+		result.isActiveHandler = abilityDef.isActiveHandler;
+		result.cost = abilityDef.cost;
+		result.maxLevel = abilityDef.maxLevel;
+		result.isHighlightedHandler = abilityDef.isHighlightedHandler;
+	}
+	return result;
 }
 
 PilotAbilityManager.prototype.getIdPrefix = function(idx){

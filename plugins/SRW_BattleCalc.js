@@ -53,7 +53,7 @@ BattleCalc.prototype.isTargetInRange = function(originPos, targetPos, range, min
 }
 
 BattleCalc.prototype.performPPCalculation = function(attacker, defender){
-	var attackerLevel = attacker.SRWStats.pilot.level;
+	/*var attackerLevel = attacker.SRWStats.pilot.level;
 	var defenderLevel = defender.SRWStats.pilot.level;
 	
 	if(ENGINE_SETTINGS.DIFFICULTY_MODS && ENGINE_SETTINGS.DIFFICULTY_MODS.enabled > 0){
@@ -67,10 +67,11 @@ BattleCalc.prototype.performPPCalculation = function(attacker, defender){
 				defenderLevel = defender.originalLevel;
 			}			
 		}
-	}
+	}*/
 	
 	var defenderTotalYield = defender.SRWStats.pilot.PPYield + defender.SRWStats.mech.PPYield ;
-	var totalExp = defenderTotalYield * (defenderLevel/attackerLevel);
+	//var totalExp = defenderTotalYield * (defenderLevel/attackerLevel);
+	var totalExp = defenderTotalYield;
 	
 	if(ENGINE_SETTINGS.DIFFICULTY_MODS && ENGINE_SETTINGS.DIFFICULTY_MODS.enabled > 0){
 		const modSet = ENGINE_SETTINGS.DIFFICULTY_MODS.levels[$gameSystem.getCurrentDifficultyLevel()];

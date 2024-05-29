@@ -4399,7 +4399,7 @@ StatCalc.prototype.getPilotAbilityList = function(actor){
 		if(learnedAbilities){
 			Object.keys(learnedAbilities).forEach(function(abilityIdx){
 				var ability = learnedAbilities[abilityIdx];
-				if(ability.slot != -1 && ability.idx != "" &&  ability.idx != null){
+				if(ability.slot != -1 && ability.idx !== "" &&  ability.idx != null){
 					result[ability.slot] = ability;
 				}
 			});	
@@ -5853,7 +5853,7 @@ StatCalc.prototype.getSearchedActors = function(type, searchInfo){
 						}
 					});
 					var twinSpirit = _this.getTwinSpirit(actor);
-					if(twinSpirit.idx != "" && twinSpirit && twinSpirit.idx == searchInfo.value){
+					if(twinSpirit && twinSpirit.idx != "" && twinSpirit.idx == searchInfo.value){
 						isValid = true;
 					}
 				} else if(searchInfo.type == "pilot"){

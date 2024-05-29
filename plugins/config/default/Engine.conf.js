@@ -16,6 +16,7 @@ var ENGINE_SETTINGS = {
 	ENABLE_EQUIPABLES: true,
 	ALLOW_DUPLICATE_EQUIPS: false,
 	MAX_UNIT_EQUIPABLES: 5, //the number of equipable weapon slots a unit has by default
+	DEFAULT_PILOT_ABI_COUNT: 6,
 	DEFAULT_CARRYING_CAPACITY: 150,		
 	LOCK_CAMERA_TO_CURSOR: false,
 	BEFORE_BATTLE_SPIRITS: false,

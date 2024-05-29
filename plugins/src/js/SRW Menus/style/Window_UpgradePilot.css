@@ -451,7 +451,10 @@
     left: 26%;
     width: 20%;
     background-color: var(--section-bg-color);
+	overflow: hidden;
 }
+
+
 
 .current_abilities.inactive {
 	opacity: 0.5;
@@ -464,6 +467,16 @@
 	--fontsize: 2px;
 }
 
+#upgrade_pilot .ability_list_scroll {
+	height: 90%;
+	width: 100%;
+	overflow-y: auto;
+}
+
+#upgrade_pilot .ability_list_scroll.styled_scroll::-webkit-scrollbar {
+    width: 0.6vw;
+}
+
 #upgrade_pilot .pilot_stat_container {
 	--fontsize: 2px;
 	width: 90%;
@@ -473,6 +486,7 @@
 	justify-content: center;
 	align-items: center;
 	padding: 2%;
+	height: 9.5%;
 }
 
 #upgrade_pilot .pilot_stat_container.selected {

@@ -39,7 +39,7 @@ Window_UpgradePilot.prototype.initialize = function() {
 	this._currentSelection = 0;
 	this._currentCost = 0;
 	
-	this._maxEquipSelection = 6;
+	this._maxEquipSelection = $gameSystem.getMaxPilotAbilities();
 	this._currentEquipSelection = 0;
 	
 	this._currentFavSkillSelection = 0;
@@ -457,7 +457,7 @@ Window_UpgradePilot.prototype.update = function() {
 				var current = this._abilityList.getCurrentSelection();
 				var learnedAbilities = $statCalc.getLearnedPilotAbilities(pilotData);
 				
-				if((learnedAbilities[current.idx] && learnedAbilities[current.idx].slot == -1)){
+				if((learnedAbilities[current.refId] && learnedAbilities[current.idx].slot == -1)){
 					SoundManager.playOk();
 					this._currentUIState = "ability_equip_selection";
 				} else if(!learnedAbilities[current.idx] || (current.info.hasLevel && learnedAbilities[current.idx].level < current.info.maxLevel)){
@@ -914,7 +914,8 @@ Window_UpgradePilot.prototype.redraw = function() {
 	currentAbilitiesContent+="<div class='abilities_label scaled_text'>";
 	currentAbilitiesContent+=APPSTRINGS.GENERAL.label_abilities;	
 	currentAbilitiesContent+="</div>";			
-	for(var i = 0; i < 6; i++){
+	currentAbilitiesContent+="<div class='ability_list_scroll styled_scroll'>";		
+	for(var i = 0; i < $gameSystem.getMaxPilotAbilities(); i++){
 		var displayName = "---";
 		var uniqueString = "";
 		if(typeof abilityList[i] != "undefined" && abilityList[i].requiredLevel <= currentLevel){
@@ -942,9 +943,10 @@ Window_UpgradePilot.prototype.redraw = function() {
 		currentAbilitiesContent+="<div class='stat_value'>"+displayName+"</div>";
 		currentAbilitiesContent+="</div>";			
 	}
-	
+	currentAbilitiesContent+="</div>";		
 	this._currentAbilities.innerHTML = currentAbilitiesContent;
 	
+	const currentActiveBlock = this._currentAbilities.querySelector(".pilot_stat_container.selected");
 	
 	
 	this._pilotStatsTabButton.classList.remove("selected");
@@ -1091,4 +1093,8 @@ Window_UpgradePilot.prototype.redraw = function() {
 	
 	this.loadImages();
 	Graphics._updateCanvas();
+	
+	if(currentActiveBlock){
+		currentActiveBlock.scrollIntoView(false);
+	}
 }

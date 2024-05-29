@@ -570,3 +570,62 @@
     margin: 2%;
 }
 
+#detail_pages #pilot_abi_container {
+	position: absolute;
+	top: 0;
+	left: 0;
+	background-color: rgba(0,0,0,0.5);
+	width: 100%;
+	height: 100%;
+	display: none;
+	z-index: 5;
+}
+
+#detail_pages #pilot_abi_list {
+    position: absolute;
+    top: 8%;
+    left: 49.5%;
+    width: 35%;
+    height: 83%;
+    background-color: rgba(0,67,99,0.9);
+    margin-left: 15%;
+    border: 0.1vw solid #FFFFFF;
+    border-radius: 1vw;
+    border-top-right-radius: 0;
+    border-bottom-right-radius: 0;
+    align-items: center;
+    z-index: 11;
+}
+
+#detail_pages #pilot_abi_list .columns_container {
+	display: flex;
+}
+
+#detail_pages #pilot_abi_list .ability_block_label {
+	margin-left: 4%;
+}
+
+#detail_pages #pilot_abi_list .column {
+	height: 100%;
+	width: 45%;
+}
+
+#detail_pages #pilot_abi_list .entry {
+	width: 100%;
+	color: #FFF;
+	--fontsize: 2px;
+	padding-left: 4%;
+    padding-right: 4%;
+}
+
+#detail_pages #pilot_abi_list .entry .pilot_stat_container {
+	width: 20px;
+}
+
+#detail_pages #pilot_abi_list .entry .pilot_stat_container .stat_value {
+	margin-left: 0;
+}
+
+#detail_pages #pilot_abi_container.active {
+	display: block;
+}
