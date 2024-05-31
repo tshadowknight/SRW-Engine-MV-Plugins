@@ -1003,6 +1003,7 @@ EDITORSTRINGS.MECH = {
 	hint_default_size: "The width and height of the texture files for this sprite in pixels",
 	hint_3D_scale: "A scaling factor for the 3D model",
 	hint_3D_rotation: "The default rotation of the 3D model",
+	hint_shadow_parent: "The node that is use to parent the shadow to",
 	hint_shadow: "Scale for the shadow of the unit",
 	hint_world_size: "The size at which the sprite is displayed in World units(default 3)",
 	
@@ -1013,6 +1014,7 @@ EDITORSTRINGS.MECH = {
 	label_source_size: "Source Size",
 	label_scale: "Scale",
 	label_rotation: "Rotation",
+	label_shadow_parent: "Shadow Parent",
 	label_y_offset: "Y Offset",
 	label_x_offset: "X Offset",
 	label_root_y_offset: "Root Y Offset",

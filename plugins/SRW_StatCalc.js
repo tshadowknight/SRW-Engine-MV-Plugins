@@ -3524,6 +3524,8 @@ StatCalc.prototype.getBattleSceneInfo = function(actor){
 		
 		result.BBHack = (mechProperties.mechBattleSceneBBHack || 0) * 1;
 		
+		result.shadowParent = String(mechProperties.mechShadowParent || "").trim();
+		
 		result.rotation = parseInt(mechProperties.mechBattleSceneSpriteRotation) || 0;
 		
 		result.animGroup = mechProperties.mechBattleSceneAnimGroup;

@@ -596,7 +596,7 @@ SRWEditor.prototype.init = function(){
 		},
 		reset_position: {
 			hasTarget: true,
-			params: ["duration", "noDamage", "noDamageText"],
+			params: ["duration", "noDamage", "noDamageText", "noReposition"],
 			desc: "Reset the position of the target to the default position."
 		},
 		destroy: {
@@ -747,6 +747,7 @@ SRWEditor.prototype.init = function(){
 		noWait: "If 1 the engine will not wait for the destruction animation to complete.",
 		noDamage: "If 1 the damage number will not be shown",
 		noDamageText: "If 1 the quote for taking damage will not be shown",
+		noReposition: "If 1 the unit will not be moved back to its origin point(in screen space) and its sprite_frame will not be changed.",
 		animationLoop: "The animation frame from where to loop. 0 or empty to not loop.",
 		animationDelay: "The time between animation frames in ticks.",
 		path: "The file path of the asset.",
@@ -1129,6 +1130,9 @@ SRWEditor.prototype.init = function(){
 		
 		}, 
 		noDamageText: function(value){
+		
+		}, 
+		noReposition: function(value){
 		
 		}, 
 		animationDelay: function(value){

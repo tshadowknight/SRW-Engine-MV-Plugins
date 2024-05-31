@@ -1169,7 +1169,7 @@ BattleSceneManager.prototype.updateMainSprite = async function(type, name, sprit
 			spriteInfo = _this.createSpineSprite(name+"_displayed", path,  new BABYLON.Vector3(xOffset, spriteConfig.yOffset, 0), flipX, "main", spriteConfig.referenceSize, spriteConfig.canvasDims.width, spriteConfig.canvasDims.height);
 			pivotYOffset+=spriteConfig.referenceSize / 2 - spriteConfig.yOffset;				
 		} else if(spriteConfig.type == "3D"){
-			spriteInfo = await _this.createUnitModel(name+"_displayed", path,  new BABYLON.Vector3(xOffset, spriteConfig.yOffset, 0), flipX, spriteConfig.animGroup, "main",  spriteConfig.scale, new BABYLON.Vector3(0, BABYLON.Tools.ToRadians(spriteConfig.rotation || 0), 0), spriteConfig.BBHack);
+			spriteInfo = await _this.createUnitModel(name+"_displayed", path,  new BABYLON.Vector3(xOffset, spriteConfig.yOffset, 0), flipX, spriteConfig.animGroup, "main",  spriteConfig.scale, new BABYLON.Vector3(0, BABYLON.Tools.ToRadians(spriteConfig.rotation || 0), 0), spriteConfig.BBHack, spriteConfig.shadowParent);
 			pivotYOffset+=spriteConfig.referenceSize / 2 - spriteConfig.yOffset + spriteConfig.centerYOffset;	
 			pivotXOffset+=spriteConfig.centerXOffset;
 			/*if(flipX){
@@ -1332,7 +1332,7 @@ BattleSceneManager.prototype.createModel = async function(name, path, position, 
 	return this.prepareModel(root, name, position, flipX, animGroup, animName, scale, rotation, null, unlit);	
 }
 
-BattleSceneManager.prototype.prepareModel = function(root, name, position, flipX, animGroup, animName, scale, rotation, BBHack, unlit){
+BattleSceneManager.prototype.prepareModel = function(root, name, position, flipX, animGroup, animName, scale, rotation, BBHack, unlit, shadowParent){
 	const _this = this;
 	scale = scale || 1;
 	let directionFactor = flipX ? -1 : 1;
@@ -1348,6 +1348,7 @@ BattleSceneManager.prototype.prepareModel = function(root, name, position, flipX
 	//body.parent = outer;
 	body.isPickable = false; //so our raycasts dont hit ourself
 	let meshGroups = {};
+	
 	body.getChildMeshes().forEach(m => {
 		m.isPickable = false;
 		
@@ -1371,6 +1372,7 @@ BattleSceneManager.prototype.prepareModel = function(root, name, position, flipX
 		//m.material.backFaceCulling = true;
 		//m.material.transparencyMode = BABYLON.Material.MATERIAL_ALPHATEST;
 		
+		
 		if(m.material){
 			m.material.specularColor = new BABYLON.Color3(0, 0, 0);
 			if(unlit){
@@ -1380,6 +1382,25 @@ BattleSceneManager.prototype.prepareModel = function(root, name, position, flipX
 		}
 	});
 	
+	let shadowParentNode;
+	if(shadowParent){
+		const stack = [];
+		stack.push(body);
+		while(stack.length){
+			let current = stack.shift();
+			if(current.id.indexOf(shadowParent) != -1){
+				shadowParentNode = current;
+			}
+			
+			let children = current.getChildren();
+			
+			let materialLeaves = {};
+			for(let child of children){		
+				stack.push(child);		
+			}
+		}
+	}
+		
 	if(body.material){
 		body.material.specularColor = new BABYLON.Color3(0, 0, 0);
 		if(unlit){
@@ -1450,19 +1471,19 @@ BattleSceneManager.prototype.prepareModel = function(root, name, position, flipX
 
 	root.name = name+"_model";
 	
-	
 	body.spriteConfig = {
-		type: "3D"
+		type: "3D",
 	};
 	const unitModelInfo = {
-		sprite: body		
+		sprite: body,
+		shadowParentNode: shadowParentNode	
 	};
 	this._unitModelInfo.push(unitModelInfo);
 	
 	return unitModelInfo;
 }
 
-BattleSceneManager.prototype.createUnitModel = async function(name, path, position, flipX, animGroup, animName, scale, rotation, BBHack){
+BattleSceneManager.prototype.createUnitModel = async function(name, path, position, flipX, animGroup, animName, scale, rotation, BBHack, shadowParent){
 	let result = await BABYLON.SceneLoader.ImportMeshAsync(null, "img/SRWBattleScene/"+path, "model.glb", this._scene);
 	const root = result.meshes[0];
 	root.defaultScale = scale;
@@ -1487,7 +1508,7 @@ BattleSceneManager.prototype.createUnitModel = async function(name, path, positi
 	}
 	root.animationRef = animationGroupLookup;
 	
-	return this.prepareModel(root, name, position, flipX, animGroup, animName, scale, rotation, BBHack);	
+	return this.prepareModel(root, name, position, flipX, animGroup, animName, scale, rotation, BBHack, false, shadowParent);	
 }
 
 BattleSceneManager.prototype.createDragonBonesSprite = function(name, path, armatureName, position, flipX, size, canvasDims, animName){
@@ -1760,8 +1781,16 @@ BattleSceneManager.prototype.hookBeforeRender = function(){
 		if(spriteInfo){
 			var shadowSprite = spriteInfo.sprite.shadowSprite;
 			if(shadowSprite){			
-				shadowSprite.position.x = spriteInfo.sprite.parent_handle.position.x + ((shadowSprite.shadowInfo.offsetX || 0) * (shadowSprite.shadowInfo.type == "enemy" ? -1 : 1));
-				shadowSprite.position.z = spriteInfo.sprite.parent_handle.position.z + 0.1;//(shadowSprite.shadowInfo.offsetZ || 0);
+			
+				let refPosition;
+				if(spriteInfo.shadowParentNode){
+					refPosition = spriteInfo.shadowParentNode.getAbsolutePosition();
+				} else {
+					refPosition = spriteInfo.sprite.parent_handle.position;
+				}
+			
+				shadowSprite.position.x = refPosition.x + ((shadowSprite.shadowInfo.offsetX || 0) * (shadowSprite.shadowInfo.type == "enemy" ? -1 : 1));
+				shadowSprite.position.z = refPosition.z + 0.1;//(shadowSprite.shadowInfo.offsetZ || 0);
 				var scale = Math.max(4 - spriteInfo.sprite.parent_handle.position.y, 0) / 4;
 				
 				shadowSprite.scaling.x = scale;
@@ -4601,7 +4630,7 @@ BattleSceneManager.prototype.executeAnimation = function(animation, startTick){
 				targetObj.setShown(false);
 				targetObj.context.update();
 				targetObj.stop();
-				targetObj.context.releaseEffect(targetObj.handle);
+				//targetObj.context.releaseEffect(targetObj.handle);
 				targetObj.context.activeCount--;
 			}
 		},
@@ -5055,32 +5084,34 @@ BattleSceneManager.prototype.executeAnimation = function(animation, startTick){
 				} else {
 					if(!action.isHit){
 						var action = _this.getTargetAction(target);
-						if(action.side == "actor"){
-							if(_this.applyAnimationDirection(targetPostion).x > targetObj.parent_handle.position.x){								
-								additions[startTick + 1] = [									
-									{type: "set_sprite_frame", target: target, params:{name: "out"}},
-								];
-							} else if(_this.applyAnimationDirection(targetPostion).x < targetObj.parent_handle.position.x){
-								additions[startTick + 1] = [									
-									{type: "set_sprite_frame", target: target, params:{name: "in"}},
-								];
-							}							
-						} else {
-							if(_this.applyAnimationDirection(targetPostion).x > targetObj.parent_handle.position.x){								
-								additions[startTick + 1] = [									
-									{type: "set_sprite_frame", target: target, params:{name: "in"}},
-								];
-							} else if(_this.applyAnimationDirection(targetPostion).x < targetObj.parent_handle.position.x){
-								additions[startTick + 1] = [									
-									{type: "set_sprite_frame", target: target, params:{name: "out"}},
-								];
+						if(!params.noReposition){
+							if(action.side == "actor"){
+								if(_this.applyAnimationDirection(targetPostion).x > targetObj.parent_handle.position.x){								
+									additions[startTick + 1] = [									
+										{type: "set_sprite_frame", target: target, params:{name: "out"}},
+									];
+								} else if(_this.applyAnimationDirection(targetPostion).x < targetObj.parent_handle.position.x){
+									additions[startTick + 1] = [									
+										{type: "set_sprite_frame", target: target, params:{name: "in"}},
+									];
+								}							
+							} else {
+								if(_this.applyAnimationDirection(targetPostion).x > targetObj.parent_handle.position.x){								
+									additions[startTick + 1] = [									
+										{type: "set_sprite_frame", target: target, params:{name: "in"}},
+									];
+								} else if(_this.applyAnimationDirection(targetPostion).x < targetObj.parent_handle.position.x){
+									additions[startTick + 1] = [									
+										{type: "set_sprite_frame", target: target, params:{name: "out"}},
+									];
+								}
 							}
-						}
+						}						
 					}
 				}				
 					
 				
-				if(!hasSpecialEvasion){
+				if(!hasSpecialEvasion && !params.noReposition){
 					
 					_this.registerMatrixAnimation("translate", targetObj.parent_handle, _this.applyAnimationDirection(targetObj.parent_handle.position), targetPostion, startTick, params.duration);
 				}
@@ -5782,6 +5813,7 @@ BattleSceneManager.prototype.readBattleCache = async function() {
 		spriteInfo.canvasDims = battleSceneInfo.canvasDims;
 		spriteInfo.armatureName = battleSceneInfo.armatureName;
 		spriteInfo.BBHack = battleSceneInfo.BBHack;
+		spriteInfo.shadowParent = battleSceneInfo.shadowParent;
 		spriteInfo.defaultAttachments = battleSceneInfo.defaultAttachments;
 		if(battleEffect.side == "actor"){
 			if(battleEffect.type == "initiator" || battleEffect.type == "defender"){
