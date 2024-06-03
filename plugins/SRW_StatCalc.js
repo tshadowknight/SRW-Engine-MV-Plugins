@@ -6164,12 +6164,16 @@ StatCalc.prototype.modifyWill = function(actor, increment, preserveCache, noSubP
 		if(!noSubPilots && actor.isActor()){
 			const subPilots = this.getSubPilots(actor);
 			for(let pilotId of subPilots){
-				this.modifyWill($gameActors.actor(pilotId), increment, preserveCache, true);
+				if(pilotId){
+					this.modifyWill($gameActors.actor(pilotId), increment, preserveCache, true);	
+				}				
 			}
 		}
 	} 	
 	if(!preserveCache){
-		this.invalidateAbilityCache(actor);	
+		if(actor){
+			this.invalidateAbilityCache(actor);	
+		}		
 	}	
 }
 

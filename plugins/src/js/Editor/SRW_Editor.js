@@ -966,20 +966,28 @@ SRWEditor.prototype.init = function(){
 					pos4: {}
 				};
 			}
+			
+			function getDisplayValue(val){
+				if(val == null){
+					return "";
+				}
+				return val;
+			}
+			
 			var result = "";
 			result+="<div class='catmullrom_block' style=''>";
 			result+="<div data-catmullpos='pos1' class='param_values pos1'>";
-			result+="x1: <input data-dataid='x' class='param_value param_coord' value='"+(value.pos1.x || "")+"'></input>";
-			result+="y1: <input data-dataid='y' class='param_value param_coord' value='"+(value.pos1.y || "")+"'></input>";
-			result+="z1: <input data-dataid='z' class='param_value param_coord' value='"+(value.pos1.z || "")+"'></input>";	
+			result+="x1: <input data-dataid='x' class='param_value param_coord' value='"+getDisplayValue(value.pos1.x)+"'></input>";
+			result+="y1: <input data-dataid='y' class='param_value param_coord' value='"+getDisplayValue(value.pos1.y)+"'></input>";
+			result+="z1: <input data-dataid='z' class='param_value param_coord' value='"+getDisplayValue(value.pos1.z)+"'></input>";	
 
 			
 			result+="</div>";
 			
 			result+="<div data-catmullpos='pos4' class='param_values pos4'>";
-			result+="x2: <input data-dataid='x' class='param_value param_coord' value='"+(value.pos4.x || "")+"'></input>";
-			result+="y2: <input data-dataid='y' class='param_value param_coord' value='"+(value.pos4.y || "")+"'></input>";
-			result+="z2: <input data-dataid='z' class='param_value param_coord' value='"+(value.pos4.z || "")+"'></input>";	
+			result+="x2: <input data-dataid='x' class='param_value param_coord' value='"+getDisplayValue(value.pos4.x)+"'></input>";
+			result+="y2: <input data-dataid='y' class='param_value param_coord' value='"+getDisplayValue(value.pos4.y)+"'></input>";
+			result+="z2: <input data-dataid='z' class='param_value param_coord' value='"+getDisplayValue(value.pos4.z)+"'></input>";	
 
 			result+="</div>";
 			result+="</div>";
@@ -4119,14 +4127,23 @@ SRWEditor.prototype.processParamInput = function(input){
 		catmullRom: function(input){
 			var container = input.closest(".command_param ");
 			var pos1 = {};
-			pos1.x = container.querySelector("div[data-catmullpos='pos1'] input[data-dataid='x']").value*1;
-			pos1.y = container.querySelector("div[data-catmullpos='pos1'] input[data-dataid='y']").value*1;
-			pos1.z = container.querySelector("div[data-catmullpos='pos1'] input[data-dataid='z']").value*1;
+			
+			function parseValue(val){
+				if(val === ""){
+					return val;
+				} else {
+					return val * 1;
+				}
+			}
+			
+			pos1.x = parseValue(container.querySelector("div[data-catmullpos='pos1'] input[data-dataid='x']").value);
+			pos1.y = parseValue(container.querySelector("div[data-catmullpos='pos1'] input[data-dataid='y']").value);
+			pos1.z = parseValue(container.querySelector("div[data-catmullpos='pos1'] input[data-dataid='z']").value);
 			
 			var pos4 = {};
-			pos4.x = container.querySelector("div[data-catmullpos='pos4'] input[data-dataid='x']").value*1;
-			pos4.y = container.querySelector("div[data-catmullpos='pos4'] input[data-dataid='y']").value*1;
-			pos4.z = container.querySelector("div[data-catmullpos='pos4'] input[data-dataid='z']").value*1;
+			pos4.x = parseValue(container.querySelector("div[data-catmullpos='pos4'] input[data-dataid='x']").value);
+			pos4.y = parseValue(container.querySelector("div[data-catmullpos='pos4'] input[data-dataid='y']").value);
+			pos4.z = parseValue(container.querySelector("div[data-catmullpos='pos4'] input[data-dataid='z']").value);
 			return {pos1: pos1, pos4: pos4};
 		}
 	};
