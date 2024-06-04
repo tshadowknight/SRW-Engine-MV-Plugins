@@ -7130,6 +7130,8 @@ BattleSceneManager.prototype.processActionQueue = function() {
 			nextAction = _this._actionQueue.shift();
 		}
 		
+		
+		
 		if(nextAction && nextAction.action.type != "defend" && nextAction.action.type != "evade" && nextAction.action.type != "none"){
 			_this._UILayerManager.resetTextBox();
 			_this._UILayerManager.hideNoise();
@@ -7308,22 +7310,38 @@ BattleSceneManager.prototype.processActionQueue = function() {
 							_this._active_target = _this._actorSprite.sprite;		
 						}	
 					}
-					//_this._active_main.barrierSprite.setEnabled(false);
-					//_this._active_support_attacker.barrierSprite.setEnabled(false);
-					//_this._active_target.barrierSprite.setEnabled(false);
-					//_this._active_support_defender.barrierSprite.setEnabled(false);
 					
-					/*if(_this._debugBarriers){
-						_this._active_main.barrierInfo.handle.isEnabled = false;
-						_this._active_support_attacker.barrierInfo.handle.isEnabled = false;
-						_this._active_target.barrierInfo.handle.isEnabled = true;
-						_this._active_support_defender.barrierInfo.handle.isEnabled = false;
-					} else {
-						_this._active_main.barrierInfo.handle.isEnabled = false;
-						_this._active_support_attacker.barrierInfo.handle.isEnabled = false;
-						_this._active_target.barrierInfo.handle.isEnabled = false;
-						_this._active_support_defender.barrierInfo.handle.isEnabled = false;
-					}	*/				
+					if(_this._active_main){
+						_this._active_main.parent_handle.rotation = new BABYLON.Vector3(0,0,0);	
+						_this._active_main.pivothelper.rotation = new BABYLON.Vector3(0,0,0);
+					}
+					
+					if(_this._active_twin){
+						_this._active_twin.parent_handle.rotation = new BABYLON.Vector3(0,0,0);	
+						_this._active_twin.pivothelper.rotation = new BABYLON.Vector3(0,0,0);
+					}
+					
+					if(_this._active_support_attacker){
+						_this._active_support_attacker.parent_handle.rotation = new BABYLON.Vector3(0,0,0);	
+						_this._active_support_attacker.pivothelper.rotation = new BABYLON.Vector3(0,0,0);
+					}
+					
+					if(_this._active_support_defender){
+						_this._active_support_defender.parent_handle.rotation = new BABYLON.Vector3(0,0,0);	
+						_this._active_support_defender.pivothelper.rotation = new BABYLON.Vector3(0,0,0);
+					}
+					
+					if(_this._active_target){
+						_this._active_target.parent_handle.rotation = new BABYLON.Vector3(0,0,0);
+						_this._active_target.pivothelper.rotation = new BABYLON.Vector3(0,0,0);
+					}
+					
+					if(_this._active_target_twin){
+						_this._active_target_twin.parent_handle.rotation = new BABYLON.Vector3(0,0,0);		
+						_this._active_target_twin.pivothelper.rotation = new BABYLON.Vector3(0,0,0);
+					}
+							
+								
 					
 					if(nextAction.attacked && nextAction.attacked.hasBarrier){
 						var target;
@@ -7331,16 +7349,7 @@ BattleSceneManager.prototype.processActionQueue = function() {
 							target = _this._active_target_twin;
 						} else {
 							target = _this._active_target;
-						}
-						/*if(nextAction.attacked.type == "defender" || nextAction.attacked.type == "initiator"){
-							//target.barrierSprite.setEnabled(true);
-							target.barrierInfo.handle.isEnabled = true;
-						} else if(nextAction.attacked.type == "twin defend" || nextAction.attacked.type == "twin attack"){
-							//target.barrierSprite.setEnabled(true);
-							target.barrierInfo.handle.isEnabled = true;
-						} else {
-							//_this._active_support_defender.barrierSprite.setEnabled(true);
-						}*/
+						}					
 					}
 					if(nextAction.attacked_all_sub && nextAction.attacked_all_sub.hasBarrier){
 						var target;
@@ -7349,13 +7358,6 @@ BattleSceneManager.prototype.processActionQueue = function() {
 						} else {
 							target = _this._active_target;
 						}
-						/*if(nextAction.attacked_all_sub.type == "defender" || nextAction.attacked_all_sub.type == "initiator"){
-							//target.barrierSprite.setEnabled(true);
-							target.barrierInfo.handle.isEnabled = true;
-						} else if(nextAction.attacked_all_sub.type == "twin defend" || nextAction.attacked_all_sub.type == "twin attack"){
-							//target.barrierSprite.setEnabled(true);
-							target.barrierInfo.handle.isEnabled = true;
-						} */
 					}
 					
 					if(_this.isTwinInitiating){
