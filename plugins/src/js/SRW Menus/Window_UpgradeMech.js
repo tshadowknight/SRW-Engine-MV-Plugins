@@ -239,12 +239,14 @@ Window_UpgradeMech.prototype.update = function() {
 		
 		if(Input.isTriggered('pageup') || Input.isRepeated('pageup')){
 			this.resetDeltas();
+			this._redrawAttackList = true;
 			this.requestRedraw();			
 			$gameTemp.currentMenuUnit = this.getPreviousAvailableUnitGlobal(this.getCurrentSelection().classData.id);	
 			this.refresh();
 			return;		
 		} else if (Input.isTriggered('pagedown') || Input.isRepeated('pagedown')) {
 			this.resetDeltas();
+			this._redrawAttackList = true;
 			this.requestRedraw();			
 			$gameTemp.currentMenuUnit = this.getNextAvailableUnitGlobal(this.getCurrentSelection().classData.id);
 			this.refresh();

@@ -382,7 +382,7 @@ Window_CSS.prototype.refreshAllUnits = function(){
 }
 
 Window_CSS.prototype.getNextAvailableUnitGlobal = function(currentUnitId, deployableOnly){
-	var availableUnits = this.getAvailableUnits(null, deployableOnly);
+	var availableUnits = this.getAvailableUnits(null, deployableOnly).filter(x => !x.isSubPilot);
 	var currentIdx = -1;
 	var ctr = 0;
 	while(ctr < availableUnits.length && currentIdx == -1){
@@ -405,7 +405,7 @@ Window_CSS.prototype.getNextAvailableUnitGlobal = function(currentUnitId, deploy
 }
 
 Window_CSS.prototype.getPreviousAvailableUnitGlobal = function(currentUnitId, deployableOnly){
-	var availableUnits = this.getAvailableUnits(null, deployableOnly);
+	var availableUnits = this.getAvailableUnits(null, deployableOnly).filter(x => !x.isSubPilot);
 	var currentIdx = -1;
 	var ctr = 0;
 	while(ctr < availableUnits.length && currentIdx == -1){
