@@ -113,6 +113,10 @@ SRWEditor.prototype.init = function(){
 		{name: "Destroy", id: "onDestroy"},
 		{name: "Destroy Overwrite", id: "onDestroyOverwrite"},
 		{name: "Destroy Twin", id: "onDestroyTwin"},
+		
+		{name: "No Destroy(after hit)", id: "onNoDestroy"},
+		{name: "No Destroy(after hit) Overwrite", id: "onNoDestroyOverwrite"},
+		{name: "No Destroy Twin(after hit)", id: "onNoDestroyTwin"},
 	];
 	
 	_this._specialTargets = [

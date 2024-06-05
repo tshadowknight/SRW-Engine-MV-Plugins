@@ -5627,11 +5627,20 @@ BattleSceneManager.prototype.playAttackAnimation = function(cacheRef, attackDef)
 		if(attackDef.onHitOverwrite){
 			overwriteAnimList(attackDef.onHitOverwrite);
 		}
-		if(cacheRef.attacked && cacheRef.attacked.isDestroyed && cacheRef.attacked.destroyer == cacheRef.ref && cacheRef.attacked.destroyedOrderIdx == cacheRef.actionOrder){
-			_this.mergeAnimList(attackDef.onDestroy);
-			if(attackDef.onDestroyOverwrite){
-				overwriteAnimList(attackDef.onDestroyOverwrite);
-			}		
+		if(cacheRef.attacked){			
+			if(cacheRef.attacked.isDestroyed && cacheRef.attacked.destroyer == cacheRef.ref && cacheRef.attacked.destroyedOrderIdx == cacheRef.actionOrder){
+				_this.mergeAnimList(attackDef.onDestroy);
+				if(attackDef.onDestroyOverwrite){
+					overwriteAnimList(attackDef.onDestroyOverwrite);
+				}	
+			}  else {
+				if(attackDef.onNoDestroy){
+					_this.mergeAnimList(attackDef.onNoDestroy);
+				}
+				if(attackDef.onNoDestroyOverwrite){
+					overwriteAnimList(attackDef.onNoDestroyOverwrite);
+				}
+			}			
 		} 	
 	} else {
 		//this._animationList = this._animationList.concat(attackDef.onMiss);
@@ -5643,9 +5652,14 @@ BattleSceneManager.prototype.playAttackAnimation = function(cacheRef, attackDef)
 	if(cacheRef.attacked_all_sub){
 		if(cacheRef.hits_all_sub){		
 			_this.mergeAnimList(attackDef.onHitTwin);		
-			if(cacheRef.attacked_all_sub && cacheRef.attacked_all_sub.isDestroyed && cacheRef.attacked_all_sub.destroyer == cacheRef.ref){
-				_this.mergeAnimList(attackDef.onDestroyTwin);
-			} 	
+			if(cacheRef.attacked_all_sub){
+				if(cacheRef.attacked_all_sub.isDestroyed && cacheRef.attacked_all_sub.destroyer == cacheRef.ref && cacheRef.attacked_all_sub.destroyedOrderIdx == cacheRef.actionOrder){
+					_this.mergeAnimList(attackDef.onDestroyTwin);
+				} else {
+					_this.mergeAnimList(attackDef.onNoDestroyTwin);
+				}
+			}
+				
 		} else {
 			//this._animationList = this._animationList.concat(attackDef.onMiss);			
 			_this.mergeAnimList(attackDef.onMissTwin);			
