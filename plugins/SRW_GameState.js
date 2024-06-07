@@ -1707,14 +1707,14 @@ GameState_normal.prototype.update = function(scene){
 		let displayKey = "GameState_normal_";
 		if(summaryUnit.isActor()){
 			if(summaryUnit.canInput()){
-				items = [["actor_menu"], ["move_cursor", "speed_up_cursor"], ["navigate_units"], [menuAction]];
+				items = [["actor_menu"], ["move_cursor", "speed_up_cursor"], ["navigate_units", "navigate_enemies"], [menuAction]];
 				displayKey+="acting_unit";
 			} else {
-				items = [["show_actor"], ["move_cursor", "speed_up_cursor"], ["navigate_units"], [menuAction]];
+				items = [["show_actor"], ["move_cursor", "speed_up_cursor"], ["navigate_units", "navigate_enemies"], [menuAction]];
 				displayKey+="waiting_unit";
 			}			
 		} else {
-			items = [["show_enemy"], ["move_cursor", "speed_up_cursor"], ["navigate_units"], [menuAction]];
+			items = [["show_enemy"], ["move_cursor", "speed_up_cursor"], ["navigate_units", "navigate_enemies"], [menuAction]];
 			displayKey+="enemy";
 		}		
 
@@ -1748,8 +1748,14 @@ GameState_normal.prototype.update = function(scene){
 			$gameSystem.showWillIndicator = !$gameSystem.showWillIndicator;
 		}
 
-		$SRWGameState.updateStateButtonPrompts([["pause_menu"], ["move_cursor", "speed_up_cursor"], ["navigate_units"], [menuAction]], "GameState_normal_empty"+menuAction);
+		$SRWGameState.updateStateButtonPrompts([["pause_menu"], ["move_cursor", "speed_up_cursor"], ["navigate_units", "navigate_enemies"], [menuAction]], "GameState_normal_empty"+menuAction);
 	}	
+	
+	if(TouchInput.isCancelled()){
+		$gameSystem.setSubBattlePhase('pause_menu');		
+		scene._mapButtonsWindow.requestRedraw();	
+		return;	
+	}
 	
 	var regionId = $gameMap.regionId(currentPosition.x, currentPosition.y);
 	var terrainDetails;
@@ -1813,6 +1819,12 @@ GameState_normal.prototype.update = function(scene){
 			$gameSystem.getNextLActor();
 		} else if (Input.isTriggered('pagedown')) {      
 			$gameSystem.getNextRActor();
+		}
+		
+		if (Input.isTriggered('left_trigger')) {                   
+			$gameSystem.getNextLTarget(true);
+		} else if (Input.isTriggered('right_trigger')) {      
+			$gameSystem.getNextRTarget(true);
 		}
 	}
 	return true;
@@ -2372,7 +2384,30 @@ GameState_pause_menu.prototype = Object.create(GameState.prototype);
 GameState_pause_menu.prototype.constructor = GameState_pause_menu;
 
 GameState_pause_menu.prototype.update = function(scene){
-	$SRWGameState.updateStateButtonPrompts([["select_action"], ["confirm_action"]], "pause_menu");
+	if(ENGINE_SETTINGS.ENABLE_ATTRIBUTE_SYSTEM){
+		$SRWGameState.updateStateButtonPrompts([["select_action"], ["confirm_action"], ["show_attr_window"]], "pause_menu");
+	} else {
+		$SRWGameState.updateStateButtonPrompts([["select_action"], ["confirm_action"]], "pause_menu");
+	}
+	
+	if(!$gameTemp.displayingAttrChart && ENGINE_SETTINGS.ENABLE_ATTRIBUTE_SYSTEM){
+		if(Input.isTriggered('L3')){
+			$gameTemp.attrWindowCancelCallback = function(){
+				$gameTemp.attrWindowCancelCallback = null;
+				scene._commandWindow.activate();
+				$gameTemp.deactivatePauseMenu = false;
+				$gameTemp.displayingAttrChart = false;
+				Input.clear();//ensure the B press from closing the list does not propagate to the pause menu
+			}
+			
+			$gameTemp.displayingAttrChart = true;
+			scene._commandWindow.deactivate();
+			$gameTemp.pushMenu = "attr_chart";
+			$gameTemp.deactivatePauseMenu = true;
+			return;
+		}
+	}	
+	
 	if(!scene._mapButtonsWindow.visible){
 		scene._mapButtonsWindow.open();
 		scene._mapButtonsWindow.show();

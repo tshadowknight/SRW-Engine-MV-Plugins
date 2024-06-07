@@ -1,0 +1,108 @@
+#attr_chart .list_container {
+	height: 70.5%;
+    border: 0px;
+    display: block;
+    width: 90%;
+    align-items: center;
+	overflow: visible;
+	padding: 1%;
+	top: 12%;
+}
+
+#attr_chart .entry {
+	display: flex;
+    align-items: center;
+    justify-content: center;
+    width: 95%;
+    --fontsize: 1.8px;
+    margin-left: auto;
+    margin-right: auto;
+	color: #FFFFFF;
+}
+
+#attr_chart .entry.selected {
+	background-color: var(--selected-color);
+	
+}
+
+#attr_chart .entry.title{
+	color: var(--text-color-highlight2);
+	--fontsize: 2px;
+}
+
+#attr_chart .entry .label {
+	width: 50%;
+	margin-left: 5%;
+	margin-right: 5%;
+	text-align: left;
+}
+
+#attr_chart .entry .value {
+	width: 30%;
+	margin-left: 5%;
+	margin-right: 5%;
+	text-align: center;
+}
+
+#attr_chart .attr_entry {
+	position: absolute;
+	--widthpixels: 62;
+	--heightpixels: 62;
+}
+
+#attr_chart .attr_entry_inner {
+	position: relative;
+	width: 100%;
+	height: 100%;
+	display: flex;
+	align-items: center;
+	justify-content: center;
+}
+
+#attr_chart .attr_entry_inner .circle {
+	width: 200%;
+    height: 200%;
+    border-radius: 99999px;
+    background-color: #FFFFFF;
+    position: absolute;
+    z-index: 0;
+	opacity: 0.5;
+}
+
+#attr_chart .attr_entry_inner .circle.a {
+	width: 100%;
+    height: 100%;
+	opacity: 1;
+}
+
+#attr_chart .attr_entry_inner .circle.b {
+	width: 150%;
+	height: 150%;
+    opacity: 1;
+}
+
+#attr_chart .attr_entry_inner .circle.c {
+	width: 200%;
+	height: 200%;
+    opacity: 0.6;
+}
+
+#attr_chart .attr_entry_inner .circle.d {
+	width: 250%;
+    height: 250%;
+	opacity: 0.4;
+}
+
+#attr_chart .attr_img {
+	width: 100%;
+	z-index: 1;
+}
+
+#attr_chart .attr_entry_inner .pointer {
+	width: 230%;
+	position: absolute;
+	bottom: 50%;
+    transform-origin: bottom center;
+	opacity: 1;
+	z-index: 1;
+}

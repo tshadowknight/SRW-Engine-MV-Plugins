@@ -695,7 +695,7 @@ Window_CSS.prototype.createAttributeBlock = function(attack) {
 	content+="<div class='attribute_block'>";
 	
 	if(ENGINE_SETTINGS.USE_WEAPON_ATTRIBUTE){
-		content+="<div class='attribute_block_entry scaled_width scaled_height scaled_text effectiveness'>";
+		content+="<div class='attribute_block_entry scaled_width scaled_height scaled_text effectiveness described_element' data-type='attack' data-subtype='attribute' data-value=''>";
 		let attr1 = $statCalc.getParticipantAttribute($gameTemp.currentMenuUnit.actor, "attribute1", attack);
 		if(attr1){
 			content+="<img data-img='img/system/attribute_"+attr1+".png'>";	
@@ -703,22 +703,22 @@ Window_CSS.prototype.createAttributeBlock = function(attack) {
 		content+="</div>";
 	}
 	
-	content+="<div class='attribute_block_entry scaled_width scaled_height scaled_text'>";
+	content+="<div class='attribute_block_entry scaled_width scaled_height scaled_text described_element' data-type='attack' data-subtype='effect' data-value=''>";
 	if(attack.effects.length){
 		content+="S";
 	} 
 	content+="</div>";
-	content+="<div class='attribute_block_entry scaled_width scaled_height scaled_text'>";
+	content+="<div class='attribute_block_entry scaled_width scaled_height scaled_text described_element' data-type='attack' data-subtype='postMove' data-value=''>";
 	if(attack.postMoveEnabled){
 		content+="P";
 	} 
 	content+="</div>";
-	content+="<div class='attribute_block_entry scaled_width scaled_height scaled_text'>";
+	content+="<div class='attribute_block_entry scaled_width scaled_height scaled_text described_element' data-type='attack' data-subtype='counter' data-value=''>";
 	if(attack.isCounter){
 		content+="C";
 	} 
 	content+="</div>";
-	content+="<div class='attribute_block_entry scaled_width scaled_height scaled_text'>";
+	content+="<div class='attribute_block_entry scaled_width scaled_height scaled_text described_element' data-type='attack' data-subtype='particle' data-value=''>";
 	/*if(attack.particleType == "missile"){
 		content+="Mi";	
 	}
@@ -741,7 +741,7 @@ Window_CSS.prototype.createAttributeBlock = function(attack) {
 	content+="</div>";
 	
 	if(ENGINE_SETTINGS.ENABLE_TWIN_SYSTEM){
-		content+="<div class='attribute_block_entry all scaled_width scaled_height scaled_text fitted_text'>";
+		content+="<div class='attribute_block_entry all scaled_width scaled_height scaled_text fitted_text described_element' data-type='attack' data-subtype='all' data-value=''>";
 		if(attack.isAll){
 			content+="ALL";
 		} 

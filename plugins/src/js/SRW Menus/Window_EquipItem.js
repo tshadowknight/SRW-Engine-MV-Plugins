@@ -155,8 +155,16 @@ Window_EquipItem.prototype.createComponents = function() {
 	windowNode.appendChild(this._mechNameDisplay);
 }	
 
+Window_EquipItem.prototype.getTargetMechId = function(mechId){
+	var mech = $dataClasses[mechId];
+	if(mech.meta.mechInheritsPartsFrom != null && mech.meta.mechInheritsPartsFrom != ""){
+		mechId = mech.meta.mechInheritsPartsFrom;
+	}
+	return mechId;
+}
 
 Window_EquipItem.prototype.update = function() {
+	const _this = this;
 	Window_Base.prototype.update.call(this);
 	
 	if(this.isOpen() && !this._handlingInput){
@@ -214,6 +222,8 @@ Window_EquipItem.prototype.update = function() {
 			this.requestRedraw();
 		} 	
 		
+		
+		
 		if(Input.isTriggered('ok') || this._touchOK){
 			this.requestRedraw();
 			SoundManager.playOk();
@@ -224,14 +234,14 @@ Window_EquipItem.prototype.update = function() {
 				var itemIdx = this._itemList.getCurrentSelection().idx;
 				if(itemIdx == -1){
 					var mech = this.getCurrentSelection();
-					$inventoryManager.removeItemHolder(mech.id, this._currentSelection);
+					$inventoryManager.removeItemHolder(_this.getTargetMechId(mech.id), this._currentSelection);
 					mech.items = $statCalc.getActorMechItems(mech.id);
 					this._currentUIState = "slot_selection";
 					this.refreshAllUnits();
 				} else if(inventoryInfo[itemIdx].count > 0){
 					if(inventoryInfo[itemIdx].count - inventoryInfo[itemIdx].holders.length > 0){
 						var mech = this.getCurrentSelection();
-						$inventoryManager.addItemHolder(itemIdx, mech.id, this._currentSelection);
+						$inventoryManager.addItemHolder(itemIdx, _this.getTargetMechId(mech.id), this._currentSelection);
 						mech.items = $statCalc.getActorMechItems(mech.id);
 						this._currentUIState = "slot_selection";	
 						this.refreshAllUnits();
@@ -248,8 +258,8 @@ Window_EquipItem.prototype.update = function() {
 					var transferCandidates = inventoryInfo[this._itemList.getCurrentSelection().idx].holders;		
 					if(transferCandidates[this._currentTransferSelection]){
 						var donor = transferCandidates[this._currentTransferSelection];
-						$inventoryManager.removeItemHolder(donor.mechId, donor.slot);
-						$inventoryManager.addItemHolder(itemIdx, mech.id, this._currentSelection);
+						$inventoryManager.removeItemHolder(_this.getTargetMechId(donor.mechId), donor.slot);
+						$inventoryManager.addItemHolder(itemIdx, _this.getTargetMechId(mech.id), this._currentSelection);
 						this._currentUIState = "slot_selection";
 						var availableUnits = this.getAvailableUnits();
 						for(var i = 0; i < availableUnits.length; i++){
@@ -309,7 +319,7 @@ Window_EquipItem.prototype.redraw = function() {
 	var mechData = this.getCurrentSelection();
 	var inventoryInfo = $inventoryManager.getCurrentInventory();
 
-	var items = $inventoryManager.getActorItemIds(mechData.id);
+	var items = $inventoryManager.getActorItemIds(_this.getTargetMechId(mechData.id));
 	var slotSelectionContent = "";
 	for(var i = 0; i < this.getMaxSelection(); i++){
 		var itemId = items[i];

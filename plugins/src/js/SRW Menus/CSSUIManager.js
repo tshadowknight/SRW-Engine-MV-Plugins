@@ -236,6 +236,7 @@ CSSUIManager.prototype.initAllWindows = function(){
 	this.initWindow("game_modes");
 	this.initWindow("button_hints");
 	this.initWindow("mode_selection");
+	this.initWindow("attr_chart");
 }
 
 CSSUIManager.prototype.initWindow = function(id){

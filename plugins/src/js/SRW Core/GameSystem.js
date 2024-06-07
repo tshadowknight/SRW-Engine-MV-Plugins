@@ -1272,7 +1272,7 @@
 			return isInRange && validTarget;
 		}                               
 		
-		Game_System.prototype.getNextRTarget = function() {
+		Game_System.prototype.getNextRTarget = function(all) {
 			var candidates =  $statCalc.getAllCandidates("enemy");
 			var candidate;
 			var ctr = 0;
@@ -1281,7 +1281,7 @@
 				if(this.targetLRId >= candidates.length){
 					this.targetLRId = 0;
 				}
-				if(this.isValidAttackTarget(candidates[this.targetLRId])){
+				if(all || this.isValidAttackTarget(candidates[this.targetLRId])){
 					candidate = candidates[this.targetLRId];
 				}			
 				ctr++;
@@ -1293,7 +1293,7 @@
 		}
 
 		//次のカーソル移動先のアクターを取得する(L)
-		Game_System.prototype.getNextLTarget = function() {       
+		Game_System.prototype.getNextLTarget = function(all) {       
 			var candidates =  $statCalc.getAllCandidates("enemy");
 			var candidate;
 			var ctr = 0;
@@ -1302,7 +1302,7 @@
 				if(this.targetLRId < 0){
 					this.targetLRId = candidates.length-1;
 				}
-				if(this.isValidAttackTarget(candidates[this.targetLRId])){
+				if(all || this.isValidAttackTarget(candidates[this.targetLRId])){
 					candidate = candidates[this.targetLRId];
 				}			
 				ctr++;

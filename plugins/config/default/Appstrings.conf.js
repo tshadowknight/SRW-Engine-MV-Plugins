@@ -345,7 +345,28 @@ APPSTRINGS.ATTACKLIST = {
 	label_target_enemies: "Enemy",
 	label_target_allies: "Ally",
 	title: "Select Attack",
-}
+	
+	hint_strings: {
+		subType: {
+			type: "The type determines which attacking stat of the Pilot is used.",
+			attribute: "The attribute of the weapon, determines super effective/not very effective damage against target.",
+			effect: "An S indicates that the weapon has one or more additional effects such as inflicting status.",
+			postMove: "A P indicates that the weapon can be used after moving.",
+			counter: "A C indicates that the weapon will always go first, even when counter attacking.",
+			particle: "The sub-type of the weapon. Some abilities may affect weapons of specific sub-types.",
+			all: "An All weapon will hit both targets in an enemy Twin formation.",
+			power: "The base power of the weapon.",
+			range: "The mininum-maximum range of the weapon, this determines from how many spaces away an attack can hit a target.",
+			hit: "The weapon's bonus to hit rate when attacking using it.",
+			crit: "The weapon's bonus to critical hit rate when attacking using it.",
+		},
+		value: {
+			melee: "This is a Melee attack.",
+			ranged: "This is a Ranged attack.",
+		}
+	}
+}	
+	
 
 APPSTRINGS.REWARDS = {
 	label_funds_gained: "Funds gained",
@@ -383,6 +404,10 @@ APPSTRINGS.SEARCH = {
 	label_spirit: "Spirit",
 	label_pilot: "Pilot",
 	label_mech: "Mech"
+}
+
+APPSTRINGS.ATTR_CHART = {
+	title: "Effectiveness"
 }
 
 APPSTRINGS.OPTIONS = {
@@ -498,6 +523,7 @@ APPSTRINGS.BUTTON_HINTS = {
 	test2: {text: "This is a test action2", action: 'ok'},
 	test3: {text: "This is a test action3", action: 'escape'},
 	abi_details: {text: "Show Ability Details", action: 'menu'},
+	weap_details: {text: "Show Property Details", action: 'menu'},
 	tab_nav: {text: "Navigate Tabs", action: "d:left_right"},
 	previous_sub_pilot: {text: "Navigate Sub Pilot", action: "d:shoulder_triggers"},
 	//next_sub_pilot: {text: "Next Sub Pilot", action: "right_trigger"},

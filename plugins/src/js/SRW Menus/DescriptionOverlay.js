@@ -85,7 +85,15 @@ DescriptionOverlay.prototype.redraw = function() {
 			
 			var type = describedElement.getAttribute("data-type");
 			var idx = describedElement.getAttribute("data-idx");
-			if(type == "spirit"){				
+			if(type == "attack"){
+				var subType = describedElement.getAttribute("data-subtype");
+				var value = describedElement.getAttribute("data-value");
+				let displayText = APPSTRINGS.ATTACKLIST.hint_strings.subType[subType];
+				if(value){
+					displayText+= "<br>" + APPSTRINGS.ATTACKLIST.hint_strings.value[value];
+				}
+				this._text.innerHTML = displayText;
+			} else if(type == "spirit"){				
 				var displayInfo = $spiritManager.getSpiritDisplayInfo(idx);
 				this._text.innerHTML = displayInfo.desc;				
 			} else if(type == "status"){				

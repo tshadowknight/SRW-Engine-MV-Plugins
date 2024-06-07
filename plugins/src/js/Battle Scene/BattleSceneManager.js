@@ -6764,6 +6764,8 @@ BattleSceneManager.prototype.showScene = async function() {
 	_this._sceneIsEnding = false;
 	_this._UIcontainer.style.display = "block";	
 	_this._PIXIContainer.style.display = "block";	
+	_this._systemFadeContainer.style.display = "block";
+	_this._swipeContainer.style.display = "block";
 	//_this.resetScene();
 	_this._assetsPreloaded = false;
 	await _this.readBattleCache();	
@@ -7038,6 +7040,9 @@ BattleSceneManager.prototype.endScene = function(force) {
 			_this.stopScene();
 			$gameSystem.setSubBattlePhase('after_battle');
 		}
+		//fail safe against state bugs with the system fade and swipe container
+		_this._systemFadeContainer.style.display = "none";
+		_this._swipeContainer.style.display = "none";
 	}, 2500);
 	if(!_this._sceneIsEnding || force){
 		_this._sceneIsEnding = true;	
@@ -7065,6 +7070,9 @@ BattleSceneManager.prototype.endScene = function(force) {
 			_this.stopScene();
 			AudioManager.stopSe();
 			_this.systemFadeFromBlack(400, 1000).then(function(){
+				//fail safe against state bugs with the system fade and swipe container
+				_this._systemFadeContainer.style.display = "none";
+				_this._swipeContainer.style.display = "none";
 				sanityCheck = false;
 				$gameSystem.setSubBattlePhase('after_battle');
 				if(!$gameTemp.editMode){
@@ -7568,6 +7576,8 @@ BattleSceneManager.prototype.showEnvironmentScene = async function() {
 	_this._sceneIsEnding = false;
 	_this._UIcontainer.style.display = "block";	
 	_this._PIXIContainer.style.display = "block";	
+	_this._systemFadeContainer.style.display = "block";
+	_this._swipeContainer.style.display = "block";
 	
 	_this.resetScene();		
 	_this.setBgScrollDirection(1, true);

@@ -784,6 +784,7 @@ SceneManager.isInSaveScene = function(){
 		this.createDeploySelectionWindow();
 		this.createSearchWindow();
 		this.createOptionsWindow();
+		this.createAttrChartWindow();
 		this.createGameModesWindow();
 		this.createMapButtonsWindow();
 		this.createOpeningCrawlWindow();
@@ -1345,6 +1346,20 @@ SceneManager.isInSaveScene = function(){
 		this.addWindow(this._optionsWindow);
 		this._optionsWindow.hide();
 		this.idToMenu["options"] = this._optionsWindow;
+    };
+	
+	Scene_Map.prototype.createAttrChartWindow = function() {
+		var _this = this;
+		this._attrChartWindow = new Window_Attribute_Chart(0, 0, Graphics.boxWidth, Graphics.boxHeight);
+		this._attrChartWindow.registerCallback("closed", function(){
+			if($gameTemp.attrWindowCancelCallback){
+				$gameTemp.attrWindowCancelCallback();
+			}
+		});
+		this._attrChartWindow.close();
+		this.addWindow(this._attrChartWindow);
+		this._attrChartWindow.hide();
+		this.idToMenu["attr_chart"] = this._attrChartWindow;
     };
 	
 	Scene_Map.prototype.createGameModesWindow = function() {
@@ -2039,6 +2054,25 @@ SceneManager.isInSaveScene = function(){
 			}				
 		}
 		
+		if (!$gameMap.isEventRunning()) {		
+			if ($gameSystem.isBattlePhase() === 'AI_phase') {
+				$gameTemp.summaryUnit = null;					
+			}
+							
+			//$gameSystem.isSubBattlePhase() === 'actor_target' || $gameSystem.isSubBattlePhase() === 'actor_target_spirit' || $gameSystem.isSubBattlePhase() === 'actor_map_target_confirm'
+			if ($SRWGameState.canShowSummaries() && $gameTemp.summariesTimeout <= 0 && !$gameTemp.isDraggingMap) {
+				var currentPosition = {x: $gamePlayer.posX(), y: $gamePlayer.posY()};
+				$gameTemp.previousCursorPosition = currentPosition;
+				var summaryUnit = $statCalc.activeUnitAtPosition(currentPosition);
+				if(summaryUnit && ($gameSystem.isSubBattlePhase() !== 'actor_map_target_confirm' || $gameTemp.isMapTarget(summaryUnit.event.eventId()))){
+					var previousUnit = $gameTemp.summaryUnit;
+					$gameTemp.summaryUnit = summaryUnit;	
+					if(!_this._summaryWindow.visible || $gameTemp.summaryUnit != previousUnit){
+						_this._summaryWindow.show();
+					}											
+				}
+			}
+		}
 	
 		let SRWStateResult = $SRWGameState.update(this);
 		
@@ -2137,24 +2171,7 @@ SceneManager.isInSaveScene = function(){
         }      
        	
 		
-        //エネミーフェイズの処理
-        if ($gameSystem.isBattlePhase() === 'AI_phase') {
-			$gameTemp.summaryUnit = null;					
-        }
-						
-		//$gameSystem.isSubBattlePhase() === 'actor_target' || $gameSystem.isSubBattlePhase() === 'actor_target_spirit' || $gameSystem.isSubBattlePhase() === 'actor_map_target_confirm'
-		if ($SRWGameState.canShowSummaries() && $gameTemp.summariesTimeout <= 0 && !$gameTemp.isDraggingMap) {
-			var currentPosition = {x: $gamePlayer.posX(), y: $gamePlayer.posY()};
-			$gameTemp.previousCursorPosition = currentPosition;
-			var summaryUnit = $statCalc.activeUnitAtPosition(currentPosition);
-			if(summaryUnit && ($gameSystem.isSubBattlePhase() !== 'actor_map_target_confirm' || $gameTemp.isMapTarget(summaryUnit.event.eventId()))){
-				var previousUnit = $gameTemp.summaryUnit;
-				$gameTemp.summaryUnit = summaryUnit;	
-				if(!_this._summaryWindow.visible || $gameTemp.summaryUnit != previousUnit){
-					_this._summaryWindow.show();
-				}											
-			}
-		}
+       
 		
     };
 	

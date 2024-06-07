@@ -131,6 +131,10 @@ window.Window_ButtonHints= Window_ButtonHints;
 import Window_ModeSelection from "./Window_ModeSelection.js";
 window.Window_ModeSelection= Window_ModeSelection;
 
+import Window_Attribute_Chart from "./Window_Attribute_Chart.js";
+window.Window_Attribute_Chart = Window_Attribute_Chart;
+
+
 import "./style/SRW_Menus.css";
 
 

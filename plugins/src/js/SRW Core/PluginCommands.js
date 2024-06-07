@@ -1377,7 +1377,8 @@
 				msg+="Error while executing a plugin command: "+getLogContext();
 				msg+="<br><br>";
 				if(e.message){
-					msg+=e.message;
+					msg+=e.message + "\n\n" + e.stack;
+					console.error(e.stack);
 				} else {
 					msg+=e;
 				}

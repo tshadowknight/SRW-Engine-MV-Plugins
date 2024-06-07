@@ -141,9 +141,9 @@ AttackList.prototype.createUpgradeViewRow = function(refData, attack, idx) {
 	var listContent = "";
 	listContent+="<div class='attack_list_block scaled_text'>";
 	if(attack.type == "M"){
-		listContent+="<img class='attack_list_type scaled_width' src='svg/punch_blast.svg'>";
+		listContent+="<img class='attack_list_type scaled_width described_element' data-type='attack' data-subtype='type' data-value='melee' src='svg/punch_blast.svg'>";
 	} else {
-		listContent+="<img class='attack_list_type scaled_width' src='svg/crosshair.svg'>";
+		listContent+="<img class='attack_list_type scaled_width described_element' data-type='attack' data-subtype='type' data-value='ranged' src='svg/crosshair.svg'>";
 	}
 	
 	listContent+="</div>";
@@ -161,9 +161,9 @@ AttackList.prototype.createSummaryViewRow = function(refData, attack) {
 	var listContent = "";
 	listContent+="<div class='attack_list_block scaled_text'>";
 	if(attack.type == "M"){
-		listContent+="<img class='attack_list_type scaled_width' src='svg/punch_blast.svg'>";
+		listContent+="<img class='attack_list_type scaled_width described_element' data-type='attack' data-subtype='type' data-value='melee' src='svg/punch_blast.svg'>";
 	} else {
-		listContent+="<img class='attack_list_type scaled_width' src='svg/crosshair.svg'>";
+		listContent+="<img class='attack_list_type scaled_width described_element' data-type='attack' data-subtype='type' data-value='ranged' src='svg/crosshair.svg'>";
 	}
 	
 	listContent+="</div>";
@@ -178,24 +178,24 @@ AttackList.prototype.createSummaryViewRow = function(refData, attack) {
 		}
 	}
 	
-	listContent+="<div class='attack_list_block scaled_text "+$statCalc.getWeaponPowerStatState(refData, attack)+"'>"+currentPower+"</div>";
+	listContent+="<div class='attack_list_block scaled_text "+$statCalc.getWeaponPowerStatState(refData, attack)+" described_element' data-type='attack' data-subtype='power' data-value=''>"+currentPower+"</div>";
 	if(attack.isMap){
 		listContent+="<div class='attack_list_block scaled_text'>---</div>";
 	} else {
 		var minRange = $statCalc.getRealWeaponMinRange($gameTemp.currentMenuUnit.actor, attack);
-		listContent+="<div class='attack_list_block scaled_text "+$statCalc.getWeaponRangeStatState(refData, attack)+"'>"+(minRange ? minRange : "1")+"-"+$statCalc.getRealWeaponRange($gameTemp.currentMenuUnit.actor, attack)+"</div>";
+		listContent+="<div class='attack_list_block scaled_text "+$statCalc.getWeaponRangeStatState(refData, attack)+" described_element' data-type='attack' data-subtype='range' data-value=''>"+(minRange ? minRange : "1")+"-"+$statCalc.getRealWeaponRange($gameTemp.currentMenuUnit.actor, attack)+"</div>";
 	}
 	
 	var hitMod = attack.hitMod;
 	if(attack.hitMod >= 0){
 		hitMod = "+"+attack.hitMod;
 	}
-	listContent+="<div class='attack_list_block scaled_text'>"+hitMod+"</div>";
+	listContent+="<div class='attack_list_block scaled_text described_element' data-type='attack' data-subtype='hit' data-value=''>"+hitMod+"</div>";
 	var critMod = attack.critMod;
 	if(attack.critMod >= 0){
 		critMod = "+"+attack.critMod;
 	}
-	listContent+="<div class='attack_list_block scaled_text'>"+critMod+"</div>";
+	listContent+="<div class='attack_list_block scaled_text described_element' data-type='attack' data-subtype='crit' data-value=''>"+critMod+"</div>";
 	return listContent;
 }
 

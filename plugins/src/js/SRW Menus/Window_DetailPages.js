@@ -427,7 +427,10 @@ Window_DetailPages.prototype.update = function() {
 				} else if(this._selectedTab == 1){
 					this._descriptionOverlay.show(this._detailContainer);
 					this._uiState = "description";
-				}				
+				} else if(this._selectedTab == 2){
+					this._descriptionOverlay.show(this._weaponInfoContainer);
+					this._uiState = "description";
+				}					
 			}
 		}	
 		
@@ -1200,9 +1203,9 @@ Window_DetailPages.prototype.redraw = function() {
 		}		
 	} else if(this._selectedTab == 2){
 		if(ENGINE_SETTINGS.ENABLE_TWIN_SYSTEM){
-			$gameTemp.buttonHintManager.setHelpButtons([["tab_nav"], ["inspect_weap"]]);
+			$gameTemp.buttonHintManager.setHelpButtons([["tab_nav"], ["inspect_weap"], ["weap_details"]]);
 		} else {
-			$gameTemp.buttonHintManager.setHelpButtons([["tab_nav"], ["inspect_weap"]]);
+			$gameTemp.buttonHintManager.setHelpButtons([["tab_nav"], ["inspect_weap"], ["weap_details"]]);
 		}		
 	} else {
 		$gameTemp.buttonHintManager.setHelpButtons([]);
