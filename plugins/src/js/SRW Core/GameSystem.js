@@ -82,7 +82,7 @@
 		}
 		
 		Game_System.prototype.getOptionPadSet = function() {
-			return this.optionPadSet || "xbox";
+			return ConfigManager["padSet"];
 		}
 		
 		Game_System.prototype.setControlSet = function(newSet) {
@@ -91,7 +91,7 @@
 					$gameTemp.buttonHintManager.redraw();
 				}
 			}
-			this._controlSet = newSet;		
+			this._controlSet = newSet;					
 		}
 		
 		Game_System.prototype.getActiveGlyphSet = function() {
@@ -99,7 +99,7 @@
 				return this._controlSet;
 			}
 			if(this._controlSet == "controller"){
-				return this.optionPadSet || "xbox";
+				return ConfigManager["padSet"];
 			}
 			return "mkb";
 		}
@@ -2514,10 +2514,11 @@
 			if($gameMap.isEventRunning() && !$gameSystem.isIntermission()){//hacky solution to game speed not being settable during the intermission
 				return 1;
 			}
-			return this._battleSpeed || 1;
+			return ConfigManager["battleSpeed"] || 1;
 		}
 		
 		Game_System.prototype.setBattleSpeed = function(speed) {
+			ConfigManager["battleSpeed"] = speed;
 			this._battleSpeed = speed;
 		}
 		

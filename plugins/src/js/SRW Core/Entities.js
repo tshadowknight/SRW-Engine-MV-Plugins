@@ -2161,7 +2161,7 @@
 			} else if(this._pendingMoveToPoint){
 				if (!this.isMoving()) {
 					//Input.update();
-					if(Input.isPressed("pagedown") || Input.isLongPressed("pagedown") || $gameSystem.optionSkipUnitMoving){					
+					if(!$gameMap.isEventRunning() && (Input.isPressed("pagedown") || Input.isLongPressed("pagedown") || ConfigManager["skipUnitMove"])){					
 						if(this._pathToCurrentTarget && this._pathToCurrentTarget.length){//avoid rare crash where this functional is called when the path has already been cleared
 							var targetPosition = this._pathToCurrentTarget[this._pathToCurrentTarget.length-1];
 							this._pathToCurrentTarget = [];

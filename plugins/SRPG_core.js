@@ -4715,7 +4715,7 @@ SceneManager.isInSaveScene = function(){
 					}
 				}
 				$gameTemp.supportDefendCandidates = supporters;
-				if($gameSystem.optionDefaultSupport){
+				if(ConfigManager["defaultSupport"]){
 					$gameTemp.supportDefendSelected = supporterSelected;
 				} else {
 					$gameTemp.supportDefendSelected = -1;
@@ -4992,7 +4992,7 @@ SceneManager.isInSaveScene = function(){
 		this._transitionSprite.filters = [filter];
 		this.addChild(this._transitionSprite);
 		
-		if($gameSystem.optionBattleBGM){
+		if(ConfigManager["battleBGM"]){
 			$songManager.playBattleSong($gameTemp.currentBattleActor, $gameTemp.currentBattleEnemy);
 		}		
     };

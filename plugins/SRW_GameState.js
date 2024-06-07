@@ -114,7 +114,7 @@ function GameStateManager(){
 GameStateManager.prototype.updateStateButtonPrompts = function(items, displayKey){
 	let hasBlockingMenu = ($gameTemp.menuStack && $gameTemp.menuStack.length > 0);
 	if($gameTemp && $gameTemp.buttonHintManager){		
-		if($gameSystem && $gameSystem.getOptionMapHints()){
+		if($gameSystem && ConfigManager["mapHints"]){
 			if(!hasBlockingMenu){
 				$gameTemp.buttonHintManager.setHelpButtons(items);
 				$gameTemp.buttonHintManager.show(displayKey);
@@ -1286,7 +1286,7 @@ GameState_after_battle.prototype = Object.create(GameState.prototype);
 GameState_after_battle.prototype.constructor = GameState_after_battle;
 
 GameState_after_battle.prototype.update = function(scene){
-	if(!$gameSystem.optionAfterBattleBGM){
+	if(!ConfigManager["afterBattleBGM"]){
 		$songManager.playStageSong();
 	}
 	if($gameTemp.playingBattleDemo){
@@ -1745,7 +1745,8 @@ GameState_normal.prototype.update = function(scene){
 		}
 		
 		if(Input.isTriggered('menu') && !hasActiveZones){
-			$gameSystem.showWillIndicator = !$gameSystem.showWillIndicator;
+			ConfigManager["willIndicator"] = !ConfigManager["willIndicator"];
+			ConfigManager.save();
 		}
 
 		$SRWGameState.updateStateButtonPrompts([["pause_menu"], ["move_cursor", "speed_up_cursor"], ["navigate_units", "navigate_enemies"], [menuAction]], "GameState_normal_empty"+menuAction);

@@ -1091,7 +1091,7 @@
 		}				
 		
 		//this.z = this._character.screenZ() - 1;
-		if($gameSystem.showWillIndicator){	
+		if(ConfigManager["willIndicator"]){	
 			var eventId = this._character.eventId();
 			var battlerArray = $gameSystem.EventToUnit(eventId);
 			if(battlerArray){
@@ -1850,7 +1850,7 @@
 	};
 
 	Sprite_SrpgGrid.prototype.update = function() {
-		if($gameSystem.enableGrid && !$gameSystem.optionDisableGrid){
+		if($gameSystem.enableGrid && !ConfigManager["disableGrid"]){
 			this.opacity = 128;
 		} else {
 			this.opacity = 0;
