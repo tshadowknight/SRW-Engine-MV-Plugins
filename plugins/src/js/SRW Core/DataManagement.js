@@ -407,7 +407,22 @@
 		DataManager.makeSavefileInfo = function() {
 			var info = {};
 			info.globalId   = ENGINE_SETTINGS.GAMEID || 'SRWMV';
-			info.title      = $gameSystem.saveDisplayName || $dataSystem.gameTitle;
+			
+			let title = "";
+			let stageId;
+			if($gameSystem.isIntermission()){
+				stageId = $gameVariables.value(_lastStageIdVariable);
+			} else if($gameMap){
+				stageId = $gameMap.mapId()
+			}
+			if(stageId != null){
+				var stageInfo = $SRWStageInfoManager.getStageInfo(stageId);
+				if(stageInfo){
+					title = APPSTRINGS.INTERMISSION.stage_label+" "+stageInfo.displayId+" - ";
+				}
+			}			
+			title+=$gameSystem.saveDisplayName || $dataSystem.gameTitle;
+			info.title      = title;
 			info.characters = $gameParty.charactersForSavefile();
 			info.faces      = $gameParty.facesForSavefile();
 			info.playtime   = $gameSystem.playtimeText();
