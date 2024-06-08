@@ -436,4 +436,8 @@ Window_Options.prototype.redraw = function() {
 	
 	this.loadImages();
 	Graphics._updateCanvas();
+	
+	if(this._callbacks["redraw"]){
+		this._callbacks["redraw"]();
+	}	
 }

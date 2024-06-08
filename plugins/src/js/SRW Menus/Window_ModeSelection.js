@@ -134,7 +134,7 @@ Window_ModeSelection.prototype.update = function() {
 			
 		} 	
 		
-		if(Input.isTriggered('ok')){
+		if(Input.isTriggered('ok') || this._touchOK){
 			if(this._options){
 				let selection = this.getCurrentSelection();
 				if(ENGINE_SETTINGS.DIFFICULTY_MODS.enabled & 2){//automatic mode enabled
@@ -156,16 +156,8 @@ Window_ModeSelection.prototype.update = function() {
 			
 		}	
 		
-		/*if(Input.isTriggered('cancel') || TouchInput.isCancelled()){	
-			SoundManager.playCancel();			
-			$gameTemp.popMenu = true;		
-			$gameTemp.buttonHintManager.hide();	
-			if(this._callbacks["closed"]){
-				this._callbacks["closed"]();
-			}		
-			this.refresh();
-			return;		
-		}	*/			
+		if(Input.isTriggered('cancel') || TouchInput.isCancelled()){		
+		}			
 		this.resetTouchState();
 		this.refresh();
 	}		
@@ -198,7 +190,7 @@ Window_ModeSelection.prototype.redraw = function() {
 		const entryHeight = 1 / this._options.length * 100;
 		for(let i = 0; i < this._options.length; i++){
 			const entry = this._options[i];
-			content+="<div style='height: "+entryHeight+"%;' class='difficulty_entry "+(i == this.getCurrentSelection() ? "selected" : "")+"'>";
+			content+="<div data-idx='"+i+"' style='height: "+entryHeight+"%;' class='difficulty_entry "+(i == this.getCurrentSelection() ? "selected" : "")+"'>";
 			content+="<div class='content'>";
 			content+="<div class='title scaled_text' style='color: "+(entry.color || "#FFFFFF")+";'>";
 			content+=entry.name;
@@ -214,20 +206,18 @@ Window_ModeSelection.prototype.redraw = function() {
 	this._listContainer.innerHTML = content;
 	
 	var windowNode = this.getWindowNode();
-	var entries = windowNode.querySelectorAll(".entry");
+	var entries = windowNode.querySelectorAll(".difficulty_entry");
 	entries.forEach(function(entry){
 		entry.addEventListener("click", function(){			
-			var idx = this.getAttribute("data-idx"); 
-			if(idx != null){
-				idx*=1;
-				if(idx == _this._currentSelection){
-					_this._optionInfo[_this._currentSelection].update("up");
-					_this.requestRedraw();
-				} else {
-					_this._currentSelection = idx;
-					_this.requestRedraw();
-				}
-			}								
+			_this._currentSelection = this.getAttribute("data-idx");
+			_this._touchOK = true;					
+		});
+		entry.addEventListener("mouseenter", function(){	
+			const targetIdx = this.getAttribute("data-idx"); 
+			if(targetIdx != _this._currentSelection){
+				_this._currentSelection = this.getAttribute("data-idx");
+				_this.requestRedraw();
+			}				
 		});
 	});	
 	

@@ -139,5 +139,6 @@ Window_ButtonHints.prototype.redraw = async function() {
 		}
 	}*/
 	Graphics._updateCanvas();
+	$CSSUIManager.doUpdateScaledText("button_hints");
 }
 

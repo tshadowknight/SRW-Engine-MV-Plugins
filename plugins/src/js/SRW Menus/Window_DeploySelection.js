@@ -40,6 +40,7 @@ Window_DeploySelection.prototype.setCurrentSelection = function(value){
 }
 
 Window_DeploySelection.prototype.createComponents = function() {
+	const _this = this;
 	Window_CSS.prototype.createComponents.call(this);
 	
 	var windowNode = this.getWindowNode();
@@ -68,6 +69,12 @@ Window_DeploySelection.prototype.createComponents = function() {
 	
 	this._mechList = new MechList(this._listContainer, [0, 1, 2, 3], this);
 	this._mechList.createComponents();
+	this._mechList.registerTouchObserver("ok", function(){_this._touchOK = true;});
+	this._mechList.registerTouchObserver("left", function(){_this._touchLeft = true;});
+	this._mechList.registerTouchObserver("right", function(){_this._touchRight = true;});
+	this._mechList.registerObserver("redraw", function(){_this.requestRedraw();});
+	
+	
 	this._detailBarMech = new DetailBarMech(this._detailContainer, this);
 	this._detailBarMech.createComponents();
 	this._detailBarPilot = new DetailBarPilot(this._detailPilotContainer, this);
@@ -116,7 +123,7 @@ Window_DeploySelection.prototype.update = function() {
 			this._mechList.toggleSortOrder();			
 		} 	
 		
-		if(Input.isTriggered('ok')){
+		if(Input.isTriggered('ok') || this._touchOK){
 			/*if(this._internalHandlers[this._currentKey]){
 				this._handlingInput = true;
 				this._internalHandlers[this._currentKey].call(this);
@@ -133,7 +140,7 @@ Window_DeploySelection.prototype.update = function() {
 				SoundManager.playBuzzer();
 			}			
 		}
-		if(Input.isTriggered('cancel')){		
+		if(Input.isTriggered('cancel') || TouchInput.isCancelled()){		
 			SoundManager.playCancel();		
 			$gameTemp.popMenu = true;	
 			if($gameTemp.deployCancelWindowCallback){

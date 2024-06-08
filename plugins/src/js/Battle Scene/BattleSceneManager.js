@@ -2629,9 +2629,9 @@ BattleSceneManager.prototype.startScene = function(){
 		_this._effksContext.setProjectionMatrix(projectionMatrix);
 		let worldMatrix = new BABYLON.Matrix().copyFrom(BABYLON.Matrix.Invert(_this._camera.getWorldMatrix())).m;		
 		_this._effksContext.setCameraMatrix(worldMatrix);
-		if(_this._effksContext.activeCount > 0){
-			_this._effksContext.draw();
-		}
+	
+		_this._effksContext.draw();
+		
 		
 		
 		projectionMatrix = new BABYLON.Matrix().copyFrom(_this._camera.getProjectionMatrix()).m;
@@ -2660,9 +2660,9 @@ BattleSceneManager.prototype.startScene = function(){
 			_this._effksContextBg.setProjectionMatrix(projectionMatrix);
 			let worldMatrix = new BABYLON.Matrix().copyFrom(BABYLON.Matrix.Invert(_this._camera.getWorldMatrix())).m;		
 			_this._effksContextBg.setCameraMatrix(worldMatrix);
-			if(_this._effksContextBg.activeCount > 0){
-				_this._effksContextBg.draw();
-			}
+			
+			_this._effksContextBg.draw();
+			
 			
 			projectionMatrix = new BABYLON.Matrix().copyFrom(_this._camera.getProjectionMatrix()).m;
 			//projectionMatrix[0]*=-1;
@@ -2674,9 +2674,9 @@ BattleSceneManager.prototype.startScene = function(){
 			worldMatrix[2]*=-1;
 			//worldMatrix[3]*=-1;
 			_this._effksContextBgMirror.setCameraMatrix(worldMatrix);
-			if(_this._effksContextBg.activeCount > 0){
-				_this._effksContextBg.draw();		
-			}			
+		
+			_this._effksContextBg.draw();		
+						
 		}
 		
 	});
