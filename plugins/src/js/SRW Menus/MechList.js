@@ -1235,12 +1235,12 @@ MechList.prototype.redraw = function() {
 			if(idx != null){
 				idx*=1;
 				if(idx == _this._currentSelection){
-					_this.notifyTouchObserver("ok");				
+					_this.notifyTouchObserver("ok");	
+			
 				} else {
 					_this._currentSelection = idx;
-					_this.redraw();
-					_this.notifyObserver("redraw");
-					Graphics._updateCanvas();
+					_this.requestRedraw();
+					_this.notifyObserver("redraw");					
 				}
 			}						
 		});		
@@ -1253,5 +1253,6 @@ MechList.prototype.redraw = function() {
 	windowNode.querySelector("#next_page").addEventListener("click", function(){
 		_this.notifyTouchObserver("right");
 	});
+	Graphics._updateCanvas();
 }
 

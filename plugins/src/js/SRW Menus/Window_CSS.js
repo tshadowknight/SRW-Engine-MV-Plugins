@@ -842,3 +842,26 @@ Window_CSS.prototype.constructButtonIcon = function(iconCtr, iconDef) {
 	}
 	
 }
+
+Window_CSS.prototype.createConfirmContent = function(question, selection) {
+	const _this = this;
+	let content = "";
+	content+="<div class='confirm scaled_text'>";
+	content+="<div class='content'>";
+	content+="<div class='question'>";
+	
+	content+="<div class='label_unit_count'>"+question+"</div>";
+	content+="</div>";
+	content+="<div class='buttons'>";
+	content+="<div class='button ok_button "+(selection == 0 ? "active" : "")+"'>";
+	content+=APPSTRINGS.GENERAL.label_yes;
+	content+="</div>";
+	content+="<div class='button cancel_button "+(selection == 1 ? "active" : "")+"'>";
+	content+=APPSTRINGS.GENERAL.label_no;
+	content+="</div>";
+	content+="</div>";
+	content+="</div>";
+	content+="</div>";
+	return content;
+}
+

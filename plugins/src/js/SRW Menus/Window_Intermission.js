@@ -41,6 +41,8 @@ Window_Intermission.prototype.createSubCategoryList = function(container, catego
 Window_Intermission.prototype.initialize = function() {
 	var _this = this;
 	
+	_this.titleConfirmSelection = true;
+	
 	function validateReassignMenu(){
 		var availableMechs = Window_CSS.prototype.getAvailableUnits.call(_this);
 		var tmp = [];	
@@ -90,6 +92,7 @@ Window_Intermission.prototype.initialize = function() {
 		{name: APPSTRINGS.INTERMISSION.data_label, key: "data", subCommands: [
 			{name: APPSTRINGS.INTERMISSION.data_save_label, key: "data_save"},
 			{name:  APPSTRINGS.INTERMISSION.data_load_label, key: "data_load"},
+			{name:  APPSTRINGS.INTERMISSION.data_title_label, key: "title"},
 			//{name: "Search", key: "pilot_search"}
 		]},
 		{name: APPSTRINGS.INTERMISSION.next_map, key: "next_map"}
@@ -200,6 +203,12 @@ Window_Intermission.prototype.initialize = function() {
 			_this.hide();
 			SceneManager.push(Scene_Load);
 		},	
+		"title": function(){
+			_this._handlingInput = false;
+			_this.titleConfirmSelection = true;
+			_this._state = "confirm_title";
+			_this.requestRedraw();
+		},			
 		"options": function(){
 			/*_this.hide();
 			SceneManager.push(Scene_Options);*/
@@ -369,10 +378,15 @@ Window_Intermission.prototype.createComponents = function() {
 	this._aceName.classList.add("scaled_text");
 	this._aceDisplayInner.appendChild(this._aceName);
 	
+	
 
 	
 	this._aceDisplay.appendChild(this._aceDisplayInner);
 	windowNode.appendChild(this._aceDisplay);
+	
+	this._confirmContainer = document.createElement("div");	
+	this._confirmContainer.classList.add("confirm_container");
+	windowNode.appendChild(this._confirmContainer);
 }
 
 Window_Intermission.prototype.addHandler = function(key, func) {
@@ -397,34 +411,66 @@ Window_Intermission.prototype.lineHeight = function() {
 
 
 Window_Intermission.prototype.update = function() {
+	const _this = this;
 	Window_Base.prototype.update.call(this);
 	if(this.isOpen() && !this._handlingInput){
-		if(Input.isTriggered('down') || Input.isRepeated('down')){
-			SoundManager.playCursor();
-			this.requestRedraw();
-			this._currentSelection++;
-		} else if (Input.isTriggered('up') || Input.isRepeated('up')) {
-			SoundManager.playCursor();
-			this.requestRedraw();
-		   this._currentSelection--;
-		} else if(Input.isTriggered('ok') || (this._isValidTouchInteraction)){
-			if(this._internalHandlers[this._currentKey]){		
-				this._handlingInput = true; 
-				var isPrevented = this._internalHandlers[this._currentKey].call(this);
-				if(isPrevented){
-					SoundManager.playBuzzer();
-				} else {
-					SoundManager.playOk();
-				}
+		
+		if(_this._state == "confirm_title"){
+			if(Input.isTriggered('left') || Input.isRepeated('left')){
+				_this.titleConfirmSelection = !_this.titleConfirmSelection;
+				_this.requestRedraw();
 			}
+			if(Input.isTriggered('right') || Input.isRepeated('right')){
+				_this.titleConfirmSelection = !_this.titleConfirmSelection;
+				_this.requestRedraw();
+			}
+		}
+		
+		if(Input.isTriggered('down') || Input.isRepeated('down')){
+			if(_this._state != "confirm_title"){
+				SoundManager.playCursor();
+				this.requestRedraw();
+				this._currentSelection++;
+			}
+		} else if (Input.isTriggered('up') || Input.isRepeated('up')) {
+			if(_this._state != "confirm_title"){
+				SoundManager.playCursor();
+				this.requestRedraw();
+				this._currentSelection--;
+			}
+		} else if(Input.isTriggered('ok') || (this._isValidTouchInteraction)){
+			if(_this._state == "confirm_title"){
+				if(!_this.titleConfirmSelection){
+					_this.hide();
+					SceneManager.goto(Scene_Title);
+				} else {
+					_this._state = "";
+					_this.requestRedraw();
+				}
+			} else {
+				if(this._internalHandlers[this._currentKey]){		
+					this._handlingInput = true; 
+					var isPrevented = this._internalHandlers[this._currentKey].call(this);
+					if(isPrevented){
+						SoundManager.playBuzzer();
+					} else {
+						SoundManager.playOk();
+					}
+				}
+			}			
 		} else if(Input.isTriggered('cancel') || TouchInput.isCancelled()){		
 			SoundManager.playCancel();
-			if(this._menuLevels.length > 1){
-				this._menuLevels.pop();
-				this._currentSelection = this._menuLevels[this._menuLevels.length-1];				
+			if(_this._state == "confirm_title"){
+				_this._state = "";
 			} else {
-				this._currentSelection = this._commands.length-1; //Bottom command, Next Map
+				if(this._menuLevels.length > 1){
+					this._menuLevels.pop();
+					this._currentSelection = this._menuLevels[this._menuLevels.length-1];				
+				} else {
+					this._currentSelection = this._commands.length-1; //Bottom command, Next Map
+				}
 			}
+			
 			this.requestRedraw();
 		}
 		
@@ -453,7 +499,7 @@ Window_Intermission.prototype.update = function() {
 };
 
 Window_Intermission.prototype.redraw = function() {
-	var _this = this;
+	const _this = this;
 	this._redrawRequested = false;
 	
 	this.createEntryList(this._menuSection1, this._commands, "section_1");	
@@ -544,6 +590,15 @@ Window_Intermission.prototype.redraw = function() {
 			_this.requestRedraw();
 		});		
 	});
+	
+	
+	if(_this._state == "confirm_title"){
+		this._confirmContainer.innerHTML = _this.createConfirmContent(APPSTRINGS.INTERMISSION.confirm_title, _this.titleConfirmSelection);
+		this._confirmContainer.style.display = "";
+	} else {
+		this._confirmContainer.style.display = "none";
+	}
+	
 	this.loadImages();
 	Graphics._updateCanvas();
 };	

@@ -404,8 +404,7 @@ BattleAnimationBuilder.prototype.processDefinition = function(data){
 									}
 								});
 							});
-						}
-						
+						}						
 					}
 				});
 			});

@@ -2665,14 +2665,12 @@ BattleSceneManager.prototype.startScene = function(){
 			
 			
 			projectionMatrix = new BABYLON.Matrix().copyFrom(_this._camera.getProjectionMatrix()).m;
-			//projectionMatrix[0]*=-1;
 			_this._effksContextBgMirror.setProjectionMatrix(projectionMatrix);
 			
 			worldMatrix = new BABYLON.Matrix().copyFrom(BABYLON.Matrix.Invert(_this._camera.getWorldMatrix())).m;
 			worldMatrix[0]*=-1;
 			worldMatrix[1]*=-1;
 			worldMatrix[2]*=-1;
-			//worldMatrix[3]*=-1;
 			_this._effksContextBgMirror.setCameraMatrix(worldMatrix);
 		
 			_this._effksContextBg.draw();		
@@ -2689,10 +2687,7 @@ BattleSceneManager.prototype.startScene = function(){
 		if(_this._tickCounter){
 			_this._tickCounter.innerHTML = "tick "+_this._currentAnimationTick;
 		}
-				
-		//_this._frame++;
 		
-	//	console.log("Babylon main loop");
 		_this._scene.render();
 		_this._engine.wipeCaches(true);
 		var ratio = 1;
@@ -2700,11 +2695,6 @@ BattleSceneManager.prototype.startScene = function(){
 			ratio = 2;
 		}
 		ratio*=_this._animRatio;
-		/*
-		_this._effksContext.update(_this._engine.getDeltaTime() * 60 / 1000 * ratio);		
-		_this._effksContext.setProjectionMatrix(_this._camera.getProjectionMatrix().m);
-		_this._effksContext.setCameraMatrix(BABYLON.Matrix.Invert(_this._camera.getWorldMatrix()).m);
-		_this._effksContext.draw();*/
 		
 		if(_this._moviePlayback){
 			if(_this._moviePlayback.hasEnded){
@@ -2769,13 +2759,8 @@ BattleSceneManager.prototype.startScene = function(){
 		var tmp = [];
 		_this._movieBGInfo.forEach(function(movieBG){
 			if(!movieBG.sprite.isDisposed() && !movieBG.video.completed){
-				//movieBG.RMMVSprite.update(_this._engine.getDeltaTime() * ratio);
-				//movieBG.renderer.render(movieBG.stage);
 
 				const canvas = movieBG.canvas;
-				/*var rect = _this._movieContainer.getBoundingClientRect();
-				canvas.width = rect.width;
-				canvas.height = rect.height;*/
 				var video = movieBG.video;
 				
 				if(_this._animsPaused){
@@ -2830,10 +2815,6 @@ BattleSceneManager.prototype.startScene = function(){
 BattleSceneManager.prototype.stopScene = function(){
 	var _this = this;
 	this._container.style.display = "";
-	/*this._swipeContainer.style.display = "none";
-	this._fadeContainer.style.display = "none";
-	this._systemFadeContainer.style.display = "none";*/
-	// Register a render loop to repeatedly render the scene
 	if(this._engine){
 		this._engine.stopRenderLoop();
 	}

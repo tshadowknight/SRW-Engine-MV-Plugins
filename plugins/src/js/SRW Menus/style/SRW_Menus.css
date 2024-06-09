@@ -539,3 +539,38 @@ body {
 .unique_skill_mark {
 	--widthscaling: 1px;
 }
+
+.confirm .content {
+	color: #FFFFFF;
+	position: relative;
+	--widthpixels: 500;
+	--heightpixels: 157;
+	background-color: var(--menu-bg-color);
+	border: 0.4vw solid #FFFFFF;
+	border-radius: 10px;
+	padding: 1%; 
+}
+
+.confirm .content .buttons {
+	display: flex;
+    justify-content: center;  
+	align-items: center;
+	margin-top: 3%;
+}
+
+.confirm .content .button {
+	padding: 1%;
+    margin-right: auto;
+    margin-left: auto;
+    border: 0.1vw solid rgba(0,0,0,0);
+    border-radius: 10px;
+    width: 10%;
+    text-align: center;
+}
+
+.confirm .content .button.active {
+	
+	background-color: rgba(255,255,255,0.5);
+	/*border: 0.1vw solid #FFFFFF;
+	color: var(--menu-bg-color);*/
+}

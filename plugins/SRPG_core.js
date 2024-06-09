@@ -924,10 +924,7 @@ SceneManager.isInSaveScene = function(){
 	
 	Scene_GameEnd.prototype.commandToTitle = function() {
 		this.fadeOutAll();
-		//SceneManager.goto(Scene_Disclaimer);
-		//if (Utils.isNwjs()) {
-			location.reload();
-		//}
+		SceneManager.goto(Scene_Title);		
 	};
 	
 	Scene_Map.prototype.commandSave = function() {
@@ -2062,7 +2059,7 @@ SceneManager.isInSaveScene = function(){
 			//$gameSystem.isSubBattlePhase() === 'actor_target' || $gameSystem.isSubBattlePhase() === 'actor_target_spirit' || $gameSystem.isSubBattlePhase() === 'actor_map_target_confirm'
 			if ($SRWGameState.canShowSummaries() && $gameTemp.summariesTimeout <= 0 && !$gameTemp.isDraggingMap) {
 				var currentPosition = {x: $gamePlayer.posX(), y: $gamePlayer.posY()};
-				$gameTemp.previousCursorPosition = currentPosition;
+				//$gameTemp.previousCursorPosition = currentPosition;
 				var summaryUnit = $statCalc.activeUnitAtPosition(currentPosition);
 				if(summaryUnit && ($gameSystem.isSubBattlePhase() !== 'actor_map_target_confirm' || $gameTemp.isMapTarget(summaryUnit.event.eventId()))){
 					var previousUnit = $gameTemp.summaryUnit;

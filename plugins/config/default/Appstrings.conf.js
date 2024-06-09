@@ -168,11 +168,14 @@ APPSTRINGS.INTERMISSION = {
 		"data_load": "Load previous save data",
 		"options": "Manage Game Settings",
 		"deployment": "Manage Unit Deployment for the next stage",
-		"reassign": "Manage Pilot assignments to Mechs"
+		"reassign": "Manage Pilot assignments to Mechs",
+		"title": "Return to the title screen"
 	},
 	data_label: "Data",
 	data_save_label: "Save",
 	data_load_label: "Load",
+	data_title_label: "Title",
+	confirm_title: "Return to the title screen?",
 	stage_label: "Stage",
 	next_map_units: "Units for next map",
 	cleared_label: "Cleared",
