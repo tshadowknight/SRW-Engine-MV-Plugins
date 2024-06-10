@@ -713,10 +713,16 @@ Window_CSS.prototype.createAttributeBlock = function(attack) {
 		content+="P";
 	} 
 	content+="</div>";
-	content+="<div class='attribute_block_entry scaled_width scaled_height scaled_text described_element' data-type='attack' data-subtype='counter' data-value=''>";
+	
 	if(attack.isCounter){
+		content+="<div class='attribute_block_entry scaled_width scaled_height scaled_text described_element' data-type='attack' data-subtype='usage' data-value='counter'>";
 		content+="C";
-	} 
+	} else if(attack.isCombination){
+		content+="<div class='attribute_block_entry scaled_width scaled_height scaled_text described_element' data-type='attack' data-subtype='usage' data-value='combination'>";
+		content+="T";
+	} else {
+		content+="<div class='attribute_block_entry scaled_width scaled_height scaled_text described_element' data-type='attack' data-subtype='usage' data-value=''>";
+	}
 	content+="</div>";
 	content+="<div class='attribute_block_entry scaled_width scaled_height scaled_text described_element' data-type='attack' data-subtype='particle' data-value=''>";
 	/*if(attack.particleType == "missile"){

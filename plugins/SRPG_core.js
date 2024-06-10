@@ -2056,22 +2056,27 @@ SceneManager.isInSaveScene = function(){
 				$gameTemp.summaryUnit = null;					
 			}
 							
-			//$gameSystem.isSubBattlePhase() === 'actor_target' || $gameSystem.isSubBattlePhase() === 'actor_target_spirit' || $gameSystem.isSubBattlePhase() === 'actor_map_target_confirm'
-			if ($SRWGameState.canShowSummaries() && $gameTemp.summariesTimeout <= 0 && !$gameTemp.isDraggingMap) {
-				var currentPosition = {x: $gamePlayer.posX(), y: $gamePlayer.posY()};
-				//$gameTemp.previousCursorPosition = currentPosition;
-				var summaryUnit = $statCalc.activeUnitAtPosition(currentPosition);
-				if(summaryUnit && ($gameSystem.isSubBattlePhase() !== 'actor_map_target_confirm' || $gameTemp.isMapTarget(summaryUnit.event.eventId()))){
-					var previousUnit = $gameTemp.summaryUnit;
-					$gameTemp.summaryUnit = summaryUnit;	
-					if(!_this._summaryWindow.visible || $gameTemp.summaryUnit != previousUnit){
-						_this._summaryWindow.show();
-					}											
+			//the normal and actor_map_target_confirm states do their own summary unit handling
+			if($gameSystem.isSubBattlePhase() !== 'normal' && $gameSystem.isSubBattlePhase() !== 'actor_map_target_confirm'){		
+				if ($SRWGameState.canShowSummaries() && $gameTemp.summariesTimeout <= 0 && !$gameTemp.isDraggingMap) {
+					var currentPosition = {x: $gamePlayer.posX(), y: $gamePlayer.posY()};
+					$gameTemp.previousCursorPosition = currentPosition;
+					var summaryUnit = $statCalc.activeUnitAtPosition(currentPosition);
+					if(summaryUnit && ($gameSystem.isSubBattlePhase() !== 'actor_map_target_confirm' || $gameTemp.isMapTarget(summaryUnit.event.eventId()))){
+						var previousUnit = $gameTemp.summaryUnit;
+						$gameTemp.summaryUnit = summaryUnit;	
+						if(!_this._summaryWindow.visible || $gameTemp.summaryUnit != previousUnit){
+							_this._summaryWindow.show();
+						}											
+					}
 				}
 			}
 		}
+		
 	
 		let SRWStateResult = $SRWGameState.update(this);
+		
+		
 		
 		//update of scene base updates menus etc.
 		Scene_Base.prototype.update.call(this);

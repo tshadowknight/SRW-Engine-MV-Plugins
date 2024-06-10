@@ -354,8 +354,8 @@ APPSTRINGS.ATTACKLIST = {
 			type: "The type determines which attacking stat of the Pilot is used.",
 			attribute: "The attribute of the weapon, determines super effective/not very effective damage against target.",
 			effect: "An S indicates that the weapon has one or more additional effects such as inflicting status.",
-			postMove: "A P indicates that the weapon can be used after moving.",
-			counter: "A C indicates that the weapon will always go first, even when counter attacking.",
+			postMove: "A P indicates that the weapon can be used after moving.",			
+			usage: "This weapon has a special usage method or condition.",			
 			particle: "The sub-type of the weapon. Some abilities may affect weapons of specific sub-types.",
 			all: "An All weapon will hit both targets in an enemy Twin formation.",
 			power: "The base power of the weapon.",
@@ -366,6 +366,8 @@ APPSTRINGS.ATTACKLIST = {
 		value: {
 			melee: "This is a Melee attack.",
 			ranged: "This is a Ranged attack.",
+			combination: "A T indicates that the weapon is a team-up weapon, it requires a parter to be available.",
+			counter: "A C indicates that the weapon will always go first, even when counter attacking.",
 		}
 	}
 }	

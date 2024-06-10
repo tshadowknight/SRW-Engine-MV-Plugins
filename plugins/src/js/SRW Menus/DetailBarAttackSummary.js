@@ -233,6 +233,8 @@ DetailBarAttackSummary.prototype.redraw = function(){
 			
 			if(detail.noComboSupport){
 				detailContent+=APPSTRINGS.ATTACKLIST.label_no_combo_support;
+			} else if(detail.noParticipants){
+				detailContent+=APPSTRINGS.ATTACKLIST.label_no_participants;
 			} else if(detail.isCounterOnly){
 				detailContent+=APPSTRINGS.ATTACKLIST.label_counter_only;
 			} else if(detail.isInnerCombo){
@@ -255,8 +257,6 @@ DetailBarAttackSummary.prototype.redraw = function(){
 				detailContent+=APPSTRINGS.ATTACKLIST.label_no_map_counter;
 			} else if(detail.isMap2){
 				detailContent+=APPSTRINGS.ATTACKLIST.label_no_map_support;
-			} else if(detail.noParticipants){
-				detailContent+=APPSTRINGS.ATTACKLIST.label_no_participants;
 			} else if(detail.terrain){
 				detailContent+=APPSTRINGS.ATTACKLIST.label_no_terrain;
 			} else if(detail.isAll){

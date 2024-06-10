@@ -7005,16 +7005,14 @@ BattleSceneManager.prototype.endScene = function(force) {
 	var sanityCheck = true;
 	setTimeout(function(){
 		if(sanityCheck){
-			console.log("battle scene ended due to sanity check");
-			_this._runningAnimation = false;
+			console.log("battle scene ended due to sanity check");			
 			_this.disposeAnimationSprites();
 			_this.disposeAnimationBackgrounds();
 			_this.disposeSpriterBackgrounds();
 			_this.disposeLights();
 			_this.disposeEffekseerInstances();
 			_this.disposeMovieBackgrounds();
-			_this.disposeRMMVBackgrounds();
-			_this._animationList = [];
+			_this.disposeRMMVBackgrounds();			
 			_this.disposeTextureCache();
 			_this._UIcontainer.style.display = "";
 			_this._PIXIContainer.style.display = "";	
@@ -7024,6 +7022,8 @@ BattleSceneManager.prototype.endScene = function(force) {
 		//fail safe against state bugs with the system fade and swipe container
 		_this._systemFadeContainer.style.display = "none";
 		_this._swipeContainer.style.display = "none";
+		_this._runningAnimation = false;
+		_this._animationList = [];
 	}, 2500);
 	if(!_this._sceneIsEnding || force){
 		_this._sceneIsEnding = true;	
@@ -7510,11 +7510,12 @@ BattleSceneManager.prototype.processActionQueue = function() {
 BattleSceneManager.prototype.playBattleScene = async function(){
 	var _this = this;
 	this._sceneCanEnd = false;
+	this._runningAnimation = false;
+	_this._animationList = [];
 	//_this.stopScene();
 	var promises = [];
 	
 	_this.systemFadeToBlack(200, 200).then(async function(){		
-		
 		
 		$gameTemp.popMenu = true;//remove before battle menu
 		//SceneManager.stop();		

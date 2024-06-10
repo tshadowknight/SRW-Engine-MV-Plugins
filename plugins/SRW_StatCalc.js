@@ -7795,13 +7795,13 @@ StatCalc.prototype.createActiveAbilityLookup = function(){
 				var eventActor = invalidatedEventIds[eventId].actor;
 				
 				var entityKey;
-				var entityKey = _this.getReferenceEvent(eventActor).eventId();
-				delete auraTiles[entityKey];	
-				
-				
-			
+				const event = _this.getReferenceEvent(eventActor);
+				if(event){
+					var entityKey = event.eventId();
+					delete auraTiles[entityKey];
+				}			
 							
-				handleEventActors(eventActor, _this.getReferenceEvent(eventActor));
+				handleEventActors(eventActor, event);
 			}			
 					
 		});		

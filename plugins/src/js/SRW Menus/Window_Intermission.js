@@ -595,6 +595,14 @@ Window_Intermission.prototype.redraw = function() {
 	if(_this._state == "confirm_title"){
 		this._confirmContainer.innerHTML = _this.createConfirmContent(APPSTRINGS.INTERMISSION.confirm_title, _this.titleConfirmSelection);
 		this._confirmContainer.style.display = "";
+		this._confirmContainer.querySelector(".ok_button").addEventListener("click", function(){
+			_this.titleConfirmSelection = false;
+			_this._isValidTouchInteraction = true;
+		});
+		this._confirmContainer.querySelector(".cancel_button").addEventListener("click", function(){
+			_this.titleConfirmSelection = true;
+			_this._isValidTouchInteraction = true;
+		});
 	} else {
 		this._confirmContainer.style.display = "none";
 	}
