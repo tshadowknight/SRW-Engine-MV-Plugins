@@ -457,7 +457,7 @@ Window_UpgradePilot.prototype.update = function() {
 				var current = this._abilityList.getCurrentSelection();
 				var learnedAbilities = $statCalc.getLearnedPilotAbilities(pilotData);
 				
-				if((learnedAbilities[current.refId] && learnedAbilities[current.idx].slot == -1)){
+				if((learnedAbilities[current.idx] && learnedAbilities[current.idx].slot == -1)){
 					SoundManager.playOk();
 					this._currentUIState = "ability_equip_selection";
 				} else if(!learnedAbilities[current.idx] || (current.info.hasLevel && learnedAbilities[current.idx].level < current.info.maxLevel)){

@@ -1387,7 +1387,7 @@ $SRWConfig.pilotAbilties = function(){
 		"Dominance", 
 		"Damage against enemies with less Will +10%.", 
 		false,
-		false,
+		true,
 		function(actor, level){
 			return [{type: "final_damage", modType: "mult", value: 1.1}];
 		},
