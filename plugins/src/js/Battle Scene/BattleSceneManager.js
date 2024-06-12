@@ -7003,7 +7003,7 @@ BattleSceneManager.prototype.endScene = function(force) {
 	var _this = this;
 	_this.lastAnimId = -1;
 	var sanityCheck = true;
-	setTimeout(function(){
+	_this.endSceneTimeOut = setTimeout(function(){
 		if(sanityCheck){
 			console.log("battle scene ended due to sanity check");			
 			_this.disposeAnimationSprites();
@@ -7024,6 +7024,7 @@ BattleSceneManager.prototype.endScene = function(force) {
 		_this._swipeContainer.style.display = "none";
 		_this._runningAnimation = false;
 		_this._animationList = [];
+		_this.endSceneTimeOut = null;
 	}, 2500);
 	if(!_this._sceneIsEnding || force){
 		_this._sceneIsEnding = true;	
@@ -7514,7 +7515,9 @@ BattleSceneManager.prototype.playBattleScene = async function(){
 	_this._animationList = [];
 	//_this.stopScene();
 	var promises = [];
-	
+	if(_this.endSceneTimeOut){
+		clearTimeout(_this.endSceneTimeOut);
+	}
 	_this.systemFadeToBlack(200, 200).then(async function(){		
 		
 		$gameTemp.popMenu = true;//remove before battle menu

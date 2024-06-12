@@ -1719,6 +1719,7 @@ BattleCalc.prototype.generateMapBattleResult = function(){
 			
 			if(dCache.damageTaken >= dCache.currentAnimHP){
 				dCache.isDestroyed = true;
+				dCache.destroyer = aCache.ref;
 			}	
 			
 			gainDonor = defender.actor;
@@ -1768,7 +1769,7 @@ BattleCalc.prototype.generateMapBattleResult = function(){
 	}
 	
 	
-	var mapRewardsScaling = 1 / (targets.length / 2);
+	var mapRewardsScaling = 1;//1 / (targets.length / 2);
 	aCache.expGain = Math.floor(aCache.expGain * mapRewardsScaling);
 	aCache.ppGain = Math.floor(aCache.ppGain * mapRewardsScaling);
 	aCache.fundGain = Math.floor(aCache.fundGain * mapRewardsScaling);

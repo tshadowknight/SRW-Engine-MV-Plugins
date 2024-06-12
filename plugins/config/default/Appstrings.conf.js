@@ -58,6 +58,7 @@ APPSTRINGS.GENERAL = {
 	label_MP: "MP",
 	label_EN: "EN",
 	label_will: "Will",
+	label_score: "Score",
 	label_level: "Lv",
 	label_HP: "HP",
 	label_EN: "EN",

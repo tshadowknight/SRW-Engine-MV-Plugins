@@ -71,11 +71,11 @@ Window_UnitSummary.prototype.redraw = async function() {
 				
 			content+="<div data-idx='"+ctr+"' class='summary'>";		
 			
+			content+="<div class='pilot_stats scaled_text'>";	
 			content+="<div class='pilot_name scaled_text fitted_text'>";
 			content+=actor.name();
 			content+="</div>";
 			
-			content+="<div class='pilot_stats scaled_text'>";	
 			content+="<div class='level scaled_width'>";
 			content+="<div class='label'>";
 			content+=APPSTRINGS.GENERAL.label_level;
@@ -84,6 +84,10 @@ Window_UnitSummary.prototype.redraw = async function() {
 			content+=$statCalc.getCurrentLevel(actor);
 			content+="</div>";
 			content+="</div>";
+			content+="</div>";
+			
+			content+="<div class='pilot_stats scaled_text'>";	
+			
 			content+="<div class='will scaled_width'>";
 			content+="<div class='label'>";
 			content+=APPSTRINGS.GENERAL.label_will;
@@ -92,6 +96,19 @@ Window_UnitSummary.prototype.redraw = async function() {
 			content+=$statCalc.getCurrentWill(actor);
 			content+="</div>";
 			content+="</div>";
+			
+			const kills =$statCalc.getKills(actor);
+			if(kills){
+				content+="<div class='score scaled_width'>";
+				content+="<div class='label'>";
+				content+=APPSTRINGS.GENERAL.label_score;
+				content+="</div>";
+				content+="<div class='value'>";
+				content+=$statCalc.getKills(actor);
+				content+="</div>";
+				content+="</div>";
+			}		
+			
 			content+="</div>";
 			
 			var calculatedStats = $statCalc.getCalculatedMechStats(actor);

@@ -182,6 +182,10 @@
 	color: #666666;
 }
 
+.spirit_selection_container .row.active {
+	color: #666666;
+}
+
 .spirit_selection_container .row.insufficient {
 	color: #FF0000;
 }

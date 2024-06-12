@@ -11,7 +11,7 @@
     -webkit-mask-image: none;   
     justify-content: center;  
     --fontsize: 2.4px;   
-	--widthpixels: 275;
+	--widthpixels: 300;
 	--heightpixels: 157;
     padding: 0;
     margin: 0;
@@ -47,8 +47,8 @@
 	filter: var(--white-filter);
     width: 6%;
     position: absolute;
-    top: 3%;
-    right: 1%;
+    top: 108%;
+    right: 2%;
     transform: rotate(45deg);
 }
 
@@ -178,10 +178,20 @@
 	display: flex;
 	align-items: center;
 	--widthscaling: 5;
-	margin-left: 10%;
+	margin-left: 3%;
 }
 
 #unit_summary .pilot_stats .will .label{
+	margin-right: 5%;
+}
+
+#unit_summary .pilot_stats .score{
+	margin-left: 25%;
+	display: flex;
+	align-items: center;
+}
+
+#unit_summary .pilot_stats .score .label{
 	margin-right: 5%;
 }
 
@@ -309,12 +319,12 @@
 	display: flex;
 	align-items: flex-start;
 	--heightpixels: 60;
-	--widthpixels: 206;
+	--widthpixels: 220;
 	position: relative;
 }
 
 #unit_summary .summary {
-	--widthpixels: 206;
+	--widthpixels: 238;
 	position: relative;
 	--heightpixels: 71;
 }
