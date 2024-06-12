@@ -740,6 +740,9 @@ BattleSceneManager.prototype.initScene = function(){
 	//video.muted = true;
 	this._movieVideo = video;
 	this._movieContainer.appendChild(video);
+	
+	_this._bgsParent = _this.createBg(name, "", new BABYLON.Vector3(0,0,0), 0, 1, null, true);
+	_this._bgsParent.isVisible = false;
 		
 		
 	//this._engine.resize();	
@@ -3005,6 +3008,8 @@ BattleSceneManager.prototype.getTargetObject = function(name){
 	let obj;
 	if(name == "Camera"){
 		return _this._camera;
+	} else if(name == "bgs_parent"){
+		return _this._bgsParent;
 	} else if(name == "active_main"){
 		if(_this._supportAttackerActive){
 			obj = _this._active_support_attacker;
@@ -6316,6 +6321,7 @@ BattleSceneManager.prototype.createScrollingBg = function(id, bgId, path, size, 
 		const position = new BABYLON.Vector3(startX + (i * size.width), yOffset, zOffset);
 		if(i == 0){
 			bg = this.createBg(id + "_" + i, path, position, size, 1, null, true, false, true);
+			bg.parent = _this._bgsParent;
 			bg.isInstanceRef = true;
 			instanceRef = bg;
 			bg.visibility = 0;
@@ -6324,6 +6330,7 @@ BattleSceneManager.prototype.createScrollingBg = function(id, bgId, path, size, 
 			_this._bgs.push(bg);
 		} else {
 			bg = instanceRef.createInstance(id + "_" + i);
+			bg.parent = _this._bgsParent;
 			bg.isInstanceRef = false;
 			bg.position = position;
 			bg.sizeInfo = {
@@ -6332,7 +6339,7 @@ BattleSceneManager.prototype.createScrollingBg = function(id, bgId, path, size, 
 			};			
 			_this._bgInstances.push(bg);
 		}			
-	}
+	} 
 }
 
 BattleSceneManager.prototype.fadeAndShowScene = function(){
