@@ -6597,7 +6597,7 @@ BattleSceneManager.prototype.preloadSceneAssets = function(){
 				promises.push(_this.initShader("shockWave_fragment"));
 			}
 			if(animCommand.type == "effect_screen_shader"){
-				promises.push(_this.initShader(params.shaderName));
+				promises.push(_this.initShader(params.shaderName+"_fragment"));
 			}
 			if(animCommand.type == "play_se"){
 				var se = {};
