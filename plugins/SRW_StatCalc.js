@@ -783,7 +783,7 @@ StatCalc.prototype.getSpiritInfo = function(actor, actorProperties){
 				cost = spiritCostModLookup[idx];
 			}
 			//cost = $statCalc.applyStatModsToValue(actor, cost, ["sp_cost"]);
-			if(spiritModLookup[idx]){
+			if(spiritModLookup[idx] != null){
 				idx = spiritModLookup[idx];
 			}
 			result.push({
@@ -6188,7 +6188,7 @@ StatCalc.prototype.getMechTerrainString = function(actor, terrain){
 		var mechTerrainLevel = actor.SRWStats.mech.stats.calculated.terrain[currentTerrain]; 
 		var mechTerrainNumeric = this._terrainToNumeric[mechTerrainLevel];
 		var minMechTerrains = this.getMinTerrains(actor);
-		if(mechTerrainNumeric < minMechTerrains[currentTerrain]){
+		if(mechTerrainNumeric < minMechTerrains[currentTerrain] || (mechTerrainNumeric == undefined && minMechTerrains[currentTerrain] != null)){
 			mechTerrainNumeric = minMechTerrains[currentTerrain];
 		}		
 		return this._terrainSumToLevel[mechTerrainNumeric + mechTerrainNumeric];
@@ -6212,7 +6212,7 @@ StatCalc.prototype.getFinalTerrainString = function(actor, terrain){
 		var mechTerrainLevel = actor.SRWStats.mech.stats.calculated.terrain[currentTerrain]; 
 		var mechTerrainNumeric = this._terrainToNumeric[mechTerrainLevel];
 		var minMechTerrains = this.getMinTerrains(actor);	
-		if(mechTerrainNumeric < minMechTerrains[currentTerrain]){
+		if(mechTerrainNumeric < minMechTerrains[currentTerrain] || (mechTerrainNumeric == undefined && minMechTerrains[currentTerrain] != null)){
 			mechTerrainNumeric = minMechTerrains[currentTerrain];
 		}		
 		return this._terrainSumToLevel[this._terrainToNumeric[pilotTerrainLevel] + mechTerrainNumeric];
@@ -6227,7 +6227,7 @@ StatCalc.prototype.getWeaponTerrainMod = function(actor, weaponInfo){
 		
 		var weaponTerrainNumeric = this._terrainToNumeric[weaponTerrainRanking];
 		var minTerrains = this.getMinTerrains(actor);	
-		if(weaponTerrainNumeric < minTerrains[currentTerrain]){
+		if(weaponTerrainNumeric < minTerrains[currentTerrain] || (weaponTerrainNumeric == undefined && minTerrains[currentTerrain] != null)){
 			weaponTerrainNumeric = minTerrains[currentTerrain];
 		}		
 		return this._terrainSumToLevel[weaponTerrainNumeric + weaponTerrainNumeric];
@@ -6261,7 +6261,7 @@ StatCalc.prototype.getRealWeaponTerrainStrings = function(actor, weaponInfo){
 		Object.keys(weaponInfo.terrain).forEach(function(currentTerrain){
 			var weaponTerrainRanking = weaponInfo.terrain[currentTerrain];
 			var weaponTerrainNumeric = _this._terrainToNumeric[weaponTerrainRanking];
-			if(weaponTerrainNumeric < minTerrains[currentTerrain]){
+			if(weaponTerrainNumeric < minTerrains[currentTerrain] || (weaponTerrainNumeric == undefined && minTerrains[currentTerrain] != null)){
 				weaponTerrainNumeric = minTerrains[currentTerrain];
 			}	
 			result[currentTerrain] = _this._terrainSumToLevel[weaponTerrainNumeric + weaponTerrainNumeric];
