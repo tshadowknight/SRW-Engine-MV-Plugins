@@ -65,6 +65,15 @@ StatCalc.prototype.isActorSRWInitialized = function(actor){
 	return actor && actor.SRWInitialized;
 }
 
+StatCalc.prototype.getTerrainPerformance = function(terrainString){
+	return (ENGINE_SETTINGS.TERRAIN_PERFORMANCE || {
+		"S": 1.1,
+		"A": 1,
+		"B": 0.9,
+		"C": 0.8,
+		"D": 0.6
+	})[terrainString];
+}
 
 StatCalc.prototype.getReferenceId = function(actor, depth){
 	if(actor.isActor()){
@@ -6197,7 +6206,7 @@ StatCalc.prototype.getMechTerrainString = function(actor, terrain){
 }
 
 StatCalc.prototype.getTerrainMod = function(actor, terrain){			
-	return this._terrainLevelPerformance[this.getFinalTerrainString(actor, terrain)];	
+	return this.getTerrainPerformance(this.getFinalTerrainString(actor, terrain));	
 }
 
 StatCalc.prototype.getFinalTerrainString = function(actor, terrain){

@@ -100,6 +100,13 @@ var ENGINE_SETTINGS = {
 			"2L": 1.4
 		}
 	},	
+	TERRAIN_PERFORMANCE: {
+		"S": 1.1,
+		"A": 1,
+		"B": 0.9,
+		"C": 0.8,
+		"D": 0.6
+	},
 	DISABLE_FULL_BATTLE_SCENE: false,// if true the option to show the battle DEMO will not be available
 	BATTLE_SCENE: {
 		FXAA_ON: false,

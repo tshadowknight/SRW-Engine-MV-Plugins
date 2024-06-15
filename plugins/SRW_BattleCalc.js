@@ -406,7 +406,7 @@ BattleCalc.prototype.performDamageCalculation = function(attackerInfo, defenderI
 			armor = 1;
 		}	
 		
-		var defenderTerrainRating = this.getMechTerrainValue(defenderMechStats.terrain[$statCalc.getCurrentAliasedTerrain(defenderInfo.actor)]) || 0;
+		var defenderTerrainRating = $statCalc.getTerrainMod(defenderInfo.actor) || 0;
 		
 		//final damage
 		var terrainDefenseFactor = $statCalc.getCurrentTerrainMods(defenderInfo.actor).defense || 0; 
