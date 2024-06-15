@@ -59,6 +59,14 @@ function StatCalc(){
 	this._invalidatedEventIds = {};
 	
 	this._abilityLookupDepth = 0;
+	
+	this._defaultTerrainPerformance = {
+		"S": 1.1,
+		"A": 1,
+		"B": 0.9,
+		"C": 0.8,
+		"D": 0.6
+	};
 }
 
 StatCalc.prototype.isActorSRWInitialized = function(actor){
@@ -66,13 +74,7 @@ StatCalc.prototype.isActorSRWInitialized = function(actor){
 }
 
 StatCalc.prototype.getTerrainPerformance = function(terrainString){
-	return (ENGINE_SETTINGS.TERRAIN_PERFORMANCE || {
-		"S": 1.1,
-		"A": 1,
-		"B": 0.9,
-		"C": 0.8,
-		"D": 0.6
-	})[terrainString];
+	return (ENGINE_SETTINGS.TERRAIN_PERFORMANCE || this._defaultTerrainPerformance)[terrainString];
 }
 
 StatCalc.prototype.getReferenceId = function(actor, depth){
