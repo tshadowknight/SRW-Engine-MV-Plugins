@@ -1021,8 +1021,12 @@ Window_DetailPages.prototype.drawPilotStats2 = function() {
 	detailContent+=APPSTRINGS.GENERAL.label_ace_bonus;
 	detailContent+="</div>";
 	
-	var aceAbility = $statCalc.getAceAbility(actor);		
-	if(aceAbility && $statCalc.isAce(actor)){		
+	var aceAbility = $statCalc.getAceAbility(actor);	
+	if(aceAbility == -1){
+		detailContent+="<div class='ace_desc scaled_text'>";
+		detailContent+="---";
+		detailContent+="</div>";
+	} else if(aceAbility && $statCalc.isAce(actor)){		
 		detailContent+="<div class='ace_desc scaled_text'>";
 		detailContent+=$pilotAbilityManager.getAbilityDisplayInfo(aceAbility.idx).desc;
 		detailContent+="</div>";

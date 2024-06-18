@@ -244,7 +244,7 @@
 }
 
 .unit_list_table.pilot_default .list_table_row .list_table_block:nth-child(6){
-	width: 30%;
+	width: 22%;
 }
 
 .unit_list_table.pilot_ability_1 .list_table_row .list_table_block:nth-child(1){
@@ -498,6 +498,14 @@
 	color: var(--text-color-highlight);
 	margin-top: 1%;
 	margin-bottom: 1%;
+}
+
+.list_table_block .attribute_indicator {
+	display: flex;
+}
+
+.list_table_block .attribute_indicator img{
+	width: 39%;
 }
 
 #mech_list_control_details {

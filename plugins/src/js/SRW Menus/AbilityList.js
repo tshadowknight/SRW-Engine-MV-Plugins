@@ -8,7 +8,7 @@ export default function AbilityList(container, selectionProvider, excludeUnique)
 	this._maxPageSize = 8;
 	this._selectionProvider = selectionProvider;
 	this._excludeUnique = excludeUnique;
-	this._orderedAbilityIdxs = ENGINE_SETTINGS.PURCHASABLE_ABILITIES;
+	this._orderedAbilityIdxs = $gameSystem.getPurchasbleAbilities();
 	this._abilityDisplayInfo = [];
 	this.initDisplayInfo();
 }

@@ -2877,6 +2877,9 @@ StatCalc.prototype.swapPilot = function(actor, newActorId){
 		this.invalidateAbilityCache();
 		this.reloadSRWStats(targetPilot, false, true);
 		targetPilot.SRWStats.mech = currentMechData;
+		
+		//abilities used tracking should be shared beween all pilots in a mech
+		targetPilot.SRWStats.stageTemp.abilityUsed = actor.SRWStats.stageTemp.abilityUsed;
 		event.refreshImage();	
 	}
 }
@@ -6199,7 +6202,7 @@ StatCalc.prototype.getMechTerrainString = function(actor, terrain){
 		var mechTerrainLevel = actor.SRWStats.mech.stats.calculated.terrain[currentTerrain]; 
 		var mechTerrainNumeric = this._terrainToNumeric[mechTerrainLevel];
 		var minMechTerrains = this.getMinTerrains(actor);
-		if(mechTerrainNumeric < minMechTerrains[currentTerrain] || (mechTerrainNumeric == undefined && minMechTerrains[currentTerrain] != null)){
+		if(mechTerrainNumeric < minMechTerrains[currentTerrain] || (mechTerrainNumeric == undefined && minMechTerrains[currentTerrain] != -1)){
 			mechTerrainNumeric = minMechTerrains[currentTerrain];
 		}		
 		return this._terrainSumToLevel[mechTerrainNumeric + mechTerrainNumeric];
@@ -6223,7 +6226,7 @@ StatCalc.prototype.getFinalTerrainString = function(actor, terrain){
 		var mechTerrainLevel = actor.SRWStats.mech.stats.calculated.terrain[currentTerrain]; 
 		var mechTerrainNumeric = this._terrainToNumeric[mechTerrainLevel];
 		var minMechTerrains = this.getMinTerrains(actor);	
-		if(mechTerrainNumeric < minMechTerrains[currentTerrain] || (mechTerrainNumeric == undefined && minMechTerrains[currentTerrain] != null)){
+		if(mechTerrainNumeric < minMechTerrains[currentTerrain] || (mechTerrainNumeric == undefined && minMechTerrains[currentTerrain] != -1)){
 			mechTerrainNumeric = minMechTerrains[currentTerrain];
 		}		
 		return this._terrainSumToLevel[this._terrainToNumeric[pilotTerrainLevel] + mechTerrainNumeric];
@@ -6238,7 +6241,7 @@ StatCalc.prototype.getWeaponTerrainMod = function(actor, weaponInfo){
 		
 		var weaponTerrainNumeric = this._terrainToNumeric[weaponTerrainRanking];
 		var minTerrains = this.getMinTerrains(actor);	
-		if(weaponTerrainNumeric < minTerrains[currentTerrain] || (weaponTerrainNumeric == undefined && minTerrains[currentTerrain] != null)){
+		if(weaponTerrainNumeric < minTerrains[currentTerrain] || (weaponTerrainNumeric == undefined && minTerrains[currentTerrain] != -1)){
 			weaponTerrainNumeric = minTerrains[currentTerrain];
 		}		
 		return this._terrainSumToLevel[weaponTerrainNumeric + weaponTerrainNumeric];
@@ -6247,21 +6250,28 @@ StatCalc.prototype.getWeaponTerrainMod = function(actor, weaponInfo){
 }
 
 StatCalc.prototype.getMinTerrains = function(actor){
+	let result;
 	if(this.isActorSRWInitialized(actor)){
-		return {
+		result = {
 			"land": this.applyMaxStatModsToValue(actor, 0, ["land_terrain_rating"]),
 			"air": this.applyMaxStatModsToValue(actor, 0, ["air_terrain_rating"]),
 			"water": this.applyMaxStatModsToValue(actor, 0, ["water_terrain_rating"]),
 			"space": this.applyMaxStatModsToValue(actor, 0, ["space_terrain_rating"])
 		};
 	} else {
-		return {
+		result = {
 			"land": 0,
 			"air": 0,
 			"water": 0,
 			"space": 0
 		};
 	}
+	for(let key in result){
+		if(result[key] == 0){
+			result[key] = -1;//indicate that the min terrain is unset if the result is 0, this is needed to avoid elevating - terrain to D terrain by default. Note: this means it's impossible to "raise" terrain to D rank using an ability.
+		}
+	}
+	return result;
 }
 
 StatCalc.prototype.getRealWeaponTerrainStrings = function(actor, weaponInfo){
@@ -6272,7 +6282,7 @@ StatCalc.prototype.getRealWeaponTerrainStrings = function(actor, weaponInfo){
 		Object.keys(weaponInfo.terrain).forEach(function(currentTerrain){
 			var weaponTerrainRanking = weaponInfo.terrain[currentTerrain];
 			var weaponTerrainNumeric = _this._terrainToNumeric[weaponTerrainRanking];
-			if(weaponTerrainNumeric < minTerrains[currentTerrain] || (weaponTerrainNumeric == undefined && minTerrains[currentTerrain] != null)){
+			if(weaponTerrainNumeric < minTerrains[currentTerrain] || (weaponTerrainNumeric == undefined && minTerrains[currentTerrain] != -1)){
 				weaponTerrainNumeric = minTerrains[currentTerrain];
 			}	
 			result[currentTerrain] = _this._terrainSumToLevel[weaponTerrainNumeric + weaponTerrainNumeric];
@@ -7424,6 +7434,9 @@ StatCalc.prototype.externalLockUnitUpdates = function(){
 	this._unitUpdatesExternalLocked = true;
 }
 
+//_unitUpdatesExternalLocked is a var that disables full ability cache invalidations and application of deploy actions, both operations that may introduce lag when done in bulk
+//this is an optimization flag that should only be toggled on in specific cases where units are deployed and it is certain that those bulk operations are not required during that deployment
+//currently this flag is set when confirming the manual deploy since all deploy actions were already applied when exiting the deploy menu
 StatCalc.prototype.externalUnlockUnitUpdates = function(){
 	this._unitUpdatesExternalLocked = false;
 }
@@ -7441,8 +7454,7 @@ StatCalc.prototype.invalidateAbilityCache = function(actor){
 	if(actor && actor.isSubPilot){
 		return; //a sub pilot should not trigger a partial cache invalidation to prevent issue with reloading a unit
 	}
-	if(!this._abilityCacheLocked && !this._unitUpdatesExternalLocked){
-
+	if(!this._abilityCacheLocked){
 		if(actor){
 			var event = this.getReferenceEvent(actor);
 			if(event){
@@ -7450,7 +7462,7 @@ StatCalc.prototype.invalidateAbilityCache = function(actor){
 				event._lastModsPosition = null;
 				//this._invalidatedActor = actor;
 			}			
-		} else {
+		} else if(!this._unitUpdatesExternalLocked){
 			console.log("Full cache invalidation");
 			this._abilityCacheBuilding = false;
 			this._abilityCacheDirty = true;
@@ -7459,8 +7471,6 @@ StatCalc.prototype.invalidateAbilityCache = function(actor){
 		this.invalidateActorAbiTracking(actor);	
 	}	
 }
-
-
 
 StatCalc.prototype.invalidateActorAbiTracking = function(actor){
 	const _this = this;

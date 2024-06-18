@@ -946,6 +946,34 @@ MechList.prototype.defineContent = function(){
 			]
 		},
 	}
+	
+	function generateAttributeColumnConfig(){
+		return {
+			title: APPSTRINGS.MECHLIST.column_attribute,
+			contentFunction: function(pilot, mech){
+				let content = "";
+				let attr1 = $statCalc.getParticipantAttribute(pilot, "attribute1");
+				if(attr1){
+					let attrInfo = ENGINE_SETTINGS.ATTRIBUTE_DISPLAY_NAMES[attr1] || {};
+					content+="<div class='attribute_indicator scaled_text fitted_text'>";		
+					content+="<img data-img='img/system/attribute_"+attr1+".png'>";		
+					//content+=attrInfo.name || attr1;
+					content+="</div>";
+				}
+				return content;
+			},
+			compareFunction: function(a, b){
+				let attrA = String($statCalc.getParticipantAttribute(a, "attribute1") || "");
+				let attrB = String($statCalc.getParticipantAttribute(b, "attribute1") || "");
+				return attrA.localeCompare(attrB);
+			}
+		};
+	}
+	
+	if(ENGINE_SETTINGS.ENABLE_ATTRIBUTE_SYSTEM){
+		this._pageInfo[0].content.push(generateAttributeColumnConfig());
+		this._pageInfo[5].content.push(generateAttributeColumnConfig());
+	}
 }
 
 MechList.prototype.setUnitModeActor = function(){

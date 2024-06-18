@@ -26,7 +26,7 @@
 			this._searchedItemList = [];
 			this._pilotFallbackInfo = {};
 			this.initOptions();
-			
+			this.purchasableAbilities = structuredClone(ENGINE_SETTINGS.PURCHASABLE_ABILITIES);
 			this._controlSet = "mkb";
 		};
 		
@@ -3090,5 +3090,18 @@
 				this._pilotAbilityUniqueOverrides = {};
 			}
 			this._pilotAbilityUniqueOverrides[abilityId] = state;
+		}
+		
+		Game_System.prototype.getPurchasbleAbilities = function() {
+			return ENGINE_SETTINGS.PURCHASABLE_ABILITIES.concat((this._additionalPurchasableAbilities || []));
+		}
+		
+		Game_System.prototype.addPurchasableAbility = function(id) {
+			if(!this._additionalPurchasableAbilities){
+				this._additionalPurchasableAbilities = [];
+			}
+			if(this._additionalPurchasableAbilities.indexOf(id) == -1){
+				this._additionalPurchasableAbilities.push(id);
+			}			
 		}
 	}

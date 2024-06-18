@@ -204,7 +204,8 @@ APPSTRINGS.MECHLIST = {
 	column_kills: "Score",
 	column_support_attack: "Support ATK",
 	column_support_defend: "Support DEF",
-	column_slots: "Slots"
+	column_slots: "Slots",
+	column_attribute: "Attr."
 }
 
 APPSTRINGS.PILOTLIST = {
