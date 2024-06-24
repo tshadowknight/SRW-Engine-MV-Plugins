@@ -383,7 +383,10 @@
 				if($gameSystem.isIntermission()){
 					$gameSystem.startIntermission();
 				} else {
+					$statCalc.invalidateAbilityCache();
+					$statCalc.invalidateZoneCache();
 					$statCalc.softRefreshUnits();
+					
 					$SRWGameState.requestNewState("normal");
 				}			
 				return true;
@@ -451,7 +454,10 @@
 				if(ENGINE_SETTINGS.SAVE_UPDATE_FUNCTION){
 					ENGINE_SETTINGS.SAVE_UPDATE_FUNCTION();
 				}
+				$statCalc.invalidateAbilityCache();
+				$statCalc.invalidateZoneCache();
 				$statCalc.softRefreshUnits();
+				
 				SceneManager._scene.fadeOutAll()
 				SceneManager.goto(Scene_Map);
 				if($gameSystem._bgmOnSave){

@@ -1044,14 +1044,14 @@ Window_DetailPages.prototype.drawPilotStats2 = function() {
 	detailContent+="</div>";
 	
 	detailContent+="<div class='ability_block_row scaled_height'>";
-	if($gameTemp.currentMenuUnit.actor.isActor()){
-		abilityList = ENGINE_SETTINGS.FAV_POINT_ABILITIES[$gameTemp.currentMenuUnit.actor.actorId()] || ENGINE_SETTINGS.FAV_POINT_ABILITIES[-1];
+	if(actor.isActor()){
+		abilityList = ENGINE_SETTINGS.FAV_POINT_ABILITIES[actor.actorId()] || ENGINE_SETTINGS.FAV_POINT_ABILITIES[-1];
 	} else {
 		abilityList = [];
 	}
 	
 	if(abilityList){
-		let pointCount = $statCalc.getFavPoints($gameTemp.currentMenuUnit.actor);
+		let pointCount = $statCalc.getFavPoints(actor);
 		let unlocked = {};
 		for(let i = 0; i < abilityList.length; i++){
 			let def = abilityList[i];	

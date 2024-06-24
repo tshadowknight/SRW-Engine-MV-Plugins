@@ -437,7 +437,11 @@ Window_SpiritSelection.prototype.getSpiritEnabledState = function(listIdx, slot,
 	if(listIdx < list.length){	
 		var selectedSpirit = list[listIdx];
 		var spiritDisplayInfo = $spiritManager.getSpiritDisplayInfo(selectedSpirit.idx);
-		if(selectedSpirit.cost > $statCalc.getCalculatedPilotStats(caster).currentSP - pendingBatchCost && (this.getCurrentBatchedSpirits(slot)[selectedSpirit.idx] == null || this.getCurrentBatchedSpirits(slot)[selectedSpirit.idx].actor.actorId() != caster.actorId())){
+		
+		//this is enabled handler check also filters out checks for invalid spirit ids! Without it further checks may crash!
+		if(!spiritDisplayInfo.enabledHandler(target)){
+			result = -1;
+		} else if(selectedSpirit.cost > $statCalc.getCalculatedPilotStats(caster).currentSP - pendingBatchCost && (this.getCurrentBatchedSpirits(slot)[selectedSpirit.idx] == null || this.getCurrentBatchedSpirits(slot)[selectedSpirit.idx].actor.actorId() != caster.actorId())){
 			result = -2;
 		} else if(this.getCurrentBatchedSpirits(slot)[selectedSpirit.idx] != null && this.getCurrentBatchedSpirits(slot)[selectedSpirit.idx].actor.actorId() != caster.actorId()){
 			result = -1;
@@ -452,9 +456,7 @@ Window_SpiritSelection.prototype.getSpiritEnabledState = function(listIdx, slot,
 		}
 		if(this._currentPlusSpirits[selectedSpirit.idx] != null && this._currentPlusSpirits[selectedSpirit.idx] != caster.actorId()){
 			result = -3;
-		} else if(!spiritDisplayInfo.enabledHandler(target)){
-			result = -4;
-		}
+		}  
 	} else {
 		result = -1;
 	}

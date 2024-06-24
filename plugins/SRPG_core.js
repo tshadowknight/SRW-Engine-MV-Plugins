@@ -919,6 +919,9 @@ SceneManager.isInSaveScene = function(){
 	
 	Scene_Map.prototype.commandGameEnd = function() {
 		//this.closePauseMenu();
+		$gameTemp.buttonHintManager.hide();
+		this._mapButtonsWindow.hide();
+		this._mapButtonsWindow.close();
 		SceneManager.push(Scene_GameEnd);
 	};
 	
@@ -1882,17 +1885,39 @@ SceneManager.isInSaveScene = function(){
     var _SRPG_SceneMap_update = Scene_Map.prototype.update;
     Scene_Map.prototype.update = function() {
 		var _this = this;
-			
+		if($gameTemp.doingSoftRestFade){
+			this.updateFade();
+			return;
+		}	
 		//Soft Reset
 		if(!$gameSystem.isIntermission() && Input.isPressed("ok") && Input.isPressed("cancel") && Input.isPressed("pageup") && Input.isPressed("pagedown")){
-			Input.clear();
-			$gameSystem.setSubBattlePhase("normal");
-			try {
-				JsonEx.parse(StorageManager.load("continue"));//check if the continue slot exists first by trying to parse it
-				DataManager.loadContinueSlot();
-			} catch(e){
-				
-			}			
+			this.fadeOutAll();
+			$gameTemp.buttonHintManager.hide();
+			this._mapButtonsWindow.hide();
+			this._mapButtonsWindow.close();
+			
+			this._summaryWindow.hide();
+			this._summaryWindow.close();
+			
+			this._zoneSummaryWindow.hide();
+			this._zoneSummaryWindow.close();
+			
+			this._terrainDetailsWindow.hide();
+			this._terrainDetailsWindow.close();
+			
+			$gameTemp.doingSoftRestFade = true;
+			setTimeout(function(){
+				$gameTemp.doingSoftRestFade = false;
+				Input.clear();
+				$gameSystem.setSubBattlePhase("normal");
+				try {
+					JsonEx.parse(StorageManager.load("continue"));//check if the continue slot exists first by trying to parse it
+					DataManager.loadContinueSlot();
+				} catch(e){
+					
+				}			
+			}, 1000);
+			
 			return;
 		}				
 		

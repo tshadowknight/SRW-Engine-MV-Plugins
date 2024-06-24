@@ -614,8 +614,8 @@ BattleSceneManager.prototype.initScene = function(){
 	this._scene = scene;
 	//this._scene.performancePriority  = BABYLON.ScenePerformancePriority.Intermediate;
 	
-	this._scene.clearColor = new BABYLON.Color3(0, 0, 0);
-	this._scene.ambientColor = new BABYLON.Color3(0, 0, 0);
+	this._scene.clearColor = new BABYLON.Color3(0.5, 0.5, 0.5);
+	//this._scene.ambientColor = new BABYLON.Color3(0, 0, 0);
 	
 	//const light = new BABYLON.PointLight("pointLight", new BABYLON.Vector3(0, 0, 0), scene);
 	
