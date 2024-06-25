@@ -884,10 +884,16 @@ GameState_actor_support.prototype.updateMapEvent = function(x, y, triggers){
 							totalExp = ENGINE_SETTINGS.EXP_YIELD.MAX;
 						}
 						totalExp = Math.floor(totalExp);
-						var gainResults = [{actor: actor, expGain: totalExp, ppGain: 0}];			
-
-						var expResults = [{actor: actor, details: $statCalc.addExp(actor, totalExp)}];
-									
+						
+						let gainRecipientIds = [actor.actorId()].concat($statCalc.getSubPilots(actor));
+						
+						var gainResults = [];	
+						var expResults = [];						
+						for(let id of gainRecipientIds){
+							const actor = $gameActors.actor(id);
+							gainResults.push({actor: actor, expGain: totalExp, ppGain: 0});
+							expResults.push({actor: actor, details: $statCalc.addExp(actor, totalExp)});
+						}									
 						
 						$gameTemp.rewardsInfo = {
 							//actor: battleEffect.ref,

@@ -402,8 +402,12 @@ BattleCalc.prototype.performDamageCalculation = function(attackerInfo, defenderI
 		}
 		armor = $statCalc.applyStatModsToValue(defenderInfo.actor, armor, ["armor"]);	
 
-		if($statCalc.applyStatModsToValue(attackerInfo.actor, 0, ["ignore_armor"])){
-			armor = 1;
+		const ignoreAmount = $statCalc.applyStatModsToValue(attackerInfo.actor, 0, ["ignore_armor"])
+		if(ignoreAmount){
+			armor-=ignoreAmount;
+			if(armor < 1){
+				armor = 1;
+			}			
 		}	
 		
 		var defenderTerrainRating = $statCalc.getTerrainMod(defenderInfo.actor) || 0;
