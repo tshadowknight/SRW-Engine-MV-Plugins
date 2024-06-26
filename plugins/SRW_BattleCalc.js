@@ -352,7 +352,7 @@ BattleCalc.prototype.performDamageCalculation = function(attackerInfo, defenderI
 		//initial attack
 		var weaponInfo = attackerAction.attack;
 		var weaponPower = $statCalc.getWeaponPower(attackerInfo.actor, weaponInfo)*1;
-		var weaponTerrainRating = this.getWeaponTerrainValue($statCalc.getWeaponTerrainMod(defenderInfo.actor, weaponInfo)) || 0;
+		var weaponTerrainRating = this.getWeaponTerrainValue($statCalc.getWeaponTerrainMod(attackerInfo.actor, defenderInfo.actor, weaponInfo)) || 0;
 		
 		var attackerPilotOffense;
 		var attackerPilotStats = $statCalc.getCalculatedPilotStats(attackerInfo.actor);

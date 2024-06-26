@@ -1180,7 +1180,7 @@
 				
 				//this.z = this._character.screenZ() - 1;
 			
-				if(unit && !this._character.isErased() && $gameSystem.showWillIndicator){
+				if(unit && !this._character.isErased() && ConfigManager["willIndicator"]){
 					this.opacity = 255;
 				} else {
 					this.opacity = 0;

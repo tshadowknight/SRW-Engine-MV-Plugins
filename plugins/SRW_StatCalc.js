@@ -6234,13 +6234,13 @@ StatCalc.prototype.getFinalTerrainString = function(actor, terrain){
 	return "-";
 }
 
-StatCalc.prototype.getWeaponTerrainMod = function(actor, weaponInfo){
-	if(this.isActorSRWInitialized(actor)){
-		var currentTerrain = this.getCurrentAliasedTerrain(actor);
+StatCalc.prototype.getWeaponTerrainMod = function(attackingActor, targetActor, weaponInfo){
+	if(this.isActorSRWInitialized(targetActor) && this.isActorSRWInitialized(attackingActor)){
+		var currentTerrain = this.getCurrentAliasedTerrain(targetActor);
 		var weaponTerrainRanking = weaponInfo.terrain[currentTerrain];
 		
 		var weaponTerrainNumeric = this._terrainToNumeric[weaponTerrainRanking];
-		var minTerrains = this.getMinTerrains(actor);	
+		var minTerrains = this.getMinTerrains(attackingActor);	
 		if(weaponTerrainNumeric < minTerrains[currentTerrain] || (weaponTerrainNumeric == undefined && minTerrains[currentTerrain] != -1)){
 			weaponTerrainNumeric = minTerrains[currentTerrain];
 		}		

@@ -891,8 +891,10 @@ GameState_actor_support.prototype.updateMapEvent = function(x, y, triggers){
 						var expResults = [];						
 						for(let id of gainRecipientIds){
 							const actor = $gameActors.actor(id);
-							gainResults.push({actor: actor, expGain: totalExp, ppGain: 0});
-							expResults.push({actor: actor, details: $statCalc.addExp(actor, totalExp)});
+							if(actor){
+								gainResults.push({actor: actor, expGain: totalExp, ppGain: 0});
+								expResults.push({actor: actor, details: $statCalc.addExp(actor, totalExp)});
+							}							
 						}									
 						
 						$gameTemp.rewardsInfo = {
