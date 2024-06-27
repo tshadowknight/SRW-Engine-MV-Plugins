@@ -15,20 +15,43 @@ MapAttackPreview.prototype.showPreview = function(attack){
 	var tileCoordinates = JSON.parse(JSON.stringify(mapAttackDef.shape));	
 	
 	var coordLookup = {};
+	var retargetCoordLookup = {};
 		
 	var maxCoord = 0;
-	for(var coord of tileCoordinates){
-		if(coord[0] > maxCoord){
-			maxCoord = coord[0];
+	
+	function updateCoordInfo(tileCoordinates, offset, coordLookup){
+		if(!offset){
+			offset = {x: 0, y: 0};
 		}
-		if(coord[1] > maxCoord){
-			maxCoord = coord[1];
+		for(var coord of tileCoordinates){
+			const x = coord[0] + offset.x;
+			const y = coord[1] + offset.y;
+			if(x > maxCoord){
+				maxCoord = x;
+			}
+			if(y > maxCoord){
+				maxCoord = y;
+			}
+			if(!coordLookup[x]){
+				coordLookup[x] = {};
+			}
+			coordLookup[x][y] = true;
 		}
-		if(!coordLookup[coord[0]]){
-			coordLookup[coord[0]] = {};
-		}
-		coordLookup[coord[0]][coord[1]] = true;
 	}
+	updateCoordInfo(tileCoordinates, null, coordLookup);
+	
+	
+	if(mapAttackDef.retargetInfo){
+		var tileCoordinates = JSON.parse(JSON.stringify(mapAttackDef.retargetInfo.shape));
+		let initialPos = mapAttackDef.retargetInfo.initialPosition;
+		let center = mapAttackDef.retargetInfo.center;
+		const offset = {
+			x: initialPos.x - center.x,
+			y: initialPos.y - center.y
+		};
+		updateCoordInfo(tileCoordinates, offset, retargetCoordLookup);
+	}
+	
 	var gridSize = maxCoord + 1;		
 	if(mapAttackDef.lockRotation){
 		gridSize*= 2;	
@@ -74,12 +97,21 @@ MapAttackPreview.prototype.showPreview = function(attack){
 					classes.push("ignore_friendlies");
 				}
 			}
-			
-			
+						
 			previewContent+="<div style='border: "+borderSize+"px solid rgba(255,255,255,0.75); width: "+blockSize+"px; height: "+blockSize+"px; top: "+(j * fullSize)+"px; left: "+(i * fullSize)+"px;' class='"+(classes.join(" "))+"'>";
 			previewContent+="</div>";
+			if(retargetCoordLookup[refX] && retargetCoordLookup[refX][refY]){
+				classes = ["grid_block", "retarget_tile"];
+				previewContent+="<div style='border: "+borderSize+"px solid rgba(255,255,255,0.75); width: "+blockSize+"px; height: "+blockSize+"px; top: "+(j * fullSize)+"px; left: "+(i * fullSize)+"px;' class='"+(classes.join(" "))+"'>";
+				previewContent+="</div>";
+			}
+			
+			
 		}
 	}
+	
+	
+	
 	previewContent+="</div>";
 	this._container.innerHTML = previewContent;	
 }

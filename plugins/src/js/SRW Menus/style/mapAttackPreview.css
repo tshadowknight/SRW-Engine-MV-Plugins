@@ -25,3 +25,24 @@
 .preview_grid .attack_tile.ignore_friendlies {
 	background-color: rgba(0,0,255,0.5);
 }
+
+
+.preview_grid .retarget_tile {
+	background-color: rgba(255,255,255,0.7);
+	animation: fadeInFromNone 4s linear;
+	animation-iteration-count: infinite;
+}
+
+@keyframes fadeInFromNone {
+    0% {
+        opacity: 0.5;
+    }
+	
+	50% {
+		opacity: 1;
+	}
+
+    100% {
+        opacity: 0.5;
+    }
+}

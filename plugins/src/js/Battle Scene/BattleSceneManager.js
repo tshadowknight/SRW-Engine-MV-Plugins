@@ -4505,7 +4505,8 @@ BattleSceneManager.prototype.executeAnimation = function(animation, startTick){
 				}
 				ctr++;
 			}
-			if(targetObj){
+			if(targetObj && targetObj.parent){
+				targetObj.position = targetObj.parent.getAbsolutePosition();
 				delete targetObj.parent;
 			}
 		}			,
