@@ -624,7 +624,7 @@ GameState_actor_map_target.prototype.update = function(scene){
 			tileCoordinates[i][0]+=deltaX;
 			tileCoordinates[i][1]+=deltaY;
 			//$gameTemp.pushMoveList(tileCoordinates[i]);		
-			$gameSystem.highlightedTiles.push({x: tileCoordinates[i][0], y: tileCoordinates[i][1], color: "#ff3a3a"});	
+			$gameSystem.highlightedTiles.push({x: tileCoordinates[i][0], y: tileCoordinates[i][1], color: attack.ignoresFriendlies ? "#3a69ff" : "#ff3a3a"});	
 		}							
 		$gameTemp.currentMapTargetTiles = JSON.parse(JSON.stringify(tileCoordinates));
 	}

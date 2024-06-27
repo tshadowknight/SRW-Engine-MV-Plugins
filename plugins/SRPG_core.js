@@ -1890,35 +1890,39 @@ SceneManager.isInSaveScene = function(){
 			return;
 		}	
 		//Soft Reset
-		if(!$gameSystem.isIntermission() && Input.isPressed("ok") && Input.isPressed("cancel") && Input.isPressed("pageup") && Input.isPressed("pagedown")){
-			this.fadeOutAll();
-			$gameTemp.buttonHintManager.hide();
-			this._mapButtonsWindow.hide();
-			this._mapButtonsWindow.close();
-			
-			this._summaryWindow.hide();
-			this._summaryWindow.close();
-			
-			this._zoneSummaryWindow.hide();
-			this._zoneSummaryWindow.close();
-			
-			this._terrainDetailsWindow.hide();
-			this._terrainDetailsWindow.close();
-			
-			$gameTemp.doingSoftRestFade = true;
-			setTimeout(function(){
-				$gameTemp.doingSoftRestFade = false;
-				Input.clear();
-				$gameSystem.setSubBattlePhase("normal");
-				try {
-					JsonEx.parse(StorageManager.load("continue"));//check if the continue slot exists first by trying to parse it
-					DataManager.loadContinueSlot();
-				} catch(e){
-					
-				}			
-			}, 1000);
-			
-			return;
+		if(!$gameSystem.isIntermission() && Input.isPressed("ok") && Input.isPressed("cancel") && Input.isPressed("pageup") && Input.isPressed("pagedown")){			
+			let continueSlotIsPopulated = false;
+			try {
+				JsonEx.parse(StorageManager.load("continue"));//check if the continue slot exists first by trying to parse it
+				continueSlotIsPopulated = true;
+			} catch(e){
+				
+			}
+			if(continueSlotIsPopulated){
+				this.fadeOutAll();
+				$gameTemp.buttonHintManager.hide();
+				this._mapButtonsWindow.hide();
+				this._mapButtonsWindow.close();
+				
+				this._summaryWindow.hide();
+				this._summaryWindow.close();
+				
+				this._zoneSummaryWindow.hide();
+				this._zoneSummaryWindow.close();
+				
+				this._terrainDetailsWindow.hide();
+				this._terrainDetailsWindow.close();
+				
+				$gameTemp.doingSoftRestFade = true;
+				setTimeout(function(){
+					$gameTemp.doingSoftRestFade = false;
+					Input.clear();
+					$gameSystem.setSubBattlePhase("normal");				
+					DataManager.loadContinueSlot();							
+				}, 1000);
+				
+				return;
+			}			
 		}				
 		
 		if(Input.isTriggered("left") || Input.isTriggered("right") || Input.isTriggered("up") || Input.isTriggered("down")){
@@ -3690,7 +3694,7 @@ SceneManager.isInSaveScene = function(){
 				tileCoordinates[i][0]+=deltaX;
 				tileCoordinates[i][1]+=deltaY;
 				$gameTemp.pushMoveList(tileCoordinates[i]);	
-				$gameSystem.highlightedTiles.push({x: tileCoordinates[i][0], y: tileCoordinates[i][1], color: "#ff3a3a"});					
+				$gameSystem.highlightedTiles.push({x: tileCoordinates[i][0], y: tileCoordinates[i][1], color: bestMapAttack.attack.ignoresFriendlies ? "#3a69ff" : "#ff3a3a"});					
 			}
 				
 			$statCalc.setCurrentAttack(enemy, bestMapAttack.attack);
