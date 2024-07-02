@@ -33,8 +33,8 @@ Window_ModeSelection.prototype.show = function(){
 	//lock input until loader has faded away
 	this._handlingInput = true;
 	setTimeout(() => {this._handlingInput = false}, 1000);
-	this._loader.classList.add("doFade");
-	
+	this.doFadeIn();
+	this._loader.classList.remove("fadeToNone");
 	Graphics._updateCanvas();
 }
 
@@ -47,6 +47,22 @@ Window_ModeSelection.prototype.resetSelection = function(){
 
 Window_ModeSelection.prototype.getCurrentSelection = function(){
 	return this._currentSelection;
+}
+
+Window_ModeSelection.prototype.resetFade = function() {
+	var windowNode = this.getWindowNode();
+	windowNode.removeChild(this._loader);
+	windowNode.appendChild(this._loader);
+}
+
+Window_ModeSelection.prototype.doFadeIn = function() {
+	this.resetFade();
+	this._loader.classList.add("doFade");
+}
+
+Window_ModeSelection.prototype.doFadeOut = function() {
+	this.resetFade();
+	this._loader.classList.add("fadeToNone");
 }
 
 Window_ModeSelection.prototype.createComponents = function() {
@@ -157,6 +173,10 @@ Window_ModeSelection.prototype.update = function() {
 		}	
 		
 		if(Input.isTriggered('cancel') || TouchInput.isCancelled()){		
+			if(this._callbacks["closed"]){
+				this.doFadeOut();
+				setTimeout(() => {this._callbacks["closed"]();}, 1000);				
+			}
 		}			
 		this.resetTouchState();
 		this.refresh();
@@ -212,7 +232,7 @@ Window_ModeSelection.prototype.redraw = function() {
 			_this._currentSelection = this.getAttribute("data-idx");
 			_this._touchOK = true;					
 		});
-		entry.addEventListener("mouseenter", function(){	
+		entry.addEventListener("mousemove", function(){	
 			const targetIdx = this.getAttribute("data-idx"); 
 			if(targetIdx != _this._currentSelection){
 				_this._currentSelection = this.getAttribute("data-idx");

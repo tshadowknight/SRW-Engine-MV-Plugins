@@ -1733,6 +1733,7 @@ BattleCalc.prototype.generateMapBattleResult = function(){
 				expGain = $statCalc.applyStatModsToValue(gainRecipient, expGain, ["exp"]);
 				if($statCalc.getActiveSpirits(gainRecipient).gain){
 					expGain*=2;
+					aCache.isGainBoosted = true;
 				}
 				var ppGain = _this.performPPCalculation(gainRecipient, gainDonor);
 				var fundGain = $statCalc.getAwardedFunds(gainDonor);

@@ -1085,6 +1085,11 @@ SceneManager.isInSaveScene = function(){
 		this._modeSelectionWindow = new Window_ModeSelection(0, 0, Graphics.boxWidth, Graphics.boxHeight);
 		this._modeSelectionWindow.close();
 		this.addWindow(this._modeSelectionWindow);
+		this._modeSelectionWindow.registerCallback("closed", function(){
+			if($gameTemp.modeSelectionWindowCallback){
+				$gameTemp.modeSelectionWindowCallback();
+			}
+		});
 	
 		this._modeSelectionWindow.hide();
 		this.idToMenu["mode_selection"] = this._modeSelectionWindow;

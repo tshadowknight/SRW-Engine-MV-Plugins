@@ -1413,31 +1413,33 @@ StatCalc.prototype.softRefreshUnits = function(){
 	});
 	
 	this.iterateAllActors(null, function(actor, event){
-		var itemsIds = [];
-		actor.SRWStats.mech.items.forEach(function(item){
-			if(!item){
-				itemsIds.push(null);
-			} else {
-				itemsIds.push(item.idx);
-			}			
-		});
-		if(!actor.SRWStats.dropBoxItems){
-			actor.SRWStats.dropBoxItems = [];
-		}
-		var dropBoxItems = [];
-		actor.SRWStats.dropBoxItems.forEach(function(item){
-			if(!item){
-				dropBoxItems.push(null);
-			} else {
-				dropBoxItems.push(item);
-			}			
-		});
-		actor.SRWStats.pilot.abilities = null;//ensure reload
-		//ensure dummy events are expanded after loading an intermission save
-		if(event._dummyId != null){
-			_this.attachDummyEvent(actor, event._dummyId);
-		}
-		_this.initSRWStats(actor, _this.getCurrentLevel(actor), itemsIds, true, false, dropBoxItems);				
+		if(!_this.isBoarded(actor)){//workaround for issue with applying stat mods to boarded units on save load, the temp tracking workaround for live deploys is not applicable so the engine reverts to the behavior where it applies the ship's stat mods to the unit		
+			var itemsIds = [];
+			actor.SRWStats.mech.items.forEach(function(item){
+				if(!item){
+					itemsIds.push(null);
+				} else {
+					itemsIds.push(item.idx);
+				}			
+			});
+			if(!actor.SRWStats.dropBoxItems){
+				actor.SRWStats.dropBoxItems = [];
+			}
+			var dropBoxItems = [];
+			actor.SRWStats.dropBoxItems.forEach(function(item){
+				if(!item){
+					dropBoxItems.push(null);
+				} else {
+					dropBoxItems.push(item);
+				}			
+			});
+			actor.SRWStats.pilot.abilities = null;//ensure reload
+			//ensure dummy events are expanded after loading an intermission save
+			if(event._dummyId != null){
+				_this.attachDummyEvent(actor, event._dummyId);
+			}
+			_this.initSRWStats(actor, _this.getCurrentLevel(actor), itemsIds, true, false, dropBoxItems);	
+		}	
 	});
 	this.invalidateAbilityCache();
 }
@@ -8404,16 +8406,7 @@ StatCalc.prototype.unbindLinkedDeploySlots = function(actorId, mechId, type, slo
 	this.lockAbilityCache();
 	var deployActions = this.getDeployActions(actorId, mechId);
 	
-	if(deployActions){
-		var lockedPilots = {};
-		var deployInfo = $gameSystem.getDeployInfo();
-		
-		Object.keys(deployInfo.assigned).forEach(function(slot){
-			if(deployInfo.lockedSlots[slot]){
-				lockedPilots[$gameActors.actor(deployInfo.assigned[slot]).SRWStats.pilot.id] = true;
-			}
-		});
-		
+	if(deployActions){				
 		Object.keys(deployActions).forEach(function(targetMechId){	
 			if(targetMechId != "optional"){	
 				var actions = deployActions[targetMechId];			
@@ -8431,7 +8424,7 @@ StatCalc.prototype.unbindLinkedDeploySlots = function(actorId, mechId, type, slo
 					if(sourceId != -1 && targetDef.type == type){
 						if(type != "sub" || targetDef.slot == slot){
 							var targetPilot = $gameActors.actor(sourceId);	
-							if(targetPilot && !lockedPilots[sourceId]){
+							if(targetPilot){
 								if(sourceDef.type == "main" || sourceDef.type == "direct"){
 									targetPilot._classId = 0;
 									targetPilot.isSubPilot = false;
@@ -8482,13 +8475,13 @@ StatCalc.prototype.applyDeployActions = function(actorId, mechId, overwriteFallb
 	if(deployActions){
 		result = true;
 		var lockedPilots = {};
-		var deployInfo = $gameSystem.getDeployInfo();
+		/*var deployInfo = $gameSystem.getDeployInfo();
 		
 		Object.keys(deployInfo.assigned).forEach(function(slot){
 			if(deployInfo.lockedSlots[slot]){
 				lockedPilots[$gameActors.actor(deployInfo.assigned[slot]).SRWStats.pilot.id] = true;
 			}
-		});
+		});*/
 		
 		Object.keys(deployActions).forEach(function(targetMechId){
 			if(targetMechId != "optional"){			

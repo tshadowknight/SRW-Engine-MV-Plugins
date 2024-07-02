@@ -872,30 +872,33 @@ GameState_actor_support.prototype.updateMapEvent = function(x, y, triggers){
 					$gameTemp.spiritWindowDoneHandler = function(){
 						var actor = $gameSystem.EventToUnit($gameTemp.activeEvent().eventId())[1];
 						
-						var attackerLevel = actor.SRWStats.pilot.level;
-						var defenderLevel = candidate.SRWStats.pilot.level;
-						var defenderTotalYield = baseYield;
-						
-						var totalExp = eval(ENGINE_SETTINGS.EXP_YIELD.LEVEL_SCALING_FORMULA);
-						if(totalExp < ENGINE_SETTINGS.EXP_YIELD.MIN){
-							totalExp = ENGINE_SETTINGS.EXP_YIELD.MIN;
-						}
-						if(totalExp > ENGINE_SETTINGS.EXP_YIELD.MAX){
-							totalExp = ENGINE_SETTINGS.EXP_YIELD.MAX;
-						}
-						totalExp = Math.floor(totalExp);
 						
 						let gainRecipientIds = [actor.actorId()].concat($statCalc.getSubPilots(actor));
 						
 						var gainResults = [];	
 						var expResults = [];						
 						for(let id of gainRecipientIds){
-							const actor = $gameActors.actor(id);
+							const actor = $gameActors.actor(id);							
 							if(actor){
+								var attackerLevel = actor.SRWStats.pilot.level;
+								var defenderLevel = candidate.SRWStats.pilot.level;
+								var defenderTotalYield = baseYield;
+								
+								var totalExp = eval(ENGINE_SETTINGS.EXP_YIELD.LEVEL_SCALING_FORMULA);
+								if(totalExp < ENGINE_SETTINGS.EXP_YIELD.MIN){
+									totalExp = ENGINE_SETTINGS.EXP_YIELD.MIN;
+								}
+								if(totalExp > ENGINE_SETTINGS.EXP_YIELD.MAX){
+									totalExp = ENGINE_SETTINGS.EXP_YIELD.MAX;
+								}
+								totalExp = Math.floor(totalExp);
+							
+							
 								gainResults.push({actor: actor, expGain: totalExp, ppGain: 0});
 								expResults.push({actor: actor, details: $statCalc.addExp(actor, totalExp)});
 							}							
-						}									
+						}							
+														
 						
 						$gameTemp.rewardsInfo = {
 							//actor: battleEffect.ref,

@@ -1184,10 +1184,16 @@
 			$gameTemp.originalDeployInfo = JSON.parse(JSON.stringify($gameSystem.getDeployList()));
 		}
 		
-		Game_Interpreter.prototype.showModeSelection = function(){
+		Game_Interpreter.prototype.showModeSelection = function(allowCancel){
 			this.setWaitMode("mode_selection");
 			$gameTemp.doingModeSelection = true;
 			$gameTemp.pushMenu = "mode_selection";
+			if(allowCancel){
+				$gameTemp.modeSelectionWindowCallback = function(){
+					$gameTemp.modeSelectionWindowCallback = null;
+					SceneManager.goto(Scene_Title);
+				}				
+			}
 		}
 		
 		Game_Interpreter.prototype.showTextCrawl = function(id, canCancel, speed){

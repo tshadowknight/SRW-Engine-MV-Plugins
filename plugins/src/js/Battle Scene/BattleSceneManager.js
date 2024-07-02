@@ -614,7 +614,7 @@ BattleSceneManager.prototype.initScene = function(){
 	this._scene = scene;
 	//this._scene.performancePriority  = BABYLON.ScenePerformancePriority.Intermediate;
 	
-	this._scene.clearColor = new BABYLON.Color3(0.5, 0.5, 0.5);
+	this._scene.clearColor = new BABYLON.Color3(0, 0, 0);
 	//this._scene.ambientColor = new BABYLON.Color3(0, 0, 0);
 	
 	//const light = new BABYLON.PointLight("pointLight", new BABYLON.Vector3(0, 0, 0), scene);
@@ -1823,6 +1823,7 @@ BattleSceneManager.prototype.hookBeforeRender = function(){
 	
 	_this._scene.registerBeforeRender(function() {
 		var deltaTime = _this._engine.getDeltaTime();
+		_this._effekseerWasTranslated = false;
 		
 		var ratio = 1;
 		if(_this.isOKHeld){
@@ -2086,9 +2087,9 @@ BattleSceneManager.prototype.hookBeforeRender = function(){
 						targetObj.handle.setRotation(targetObj.rotation.x, targetObj.rotation.y, targetObj.rotation.z);
 						targetObj.offsetRotation = {x: targetObj.rotation.x, y: targetObj.rotation.y, z: targetObj.rotation.z};
 					}
-					
+					_this._effekseerWasTranslated = true;
 					//do a 0 speed update to rerender the effect at the new location without progressing the animation
-					for(let info of _this._effekseerInfo){
+					/*for(let info of _this._effekseerInfo){
 						info.savedSpeed = info.handle.speed;
 						info.handle.setSpeed(0);
 					}
@@ -2102,7 +2103,7 @@ BattleSceneManager.prototype.hookBeforeRender = function(){
 						}
 						info.handle.setSpeed(info.savedSpeed);
 						delete info.savedSpeed;
-					}
+					}*/
 				}	
 			}
 		});	
@@ -2560,6 +2561,8 @@ BattleSceneManager.prototype.updateParentedEffekseerEffect = function(effekInfo)
 			(rotation.y + effekInfo.offsetRotation.y), 
 			(rotation.z + effekInfo.offsetRotation.z) * mirrorFactor
 		);
+		
+		this._effekseerWasTranslated = true;
 	}
 }
 
@@ -2589,10 +2592,37 @@ BattleSceneManager.prototype.startScene = function(){
 		if(_this._fastForward){
 			deltaTime*=5;
 		}
+		
 		this._effekseerInfo.forEach(function(effekInfo){
-			_this.updateParentedEffekseerEffect(effekInfo);
+			_this.updateParentedEffekseerEffect(effekInfo)				
 		});
 			
+		for(let info of this._effekseerInfo){
+			if(!info.context.updateStarted){
+				info.context.updateStarted = true;
+				info.context.beginUpdate();
+			}
+			
+		}
+
+		_this._effekseerWasTranslated = false;
+		//do a 0 speed update to rerender the effect at the new location without progressing the animation
+		for(let info of this._effekseerInfo){
+			info.context.updateHandle(info.handle, 0);
+		}
+
+		for(let info of this._effekseerInfo){
+			//force reapply active triggers because sometimes they get lost during the update process
+			if(info.handle.activeTriggers){
+				for(let trigger of info.handle.activeTriggers){
+					info.handle.sendTrigger(trigger);
+				}
+			}
+			if(info.context.updateStarted){
+				info.context.updateStarted = false;
+				info.context.endUpdate();
+			}
+		}
 		
 		
 		if(!_this._animsPaused){

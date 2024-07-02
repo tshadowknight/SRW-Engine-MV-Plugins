@@ -38,6 +38,21 @@
 	}
 }
 
+#mode_selection .loader.fadeToNone {
+	-webkit-animation: fadeToNone 1s ease-out;	
+	animation-fill-mode: forwards
+}
+
+@-webkit-keyframes fadeToNone {
+	0% {
+		opacity: 0;
+	} 
+
+	100% {
+		opacity: 1;
+	}
+}
+
 #mode_selection .difficulty_entry {
 	width: 100%;
 	display: flex;
