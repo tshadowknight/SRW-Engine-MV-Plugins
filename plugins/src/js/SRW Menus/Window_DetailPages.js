@@ -42,7 +42,15 @@ Window_DetailPages.prototype.resetSelection = function(){
 	this._selectedTab = 0;
 	this._isPilotAbiOverflow = false;
 	this._uiState = "normal";
+	
 	this._subPilotIdx = 0;
+	if($gameTemp.currentMenuUnit){
+		if($gameTemp.currentMenuUnit.actor?.isSubPilot){
+			const refId = $gameTemp.currentMenuUnit.actor.SRWStats.pilot.id;
+			this._subPilotIdx = $statCalc.getSubPilots($gameTemp.currentMenuUnit.actor).indexOf(refId) + 1;
+		}
+	}
+	
 	this.validateTab();
 	this.resetRenderedTabs();
 }
@@ -53,6 +61,14 @@ Window_DetailPages.prototype.resetRenderedTabs = function(){
 
 Window_DetailPages.prototype.getCurrentSelection = function(){
 	var unit = $gameTemp.currentMenuUnit;	
+	
+	if(unit.actor.isSubPilot){
+		unit = {
+			actor: unit.actor.mainPilot,
+			mech: unit.mech
+		}
+	}
+	
 	if(this._subPilotIdx != 0){
 		var subPilots = $statCalc.getSubPilots(unit.actor);
 		var subPilotId = subPilots[this._subPilotIdx - 1];
@@ -1310,5 +1326,5 @@ Window_DetailPages.prototype.redraw = function() {
 		this._fullPilotAbiContainer.classList.remove("active");
 	}
 	
-	Graphics._updateCanvas();
+	this.updateCanvas();
 }

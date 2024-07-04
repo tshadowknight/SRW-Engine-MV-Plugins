@@ -541,6 +541,9 @@ Window_BattleBasic.prototype.show = function() {
 	
 	_this.loadRequiredImages().then(function(){
 		_this._isLoading = true;
+		setTimeout(function(){//ensure the player can cancel the battle scene if loading fails
+			_this._isLoading = false;
+		}, 5000);
 		_this.createTerrainScrolls();
 		
 		_this._handlingInput = false;
@@ -1151,17 +1154,7 @@ Window_BattleBasic.prototype.update = function() {
 			_this.initTimer--;
 			return;
 		}
-		
-		var tmp = [];
-		_this._RMMVSpriteInfo.forEach(function(RMMVBg){
-			if(!RMMVBg.RMMVSprite.hasEnded()){			
-				RMMVBg.RMMVSprite.update(_this._deltaTime / Math.max(_this.getAnimTimeRatio(), 0.5));				
-				RMMVBg.renderer.render(RMMVBg.stage);	
-				tmp.push(RMMVBg);
-			}			
-		});
-		_this._RMMVSpriteInfo = tmp;
-		
+			
 		if(this._finishing){
 			if(this._finishTimer <= 0 && !$gameTemp.pauseBasicBattle){
 				this._animationQueue = [];
@@ -1173,6 +1166,15 @@ Window_BattleBasic.prototype.update = function() {
 			return;
 		}
 		
+		var tmp = [];
+		_this._RMMVSpriteInfo.forEach(function(RMMVBg){
+			if(!RMMVBg.RMMVSprite.hasEnded()){			
+				RMMVBg.RMMVSprite.update(_this._deltaTime / Math.max(_this.getAnimTimeRatio(), 0.5));				
+				RMMVBg.renderer.render(RMMVBg.stage);	
+				tmp.push(RMMVBg);
+			}			
+		});
+		_this._RMMVSpriteInfo = tmp;
 		
 		
 		if(!this._processingAction){

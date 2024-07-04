@@ -33,6 +33,7 @@ body {
 	font-family: GameFont;
 	--fontsize: 2px; /*percent of GameCanvas width*/
 	overflow: hidden;
+	container-type: size;
 }
 
 .svg_text {

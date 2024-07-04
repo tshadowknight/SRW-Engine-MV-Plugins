@@ -51,8 +51,12 @@ Window_CSS.prototype.show = function() {
 	this.refresh();	
 	this.triggerCustomBgCreate();
 	
-	Graphics._updateCanvas();
+	this.updateCanvas();
 };
+
+Window_CSS.prototype.updateCanvas = function() {
+	Graphics._updateCanvas(this._layoutId);
+}
 
 Window_CSS.prototype.triggerCustomBgCreate = function() {
 	if(ENGINE_SETTINGS.CUSTOM_MENU_ON_SHOW){
