@@ -1080,7 +1080,7 @@ BattleCalc.prototype.generateBattleResult = function(isPrediction){
 						//activeDefenderCache.attacked = aCache;
 					}
 				
-					if(this._isSupportAttack && !$statCalc.applyStatModsToValue(this._attacker.actor, 0, ["full_support_damage"])){
+					if(damageResult.damage > 0 && this._isSupportAttack && !$statCalc.applyStatModsToValue(this._attacker.actor, 0, ["full_support_damage"])){
 						damageResult.damage = Math.max(Math.floor(damageResult.damage * ENGINE_SETTINGS.SUPPORT_ATTACK_RATIO), 10);				
 					}
 				}

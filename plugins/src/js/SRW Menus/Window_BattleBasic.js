@@ -65,6 +65,14 @@ Window_BattleBasic.prototype.initialize = function() {
 	this._RMMVSpriteInfo = [];
 	this._lastFrameTime = -1;
 	this._deltaTime = -1;
+	
+	//workaround for issue where on rare occassions, tabbing out of the game during a basic battle animation causes animtionend to not fire, locking up the basic battle view
+	window.addEventListener("blur", function(){
+		if(_this.isOpen()){
+			_this._wasBlurred = true;
+			_this._blurCtr = 600;
+		}		
+	});
 }
 
 Window_BattleBasic.prototype.getCurrentSelection = function(){
@@ -1198,7 +1206,13 @@ Window_BattleBasic.prototype.update = function() {
 				this._processingAnimation = false;
 			}			
 		} else {
-			if(this._processingAnimationCount <= 0){
+			if(this._wasBlurred){
+				this._blurCtr--;
+			}
+			if(this._processingAnimationCount <= 0 || (this._wasBlurred && this._blurCtr <= 0)){
+				if(this._wasBlurred){
+					this._wasBlurred = false;
+				}
 				_this._processingAnimationCount = 0;
 				var nextAnimations = this._animationQueue.shift();
 				if(nextAnimations){
@@ -1206,6 +1220,7 @@ Window_BattleBasic.prototype.update = function() {
 					
 					for(var i = 0; i < nextAnimations.length; i++){
 						_this._processingAnimationCount++;
+						
 						var nextAnimation = nextAnimations[i];
 						var componentInfo = _this._participantComponents[nextAnimation.target];
 						var target = _this._participantComponents[nextAnimation.target].container;

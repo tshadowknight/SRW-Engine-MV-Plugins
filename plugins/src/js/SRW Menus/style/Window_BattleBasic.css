@@ -1122,7 +1122,7 @@
 }
 
 .participant_container.enemy.evade .shadow {
-	animation-name: evade_actor;
+	animation-name: evade_enemy;
 	animation-duration: 0.2s;
 	animation-fill-mode: forwards;
 }
