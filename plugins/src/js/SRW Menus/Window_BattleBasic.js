@@ -641,6 +641,9 @@ Window_BattleBasic.prototype.getHPRecoveredAnimInfo = function(action) {
 		if(endPercent < 0){
 			endPercent = 0;
 		}
+		if(endPercent > 100){
+			endPercent = 100;
+		}
 		result = {startPercent: startPercent, endPercent: endPercent};
 	}	
 	return result;

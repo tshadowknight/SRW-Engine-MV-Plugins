@@ -5299,19 +5299,31 @@ BattleSceneManager.prototype.executeAnimation = function(animation, startTick){
 			if(originalAction.HPRestored){
 				var stats = $statCalc.getCalculatedMechStats(originalAction.ref);
 				var recovered = originalAction.HPRestored;
-			
-				var startValue = originalAction.currentAnimHP;
-				var endValue = originalAction.currentAnimHP + recovered;
 				
-				var startPercent = (startValue / stats.maxHP * 100);
-				var endPercent = (endValue / stats.maxHP * 100);
-				if(endPercent < 0){
-					endPercent = 0;
+				if(originalAction.currentAnimHP < stats.maxHP){				
+					var startValue = originalAction.currentAnimHP;
+					var endValue = originalAction.currentAnimHP + recovered;
+					
+					var startPercent = (startValue / stats.maxHP * 100);
+					var endPercent = (endValue / stats.maxHP * 100);
+					if(endPercent < 0){
+						endPercent = 0;
+					}
+					if(endPercent > 100){
+						endPercent = 100;
+					}
+					originalAction.currentAnimHP = endValue;
+					var drainInfoKey = target + "_" + (action.ref.isSubTwin ? "twin" : "");
+					if(!_this._barDrainInfo[drainInfoKey]) {
+						_this._barDrainInfo[drainInfoKey] = {};
+					}	
+					if(typeof _this._barDrainInfo[drainInfoKey].HP == "undefined"){
+						_this._barDrainInfo[drainInfoKey].HP = 0;
+					}
+					_this._barDrainInfo[drainInfoKey].HP = endPercent;
+					_this._UILayerManager.animateHP(originalAction.side, originalAction.ref.isSubTwin ? "twin" : "main", startPercent, endPercent, params.duration || 500);
+					_this._UILayerManager.setNotification(originalAction.side, "HP DRAIN");
 				}
-				originalAction.currentAnimHP = endValue;
-				_this._barDrainInfo[originalAction.side+ "_" + originalAction.isSubTwin ? "twin" : ""].HP = endPercent;
-				_this._UILayerManager.animateHP(originalAction.side, originalAction.ref.isSubTwin ? "twin" : "main", startPercent, endPercent, params.duration || 500);
-				_this._UILayerManager.setNotification(originalAction.side, "HP DRAIN");
 			}			
 		},
 		drain_hp_bar: function(target, params){			

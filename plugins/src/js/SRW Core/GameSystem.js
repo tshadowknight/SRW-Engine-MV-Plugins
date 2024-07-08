@@ -839,6 +839,14 @@
 				}
 			}
 		}
+		
+		Game_System.prototype.getPilotFallbackInfoFull = function() {
+			const _this = this;
+			if(!_this._pilotFallbackInfo){
+				_this._pilotFallbackInfo = {};
+			}
+			return _this._pilotFallbackInfo;
+		}
 
 		Game_System.prototype.deployShips = function(toAnimQueue) {		
 			var _this = this;

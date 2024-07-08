@@ -2846,6 +2846,7 @@ StatCalc.prototype.canSwapPilot = function(actor){
 
 StatCalc.prototype.swapPilot = function(actor, newActorId){
 	if(this.isActorSRWInitialized(actor) && actor.isActor()){
+		const previousActorId = actor.actorId();
 		let event = this.getReferenceEvent(actor)
 		let currentMechId = actor.SRWStats.mech.id;
 		let currentMechData = JSON.parse(JSON.stringify(actor.SRWStats.mech));
@@ -2855,7 +2856,8 @@ StatCalc.prototype.swapPilot = function(actor, newActorId){
 		
 		
 		let targetPilot = $gameActors.actor(newActorId);
-		var actionsResult = this.applyDeployActions(newActorId, currentMechId);
+		//force reassigns for these deploy actions to allow swapping of pilots from units in locked slots
+		var actionsResult = this.applyDeployActions(newActorId, currentMechId, null, true);
 		if(!actionsResult){//if no deploy actions are assigned	
 			actor._classId = 0;
 			$statCalc.reloadSRWStats(actor, false, true);			
@@ -2883,6 +2885,18 @@ StatCalc.prototype.swapPilot = function(actor, newActorId){
 		//abilities used tracking should be shared beween all pilots in a mech
 		targetPilot.SRWStats.stageTemp.abilityUsed = actor.SRWStats.stageTemp.abilityUsed;
 		event.refreshImage();	
+		
+		//workaround for issue where the deploy list loses track of the original pilot 
+		const deployInfo = $gameSystem.getDeployInfo();
+			
+		Object.keys(deployInfo.assigned).forEach(function(slot){
+			if(deployInfo.lockedSlots[slot]){
+				if(deployInfo.assigned[slot] == previousActorId){
+					deployInfo.assigned[slot] = newActorId;
+				}
+			}
+		});
+		$gameSystem.setDeployInfo(deployInfo);
 	}
 }
 
@@ -4217,26 +4231,39 @@ StatCalc.prototype.getMechTerrain = function(actor, terrain){
 	}
 }
 
-StatCalc.prototype.getCurrentPilot = function(mechId, includeUndeployed, includeEnemies, includeSubPilots){
+StatCalc.prototype.getCurrentPilot = function(mechId, includeUndeployed, includeEnemies, includeSubPilots, searchFallbackInfo){
 	var result;
-	if(includeUndeployed){
-		for(var i = 0; i < $dataActors.length; i++){
-			var actor = $gameActors.actor(i);
-			if(actor && $dataActors[actor.actorId()].name && actor._classId == mechId && (includeSubPilots || !actor.isSubPilot)){
-				result = $gameActors.actor(i);
-			}
-		}
-	} else {
-		var type = "actor";
-		if(includeEnemies){
-			type = null;
-		}
-		this.iterateAllActors(type, function(actor){
-			if(actor.SRWStats.mech.id == mechId && actor.SRWStats.pilot.id != -1 && !actor.isSubPilot){//actor.currentClass() && actor.currentClass().id == mechId
-				result = actor;
-			}
-		});
 	
+	if(searchFallbackInfo){
+		const fallBackInfo = $gameSystem.getPilotFallbackInfoFull();
+		for(let pilotId in fallBackInfo){
+			const entry = fallBackInfo[pilotId];
+			if(!entry.isSubPilot && entry.classId == mechId){
+				result =  $gameActors.actor(pilotId);
+			}
+		}
+	}
+	
+	if(!result){		
+		if(includeUndeployed){
+			for(var i = 0; i < $dataActors.length; i++){
+				var actor = $gameActors.actor(i);
+				if(actor && $dataActors[actor.actorId()].name && actor._classId == mechId && (includeSubPilots || !actor.isSubPilot)){
+					result = $gameActors.actor(i);
+				}
+			}
+		} else {
+			var type = "actor";
+			if(includeEnemies){
+				type = null;
+			}
+			this.iterateAllActors(type, function(actor){
+				if(actor.SRWStats.mech.id == mechId && actor.SRWStats.pilot.id != -1 && !actor.isSubPilot){//actor.currentClass() && actor.currentClass().id == mechId
+					result = actor;
+				}
+			});
+		
+		}
 	}
 	return result;
 }
@@ -8461,7 +8488,7 @@ StatCalc.prototype.unbindLinkedDeploySlots = function(actorId, mechId, type, slo
 }
 
 //if overwriteFallbackInfo is set the stored state for all affected units will be update to the state after the deploy actions are applied
-StatCalc.prototype.applyDeployActions = function(actorId, mechId, overwriteFallbackInfo){
+StatCalc.prototype.applyDeployActions = function(actorId, mechId, overwriteFallbackInfo, force){
 	var _this = this;
 	if(this._unitUpdatesExternalLocked){
 		return;
@@ -8475,13 +8502,15 @@ StatCalc.prototype.applyDeployActions = function(actorId, mechId, overwriteFallb
 	if(deployActions){
 		result = true;
 		var lockedPilots = {};
-		/*var deployInfo = $gameSystem.getDeployInfo();
-		
-		Object.keys(deployInfo.assigned).forEach(function(slot){
-			if(deployInfo.lockedSlots[slot]){
-				lockedPilots[$gameActors.actor(deployInfo.assigned[slot]).SRWStats.pilot.id] = true;
-			}
-		});*/
+		if(!force){
+			var deployInfo = $gameSystem.getDeployInfo();
+			
+			Object.keys(deployInfo.assigned).forEach(function(slot){
+				if(deployInfo.lockedSlots[slot]){
+					lockedPilots[$gameActors.actor(deployInfo.assigned[slot]).SRWStats.pilot.id] = true;
+				}
+			});
+		}		
 		
 		Object.keys(deployActions).forEach(function(targetMechId){
 			if(targetMechId != "optional"){			

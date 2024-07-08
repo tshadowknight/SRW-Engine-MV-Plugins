@@ -272,11 +272,13 @@
 					//args[0]: slot 
 					//args[1]: actor id
 					var deployInfo = $gameSystem.getDeployInfo();
-					var actorId = String($statCalc.getCurrentPilot(args[1], true).actorId());
+					//always check the fallback info to avoid issues with pilots who were switched around during the stage
+					var actorId = String($statCalc.getCurrentPilot(args[1], true, false, false, true).actorId());
 					var parts = actorId.match(/\<(.*)\>/);	
 					if(parts && parts.length > 1){
 						actorId = $gameVariables.value(parts[1]);
 					}
+
 					deployInfo.assigned[args[0]] = actorId;
 					$gameSystem.setDeployInfo(deployInfo);
 				}
