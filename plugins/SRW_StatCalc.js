@@ -7964,7 +7964,7 @@ StatCalc.prototype.getActorStatMods = function(actor, excludedSkills){
 	let zoneMods;
 	
 	try {
-		if(event){	
+		if(event && !event.isErased() && $gameSystem.EventToUnit(event.eventId())){	
 					
 			if(!this._zoneEffectCache){
 				this._zoneEffectCache = {};

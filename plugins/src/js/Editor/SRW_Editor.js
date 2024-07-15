@@ -653,6 +653,11 @@ SRWEditor.prototype.init = function(){
 			params: ["ratio", "smooth", "duration(ms)", "easingFunction", "easingMode"],
 			desc: "Set the speed at the scene is animated."
 		},
+		hold_tick: {
+			hasTarget: false,
+			params: ["duration(ms)"],
+			desc: "This animation tick will be held for the specified duration."
+		},
 		toggle_bg_scroll: {
 			hasTarget: false,
 			params: [],

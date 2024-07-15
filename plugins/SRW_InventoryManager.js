@@ -120,6 +120,27 @@ SRWInventoryManager.prototype.addItemHolder = function(itemIdx, mechId, slot){
 	this.updateCurrentInventory(inventory);
 }
 
+SRWInventoryManager.prototype.lockMechPartsForTransfer = function(mechId){
+	if(!$gameSystem.lockedPartsTransferInfo){
+		$gameSystem.lockedPartsTransferInfo = {};
+	}
+	$gameSystem.lockedPartsTransferInfo[mechId] = true;
+}
+
+SRWInventoryManager.prototype.unlockMechPartsForTransfer = function(mechId){
+	if(!$gameSystem.lockedPartsTransferInfo){
+		$gameSystem.lockedPartsTransferInfo = {};
+	}
+	$gameSystem.lockedPartsTransferInfo[mechId] = false;
+}
+
+SRWInventoryManager.prototype.islockedForTransfer = function(mechId){
+	if(!$gameSystem.lockedPartsTransferInfo){
+		$gameSystem.lockedPartsTransferInfo = {};
+	}
+	return $gameSystem.lockedPartsTransferInfo[mechId];
+}
+
 SRWInventoryManager.prototype.removeItemHolder = function(mechId, slot){
 	var inventory = this.getCurrentInventory();
 	

@@ -91,6 +91,7 @@ export default function BattleSceneManager(){
 	this._bgScrollCooldown = 60;
 	this._bgScrollRatio = 1;
 	this._animRatio = 1;
+	this._holdTickDuration = 0;
 
 	this._spriteManagers = {};
 	this._animationSpritesInfo = [];
@@ -1835,6 +1836,11 @@ BattleSceneManager.prototype.hookBeforeRender = function(){
 			deltaTime*=5;
 		}
 		
+		if(_this._holdTickDuration > 0){
+			_this._holdTickDuration-=deltaTime;
+			return;
+		}
+		
 		_this._scene.animationTimeScale = ratio;
 		
 		if(!_this._animsPaused){
@@ -2582,7 +2588,14 @@ BattleSceneManager.prototype.startScene = function(){
 	
 	this._scene.onAfterAnimationsObservable.add(() => {
 		
+		if(_this._holdTickDuration > 0){
+			return;
+		}
+		
 		var deltaTime = _this._engine.getDeltaTime();
+		
+		
+		
 		var ratio = 1;
 		if(_this.isOKHeld){
 			ratio = 2;
@@ -5440,6 +5453,9 @@ BattleSceneManager.prototype.executeAnimation = function(animation, startTick){
 				_this.setAnimRatio(params.ratio || 0);
 			}			
 		},
+		hold_tick:  function(target, params){			
+			_this._holdTickDuration = params["duration(ms)"] || 0;
+		},
 		toggle_bg_scroll:  function(target, params){
 			_this.setBgScrollDirection(_this._bgScrollDirection * -1);
 		},
@@ -5530,6 +5546,8 @@ BattleSceneManager.prototype.startAnimation = function(){
 	_this._animTimeAccumulator = 0;
 	_this._currentAnimationTickHiRes = 0;
 	_this._lastAnimationTick = -1;	
+	_this._holdTickDuration = 0;
+	_this._animRatio = 1;
 	_this._barDrainInfo = {};
 	_this._animationPromise = new Promise(function(resolve, reject){
 		_this._animationResolve = resolve;

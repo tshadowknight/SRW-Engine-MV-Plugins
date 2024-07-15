@@ -160,7 +160,13 @@ ItemList.prototype.redraw = function() {
 			
 			listContent+="</div>";
 			
-		
+			let transferLockOffset = 0;
+			var holders = inventoryInfo[current.idx].holders;
+			for(let holder of holders){
+				if($inventoryManager.islockedForTransfer(holder.mechId) && !$SRWSaveManager.getUnlockedUnits()[holder.mechId]){
+					transferLockOffset++;
+				}
+			}
 			
 			if(_this._isSellList){
 				listContent+="<div class='item_list_block scaled_text'>";
@@ -172,14 +178,14 @@ ItemList.prototype.redraw = function() {
 				listContent+="<img class='sell_select increment' src=svg/chevron_right.svg>";				
 				listContent+="</div>";
 				listContent+="<div class='item_list_block scaled_text'>";
-				listContent+=inventoryInfo[current.idx].count - inventoryInfo[current.idx].holders.length;
+				listContent+=(inventoryInfo[current.idx].count - transferLockOffset) - (inventoryInfo[current.idx].holders.length - transferLockOffset);
 				listContent+="</div>";
 			} else {			
 				listContent+="<div class='item_list_block scaled_text'>";
-				listContent+=inventoryInfo[current.idx].count - inventoryInfo[current.idx].holders.length;
+				listContent+=(inventoryInfo[current.idx].count - transferLockOffset) - (inventoryInfo[current.idx].holders.length - transferLockOffset);
 				listContent+="</div>";
 				listContent+="<div class='item_list_block scaled_text'>";
-				listContent+=inventoryInfo[current.idx].count;
+				listContent+=inventoryInfo[current.idx].count - transferLockOffset;
 				listContent+="</div>";
 			}	
 			

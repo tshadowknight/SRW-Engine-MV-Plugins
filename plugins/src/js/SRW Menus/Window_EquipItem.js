@@ -238,8 +238,8 @@ Window_EquipItem.prototype.update = function() {
 					mech.items = $statCalc.getActorMechItems(mech.id);
 					this._currentUIState = "slot_selection";
 					this.refreshAllUnits();
-				} else if(inventoryInfo[itemIdx].count > 0){
-					if(inventoryInfo[itemIdx].count - inventoryInfo[itemIdx].holders.length > 0){
+				} else if(this.getAvailableCount(inventoryInfo[itemIdx]) > 0){
+					if(this.getAvailableCount(inventoryInfo[itemIdx]) - inventoryInfo[itemIdx].holders.length > 0){
 						var mech = this.getCurrentSelection();
 						$inventoryManager.addItemHolder(itemIdx, _this.getTargetMechId(mech.id), this._currentSelection);
 						mech.items = $statCalc.getActorMechItems(mech.id);
@@ -255,7 +255,7 @@ Window_EquipItem.prototype.update = function() {
 				if(itemIdx != -1){
 					var inventoryInfo = $inventoryManager.getCurrentInventory();
 					var mech = this.getCurrentSelection();
-					var transferCandidates = inventoryInfo[this._itemList.getCurrentSelection().idx].holders;		
+					var transferCandidates = this.getTransferCandidates();		
 					if(transferCandidates[this._currentTransferSelection]){
 						var donor = transferCandidates[this._currentTransferSelection];
 						$inventoryManager.removeItemHolder(_this.getTargetMechId(donor.mechId), donor.slot);
@@ -294,6 +294,26 @@ Window_EquipItem.prototype.update = function() {
 		this.refresh();
 	}		
 };
+
+Window_EquipItem.prototype.getAvailableCount = function(itemInfo) {
+	let result = itemInfo.count;
+	
+	var inventoryInfo = $inventoryManager.getCurrentInventory();
+	var holders = inventoryInfo[this._itemList.getCurrentSelection().idx].holders;
+	for(let holder of holders){
+		if($inventoryManager.islockedForTransfer(holder.mechId) && !$SRWSaveManager.getUnlockedUnits()[holder.mechId]){
+			result--;
+		}
+	}
+	return result;
+}
+
+Window_EquipItem.prototype.getTransferCandidates = function() {
+	var inventoryInfo = $inventoryManager.getCurrentInventory();
+	var transferCandidates = inventoryInfo[this._itemList.getCurrentSelection().idx].holders;
+	transferCandidates.filter((x) => !$inventoryManager.islockedForTransfer(x.mechId) && !$SRWSaveManager.getUnlockedUnits()[x.mechId]);
+	return transferCandidates;
+}
 
 Window_EquipItem.prototype.getWeaponLevels = function() {
 	return [];
@@ -338,7 +358,7 @@ Window_EquipItem.prototype.redraw = function() {
 	}
 	this._slotSelection.innerHTML = slotSelectionContent;
 	if(this._itemList.getCurrentSelection().idx != -1){	
-		var transferCandidates = inventoryInfo[this._itemList.getCurrentSelection().idx].holders;
+		var transferCandidates = this.getTransferCandidates();	
 		var transferSelectionContent = "";
 		transferSelectionContent+="<div class='transfer_column'>";
 		for(var i = 0; i < this._maxTransferSelection; i++){
@@ -389,7 +409,7 @@ Window_EquipItem.prototype.redraw = function() {
 	} else if(this._currentUIState == "item_selection"){
 		this._itemListContainer.classList.add("active");
 		this._itemListContainer.style.display = "";
-		if(this._itemList.getCurrentSelection().idx != -1 && inventoryInfo[this._itemList.getCurrentSelection().idx].count > 0){
+		if(this._itemList.getCurrentSelection().idx != -1 && this.getAvailableCount(inventoryInfo[this._itemList.getCurrentSelection().idx]) > 0){
 			this._toolTip.innerHTML = this._itemList.getCurrentSelection().info.desc;
 		} 		
 	} else if(this._currentUIState == "item_transfer"){

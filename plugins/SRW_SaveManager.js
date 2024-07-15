@@ -258,7 +258,7 @@ SRWSaveManager.prototype.getSRCount = function(mapId){
 	if(!$gameSystem.awardedSRPoints){
 		$gameSystem.awardedSRPoints = {};
 	}
-	return Object.keys($gameSystem.awardedSRPoints).length;
+	return  Object.keys($gameSystem.awardedSRPoints).filter((x) => $gameSystem.awardedSRPoints[x]).length;
 }
 
 SRWSaveManager.prototype.hasMapSRPoint = function(mapId){
