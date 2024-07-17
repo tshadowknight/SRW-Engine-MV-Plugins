@@ -1728,7 +1728,7 @@ BattleCalc.prototype.generateMapBattleResult = function(){
 			
 			gainDonor = defender.actor;
 					
-			if(aCache && dCache){			
+			if(aCache && dCache && !$gameSystem.isFriendly(aCache.ref, $gameSystem.getFactionId(dCache.ref))){			
 				var expGain = _this.performExpCalculation(gainRecipient, gainDonor);
 				expGain = $statCalc.applyStatModsToValue(gainRecipient, expGain, ["exp"]);
 				if($statCalc.getActiveSpirits(gainRecipient).gain){

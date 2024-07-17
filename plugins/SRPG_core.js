@@ -2321,7 +2321,7 @@ SceneManager.isInSaveScene = function(){
 					var items = $statCalc.getEquipInfo(gainDonor.ref);
 					if(items){
 						items.forEach(function(item){
-							if(item){
+							if(item && !$gameSystem.isFriendly(gainDonor.ref, "player")){
 								$inventoryManager.addItem(item.idx);
 								itemDrops.push(item.idx);	
 							}							
