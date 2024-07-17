@@ -147,7 +147,7 @@ DetailBarMechDetail.prototype.redraw = function(){
 		var descriptionData = "";
 		var descriptionClass = "";
 		if(typeof abilityList[i] != "undefined"){
-			displayClass = "";
+			
 			descriptionClass = "described_element";
 			descriptionData = "data-type='mech' data-idx='"+abilityList[i].idx+"'";
 			var displayInfo = $mechAbilityManager.getAbilityDisplayInfo(abilityList[i].idx);
@@ -187,7 +187,11 @@ DetailBarMechDetail.prototype.redraw = function(){
 		var descriptionData = "";
 		var descriptionClass = "";
 		if(typeof itemList[i] != "undefined" && itemList[i] != null){
-			displayClass = "";
+			if(actor.lockedDropSlots && actor.lockedDropSlots[i]){
+				displayClass = "no_drop";
+			} else {
+				displayClass = "";
+			}	
 			descriptionClass = "described_element";
 			descriptionData = "data-type='item' data-idx='"+itemList[i].idx+"'";
 			var displayInfo = $itemEffectManager.getAbilityDisplayInfo(itemList[i].idx);

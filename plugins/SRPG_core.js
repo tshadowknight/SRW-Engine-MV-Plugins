@@ -2320,11 +2320,13 @@ SceneManager.isInSaveScene = function(){
 				if(gainDonor.isDestroyed){
 					var items = $statCalc.getEquipInfo(gainDonor.ref);
 					if(items){
+						let slot = 0;
 						items.forEach(function(item){
-							if(item && !$gameSystem.isFriendly(gainDonor.ref, "player")){
+							if(item && !$gameSystem.isFriendly(gainDonor.ref, "player") && (!gainDonor.ref.lockedDropSlots || !gainDonor.ref.lockedDropSlots[slot])){
 								$inventoryManager.addItem(item.idx);
 								itemDrops.push(item.idx);	
-							}							
+							}		
+							slot++;	
 						});
 					}					
 				}

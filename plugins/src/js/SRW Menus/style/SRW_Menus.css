@@ -466,6 +466,10 @@ body {
 	color: #888888;
 }
 
+.no_drop {
+	color: #a47777;
+}
+
 .faction_color.ally {
 	background-color: rgba(38, 110, 172, 0.7);
 }
