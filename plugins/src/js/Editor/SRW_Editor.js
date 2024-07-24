@@ -403,6 +403,11 @@ SRWEditor.prototype.init = function(){
 			aliases: {"moveOriginToParent": "syncOrigin"},
 			desc: "Create a new model."
 		},	
+		create_unit_model: {
+			hasTarget: true,
+			params: ["mechId", "position"],//"animGroup",  "animName", , "unlit"
+			desc: "Spawn a new model for the specified mech id."
+		},
 		create_model_instance: {
 			hasTarget: true,
 			params: ["parent"],
@@ -706,6 +711,7 @@ SRWEditor.prototype.init = function(){
 		animGroup: "The name of the group of the model's animations",
 		animName: "The name of the animation that will be shown",
 		moveOriginToParent: "If 1 set the origin of the object to the parent's absolute position",
+		mechId: "The numeric id of the target mech.",
 		unlit: "If 1 the target will not receive influence from lights",
 		canvasWidth: "The width of the rendering surface for the external renderer", 
 		canvasHeight: "The height of the rendering surface for the external renderer",
@@ -868,6 +874,9 @@ SRWEditor.prototype.init = function(){
 			
 		},
 		moveOriginToParent: function(value){
+			
+		},
+		mechId: function(value){
 			
 		},
 		animGroup: function(value){

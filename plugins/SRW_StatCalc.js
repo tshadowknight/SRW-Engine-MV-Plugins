@@ -1586,6 +1586,12 @@ StatCalc.prototype.reloadSRWStats = function(actor, lockAbilityCache, reloadMech
 	}
 }
 
+StatCalc.prototype.initSRWStatsIfUninitialized = function(actor){
+	if(!actor?.SRWInitialized){
+		this.initSRWStats(actor);
+	}
+}
+
 StatCalc.prototype.initSRWStats = function(actor, level, itemIds, preserveVolatile, isReload, boxDropIds){
 	var _this = this;
 	if(!level){
