@@ -77,6 +77,7 @@ export default function BattleSceneManager(){
 	this._shakeAnimations = {};
 	this._shakeAnimationCtr = 0;
 	this._bgAnimations = {};
+	this._animatedModelTextureInfo = [];
 	this._bgAnimationCounter = 0;
 	this._fadeAnimations = {};
 	this._fadeAnimationCtr = 0;
@@ -1458,18 +1459,49 @@ BattleSceneManager.prototype.prepareModel = function(root, name, position, flipX
 	let stack = [];
 	stack.push(body);
 	let attNodes = [];
+	let textureAnimNodes = [];
 	while(stack.length){
 		let current = stack.shift();
 		if(current.id.indexOf("att_") == 0){
 			attNodes.push(current);
 		}
 		
+		
+		
+		let animInfoRef;
+		
+		if(current.animInfoRef){
+			current.animInfoRef.nodes.push(current);
+			animInfoRef = current.animInfoRef;
+		}		
+		
+		if(current.id.indexOf("anim_") == 0){
+			const parts = current.id.split("_");
+			animInfoRef = {
+				animInfo: {
+					frameSize: parts[1],
+					lineCount: parts[2],
+					columnCount: parts[3],
+					delay: parts[4],
+					accumulator: 0,
+					currentFrame: 0,
+					endFrame: parts[2] * parts[3]
+				},
+				nodes: []
+			};
+			textureAnimNodes.push(animInfoRef);
+		}
+		
 		let children = current.getChildren();
 		
 		let materialLeaves = {};
 		for(let child of children){		
+			if(animInfoRef){
+				child.animInfoRef = animInfoRef;
+			}
 			stack.push(child);		
 		}
+
 	}
 	
 	stack = attNodes;
@@ -1481,7 +1513,11 @@ BattleSceneManager.prototype.prepareModel = function(root, name, position, flipX
 			stack.push(child);		
 		}
 	}
-
+	
+	for(let entry of textureAnimNodes){
+		this._animatedModelTextureInfo.push(entry);
+	}
+	
 	root.name = name+"_model";
 	
 	body.spriteConfig = {
@@ -1746,7 +1782,6 @@ BattleSceneManager.prototype.advanceTick = function(){
 
 BattleSceneManager.prototype.hookBeforeRender = function(){
 	var _this = this;
-	
 	function scrollBg(bg, animRatio, step){
 		if(bg.isInstanceRef){		
 			//var deltaStep1 = (step/(1000/60)) * deltaTime;	
@@ -2374,6 +2409,64 @@ BattleSceneManager.prototype.hookBeforeRender = function(){
 				}	
 			}
 		});	
+		
+		for(let entry of _this._animatedModelTextureInfo){
+			const animation = entry.animInfo;
+			for(let node of entry.nodes){
+				if(node){
+					var texture;	
+					if(node.material){
+						if(node.material.diffuseTexture){
+							texture = node.material.diffuseTexture;
+						} else if(node.material.albedoTexture){
+							texture = node.material.albedoTexture;
+						}
+					} else {
+						texture = node.texture;
+					}
+					if(texture){			
+						var deltaFrames = 0;
+						animation.accumulator+=deltaTime;
+						while(animation.accumulator - animation.delay >= 0){
+							animation.accumulator-=animation.delay;
+							deltaFrames++;
+						}
+						
+						animation.currentFrame+=deltaFrames;
+						
+						
+						animation.lastTick = _this._currentAnimationTick;
+									
+						if(animation.currentFrame >= animation.endFrame){							
+							//console.log("loop to " +  (animation.loop - 1));
+							animation.currentFrame = 0;
+							animation.startTick = _this._currentAnimationTick;													
+						}			
+
+						
+						
+						
+						
+						const uSize = 1 / (texture._texture.width / animation.frameSize);	
+						const vSize = 1 / (texture._texture.height / animation.frameSize);
+					
+						var col = animation.currentFrame % animation.columnCount;						
+						var row = Math.floor(animation.currentFrame / animation.columnCount);
+						//console.log("col: " + col + ", " + "row:" + row);
+						if(!texture.defaultOffsets){
+							texture.defaultOffsets = {
+								u: texture.uOffset,
+								v: texture.vOffset
+							};
+						}		
+					
+						texture.uOffset = (texture.defaultOffsets.u * uSize) + (col * uSize);								
+						texture.vOffset = (texture.defaultOffsets.v * vSize) + (row * vSize);					
+											
+					}	
+				}
+			}
+		}
 		
 		Object.keys(_this._bgScrolls).forEach(function(targetName){
 			var animInfo = _this._bgScrolls[targetName];
@@ -6264,6 +6357,7 @@ BattleSceneManager.prototype.resetScene = function() {
 	_this._sizeAnimations = {};
 	_this._shakeAnimations = {};
 	_this._bgAnimations = {};	
+	_this._animatedModelTextureInfo = [];
 	_this._bgScrolls = {};	
 	_this._fadeAnimations = {};	
 	_this._lastAction = null;
