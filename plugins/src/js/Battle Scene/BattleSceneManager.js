@@ -66,6 +66,8 @@ export default function BattleSceneManager(){
 	this._animationTickDuration = 1000/60;
 	this._animationList = [];
 
+	this._activeAliases = {};
+
 	this._matrixAnimations = {};
 	this._translateAnimationCtr = 0;
 	this._animationBlends = {};
@@ -3339,6 +3341,10 @@ BattleSceneManager.prototype.executeAnimation = function(animation, startTick){
 		}
 	});*/
 	
+	if(animation.target && this._activeAliases[animation.target]){
+		animation.target = this._activeAliases[animation.target];
+	}
+	
 	function getTargetObject(name){
 		return _this.getTargetObject(name);
 	}
@@ -3358,6 +3364,9 @@ BattleSceneManager.prototype.executeAnimation = function(animation, startTick){
 	}
 		
 	var animationHandlers = {
+		register_alias: function(target, params){
+			_this._activeAliases[params.id] = target;
+		},
 		set_opacity_texture: function(target, params){
 			var targetObj = getTargetObject(target);
 			if(targetObj){
@@ -6354,6 +6363,7 @@ BattleSceneManager.prototype.resetScene = function() {
 	
 	_this._animationList = [];
 	_this._matrixAnimations = {};
+	_this._activeAliases = {};
 	_this._sizeAnimations = {};
 	_this._shakeAnimations = {};
 	_this._bgAnimations = {};	

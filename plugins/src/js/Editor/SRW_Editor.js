@@ -221,6 +221,11 @@ SRWEditor.prototype.init = function(){
 			params: ["path"],
 			desc: "Set an opacity texture for the target."
 		},
+		register_alias: {
+			hasTarget: true,
+			params: ["id"],
+			desc: "Register an alias for the target."
+		},
 		clear_opacity_texture: {
 			hasTarget: true,
 			params: [],
