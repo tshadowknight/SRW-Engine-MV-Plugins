@@ -465,7 +465,7 @@ SRWEditor.prototype.init = function(){
 		},	
 		play_effekseer: {
 			hasTarget: true,
-			params: ["path", "position", "scale", "speed", "rotation", "parent", "isBackground", "autoRotate", "flipZ"],
+			params: ["path", "position", "scale", "speed", "rotation", "parent", "isForeground", "autoRotate", "flipZ"],
 			desc: "Play a predefined effekseer effect."
 		},
 		remove_effekseer_parent: {
@@ -675,7 +675,7 @@ SRWEditor.prototype.init = function(){
 		},
 		include_animation: {
 			hasTarget: false,
-			params: ["battleAnimId"],
+			params: ["battleAnimId", "sequenceId"],
 			desc: "Include the main track of the animation with id battleAnimId starting at the current tick +1."
 		}
 	};
@@ -779,6 +779,7 @@ SRWEditor.prototype.init = function(){
 		lineCount: "The number of lines in the spritesheet.",
 		columnCount: "The number of columns in the spritesheet.",
 		isBackground: "If 1 the layer will be a background layer.",
+		isForeground: "If 1 the layer will render as render group 4, otherwise render group 2. Higher number render groups are drawn last.",
 		autoRotate: "If 1 the effect will be automatically rotated for enemies.",
 		flipZ: "If 1 the effect will have its z scale inverted.",
 		color: "The blend color for the skybox.",
@@ -793,6 +794,7 @@ SRWEditor.prototype.init = function(){
 		ratio: "The factor by which the scroll speed is multiplied.",
 		smooth: "If set to 1 the ratio change will be smoothed out over the specified duration.",
 		battleAnimId: "The id of the battle animation",
+		sequenceId: "The attack animation sequence.",
 		animId: "The id of the RMMV animation.",
 		loop: "If set to 1 the animation will continue looping.",
 		noFlash: "If set to 1 the flashing effects of the RMMV animation are not shown.",
@@ -979,6 +981,15 @@ SRWEditor.prototype.init = function(){
 			result+="<select class='hide_select param_select'>";
 			result+="<option value='0' "+(!value ? "selected" : "")+">0</option>";
 			result+="<option value='1' "+(value ? "selected" : "")+">1</option>";			
+			result+="</select>";
+			return result;
+		},
+		sequenceId: function(value){
+			var result = "";			
+			result+="<select class='sequence_mode_select param_select'>";
+			Object.keys(_this._sequenceTypes).sort().forEach(function(type){
+				result+="<option "+(value == type ? "selected" : "")+" value='"+type+"'>"+_this._sequenceTypes[type].name+"</option>";
+			});
 			result+="</select>";
 			return result;
 		},
@@ -1197,6 +1208,9 @@ SRWEditor.prototype.init = function(){
 		
 		},
 		isBackground: function(value){
+		
+		},
+		isForeground: function(value){
 		
 		},
 		autoRotate: function(value){

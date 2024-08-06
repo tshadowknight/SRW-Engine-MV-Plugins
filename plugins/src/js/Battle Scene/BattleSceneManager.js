@@ -331,8 +331,8 @@ BattleSceneManager.prototype.init = function(attachControl){
 		
 		this._effksContext = effekseer.createContext();		
 		this._effksContextMirror = effekseer.createContext();		
-		this._effksContextBg = effekseer.createContext();
-		this._effksContextBgMirror = effekseer.createContext();
+		this._effksContextFg = effekseer.createContext();
+		this._effksContextFgMirror = effekseer.createContext();
 		this._effksContextAttached = effekseer.createContext();
 		
 		const settings = {
@@ -341,8 +341,8 @@ BattleSceneManager.prototype.init = function(attachControl){
 		
 		this._effksContext.init(this._glContext, settings);
 		this._effksContextMirror.init(this._glContext, settings);
-		this._effksContextBg.init(this._glContext, settings);
-		this._effksContextBgMirror.init(this._glContext, settings);
+		this._effksContextFg.init(this._glContext, settings);
+		this._effksContextFgMirror.init(this._glContext, settings);
 		this._effksContextAttached.init(this._glContext, settings);
 		
 		this._engine = new BABYLON.Engine(this._canvas, true, {preserveDrawingBuffer: true, stencil: true, antialiasing: true}); // Generate the BABYLON 3D engine	
@@ -379,7 +379,9 @@ BattleSceneManager.prototype.preloadTexture = async function(path, context){
 	const _this = this;
 	const bitmap = await ImageManager.loadBitmapPromise("", path, true, null, null, true);
 	if(bitmap == -1){
-		alert("Failed to load image from path '" + path + "' "+(context ? " For "+context : "" + "") + "\n\nYou may need to reload the game to get the battlescene to load again after fixing the missing asset.");
+		if(!_this._isEnvPreview){
+			alert("Failed to load image from path '" + path + "' "+(context ? " For "+context : "" + "") + "\n\nYou may need to reload the game to get the battlescene to load again after fixing the missing asset.");
+		}
 	} else {
 		let objURL = bitmap._image.src; //after loading an image through the manager with asBlob=true, the returned bitmap has an image with an Object URL src
 		new BABYLON.Texture(objURL, _this._scene, false, true, BABYLON.Texture.NEAREST_NEAREST);
@@ -448,8 +450,8 @@ BattleSceneManager.prototype.dispose = function(){
 	this.disposeLights();
 	/*this.stopEffekContext(this._effksContext);
 	this.stopEffekContext(this._effksContextMirror);
-	this.stopEffekContext(this._effksContextBg);
-	this.stopEffekContext(this._effksContextBgMirror);
+	this.stopEffekContext(this._effksContextFg);
+	this.stopEffekContext(this._effksContextFgMirror);
 	this.stopEffekContext(this._effksContextAttached);*/
 	
 	
@@ -2572,8 +2574,8 @@ BattleSceneManager.prototype.disposeEffekseerInstances = function(){
 	
 	this.stopEffekContext(this._effksContext);
 	this.stopEffekContext(this._effksContextMirror);
-	this.stopEffekContext(this._effksContextBg);
-	this.stopEffekContext(this._effksContextBgMirror);
+	this.stopEffekContext(this._effksContextFg);
+	this.stopEffekContext(this._effksContextFgMirror);
 	this.stopEffekContext(this._effksContextAttached);
 }
 
@@ -2745,8 +2747,8 @@ BattleSceneManager.prototype.startScene = function(){
 		if(!_this._animsPaused){
 			_this._effksContext.update(60 / _this._engine.getFps() * ratio);
 			_this._effksContextMirror.update(60 / _this._engine.getFps() * ratio);
-			_this._effksContextBg.update(60 / _this._engine.getFps() * ratio);				
-			_this._effksContextBgMirror.update(60 / _this._engine.getFps() * ratio);	
+			_this._effksContextFg.update(60 / _this._engine.getFps() * ratio);				
+			_this._effksContextFgMirror.update(60 / _this._engine.getFps() * ratio);	
 			_this._effksContextAttached.update();	
 		}
 		
@@ -2768,65 +2770,86 @@ BattleSceneManager.prototype.startScene = function(){
 				}
 			}
 		}		
-		
+		_this._effekseerLayerRendered = {
+			bg: false,
+			fg: false
+		};
 		//console.log("_effksContext.update");
 
 	});
 	
-	//foreground layer
-	this._scene.onAfterDrawPhaseObservable.add(() => {//onAfterRenderObservable 
-		let projectionMatrix = new BABYLON.Matrix().copyFrom(_this._camera.getProjectionMatrix()).m;
-		_this._effksContext.setProjectionMatrix(projectionMatrix);
-		let worldMatrix = new BABYLON.Matrix().copyFrom(BABYLON.Matrix.Invert(_this._camera.getWorldMatrix())).m;		
-		_this._effksContext.setCameraMatrix(worldMatrix);
-	
-		_this._effksContext.draw();
-		
-		
-		
-		projectionMatrix = new BABYLON.Matrix().copyFrom(_this._camera.getProjectionMatrix()).m;
-		//projectionMatrix[0]*=-1;
-		_this._effksContextMirror.setProjectionMatrix(projectionMatrix);
-		
-		worldMatrix = new BABYLON.Matrix().copyFrom(BABYLON.Matrix.Invert(_this._camera.getWorldMatrix())).m;
-		worldMatrix[0]*=-1;
-		worldMatrix[1]*=-1;
-		worldMatrix[2]*=-1;
-		//worldMatrix[3]*=-1;
-		_this._effksContextMirror.setCameraMatrix(worldMatrix);
-		if(_this._effksContextMirror.activeCount > 0){
-			_this._effksContextMirror.draw();		
-		}	
-		
-		_this._effksContextAttached.setProjectionMatrix(_this._camera.getProjectionMatrix().m);
-		_this._effksContextAttached.setCameraMatrix(BABYLON.Matrix.Invert(_this._camera.getWorldMatrix()).m);
-		_this._effksContextAttached.draw();
-	});
-	
-	//background layer
-	this._scene.onAfterRenderingGroupObservable.add((info) => {//onAfterRenderObservable 
-		if(info.renderingGroupId == 1){
-			let projectionMatrix = new BABYLON.Matrix().copyFrom(_this._camera.getProjectionMatrix()).m;
-			_this._effksContextBg.setProjectionMatrix(projectionMatrix);
-			let worldMatrix = new BABYLON.Matrix().copyFrom(BABYLON.Matrix.Invert(_this._camera.getWorldMatrix())).m;		
-			_this._effksContextBg.setCameraMatrix(worldMatrix);
+	//render the effekseer layer once per frame
+	function renderEffekseerLayer(layerId){
+		if(!_this._effekseerLayerRendered[layerId]){
 			
-			_this._effksContextBg.draw();
+			let targetContext;
+			let targetContextMirror;
+			
+			if(layerId == "bg"){
+				targetContext = _this._effksContext;
+				targetContextMirror = _this._effksContextMirror;
+			} else if(layerId == "fg"){
+				targetContext = _this._effksContextFg;
+				targetContextMirror = _this._effksContextFgMirror;
+			}
+			
+			_this._effekseerLayerRendered[layerId] = true;
+		
+			let projectionMatrix = new BABYLON.Matrix().copyFrom(_this._camera.getProjectionMatrix()).m;
+			targetContext.setProjectionMatrix(projectionMatrix);
+			let worldMatrix = new BABYLON.Matrix().copyFrom(BABYLON.Matrix.Invert(_this._camera.getWorldMatrix())).m;		
+			targetContext.setCameraMatrix(worldMatrix);
+		
+			targetContext.draw();
+			
 			
 			
 			projectionMatrix = new BABYLON.Matrix().copyFrom(_this._camera.getProjectionMatrix()).m;
-			_this._effksContextBgMirror.setProjectionMatrix(projectionMatrix);
+			//projectionMatrix[0]*=-1;
+			targetContextMirror.setProjectionMatrix(projectionMatrix);
 			
 			worldMatrix = new BABYLON.Matrix().copyFrom(BABYLON.Matrix.Invert(_this._camera.getWorldMatrix())).m;
 			worldMatrix[0]*=-1;
 			worldMatrix[1]*=-1;
 			worldMatrix[2]*=-1;
-			_this._effksContextBgMirror.setCameraMatrix(worldMatrix);
-		
-			_this._effksContextBg.draw();		
-						
+			//worldMatrix[3]*=-1;
+			targetContextMirror.setCameraMatrix(worldMatrix);		
+			targetContextMirror.draw();		
+				
+			
+			if(layerId == "bg"){
+				//TODO: handle this in a less hacky way
+				_this._effksContextAttached.setProjectionMatrix(_this._camera.getProjectionMatrix().m);
+				_this._effksContextAttached.setCameraMatrix(BABYLON.Matrix.Invert(_this._camera.getWorldMatrix()).m);
+				_this._effksContextAttached.draw();
+			}			
 		}
-		
+	}
+	
+	
+	//foreground layer
+	this._scene.onAfterDrawPhaseObservable.add(() => {//onAfterRenderObservable 
+		renderEffekseerLayer("bg"); //if it was not rendered during render group handling, render it after drawing is completed
+		renderEffekseerLayer("fg");
+	});
+	
+	//background layer
+	this._scene.onAfterRenderingGroupObservable.add((info) => {//onAfterRenderObservable 		
+		/*if(info.renderingGroupId == 2){
+			renderEffekseerLayer("bg"); //render it after group 2 was rendered
+		}
+		if(info.renderingGroupId == 4){
+			renderEffekseerLayer("fg");
+		}*/
+	});
+	
+	this._scene.onBeforeRenderingGroupObservable.add((info) => {//onAfterRenderObservable
+		if(info.renderingGroupId > 2){
+			renderEffekseerLayer("bg"); //render it before any higher group is handled(if no group 2 observables fired)
+		}
+		if(info.renderingGroupId > 4){
+			renderEffekseerLayer("fg");
+		}
 	});
 		
 	this._engine.runRenderLoop(function () {
@@ -3152,6 +3175,10 @@ BattleSceneManager.prototype.getTargetObject = function(name){
 	name = parts[0];
 	const attPoint = parts[1];
 	
+	if(name && this._activeAliases[name]){
+		name = this._activeAliases[name];
+	}
+	
 	let obj;
 	if(name == "Camera"){
 		return _this._camera;
@@ -3183,7 +3210,16 @@ BattleSceneManager.prototype.getTargetObject = function(name){
 		obj = _this._enemySprite.sprite;
 	} else if(name == "scene_light"){
 		obj = _this._hemisphereLight;
-	} else {
+	} else {	
+		
+		if(name && String(name).indexOf("envBg__") == 0){
+			const envName = name.replace("envBg__", "");
+			_this._bgs.forEach(function(bg){	
+				if(bg.isVisible && bg.envRefId == envName){
+					obj = bg;
+				}
+			});	
+		}
 		
 		if(!obj){//check models
 			var ctr = 0;
@@ -4597,14 +4633,14 @@ BattleSceneManager.prototype.executeAnimation = function(animation, startTick){
 			var targetContext;
 			if(params.autoRotate && _this._animationDirection == -1){
 				
-				if(params.isBackground * 1){
-					targetContext = _this._effksContextBgMirror;//_this._effksContextBg;
+				if(params.isForeground * 1){
+					targetContext = _this._effksContextFgMirror;//_this._effksContextFg;
 				} else {
 					targetContext =  _this._effksContextMirror;//_this._effksContext;
 				}
 			} else {
-				if(params.isBackground * 1){
-					targetContext = _this._effksContextBg;
+				if(params.isForeground * 1){
+					targetContext = _this._effksContextFg;
 				} else {
 					targetContext = _this._effksContext;
 				}
@@ -5594,7 +5630,9 @@ BattleSceneManager.prototype.executeAnimation = function(animation, startTick){
 			_this.setBgScrollDirection(_this._bgScrollDirection * -1);
 		},
 		include_animation:  function(target, params){
-			let additions = _this._animationBuilder.buildAnimation(params.battleAnimId, _this).mainAnimation;
+			const animationData = _this._animationBuilder.buildAnimation(params.battleAnimId, _this);
+			const targetAnimationId = params.sequenceId || "mainAnimation";
+			const additions = animationData[targetAnimationId];
 			if(additions){
 				let tmp = [];
 				for(var i = 0; i < additions.length; i++){
@@ -6340,6 +6378,8 @@ BattleSceneManager.prototype.setBgMode = function(mode) {
 BattleSceneManager.prototype.resetScene = function() {
 	var _this = this;
 	this.initScene();
+	
+	this._isEnvPreview = false;
 	_this.disposeBarrierEffects();
 	
 	_this.disposeAnimationSprites();
@@ -6418,6 +6458,7 @@ BattleSceneManager.prototype.resetScene = function() {
 BattleSceneManager.prototype.showEnvironment = function(ref, all){
 	var bgId;
 	this._envCreateStall = true;
+	this._isEnvPreview = true;
 	if(!all){
 		bgId = $gameSystem.getUnitSceneBgId(ref);
 	}
@@ -6535,6 +6576,8 @@ BattleSceneManager.prototype.createScrollingBg = function(id, bgId, path, size, 
 			instanceRef = bg;
 			bg.visibility = 0;
 			bg.bgId = bgId;
+			const pathParts = path.split("/");
+			bg.envRefId = pathParts[pathParts.length - 1];
 			bg.alphaIndex = alphaIndex;
 			_this._bgs.push(bg);
 		} else {
@@ -6607,10 +6650,10 @@ BattleSceneManager.prototype.preloadEffekseerParticles = async function(){
 								_this._effksContextMirror.loadEffect("effekseer/"+params.path+".efk", 1.0, resolve);	
 							}));	
 							promises.push(new Promise(function(resolve, reject){
-								_this._effksContextBg.loadEffect("effekseer/"+params.path+".efk", 1.0, resolve);	
+								_this._effksContextFg.loadEffect("effekseer/"+params.path+".efk", 1.0, resolve);	
 							}));	
 							promises.push(new Promise(function(resolve, reject){
-								_this._effksContextBgMirror.loadEffect("effekseer/"+params.path+".efk", 1.0, resolve);	
+								_this._effksContextFgMirror.loadEffect("effekseer/"+params.path+".efk", 1.0, resolve);	
 							}));	
 							promises.push(new Promise(function(resolve, reject){
 								_this._effksContextAttached.loadEffect("effekseer/"+params.path+".efk", 1.0, resolve);	
@@ -6655,10 +6698,10 @@ BattleSceneManager.prototype.preloadEffekseerParticles = async function(){
 									_this._effksContextMirror.loadEffect("effekseer/"+params.path+".efk", 1.0, resolve);	
 								}));	
 								promises.push(new Promise(function(resolve, reject){
-									_this._effksContextBg.loadEffect("effekseer/"+params.path+".efk", 1.0, resolve);	
+									_this._effksContextFg.loadEffect("effekseer/"+params.path+".efk", 1.0, resolve);	
 								}));	
 								promises.push(new Promise(function(resolve, reject){
-									_this._effksContextBgMirror.loadEffect("effekseer/"+params.path+".efk", 1.0, resolve);	
+									_this._effksContextFgMirror.loadEffect("effekseer/"+params.path+".efk", 1.0, resolve);	
 								}));	
 								promises.push(new Promise(function(resolve, reject){
 									_this._effksContextAttached.loadEffect("effekseer/"+params.path+".efk", 1.0, resolve);	
@@ -7024,28 +7067,40 @@ BattleSceneManager.prototype.preloadSceneAssets = function(){
 				}			
 				
 				
+				const visitedAnims = {};
+				
+				const stack = [];
 				for(let animId in animIdsToPreload){
-					var animationList = _this._animationBuilder.buildAnimation(animId, _this);
-					if(!animationList){
-						alert("Animation "+animId+" does not have a definition!");
-						throw("Animation "+animId+" does not have a definition!");
-					}
-					Object.keys(animationList).forEach(function(animType){
-						Object.keys(animationList[animType]).forEach(function(tick){
-							const batch = animationList[animType][tick];
-							batch.forEach(function(animCommand){
-								handleAnimCommand(animCommand, animId, animType, tick);
-								if(animCommand.type == "next_phase"){
-									for(let command of animCommand.params.commands){
-										handleAnimCommand(command, animId, animType, tick);	
-									}
-								}	
-							});
-						});				
-					});	
+					stack.push(animId);
 				}
 				
-					
+				while(stack.length){
+					const animId = stack.pop();
+					if(!visitedAnims[animId]){
+						visitedAnims[animId] = true;
+						var animationList = _this._animationBuilder.buildAnimation(animId, _this);
+						if(!animationList){
+							alert("Animation "+animId+" does not have a definition!");
+							throw("Animation "+animId+" does not have a definition!");
+						}
+						Object.keys(animationList).forEach(function(animType){
+							Object.keys(animationList[animType]).forEach(function(tick){
+								const batch = animationList[animType][tick];
+								batch.forEach(function(animCommand){
+									handleAnimCommand(animCommand, animId, animType, tick);
+									if(animCommand.type == "next_phase"){
+										for(let command of animCommand.params.commands){
+											handleAnimCommand(command, animId, animType, tick);	
+										}
+									}	
+									if(animCommand.type == "include_animation"){
+										stack.push(animCommand.params.battleAnimId);
+									}
+								});
+							});				
+						});	
+					}
+				}					
 			}	 
 			
 			promises.push(DragonBonesManager.load(Object.keys(dragonBonesResources)));
