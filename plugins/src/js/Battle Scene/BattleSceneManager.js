@@ -1874,10 +1874,7 @@ BattleSceneManager.prototype.hookBeforeRender = function(){
 		var deltaTime = _this._engine.getDeltaTime();
 		_this._effekseerWasTranslated = false;
 		
-		var ratio = 1;
-		if(_this.isOKHeld){
-			ratio = 2;
-		}
+		var ratio = _this.getCurrentRatio();
 		ratio*=_this._animRatio;
 		deltaTime*=ratio;
 		if(_this._fastForward){
@@ -2678,6 +2675,21 @@ BattleSceneManager.prototype.updateParentedEffekseerEffect = function(effekInfo)
 	}
 }
 
+BattleSceneManager.prototype.getCurrentRatio = function(){
+	let ratio = 1;
+	
+	let isSpeedUp = this.isOKHeld;
+	if(this._doingSwipAnim && this._lockedSwipeState != null){
+		isSpeedUp = this._lockedSwipeState;
+	}
+	
+	if(isSpeedUp){
+		ratio = 2;
+	}	
+		
+	return ratio;
+}
+
 BattleSceneManager.prototype.startScene = function(){
 	var _this = this;
 	//_this.initScene();
@@ -2702,10 +2714,7 @@ BattleSceneManager.prototype.startScene = function(){
 		
 		
 		
-		var ratio = 1;
-		if(_this.isOKHeld){
-			ratio = 2;
-		}
+		var ratio = _this.getCurrentRatio();
 		ratio*=_this._animRatio;
 		deltaTime*=ratio;
 		if(_this._fastForward){
@@ -2754,10 +2763,7 @@ BattleSceneManager.prototype.startScene = function(){
 		
 	});
 	this._scene.onBeforeRenderObservable.add(() => {
-		var ratio = 1;
-		if(_this.isOKHeld){
-			ratio = 2;
-		}
+		var ratio = _this.getCurrentRatio();
 		ratio*=_this._animRatio;
 		
 		let checkedObjects = ["active_main", "active_twin", "active_target"];
@@ -2863,10 +2869,7 @@ BattleSceneManager.prototype.startScene = function(){
 		
 		_this._scene.render();
 		_this._engine.wipeCaches(true);
-		var ratio = 1;
-		if(_this.isOKHeld){
-			ratio = 2;
-		}
+		var ratio = _this.getCurrentRatio();
 		ratio*=_this._animRatio;
 		
 		if(_this._moviePlayback){
@@ -3838,6 +3841,8 @@ BattleSceneManager.prototype.executeAnimation = function(animation, startTick){
 			if(_this.isOKHeld){
 				swipeTime/=2;
 			}
+			_this._doingSwipAnim = true;
+			_this._lockedSwipeState = _this.isOKHeld;
 			_this.swipeToBlack(direction, "in", swipeTime).then(function(){
 				clearSwipe();				
 			});	
@@ -3847,7 +3852,10 @@ BattleSceneManager.prototype.executeAnimation = function(animation, startTick){
 					setTimeout(clearSwipe, 100);
 				} else {
 					setTimeout(function(){
-						_this.swipeToBlack(direction, "out");
+						_this.swipeToBlack(direction, "out").then(function(){
+							_this._doingSwipAnim = false;
+							_this._lockedSwipeState = null;
+						});
 					}, 100);					
 				}
 			}
@@ -3885,8 +3893,13 @@ BattleSceneManager.prototype.executeAnimation = function(animation, startTick){
 				params.speed/=2;
 				params.speedOut/=2;
 			}
+			_this._doingSwipAnim = true;
+			_this._lockedSwipeState = _this.isOKHeld;
 			_this.fadeToWhite(fadeTime * 1000, params.speed).then(function(){
-				_this.fadeFromWhite(params.speedOut);
+				_this.fadeFromWhite(params.speedOut).then(function(){
+					_this._doingSwipAnim = false;
+					_this._lockedSwipeState = null;
+				});
 			});	
 		
 		},		
@@ -3958,14 +3971,14 @@ BattleSceneManager.prototype.executeAnimation = function(animation, startTick){
 					_this._animationList[insertStartTick + 27] = params.commands;	
 					_this._animationList[insertStartTick + 28] = [{type: "updateBgMode", target: "active_target"}];
 					
-					if(_this._currentAnimatedAction.hits){
+					//if(_this._currentAnimatedAction.hits){
 						var additions = [];
 						additions[insertStartTick + 50] = [{type: "show_barrier", target: "active_target", params: {}}];	
 						//if(_this._currentAnimatedAction.attacked.action.type == "defend"){
 						additions[insertStartTick + 50].push({type: "set_sprite_frame", target: "active_target", params: {name: "block"}});
 						//}
 						_this.mergeAnimList(additions);	
-					}								
+					//}								
 				}
 			}
 		},
@@ -6224,7 +6237,7 @@ BattleSceneManager.prototype.swipeToBlack = function(direction, inOrOut, holdDur
 		_this._swipeBox.className = "";
 		_this._swipeBox.classList.add(swipeClass);		
 		_this._swipeBox.classList.add(inOrOut);
-		if(_this.isOKHeld){
+		if((_this._lockedSwipeState != null && _this._lockedSwipeState) || (_this._lockedSwipeState == null && _this.isOKHeld)){
 			var duration = _this._swipeBox.style["animation-duration"].replace(/s$/, "");
 			duration/=2;
 			_this._swipeBox.style["animation-duration"] = duration;
