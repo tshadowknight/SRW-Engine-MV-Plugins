@@ -677,7 +677,16 @@ SRWEditor.prototype.init = function(){
 			hasTarget: false,
 			params: ["battleAnimId", "sequenceId"],
 			desc: "Include the main track of the animation with id battleAnimId starting at the current tick +1."
-		}
+		},
+		merge_complete_animation: {
+			hasTarget: false,
+			params: ["battleAnimId"],
+		},
+		set_text_provider: {
+			hasTarget: false,
+			params: ["id"],
+			desc: "Set the actor id used for fetching text to specified id for the remainder of the animation."
+		},
 	};
 	
 
@@ -988,7 +997,7 @@ SRWEditor.prototype.init = function(){
 			var result = "";			
 			result+="<select class='sequence_mode_select param_select'>";
 			Object.keys(_this._sequenceTypes).sort().forEach(function(type){
-				result+="<option "+(value == type ? "selected" : "")+" value='"+type+"'>"+_this._sequenceTypes[type].name+"</option>";
+				result+="<option "+(value == _this._sequenceTypes[type].id ? "selected" : "")+" value='"+_this._sequenceTypes[type].id+"'>"+_this._sequenceTypes[type].name+"</option>";
 			});
 			result+="</select>";
 			return result;

@@ -84,7 +84,10 @@ BattleAnimationBuilder.prototype.newDef = function(name){
 			onMissOverwrite: {},
 			onDestroy: {},
 			onDestroyTwin: {},
-			onDestroyOverwrite: {}
+			onDestroyOverwrite: {},
+			onNoDestroy: {},
+			onNoDestroyOverwrite: {},
+			onNoDestroyTwin: {}
 		}		
 	};
 	//this.save();

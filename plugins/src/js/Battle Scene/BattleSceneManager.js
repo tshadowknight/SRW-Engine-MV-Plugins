@@ -2071,6 +2071,7 @@ BattleSceneManager.prototype.hookBeforeRender = function(){
 							//_this.disposeSpriterBackgrounds();
 							_this.disposeRMMVBackgrounds();
 							_this.disposeMovieBackgrounds();
+							_this._textProviderOverride = null;
 							_this._animationResolve();
 						}						
 					}					
@@ -3736,11 +3737,22 @@ BattleSceneManager.prototype.executeAnimation = function(animation, startTick){
 				attackTextProviderId = action.action.attack.id;
 			}
 			
-			var battleText = _this._battleTextManager.getText(entityType, action.ref, "attacks", action.isActor ? "enemy" : "actor", _this.getBattleTextId(_this._currentAnimatedAction), params.id, attackTextProviderId);
+			let textProvider;
+			
+			if(_this._textProviderOverride){
+				textProvider = $gameActors.actor(_this._textProviderOverride);
+			} else{
+				textProvider = action.ref;
+			}
+			
+			var battleText = _this._battleTextManager.getText(entityType, textProvider, "attacks", action.isActor ? "enemy" : "actor", _this.getBattleTextId(_this._currentAnimatedAction), params.id, attackTextProviderId);
 			_this._awaitingText = true;
 			_this._UILayerManager.setTextBox(entityType, entityId, action.ref.SRWStats.pilot.name, battleText, false, true).then(function(){
 				_this._awaitingText = false;
 			});
+		},
+		set_text_provider: function(target, params){
+			_this._textProviderOverride = params.id;
 		},
 		clear_attack_text: function(target, params){
 			_this._UILayerManager.resetTextBox();
@@ -5606,13 +5618,13 @@ BattleSceneManager.prototype.executeAnimation = function(animation, startTick){
 			//await _this.createEnvironment({commandBgId: params.id});
 			_this.showEnvironment({commandBgId: params.id});
 		},		
-		show_portrait_noise:  function(target, params){
+		show_portrait_noise: function(target, params){
 			_this._UILayerManager.showNoise();
 		},
-		hide_portrait_noise:  function(target, params){
+		hide_portrait_noise: function(target, params){
 			_this._UILayerManager.hideNoise();
 		},
-		set_bg_scroll_ratio:  function(target, params){
+		set_bg_scroll_ratio: function(target, params){
 			if(params.smooth * 1){
 				_this._targetScrollRatio = params.ratio || 0;
 				_this._scrollRatioDuration = params.duration || 0;
@@ -5621,7 +5633,7 @@ BattleSceneManager.prototype.executeAnimation = function(animation, startTick){
 				_this.setBgScrollRatio(params.ratio || 0);
 			}			
 		},
-		set_animation_ratio:  function(target, params){
+		set_animation_ratio: function(target, params){
 			if(params.smooth * 1){
 				_this._targetAnimRatio = params.ratio || 0;
 				_this._startAnimRatio = _this._animRatio;
@@ -5636,13 +5648,13 @@ BattleSceneManager.prototype.executeAnimation = function(animation, startTick){
 				_this.setAnimRatio(params.ratio || 0);
 			}			
 		},
-		hold_tick:  function(target, params){			
+		hold_tick: function(target, params){			
 			_this._holdTickDuration = params["duration(ms)"] || 0;
 		},
-		toggle_bg_scroll:  function(target, params){
+		toggle_bg_scroll: function(target, params){
 			_this.setBgScrollDirection(_this._bgScrollDirection * -1);
 		},
-		include_animation:  function(target, params){
+		include_animation: function(target, params){
 			const animationData = _this._animationBuilder.buildAnimation(params.battleAnimId, _this);
 			const targetAnimationId = params.sequenceId || "mainAnimation";
 			const additions = animationData[targetAnimationId];
@@ -5655,7 +5667,21 @@ BattleSceneManager.prototype.executeAnimation = function(animation, startTick){
 				}
 				_this.mergeAnimList(tmp);	
 			}				
-		}
+		},
+		merge_complete_animation: function(target, params){
+			const animationData = _this._animationBuilder.buildAnimation(params.battleAnimId, _this);
+			const additions = _this.constructAnimationList(_this._currentAnimatedAction, animationData);
+			
+			if(additions){
+				let tmp = [];
+				for(var i = 0; i < additions.length; i++){
+					if(additions[i]){
+						tmp[i + startTick + 1] = additions[i];
+					}			
+				}
+				_this.mergeAnimList(tmp);	
+			}				
+		}, 
 		
 	};
 	
@@ -5839,35 +5865,44 @@ BattleSceneManager.prototype.mergeAnimList = function(additions){
 	}	
 }
 
-BattleSceneManager.prototype.playAttackAnimation = function(cacheRef, attackDef){
-	var _this = this;
-	//console.log("playAttackAnimation");
-	function overwriteAnimList(additions){
+BattleSceneManager.prototype.constructAnimationList = function(cacheRef, attackDef){
+	const targetList = attackDef.mainAnimation; //the def retrieved from the BattleAnimationBuilder is already a clone, so no worries about modifying the underlying definition
+	function mergeAnimList(additions){
 		for(var i = 0; i < additions.length; i++){
 			if(additions[i]){
-				if(!_this._animationList[i]){
-					_this._animationList[i] = [];
+				if(!targetList[i]){
+					targetList[i] = [];
 				}
-				_this._animationList[i] = additions[i];
+				targetList[i] = targetList[i].concat(additions[i]);
 			}			
 		}
 	}
-	this._animationList = [];
-	this._animationList = attackDef.mainAnimation;
+	
+	function overwriteAnimList(additions){
+		for(var i = 0; i < additions.length; i++){
+			if(additions[i]){
+				if(!targetList[i]){
+					targetList[i] = [];
+				}
+				targetList[i] = additions[i];
+			}			
+		}
+	}
+	
 	if(cacheRef.hits){
-		_this.mergeAnimList(attackDef.onHit);
+		mergeAnimList(attackDef.onHit);
 		if(attackDef.onHitOverwrite){
 			overwriteAnimList(attackDef.onHitOverwrite);
 		}
 		if(cacheRef.attacked){			
 			if(cacheRef.attacked.isDestroyed && cacheRef.attacked.destroyer == cacheRef.ref && cacheRef.attacked.destroyedOrderIdx == cacheRef.actionOrder){
-				_this.mergeAnimList(attackDef.onDestroy);
+				mergeAnimList(attackDef.onDestroy);
 				if(attackDef.onDestroyOverwrite){
 					overwriteAnimList(attackDef.onDestroyOverwrite);
 				}	
 			}  else {
 				if(attackDef.onNoDestroy){
-					_this.mergeAnimList(attackDef.onNoDestroy);
+					mergeAnimList(attackDef.onNoDestroy);
 				}
 				if(attackDef.onNoDestroyOverwrite){
 					overwriteAnimList(attackDef.onNoDestroyOverwrite);
@@ -5875,28 +5910,35 @@ BattleSceneManager.prototype.playAttackAnimation = function(cacheRef, attackDef)
 			}			
 		} 	
 	} else {
-		//this._animationList = this._animationList.concat(attackDef.onMiss);
-		_this.mergeAnimList(attackDef.onMiss);
+		mergeAnimList(attackDef.onMiss);
 		if(attackDef.onMissOverwrite){
 			overwriteAnimList(attackDef.onMissOverwrite);
 		}
 	}
 	if(cacheRef.attacked_all_sub){
 		if(cacheRef.hits_all_sub){		
-			_this.mergeAnimList(attackDef.onHitTwin);		
+			mergeAnimList(attackDef.onHitTwin);		
 			if(cacheRef.attacked_all_sub){
 				if(cacheRef.attacked_all_sub.isDestroyed && cacheRef.attacked_all_sub.destroyer == cacheRef.ref && cacheRef.attacked_all_sub.destroyedOrderIdx == cacheRef.actionOrder){
-					_this.mergeAnimList(attackDef.onDestroyTwin);
+					mergeAnimList(attackDef.onDestroyTwin);
 				} else {
-					_this.mergeAnimList(attackDef.onNoDestroyTwin);
+					mergeAnimList(attackDef.onNoDestroyTwin);
 				}
 			}
 				
-		} else {
-			//this._animationList = this._animationList.concat(attackDef.onMiss);			
-			_this.mergeAnimList(attackDef.onMissTwin);			
+		} else {			
+			mergeAnimList(attackDef.onMissTwin);			
 		}
 	}
+	return targetList;
+}
+
+BattleSceneManager.prototype.playAttackAnimation = function(cacheRef, attackDef){
+	var _this = this;
+	//console.log("playAttackAnimation");
+	
+	this._animationList = this.constructAnimationList(cacheRef, attackDef);
+	
 	
 	//force participating sprites to their idle stance
 	if(!_this._animationList[0]){
@@ -6393,6 +6435,8 @@ BattleSceneManager.prototype.resetScene = function() {
 	this.initScene();
 	
 	this._isEnvPreview = false;
+	this._textProviderOverride = null;
+	
 	_this.disposeBarrierEffects();
 	
 	_this.disposeAnimationSprites();
@@ -6633,8 +6677,12 @@ BattleSceneManager.prototype.preloadEffekseerParticles = async function(){
 	var _this = this;
 	
 	for(var i = 0; i < _this._actionQueue.length; i++){
+		
 		var nextAction = _this._actionQueue[i];
-		if(nextAction){			
+		if(nextAction){		
+
+			let animIdsToPreload = {};
+			
 			var attack = nextAction.action.attack;
 			
 			var animId;
@@ -6672,12 +6720,19 @@ BattleSceneManager.prototype.preloadEffekseerParticles = async function(){
 								_this._effksContextAttached.loadEffect("effekseer/"+params.path+".efk", 1.0, resolve);	
 							}));		
 							
-						}								
+						}	
+
+						if(animCommand.type == "include_animation"){
+							animIdsToPreload[animCommand.params.battleAnimId] = true;
+						}
+						if(animCommand.type == "merge_complete_animation"){
+							animIdsToPreload[animCommand.params.battleAnimId] = true;
+						}						
 					});
 				});				
 			});	
 			
-			let animIdsToPreload = {};
+			
 			if(nextAction.isDestroyed){
 				var animId = $statCalc.getBattleSceneInfo(nextAction.action.ref).deathAnimId;
 				if(animId == null || animId == ''){
@@ -6695,34 +6750,50 @@ BattleSceneManager.prototype.preloadEffekseerParticles = async function(){
 				animIdsToPreload[animId] = true;
 			}	
 			
+			const visitedAnims = {};
+			const stack = [];
 			for(let animId in animIdsToPreload){
-				var animationList = _this._animationBuilder.buildAnimation(animId, _this);
+				stack.push(animId);
+			}
 			
-				Object.keys(animationList).forEach(function(animType){
-					animationList[animType].forEach(function(batch){
-						batch.forEach(function(animCommand){
-							var params = animCommand.params;
-							if(animCommand.type == "play_effekseer"){
-								
-								promises.push(new Promise(function(resolve, reject){
-									_this._effksContext.loadEffect("effekseer/"+params.path+".efk", 1.0, resolve);	
-								}));	
-								promises.push(new Promise(function(resolve, reject){
-									_this._effksContextMirror.loadEffect("effekseer/"+params.path+".efk", 1.0, resolve);	
-								}));	
-								promises.push(new Promise(function(resolve, reject){
-									_this._effksContextFg.loadEffect("effekseer/"+params.path+".efk", 1.0, resolve);	
-								}));	
-								promises.push(new Promise(function(resolve, reject){
-									_this._effksContextFgMirror.loadEffect("effekseer/"+params.path+".efk", 1.0, resolve);	
-								}));	
-								promises.push(new Promise(function(resolve, reject){
-									_this._effksContextAttached.loadEffect("effekseer/"+params.path+".efk", 1.0, resolve);	
-								}));
-								}								
-						});
-					});				
-				});	
+			while(stack.length){
+				const animId = stack.pop();
+				if(!visitedAnims[animId]){
+					visitedAnims[animId] = true;
+					var animationList = _this._animationBuilder.buildAnimation(animId, _this);
+			
+					Object.keys(animationList).forEach(function(animType){
+						animationList[animType].forEach(function(batch){
+							batch.forEach(function(animCommand){
+								var params = animCommand.params;
+								if(animCommand.type == "play_effekseer"){
+									
+									promises.push(new Promise(function(resolve, reject){
+										_this._effksContext.loadEffect("effekseer/"+params.path+".efk", 1.0, resolve);	
+									}));	
+									promises.push(new Promise(function(resolve, reject){
+										_this._effksContextMirror.loadEffect("effekseer/"+params.path+".efk", 1.0, resolve);	
+									}));	
+									promises.push(new Promise(function(resolve, reject){
+										_this._effksContextFg.loadEffect("effekseer/"+params.path+".efk", 1.0, resolve);	
+									}));	
+									promises.push(new Promise(function(resolve, reject){
+										_this._effksContextFgMirror.loadEffect("effekseer/"+params.path+".efk", 1.0, resolve);	
+									}));	
+									promises.push(new Promise(function(resolve, reject){
+										_this._effksContextAttached.loadEffect("effekseer/"+params.path+".efk", 1.0, resolve);	
+									}));
+								}
+							if(animCommand.type == "include_animation"){
+								stack.push(animCommand.params.battleAnimId);
+							}
+							if(animCommand.type == "merge_complete_animation"){
+								stack.push(animCommand.params.battleAnimId);
+							}							
+							});
+						});				
+					});	
+				}
 			}
 			
 			
@@ -7109,6 +7180,10 @@ BattleSceneManager.prototype.preloadSceneAssets = function(){
 									if(animCommand.type == "include_animation"){
 										stack.push(animCommand.params.battleAnimId);
 									}
+									if(animCommand.type == "merge_complete_animation"){
+										stack.push(animCommand.params.battleAnimId);
+									}
+									
 								});
 							});				
 						});	
