@@ -989,6 +989,8 @@ BattleCalc.prototype.generateBattleResult = function(isPrediction){
 		}
 		defenders = tmp;
 		
+		aCache.actionOrder = orderIdx;
+		
 		for(var i = 0; i < defenders.length; i++){		
 			var attackedRef = "";
 			if(i == 1){
@@ -1001,7 +1003,7 @@ BattleCalc.prototype.generateBattleResult = function(isPrediction){
 			}
 			//when making a prediction also resolve attacks from units that were previously predicted to be destroyed to account for potential misses
 			if(isPrediction || (!aCache.isDestroyed && !dCache.isDestroyed)) {
-				aCache.actionOrder = orderIdx;
+				
 				aCache.hasActed = true;
 				
 				aCache["attacked"+attackedRef] = dCache;
@@ -1948,6 +1950,9 @@ BattleCalc.prototype.updateTwinActions = function(){
 		} else {
 			actorTwinAction = {type: "none"};	
 		}		
+	} else {
+		$gameTemp.currentTargetingSettings.enemyTwin = "main";
+		$gameTemp.currentTargetingSettings.enemy = "main";
 	}
 	
 	if($statCalc.isMainTwin($gameTemp.currentBattleEnemy)){
@@ -1979,6 +1984,9 @@ BattleCalc.prototype.updateTwinActions = function(){
 		} else {
 			enemyTwinAction = {type: "defend"};				
 		}
+	} else {
+		$gameTemp.currentTargetingSettings.actorTwin = "main";
+		$gameTemp.currentTargetingSettings.actor = "main";
 	}
 	
 	$gameTemp.actorTwinAction = actorTwinAction;

@@ -28,7 +28,7 @@ Window_AttackList.prototype.getCurrentSelection = function(){
 
 Window_AttackList.prototype.validateAttack = function(attack) {
 	var actor = this.getCurrentSelection().actor;
-	var isPostMoveOnly = $gameTemp.isPostMove && !$gameTemp.isEnemyAttack;	
+	var isPostMoveOnly = !$gameTemp.isSupportAttackSelection && $gameTemp.isPostMove && !$gameTemp.isEnemyAttack;	
 	var rangeTarget;
 	//if($gameTemp.isEnemyAttack){
 	if($gameTemp.currentBattleEnemy){

@@ -393,7 +393,8 @@ BattleSceneManager.prototype.preloadTexture = async function(path, context){
 
 BattleSceneManager.prototype.getCachedTexture = function(path){
 	if(!this._activeTextureCache[path]){
-		throw "An uncached texture was requested("+path+"), is preloading broken?";
+		console.log("An uncached texture was requested("+path+"), is preloading broken?");
+		return null;
 	}
 	return new BABYLON.Texture(this.getCachedImageData(path), this._scene, false, true, BABYLON.Texture.NEAREST_NEAREST);
 }
@@ -6917,6 +6918,39 @@ BattleSceneManager.prototype.preloadDynamicUnitModel = async function(target, pa
 	} 
 }
 
+
+BattleSceneManager.prototype.preloadDefaultFrames = function(ref, promises){
+	const _this = this;
+	var defaultFrames = ["main", "in", "out", "hurt", "dodge", "block"];
+	if(ENGINE_SETTINGS.SINGLE_BATTLE_SPRITE_MODE){
+		defaultFrames = ["main"];
+	}
+	if(ref){
+		var battleSceneInfo = $statCalc.getBattleSceneInfo(ref);
+		if(battleSceneInfo.useSpriter){
+			var path = $statCalc.getBattleSceneImage(ref)+"/spriter/";
+			var bgInfo = _this.createSpriterSprite(path+"_preload", path,  new BABYLON.Vector3(0, 0, -1000));
+			bgInfo.sprite.dispose();
+		} else if(battleSceneInfo.useDragonBones){
+			var path = $statCalc.getBattleSceneImage(ref)+"/dragonbones/";
+			/*var bgInfo = _this.createDragonBonesSprite(path+"_preload", path, $statCalc.getBattleSceneInfo(ref).armatureName, new BABYLON.Vector3(0, 0, -1000));
+			bgInfo.sprite.dispose();*/
+			dragonBonesResources["img/SRWBattleScene/"+path+"ske.json"] = true;
+			dragonBonesResources["img/SRWBattleScene/"+path+"tex.json"] = true;
+			dragonBonesResources["img/SRWBattleScene/"+path+"tex.png"] = true;
+		} else if(battleSceneInfo.useSpine){
+			
+		} else if(battleSceneInfo.use3D){
+			
+		} else {
+			var imgPath = $statCalc.getBattleSceneImage(ref);
+			defaultFrames.forEach(function(frame){
+				promises.push(_this.preloadTexture("img/SRWBattleScene/"+imgPath+"/"+frame+".png", "Preload of mech asset for mech " + ref.SRWStats.mech.id));												
+			});
+		}					
+	}
+}
+
 BattleSceneManager.prototype.preloadSceneAssets = function(){
 	var _this = this;
 	_this._cachedBgs = {};
@@ -7062,6 +7096,8 @@ BattleSceneManager.prototype.preloadSceneAssets = function(){
 			sampleMode = BABYLON.Texture.NEAREST_NEAREST
 		}
 		
+		
+		
 		for(var i = 0; i < _this._actionQueue.length; i++){
 			var nextAction = _this._actionQueue[i];
 			if(nextAction){			
@@ -7077,48 +7113,19 @@ BattleSceneManager.prototype.preloadSceneAssets = function(){
 				}
 				animIdsToPreload[animId] = true;
 				var preloadCtr = 0;
-				function preloadDefaultFrames(ref){
-					var defaultFrames = ["main", "in", "out", "hurt", "dodge", "block"];
-					if(ENGINE_SETTINGS.SINGLE_BATTLE_SPRITE_MODE){
-						defaultFrames = ["main"];
-					}
-					if(ref){
-						var battleSceneInfo = $statCalc.getBattleSceneInfo(ref);
-						if(battleSceneInfo.useSpriter){
-							var path = $statCalc.getBattleSceneImage(ref)+"/spriter/";
-							var bgInfo = _this.createSpriterSprite(path+"_preload", path,  new BABYLON.Vector3(0, 0, -1000));
-							bgInfo.sprite.dispose();
-						} else if(battleSceneInfo.useDragonBones){
-							var path = $statCalc.getBattleSceneImage(ref)+"/dragonbones/";
-							/*var bgInfo = _this.createDragonBonesSprite(path+"_preload", path, $statCalc.getBattleSceneInfo(ref).armatureName, new BABYLON.Vector3(0, 0, -1000));
-							bgInfo.sprite.dispose();*/
-							dragonBonesResources["img/SRWBattleScene/"+path+"ske.json"] = true;
-							dragonBonesResources["img/SRWBattleScene/"+path+"tex.json"] = true;
-							dragonBonesResources["img/SRWBattleScene/"+path+"tex.png"] = true;
-						} else if(battleSceneInfo.useSpine){
-							
-						} else if(battleSceneInfo.use3D){
-							
-						} else {
-							var imgPath = $statCalc.getBattleSceneImage(ref);
-							defaultFrames.forEach(function(frame){
-								promises.push(_this.preloadTexture("img/SRWBattleScene/"+imgPath+"/"+frame+".png", "Preload of mech asset for mech " + ref.SRWStats.mech.id));												
-							});
-						}					
-					}
-				}
 				
-				preloadDefaultFrames(nextAction.ref);
+				
+				_this.preloadDefaultFrames(nextAction.ref, promises);
 				if(nextAction.ref.subTwin){
-					preloadDefaultFrames(nextAction.ref.subTwin);
+					_this.preloadDefaultFrames(nextAction.ref.subTwin, promises);
 				}
 				if(nextAction.originalTarget){
-					preloadDefaultFrames(nextAction.originalTarget.ref);
+					_this.preloadDefaultFrames(nextAction.originalTarget.ref, promises);
 				}
 				if(nextAction.attacked){
-					preloadDefaultFrames(nextAction.attacked.ref);
+					_this.preloadDefaultFrames(nextAction.attacked.ref, promises);
 					if(nextAction.attacked.ref.subTwin){
-						preloadDefaultFrames(nextAction.attacked.ref.subTwin);
+						_this.preloadDefaultFrames(nextAction.attacked.ref.subTwin, promises);
 					}
 				}
 				
@@ -7603,7 +7610,8 @@ BattleSceneManager.prototype.processActionQueue = function() {
 		
 		
 		
-		if(nextAction && nextAction.action.type != "defend" && nextAction.action.type != "evade" && nextAction.action.type != "none"){
+		
+		if(nextAction && nextAction.hasActed && nextAction.action.type != "defend" && nextAction.action.type != "evade" && nextAction.action.type != "none"){
 			_this._UILayerManager.resetTextBox();
 			_this._UILayerManager.hideNoise();
 			_this._battleTextManager.clearAttackGroupId();
@@ -7910,21 +7918,27 @@ BattleSceneManager.prototype.processActionQueue = function() {
 						if(nextAction.side == "actor"){									
 							if(nextAction.ref.isSubTwin){									
 								_this._active_support_attacker = _this._actorTwinSupporterSprite.sprite;
+								_this._UILayerManager.setStat(_this._participantInfo.actor_twin_supporter.effect, "HP");
+								_this._UILayerManager.setStat(_this._participantInfo.actor_twin_supporter.effect, "EN");
 							} else {
 								_this._active_support_attacker = _this._actorSupporterSprite.sprite;
+								_this._UILayerManager.setStat(_this._participantInfo.actor_supporter.effect, "HP");
+								_this._UILayerManager.setStat(_this._participantInfo.actor_supporter.effect, "EN");
 							}
 							_this._active_support_attacker.parent_handle.position = new BABYLON.Vector3().copyFrom(_this._defaultPositions.ally_main_idle);
-							_this._UILayerManager.setStat(_this._participantInfo.actor_supporter.effect, "HP");
-							_this._UILayerManager.setStat(_this._participantInfo.actor_supporter.effect, "EN");
+							
 						} else {
 							if(nextAction.ref.isSubTwin){									
 								_this._active_support_attacker = _this._enemyTwinSupporterSprite.sprite;
+								_this._UILayerManager.setStat(_this._participantInfo.enemy_twin_supporter.effect, "HP");
+								_this._UILayerManager.setStat(_this._participantInfo.enemy_twin_supporter.effect, "EN");
 							} else {
 								_this._active_support_attacker = _this._enemySupporterSprite.sprite;
+								_this._UILayerManager.setStat(_this._participantInfo.enemy_supporter.effect, "HP");
+								_this._UILayerManager.setStat(_this._participantInfo.enemy_supporter.effect, "EN");
 							}
 							_this._active_support_attacker.parent_handle.position = new BABYLON.Vector3().copyFrom(_this._defaultPositions.enemy_main_idle);
-							_this._UILayerManager.setStat(_this._participantInfo.enemy_supporter.effect, "HP");
-							_this._UILayerManager.setStat(_this._participantInfo.enemy_supporter.effect, "EN");
+							
 						}
 						_this._active_support_attacker.setEnabled(true);
 						if(nextAction.side == "actor"){

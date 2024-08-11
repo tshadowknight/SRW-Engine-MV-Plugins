@@ -704,6 +704,7 @@ Window_BeforebattleTwin.prototype.update = function() {
 						} else {
 							$gameTemp.allAttackSelectionRequired = -1;
 						}
+						$gameTemp.isSupportAttackSelection = true;
 						$gameTemp.currentMenuUnit = {
 							actor: supporter.actor,
 							mech: supporter.actor.SRWStats.mech
@@ -733,18 +734,21 @@ Window_BeforebattleTwin.prototype.update = function() {
 										$gameTemp.popMenu = true;	
 										$gameTemp.twinSupportAttack = {actor: supporter.actor.subTwin, action: {type: "attack", attack: attack}}
 										$gameTemp.allAttackSelectionRequired = false;
+										$gameTemp.isSupportAttackSelection = false;
 										_this._currentSelection = 0;
 										_this.requestRedraw();	
 									};
 									$gameTemp.pushMenu = "attack_list";
 								} else {
 									$gameTemp.allAttackSelectionRequired = false;
+									$gameTemp.isSupportAttackSelection = false;
 									$gameTemp.twinSupportAttack = null;
 									_this._currentSelection = 0;
 									_this.requestRedraw();	
 								}								
 							} else {
 								$gameTemp.allAttackSelectionRequired = false;
+								$gameTemp.isSupportAttackSelection = false;
 								$gameTemp.twinSupportAttack = null;
 								_this._currentSelection = 0;
 								_this.requestRedraw();	
@@ -753,6 +757,7 @@ Window_BeforebattleTwin.prototype.update = function() {
 						};	
 						$gameTemp.attackWindowCancelCallback = function(){
 							$gameTemp.allAttackSelectionRequired = false;
+							$gameTemp.isSupportAttackSelection = false;
 						}	
 						$gameTemp.pushMenu = "attack_list";
 						return;

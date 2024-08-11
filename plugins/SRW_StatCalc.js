@@ -7503,7 +7503,10 @@ StatCalc.prototype.invalidateAbilityCache = function(actor){
 			this._abilityCacheDirty = true;
 		}	
 
-		this.invalidateActorAbiTracking(actor);	
+		this.invalidateActorAbiTracking(actor);
+		if(actor?.subTwin){
+			this.invalidateActorAbiTracking(actor.subTwin);
+		}
 	}	
 }
 
@@ -7858,6 +7861,10 @@ StatCalc.prototype.createActiveAbilityLookup = function(){
 				}			
 							
 				handleEventActors(eventActor, event);
+				
+				if(eventActor.subTwin){
+					handleEventActors(eventActor.subTwin, event);
+				}
 			}			
 					
 		});		

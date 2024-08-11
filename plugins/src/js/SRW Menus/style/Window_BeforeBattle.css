@@ -163,6 +163,12 @@
 	
 }
 
+.participant_block.participant_block_small.ally.support_attack .percent_indicator_containers .target_arrow_container.twin{
+	width: 29%;
+    right: 98%;
+    top: -13%;	
+}
+
 .participant_block .percent_indicator_containers .target_arrow_container.sub_twin {
 	transform: scaleY(-1);
 	top: 5%;
