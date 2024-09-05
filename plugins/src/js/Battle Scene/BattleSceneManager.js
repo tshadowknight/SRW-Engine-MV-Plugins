@@ -514,7 +514,7 @@ BattleSceneManager.prototype.initShaders = function(){
 	}
 }
 
-BattleSceneManager.prototype.initShader = async function(name){
+BattleSceneManager.prototype.initShader = async function(name, params){
 	let _this = this;
 	return new Promise(function(resolve, reject){	
 		var parts = name.split("_");
@@ -530,11 +530,32 @@ BattleSceneManager.prototype.initShader = async function(name){
 				let data = xhr.responseText;
 				BABYLON.Effect.ShadersStore[shaderName+shaderType+'Shader'] = data;		
 				
+				let shaderParams = [];
+				if(params){
+					for(var i = 0; i < 10; i++){
+						if(params["shaderParam"+i]){
+							var parts = params["shaderParam"+i].match(/^(.*)\:(.*)\=(.*)/);
+							if(parts && parts.length >= 4){
+								var type = parts[1];
+								var varName = parts[2];
+							
+								shaderParams.push({
+									type: type,
+									name: varName
+								});
+							}
+						}
+					}
+				} else {
+					shaderParams = [{type: "vector2", name: "iWaveCentre"}, {type: "float", name: "iIntensity"}]  
+				}
+				
+				
 				_this._shaderManagement[shaderName] = {
 					isPlaying: false,
 					targetTime: 0.9,
 					currentTime: 0,
-					params: [{type: "vector2", name: "iWaveCentre"}, {type: "float", name: "iIntensity"}]
+					params: shaderParams
 				}	
 				
 				resolve(1);					
@@ -799,14 +820,22 @@ BattleSceneManager.prototype.initShaderEffect = function(id){
 BattleSceneManager.prototype.runShaderEffect = function(id, effect, postEffect){
 	var _this = this;
 	var params = _this._shaderManagement[id].params;
+	/*if(!this._animsPaused){
+		_this._shaderManagement[id].currentTime+=(_this._engine.getDeltaTime() * 0.01 * (_this.isOKHeld ? 2 : 1));	
 		
-	_this._shaderManagement[id].currentTime+=(_this._scene.getAnimationRatio() * 0.01 * (_this.isOKHeld ? 2 : 1));			
+	}*/
+	
+	console.log(_this._shaderManagement[id].currentTime);
+			
 	effect.setVector2('iResolution', new BABYLON.Vector2(postEffect.width, postEffect.height));
 	//effect.setBool('iPlaying', true);
 	effect.setFloat('iTime', _this._shaderManagement[id].currentTime);
 	params.forEach(function(paramDef){
 		if(paramDef.type == "vector2" && paramDef.value != null){
 			effect.setVector2(paramDef.name, paramDef.value);
+		}
+		if(paramDef.type == "vector3" && paramDef.value != null){
+			effect.setVector3(paramDef.name, paramDef.value);
 		}
 		if(paramDef.type == "float" && paramDef.value != null){
 			effect.setFloat(paramDef.name, paramDef.value);
@@ -1997,6 +2026,13 @@ BattleSceneManager.prototype.hookBeforeRender = function(){
 		if(_this._animsPaused || (_this._maxAnimationTick != -1 && _this._currentAnimationTick >= _this._maxAnimationTick)){
 			return;
 		}	
+		
+		for(let id in _this._shaderManagement){
+			if(_this._shaderManagement[id].isPlaying){
+				_this._shaderManagement[id].currentTime+=deltaTime * 0.001;	
+			}			
+		}
+		
 		if(_this._runningAnimation){
 			
 			if(ticksSinceLastUpdate >= 1 && !_this._isLoading){	
@@ -2281,7 +2317,8 @@ BattleSceneManager.prototype.hookBeforeRender = function(){
 					}
 					
 					targetObj.position.x = targetObj.realPosition.x + Math.sin(currentTick * animation.speed_x) * animation.magnitude_x / 10 * fade;		
-					targetObj.position.y = targetObj.realPosition.y + Math.sin(currentTick * animation.speed_y) * animation.magnitude_y / 10 * fade;	
+					targetObj.position.y = targetObj.realPosition.y + Math.sin(currentTick * animation.speed_y) * animation.magnitude_y / 10 * fade;
+					targetObj.position.z = targetObj.realPosition.z + Math.sin(currentTick * animation.speed_z) * animation.magnitude_z / 10 * fade;						
 				} else {
 					targetObj.position = targetObj.realPosition;
 					delete _this._shakeAnimations[animationId];
@@ -3075,13 +3112,15 @@ BattleSceneManager.prototype.registerEffekseerDynamicParamAnimation = function(t
 	};
 }
 	
-BattleSceneManager.prototype.registerShakeAnimation = function(targetObj, magnitude_x, speed_x, magnitude_y, speed_y, startTick, duration, fadeInTicks, fadeOutTicks){	
+BattleSceneManager.prototype.registerShakeAnimation = function(targetObj, magnitude_x, speed_x, magnitude_y, speed_y, magnitude_z, speed_z, startTick, duration, fadeInTicks, fadeOutTicks){	
 	this._shakeAnimations[this._shakeAnimationCtr++] = {		
 		targetObj: targetObj,
 		magnitude_x: magnitude_x,
 		speed_x: speed_x,
 		magnitude_y: magnitude_y,
 		speed_y: speed_y,
+		magnitude_z: magnitude_z,
+		speed_z: speed_z,
 		startTick: startTick,
 		duration: duration,
 		fadeInTicks: fadeInTicks,
@@ -3474,13 +3513,13 @@ BattleSceneManager.prototype.executeAnimation = function(animation, startTick){
 								if(_this._animationDirection == -1){
 									valueParts[0] =  1 - valueParts[0];
 								}
-								value = new BABYLON.Vector2(valueParts[0], valueParts[1]);
+								value = new BABYLON.Vector2(valueParts[0] * 1, valueParts[1] * 1);
 							} else if(type == "vector3"){
 								var valueParts = value.split(",");
 								if(_this._animationDirection == -1){
 									valueParts[0] =  1 - valueParts[0];
 								}
-								value = new BABYLON.Vector3(valueParts[0], valueParts[1], valueParts[2]);
+								value = new BABYLON.Vector3(valueParts[0] * 1, valueParts[1] * 1, valueParts[2] * 1);
 							}
 							shaderParams.push({
 								type: type,
@@ -3675,7 +3714,7 @@ BattleSceneManager.prototype.executeAnimation = function(animation, startTick){
 			if(targetObj){				
 				_this.stopShakeAnimations(target);
 				targetObj.realPosition = new BABYLON.Vector3().copyFrom(targetObj.position);
-				_this.registerShakeAnimation(targetObj, params.magnitude_x || 0, params.speed_x || 1, params.magnitude_y || 0, params.speed_y || 1, startTick, params.duration, params.fadeInTicks || 0, params.fadeOutTicks || 0);
+				_this.registerShakeAnimation(targetObj, params.magnitude_x || 0, params.speed_x || 1, params.magnitude_y || 0, params.speed_y || 1, params.magnitude_z || 0, params.speed_z || 1, startTick, params.duration, params.fadeInTicks || 0, params.fadeOutTicks || 0);
 			}			
 		},
 		set_camera_target: function(target, params){
@@ -7073,7 +7112,7 @@ BattleSceneManager.prototype.preloadSceneAssets = function(){
 				promises.push(_this.initShader("shockWave_fragment"));
 			}
 			if(animCommand.type == "effect_screen_shader"){
-				promises.push(_this.initShader(params.shaderName+"_fragment"));
+				promises.push(_this.initShader(params.shaderName+"_fragment", animCommand.params));
 			}
 			if(animCommand.type == "play_se"){
 				var se = {};
