@@ -1102,6 +1102,8 @@ BattleCalc.prototype.generateBattleResult = function(isPrediction){
 				
 				dCache.barrierNames = damageResult.barrierNames;
 				
+				dCache.attackedBy = aCache;
+				
 				if(isBetweenFriendlies && interactionType == "status"){
 					dCache.receivedBuff = true;
 				}
@@ -1872,6 +1874,8 @@ BattleCalc.prototype.updateTwinActions = function(){
 		};
 	}
 	
+	
+	
 	var allAttackUsed = false;
 	
 	if($gameTemp.actorAction && $gameTemp.actorAction.attack){
@@ -1899,6 +1903,9 @@ BattleCalc.prototype.updateTwinActions = function(){
 		}
 	}
 	
+	const isBetweenFriendlies = $gameSystem.areUnitsFriendly($gameTemp.currentBattleActor, $gameTemp.currentBattleEnemy);
+	
+	
 	/*if(allAttackUsed){
 		$gameTemp.supportAttackCandidates = [];
 		$gameTemp.supportAttackSelected = -1;
@@ -1916,6 +1923,16 @@ BattleCalc.prototype.updateTwinActions = function(){
 	var isEnemyPostMove = $gameTemp.isEnemyAttack && $gameTemp.isPostMove;	
 	
 	if($statCalc.isMainTwin($gameTemp.currentBattleActor)){
+		
+		let isBuffingAttack = false;
+		if(isBetweenFriendlies){
+			let interactionType;
+			if($gameTemp.actorAction.attack){
+			 	interactionType = $gameTemp.actorAction.attack.alliesInteraction;				
+			}
+			isBuffingAttack = interactionType == Game_System.INTERACTION_STATUS;
+		}
+		
 		var twinInfo = {
 			actor: $gameTemp.currentBattleActor.subTwin,
 			pos: {x: $gameTemp.currentBattleActor.event.posX(), y: $gameTemp.currentBattleActor.event.posY()}
@@ -1937,7 +1954,7 @@ BattleCalc.prototype.updateTwinActions = function(){
 		
 		var isInnerComboParticipant = $statCalc.isInnerComboParticipant($gameTemp.currentBattleActor.subTwin);	
 		
-		if(!isInnerComboParticipant && !$statCalc.isDisabled($gameTemp.currentBattleActor.subTwin)){
+		if(!isInnerComboParticipant && !$statCalc.isDisabled($gameTemp.currentBattleActor.subTwin) && !isBuffingAttack){
 			var weaponResult = this.getBestWeaponAndDamage(twinInfo, targetInfo, false, false, isActorPostMove, allRequired);
 			if(weaponResult.weapon){
 				if(allRequired == 1){
@@ -1956,33 +1973,47 @@ BattleCalc.prototype.updateTwinActions = function(){
 	}
 	
 	if($statCalc.isMainTwin($gameTemp.currentBattleEnemy)){
-		var twinInfo = {
-			actor: $gameTemp.currentBattleEnemy.subTwin,
-			pos: {x: $gameTemp.currentBattleEnemy.event.posX(), y: $gameTemp.currentBattleEnemy.event.posY()}
-		};
 		
-		var targetActor;
-		if($gameTemp.currentTargetingSettings.enemyTwin == "twin" && $statCalc.isMainTwin($gameTemp.currentBattleActor)){
-			targetActor = $gameTemp.currentBattleActor.subTwin;
-		} else {
-			$gameTemp.currentTargetingSettings.enemyTwin = "main";
-			targetActor = $gameTemp.currentBattleActor;
+		let isBuffingAttack = false;
+		if(isBetweenFriendlies){
+			let interactionType;
+			if($gameTemp.actorAction.attack){
+			 	interactionType = $gameTemp.actorAction.attack.alliesInteraction;				
+			}
+			isBuffingAttack = interactionType == Game_System.INTERACTION_STATUS;
 		}
 		
-		var targetInfo = {
-			actor: targetActor,
-			pos: {x: $gameTemp.currentBattleActor.event.posX(), y: $gameTemp.currentBattleActor.event.posY()}
-		};
-		var allRequired = $gameTemp.currentTargetingSettings.enemy == "all" ? 1 : -1;
-		
-		var weaponResult = this.getBestWeaponAndDamage(twinInfo, targetInfo, false, false, isEnemyPostMove, allRequired);
-		if(weaponResult.weapon){
-			if(allRequired == 1){
-				$gameTemp.currentTargetingSettings.enemyTwin = "all";
+		if(isBuffingAttack){
+			enemyTwinAction = {type: "defend"};		
+		} else {			
+			var twinInfo = {
+				actor: $gameTemp.currentBattleEnemy.subTwin,
+				pos: {x: $gameTemp.currentBattleEnemy.event.posX(), y: $gameTemp.currentBattleEnemy.event.posY()}
+			};
+			
+			var targetActor;
+			if($gameTemp.currentTargetingSettings.enemyTwin == "twin" && $statCalc.isMainTwin($gameTemp.currentBattleActor)){
+				targetActor = $gameTemp.currentBattleActor.subTwin;
+			} else {
+				$gameTemp.currentTargetingSettings.enemyTwin = "main";
+				targetActor = $gameTemp.currentBattleActor;
 			}
-			enemyTwinAction = {type: "attack", attack: weaponResult.weapon};												
-		} else {
-			enemyTwinAction = {type: "defend"};				
+			
+			var targetInfo = {
+				actor: targetActor,
+				pos: {x: $gameTemp.currentBattleActor.event.posX(), y: $gameTemp.currentBattleActor.event.posY()}
+			};
+			var allRequired = $gameTemp.currentTargetingSettings.enemy == "all" ? 1 : -1;
+			
+			var weaponResult = this.getBestWeaponAndDamage(twinInfo, targetInfo, false, false, isEnemyPostMove, allRequired);
+			if(weaponResult.weapon){
+				if(allRequired == 1){
+					$gameTemp.currentTargetingSettings.enemyTwin = "all";
+				}
+				enemyTwinAction = {type: "attack", attack: weaponResult.weapon};												
+			} else {
+				enemyTwinAction = {type: "defend"};				
+			}
 		}
 	} else {
 		$gameTemp.currentTargetingSettings.actorTwin = "main";

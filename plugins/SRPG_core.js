@@ -2574,7 +2574,11 @@ SceneManager.isInSaveScene = function(){
 						if(battleEffect.damageInflicted > 0|| battleEffect.attacked.receivedBuff){
 							applyStatusConditions(battleEffect.statusEffects, battleEffect.attacked.ref, battleEffect.hasFury);
 						}
-						
+						if(battleEffect.attacked_all_sub){
+							if(battleEffect.damageInflicted_all_sub > 0|| battleEffect.attacked_all_sub.receivedBuff){
+								applyStatusConditions(battleEffect.statusEffects, battleEffect.attacked_all_sub.ref, battleEffect.hasFury);
+							}
+						}						
 					} else {
 						
 						$statCalc.modifyWill(battleEffect.attacked.ref, defenderPersonalityInfo.evade || 0)

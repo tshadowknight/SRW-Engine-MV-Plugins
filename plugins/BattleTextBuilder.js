@@ -28,7 +28,8 @@ function BattleTextBuilder(){
 		"destroyed",
 		"support_defend",
 		"support_attack",
-		"no_counter"
+		"no_counter",
+		"received_buff"
 	];			
 }
 

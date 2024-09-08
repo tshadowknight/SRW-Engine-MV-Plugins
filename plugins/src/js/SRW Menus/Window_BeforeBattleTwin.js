@@ -1245,9 +1245,23 @@ Window_BeforebattleTwin.prototype.createParticipantBlock = function(ref, action,
 	content+="<div class='scaled_text action_row'>";
 	if(this.isBuffingAttack()){
 		if(allyOrEnemy == "ally"){
-			content+="Buffing";
+			let actorStatus = "---";
+			if(!ref.isSubTwin){
+				if($gameTemp.actorAction && $gameTemp.actorAction.type == 'attack'){
+					actorStatus = "Buffing";
+				}
+			} else {
+				if($gameTemp.actorTwinAction && $gameTemp.actorTwinAction.type == 'attack'){
+					actorStatus = "Buffing";
+				}
+			}		
+			content+=actorStatus;
 		} else {
-			content+="Receiving";
+			if($gameTemp.currentTargetingSettings.actor == "all" || (!ref.isSubTwin && $gameTemp.currentTargetingSettings.actor == "main") || (ref.isSubTwin && $gameTemp.currentTargetingSettings.actor == "twin")){
+				content+="Receiving";
+			} else {
+				content+="---";
+			}			
 		}
 	} else {
 		if(!isSupport){

@@ -465,7 +465,7 @@ SRWEditor.prototype.init = function(){
 		},	
 		play_effekseer: {
 			hasTarget: true,
-			params: ["path", "position", "scale", "speed", "rotation", "parent", "isForeground", "autoRotate", "flipZ"],
+			params: ["path", "position", "scale", "speed", "rotation", "parent", "isForeground", "autoRotate", "flipZ", "ignoreParentRotation"],
 			desc: "Play a predefined effekseer effect."
 		},
 		remove_effekseer_parent: {
@@ -793,6 +793,7 @@ SRWEditor.prototype.init = function(){
 		isForeground: "If 1 the layer will render as render group 4, otherwise render group 2. Higher number render groups are drawn last.",
 		autoRotate: "If 1 the effect will be automatically rotated for enemies.",
 		flipZ: "If 1 the effect will have its z scale inverted.",
+		ignoreParentRotation: "If 1 the parent node's rotation will not be applied.",
 		color: "The blend color for the skybox.",
 		scale: "A scaling factor for the effect.",
 		scaleX: "A scaling factor for the width of the effect.",
@@ -1234,6 +1235,9 @@ SRWEditor.prototype.init = function(){
 		
 		},
 		flipZ: function(value){
+		
+		},
+		ignoreParentRotation: function(value){
 		
 		},
 		color: function(value){
@@ -3428,7 +3432,7 @@ SRWEditor.prototype.showCameraState = function(){
 					if(targetObj.handle){
 						if(type == "rotation"){
 							var newVector;
-							if(targetObj.parent){
+							if(targetObj.parent && !targetObj.ignoreParentRotation){
 								var scale = new BABYLON.Vector3(0, 0, 0);
 								var rotation = new BABYLON.Quaternion();
 								var position = new BABYLON.Vector3(0,0,0);
@@ -3929,6 +3933,9 @@ SRWEditor.prototype.showAttackEditorControls = function(){
 				const name = document.querySelector("#helper_target").value;
 				let targetObj = $battleSceneManager.getTargetObject(name);
 				if(targetObj){
+					if(targetObj.parent_handle){
+						targetObj = targetObj.parent_handle;
+					}
 					var data = targetObj[prop]; 
 				
 					if(targetObj.handle){

@@ -426,7 +426,7 @@ Window_BattleBasic.prototype.loadRequiredImages = function(){
 					}
 					
 				} else {
-					const animId = nextAction.action.attack.vsAllyBBAnimId;
+					const animId = battleEffect.action.attack.vsAllyBBAnimId;
 					if(animId != -1){
 						preloadRMMVAnimation(animId);
 					}

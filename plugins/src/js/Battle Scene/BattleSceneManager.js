@@ -2116,86 +2116,6 @@ BattleSceneManager.prototype.hookBeforeRender = function(){
 			}
 		}			
 		
-		Object.keys(_this._matrixAnimations).forEach(function(animationId){			
-			var animation = _this._matrixAnimations[animationId];
-			var targetObj = animation.targetObj;
-			if(targetObj){				
-				var duration = animation.duration * _this.getTickDuration();
-				if(animation.accumulator == null){
-					animation.accumulator = 0;
-				}
-				animation.accumulator+=deltaTime;
-				var t = animation.accumulator / duration;		
-				
-				if(t < 1){
-					if(animation.easingFunction){
-						t = animation.easingFunction.ease(t);
-					}					
-					if(animation.type == "translate" || animation.type == "translate_relative" || animation.type == "translate_effek"){
-						var hasValidSpline = false;
-						if(animation.catmullRom){
-							var pos1 = new BABYLON.Vector3(animation.catmullRom.pos1.x, animation.catmullRom.pos1.y, animation.catmullRom.pos1.z);
-							var pos4 =  new BABYLON.Vector3(animation.catmullRom.pos4.x, animation.catmullRom.pos4.y, animation.catmullRom.pos4.z);
-							
-							var pos1Valid = pos1 && pos1.x != "" && pos1.y != "" && pos1.z != "";
-							var pos4Valid = pos4 && pos4.x != "" && pos4.y != "" && pos4.z != "";
-							
-							if(pos1Valid && pos4Valid){
-								pos1.x*=_this._animationDirection;
-								pos4.x*=_this._animationDirection;
-								hasValidSpline = true;
-								targetObj.position = BABYLON.Vector3.CatmullRom(pos1, animation.startPosition, animation.endPosition, pos4, t);
-							}
-						} 
-
-						if(!hasValidSpline){
-							targetObj.position = BABYLON.Vector3.Lerp(animation.startPosition, animation.endPosition, t);
-						}						
-						targetObj.realPosition = new BABYLON.Vector3().copyFrom(targetObj.position);
-					} else {
-						targetObj.rotation = BABYLON.Vector3.Lerp(animation.startPosition, animation.endPosition, t);
-					}
-					
-				} else {
-					if(animation.type == "translate" || animation.type == "translate_relative" || animation.type == "translate_effek"){
-						targetObj.position = BABYLON.Vector3.Lerp(animation.startPosition, animation.endPosition, 1);
-						targetObj.realPosition = new BABYLON.Vector3().copyFrom(targetObj.position);
-					} else {
-						targetObj.rotation = BABYLON.Vector3.Lerp(animation.startPosition, animation.endPosition, 1);
-					}
-					if(animation.hide){
-						targetObj.isVisible = false;
-					}
-					delete _this._matrixAnimations[animationId];
-				}	
-				if(targetObj.handle){ //support for effekseer handles
-					if(targetObj.position){
-						targetObj.handle.setLocation(targetObj.position.x, targetObj.position.y, targetObj.position.z);
-					}
-					if(targetObj.rotation){
-						targetObj.handle.setRotation(targetObj.rotation.x, targetObj.rotation.y, targetObj.rotation.z);
-						targetObj.offsetRotation = {x: targetObj.rotation.x, y: targetObj.rotation.y, z: targetObj.rotation.z};
-					}
-					_this._effekseerWasTranslated = true;
-					//do a 0 speed update to rerender the effect at the new location without progressing the animation
-					/*for(let info of _this._effekseerInfo){
-						info.savedSpeed = info.handle.speed;
-						info.handle.setSpeed(0);
-					}
-					targetObj.context.update();
-					for(let info of _this._effekseerInfo){
-						//force reapply active triggers because sometimes they get lost during the update process
-						if(info.handle.activeTriggers){
-							for(let trigger of info.handle.activeTriggers){
-								info.handle.sendTrigger(trigger);
-							}
-						}
-						info.handle.setSpeed(info.savedSpeed);
-						delete info.savedSpeed;
-					}*/
-				}	
-			}
-		});	
 		
 		Object.keys(_this._animationBlends).forEach(function(blendId){			
 			var blendInfo = _this._animationBlends[blendId];
@@ -2294,37 +2214,7 @@ BattleSceneManager.prototype.hookBeforeRender = function(){
 			}
 		});
 		
-		
-		Object.keys(_this._shakeAnimations).forEach(function(animationId){			
-			var animation = _this._shakeAnimations[animationId];
-			var targetObj = animation.targetObj;
-			if(targetObj){			
-				var currentTick = _this._currentAnimationTick - animation.startTick;
-				var duration = animation.duration * _this.getTickDuration();
-				if(animation.accumulator == null){
-					animation.accumulator = 0;
-				}
-				animation.accumulator+=deltaTime;
-				var t = animation.accumulator / duration;	
-				if(t <= 1){
-					//targetObj.position.x = targetObj.realPosition.x + (Math.random() * animation.magnitude_x * 2) - animation.magnitude_x;		
-					//targetObj.position.y = targetObj.realPosition.y + (Math.random() * animation.magnitude_y * 2) - animation.magnitude_y;	
-					var fade = 1;
-					if(currentTick < animation.fadeInTicks){
-						fade = currentTick / animation.fadeInTicks;
-					} else if(currentTick > (animation.duration - animation.fadeOutTicks)){
-						fade = (animation.duration - currentTick) / animation.fadeOutTicks;
-					}
-					
-					targetObj.position.x = targetObj.realPosition.x + Math.sin(currentTick * animation.speed_x) * animation.magnitude_x / 10 * fade;		
-					targetObj.position.y = targetObj.realPosition.y + Math.sin(currentTick * animation.speed_y) * animation.magnitude_y / 10 * fade;
-					targetObj.position.z = targetObj.realPosition.z + Math.sin(currentTick * animation.speed_z) * animation.magnitude_z / 10 * fade;						
-				} else {
-					targetObj.position = targetObj.realPosition;
-					delete _this._shakeAnimations[animationId];
-				}
-			}
-		});	
+	
 		
 		Object.keys(_this._fadeAnimations).forEach(function(animationId){			
 			var animation = _this._fadeAnimations[animationId];
@@ -2677,7 +2567,8 @@ BattleSceneManager.prototype.updateParentedEffekseerEffect = function(effekInfo)
 		var rotation = new BABYLON.Quaternion();
 		var position = new BABYLON.Vector3(0,0,0);
 		
-		var tempWorldMatrix = effekInfo.parent.getWorldMatrix();
+		
+		var tempWorldMatrix = effekInfo.parent.computeWorldMatrix(true);
 		tempWorldMatrix.decompose(scale, rotation, position);
 		
 		rotation = rotation.toEulerAngles();
@@ -2704,11 +2595,14 @@ BattleSceneManager.prototype.updateParentedEffekseerEffect = function(effekInfo)
 			position.y + effekInfo.offset.y, 
 			position.z + effekInfo.offset.z
 		);
-		effekInfo.handle.setRotation(
-			(rotation.x + effekInfo.offsetRotation.x), 
-			(rotation.y + effekInfo.offsetRotation.y), 
-			(rotation.z + effekInfo.offsetRotation.z) * mirrorFactor
-		);
+		if(!effekInfo.ignoreParentRotation){
+			effekInfo.handle.setRotation(
+				(rotation.x + effekInfo.offsetRotation.x), 
+				(rotation.y + effekInfo.offsetRotation.y), 
+				(rotation.z + effekInfo.offsetRotation.z) * mirrorFactor
+			);
+		}
+		
 		
 		this._effekseerWasTranslated = true;
 	}
@@ -2729,6 +2623,122 @@ BattleSceneManager.prototype.getCurrentRatio = function(){
 	return ratio;
 }
 
+
+BattleSceneManager.prototype.runAnimations = function(deltaTime){
+	const _this = this;
+	Object.keys(_this._matrixAnimations).forEach(function(animationId){			
+		var animation = _this._matrixAnimations[animationId];
+		var targetObj = animation.targetObj;
+		if(targetObj){				
+			var duration = animation.duration * _this.getTickDuration();
+			if(animation.accumulator == null){
+				animation.accumulator = 0;
+			}
+			animation.accumulator+=deltaTime;
+			var t = animation.accumulator / duration;		
+			
+			if(t < 1){
+				if(animation.easingFunction){
+					t = animation.easingFunction.ease(t);
+				}					
+				if(animation.type == "translate" || animation.type == "translate_relative" || animation.type == "translate_effek"){
+					var hasValidSpline = false;
+					if(animation.catmullRom){
+						var pos1 = new BABYLON.Vector3(animation.catmullRom.pos1.x, animation.catmullRom.pos1.y, animation.catmullRom.pos1.z);
+						var pos4 =  new BABYLON.Vector3(animation.catmullRom.pos4.x, animation.catmullRom.pos4.y, animation.catmullRom.pos4.z);
+						
+						var pos1Valid = pos1 && pos1.x != "" && pos1.y != "" && pos1.z != "";
+						var pos4Valid = pos4 && pos4.x != "" && pos4.y != "" && pos4.z != "";
+						
+						if(pos1Valid && pos4Valid){
+							pos1.x*=_this._animationDirection;
+							pos4.x*=_this._animationDirection;
+							hasValidSpline = true;
+							targetObj.position = BABYLON.Vector3.CatmullRom(pos1, animation.startPosition, animation.endPosition, pos4, t);
+						}
+					} 
+
+					if(!hasValidSpline){
+						targetObj.position = BABYLON.Vector3.Lerp(animation.startPosition, animation.endPosition, t);
+					}						
+					targetObj.realPosition = new BABYLON.Vector3().copyFrom(targetObj.position);
+				} else {
+					targetObj.rotation = BABYLON.Vector3.Lerp(animation.startPosition, animation.endPosition, t);
+				}
+				
+			} else {
+				if(animation.type == "translate" || animation.type == "translate_relative" || animation.type == "translate_effek"){
+					targetObj.position = BABYLON.Vector3.Lerp(animation.startPosition, animation.endPosition, 1);
+					targetObj.realPosition = new BABYLON.Vector3().copyFrom(targetObj.position);
+				} else {
+					targetObj.rotation = BABYLON.Vector3.Lerp(animation.startPosition, animation.endPosition, 1);
+				}
+				if(animation.hide){
+					targetObj.isVisible = false;
+				}
+				delete _this._matrixAnimations[animationId];
+			}	
+			if(targetObj.handle){ //support for effekseer handles
+				if(targetObj.position){
+					targetObj.handle.setLocation(targetObj.position.x, targetObj.position.y, targetObj.position.z);
+				}
+				if(targetObj.rotation){
+					targetObj.handle.setRotation(targetObj.rotation.x, targetObj.rotation.y, targetObj.rotation.z);
+					targetObj.offsetRotation = {x: targetObj.rotation.x, y: targetObj.rotation.y, z: targetObj.rotation.z};
+				}
+				_this._effekseerWasTranslated = true;
+				//do a 0 speed update to rerender the effect at the new location without progressing the animation
+				/*for(let info of _this._effekseerInfo){
+					info.savedSpeed = info.handle.speed;
+					info.handle.setSpeed(0);
+				}
+				targetObj.context.update();
+				for(let info of _this._effekseerInfo){
+					//force reapply active triggers because sometimes they get lost during the update process
+					if(info.handle.activeTriggers){
+						for(let trigger of info.handle.activeTriggers){
+							info.handle.sendTrigger(trigger);
+						}
+					}
+					info.handle.setSpeed(info.savedSpeed);
+					delete info.savedSpeed;
+				}*/
+			}	
+		}
+	});	
+	
+		
+	Object.keys(_this._shakeAnimations).forEach(function(animationId){			
+		var animation = _this._shakeAnimations[animationId];
+		var targetObj = animation.targetObj;
+		if(targetObj){			
+			var currentTick = _this._currentAnimationTick - animation.startTick;
+			var duration = animation.duration * _this.getTickDuration();
+			if(animation.accumulator == null){
+				animation.accumulator = 0;
+			}
+			animation.accumulator+=deltaTime;
+			var t = animation.accumulator / duration;	
+			if(t <= 1){
+				//targetObj.position.x = targetObj.realPosition.x + (Math.random() * animation.magnitude_x * 2) - animation.magnitude_x;		
+				//targetObj.position.y = targetObj.realPosition.y + (Math.random() * animation.magnitude_y * 2) - animation.magnitude_y;	
+				var fade = 1;
+				if(currentTick < animation.fadeInTicks){
+					fade = currentTick / animation.fadeInTicks;
+				} else if(currentTick > (animation.duration - animation.fadeOutTicks)){
+					fade = (animation.duration - currentTick) / animation.fadeOutTicks;
+				}
+				
+				targetObj.position.x = targetObj.realPosition.x + Math.sin(currentTick * animation.speed_x) * animation.magnitude_x / 10 * fade;		
+				targetObj.position.y = targetObj.realPosition.y + Math.sin(currentTick * animation.speed_y) * animation.magnitude_y / 10 * fade;
+				targetObj.position.z = targetObj.realPosition.z + Math.sin(currentTick * animation.speed_z) * animation.magnitude_z / 10 * fade;						
+			} else {
+				targetObj.position = targetObj.realPosition;
+				delete _this._shakeAnimations[animationId];
+			}
+		}
+	});	
+}
 BattleSceneManager.prototype.startScene = function(){
 	var _this = this;
 	//_this.initScene();
@@ -2760,39 +2770,49 @@ BattleSceneManager.prototype.startScene = function(){
 			deltaTime*=5;
 		}
 		
-		this._effekseerInfo.forEach(function(effekInfo){
-			_this.updateParentedEffekseerEffect(effekInfo)				
-		});
-			
-		for(let info of this._effekseerInfo){
-			if(!info.context.updateStarted){
-				info.context.updateStarted = true;
-				info.context.beginUpdate();
-			}
-			
-		}
-
-		_this._effekseerWasTranslated = false;
-		//do a 0 speed update to rerender the effect at the new location without progressing the animation
-		for(let info of this._effekseerInfo){
-			info.context.updateHandle(info.handle, 0);
-		}
-
-		for(let info of this._effekseerInfo){
-			//force reapply active triggers because sometimes they get lost during the update process
-			if(info.handle.activeTriggers){
-				for(let trigger of info.handle.activeTriggers){
-					info.handle.sendTrigger(trigger);
-				}
-			}
-			if(info.context.updateStarted){
-				info.context.updateStarted = false;
-				info.context.endUpdate();
-			}
-		}
+		
+		
 		
 		
 		if(!_this._animsPaused){
+			
+			
+			this.runAnimations(deltaTime);
+			
+			this._effekseerInfo.forEach(function(effekInfo){
+				_this.updateParentedEffekseerEffect(effekInfo)				
+			});
+			
+			for(let info of this._effekseerInfo){
+				if(!info.context.updateStarted){
+					info.context.updateStarted = true;
+					info.context.beginUpdate();
+				}
+				
+			}
+			
+			
+			_this._effekseerWasTranslated = false;
+			//do a 0 speed update to rerender the effect at the new location without progressing the animation
+			for(let info of this._effekseerInfo){
+				info.context.updateHandle(info.handle, 0);
+			}
+
+			for(let info of this._effekseerInfo){
+				//force reapply active triggers because sometimes they get lost during the update process
+				if(info.handle.activeTriggers){
+					for(let trigger of info.handle.activeTriggers){
+						info.handle.sendTrigger(trigger);
+					}
+				}
+				if(info.context.updateStarted){
+					info.context.updateStarted = false;
+					info.context.endUpdate();
+				}
+			}
+			
+		
+		
 			_this._effksContext.update(60 / _this._engine.getFps() * ratio);
 			_this._effksContextMirror.update(60 / _this._engine.getFps() * ratio);
 			_this._effksContextFg.update(60 / _this._engine.getFps() * ratio);				
@@ -3586,7 +3606,7 @@ BattleSceneManager.prototype.executeAnimation = function(animation, startTick){
 				}
 				targetObj.rotation = targetRotation;
 				if(targetObj.handle){//support for effekseer handles
-					if(targetObj.parent){			
+					if(targetObj.parent && !targetObj.ignoreParentRotation){			
 						targetObj.offsetRotation = {x: params.rotation.x, y: params.rotation.y, z: params.rotation.z};
 					} else {
 						targetObj.handle.setRotation(targetObj.rotation.x, targetObj.rotation.y, targetObj.rotation.z);
@@ -4752,6 +4772,7 @@ BattleSceneManager.prototype.executeAnimation = function(animation, startTick){
 				if(params.autoRotate && _this._animationDirection == -1){
 					info.isMirrored = true;
 				}
+				info.ignoreParentRotation = params.ignoreParentRotation * 1;
 				if(params.parent){
 					var parentObj = getTargetObject(params.parent)
 					
@@ -7621,7 +7642,11 @@ BattleSceneManager.prototype.processActionQueue = function() {
 				var entityType = nextAction.isActor ? "actor" : "enemy";
 				var entityId = nextAction.ref.SRWStats.pilot.id;				
 				
-				var battleText = _this._battleTextManager.getText(entityType, nextAction.ref, "no_counter", nextAction.isActor ? "actor" : "enemy", _this.getBattleTextId(nextAction.attacked), null, null);
+				let textType = "no_counter";
+				if(this._currentAnimatedAction.isBuffingAttack){
+					textType = "received_buff";
+				}
+				var battleText = _this._battleTextManager.getText(entityType, nextAction.ref, textType, nextAction.isActor ? "actor" : "enemy", _this.getBattleTextId(nextAction.attackedBy), null, null);
 				
 				_this._UILayerManager.setTextBox(entityType, entityId, nextAction.ref.SRWStats.pilot.name, battleText);
 			}
