@@ -5504,11 +5504,11 @@ StatCalc.prototype.getAllInRange = function(initiator, includeMoveRange, postMov
 	allWeapons.forEach(function(weapon){
 		if(_this.canUseWeapon(initiator, weapon, postMoveOnly)){			
 			_this.iterateAllActors(null, function(target, event){	
-				//if(!$gameSystem.isFriendly(target, factionId) || includeFriendlies){
+				if(!$gameSystem.isFriendly(target, factionId) || includeFriendlies){
 					if(_this.isValidWeaponTarget(initiator, target, weapon, includeMoveRange) && !event._erased){
 						result.push(event);
 					}	
-				//}						
+				}						
 			});
 		}		
 	});

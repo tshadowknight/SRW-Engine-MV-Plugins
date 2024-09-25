@@ -349,7 +349,7 @@
 						y: $gameTemp.activeEvent().posY()
 					};
 			
-					var hasTarget = $statCalc.getAllInRange(this._actor).length > 0;
+					var hasTarget = $statCalc.getAllInRange(this._actor, false, $gameTemp.isPostMove, true).length > 0;
 					var hasMapWeapon = $statCalc.hasMapWeapon(battler);
 					
 					function boardingMenu(){
