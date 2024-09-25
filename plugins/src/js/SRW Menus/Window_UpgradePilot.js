@@ -191,6 +191,7 @@ Window_UpgradePilot.prototype.incrementUpgradeLevel = function(){
 			this._currentTab = 0;
 		}
 	} else if(this._currentUIState == "upgrading_pilot_stats"){	
+		const modifier = Input.isPressed('shift') ? 10 : 1;
 		var upgradeInfo = this._upgradeTypes[this._currentSelection];
 		var upgradeId = upgradeInfo.id;
 		var pilotData = this.getCurrentSelection();
@@ -205,12 +206,21 @@ Window_UpgradePilot.prototype.incrementUpgradeLevel = function(){
 			}
 		} else {
 			if(stats.calculated[upgradeId] + this._currentUpgradeDeltas[upgradeId] < $statCalc.getMaxPilotStat()){
-				this._currentUpgradeDeltas[upgradeId]++;
+				this._currentUpgradeDeltas[upgradeId]+=modifier;
+				if(stats.calculated[upgradeId] + this._currentUpgradeDeltas[upgradeId] > $statCalc.getMaxPilotStat()){
+					this._currentUpgradeDeltas[upgradeId]-= (stats.calculated[upgradeId] + this._currentUpgradeDeltas[upgradeId] - $statCalc.getMaxPilotStat());
+				}
 				if(ENGINE_SETTINGS.MERGE_ATTACK_UPGRADES){
 					if(upgradeId == "melee"){
-						this._currentUpgradeDeltas["ranged"]++;
+						this._currentUpgradeDeltas["ranged"]+=modifier;
+						if(stats.calculated[upgradeId] + this._currentUpgradeDeltas["ranged"] > $statCalc.getMaxPilotStat()){
+							this._currentUpgradeDeltas["ranged"]-= (stats.calculated["ranged"] + this._currentUpgradeDeltas["ranged"] - $statCalc.getMaxPilotStat());
+						}
 					} else if(upgradeId == "ranged"){
-						this._currentUpgradeDeltas["melee"]++;
+						this._currentUpgradeDeltas["melee"]+=modifier;
+						if(stats.calculated[upgradeId] + this._currentUpgradeDeltas["melee"] > $statCalc.getMaxPilotStat()){
+							this._currentUpgradeDeltas["melee"]-= (stats.calculated["melee"] + this._currentUpgradeDeltas["melee"] - $statCalc.getMaxPilotStat());
+						}						
 					}
 				}
 				SoundManager.playCursor();
@@ -234,14 +244,24 @@ Window_UpgradePilot.prototype.decrementUpgradeLevel = function(){
 			this._currentTab = this._maxTab-1;
 		}
 	} else if(this._currentUIState == "upgrading_pilot_stats"){
+		const modifier = Input.isPressed('shift') ? 10 : 1;
 		var upgradeId = this._upgradeTypes[this._currentSelection].id;	
 		if(this._currentUpgradeDeltas[upgradeId] > 0){
-			this._currentUpgradeDeltas[upgradeId]--;
+			this._currentUpgradeDeltas[upgradeId]-=modifier;
+			if(this._currentUpgradeDeltas[upgradeId] < 0){
+				this._currentUpgradeDeltas[upgradeId] = 0;
+			}
 			if(ENGINE_SETTINGS.MERGE_ATTACK_UPGRADES){
 				if(upgradeId == "melee"){
-					this._currentUpgradeDeltas["ranged"]--;
+					this._currentUpgradeDeltas["ranged"]-=modifier;
+					if(this._currentUpgradeDeltas["ranged"] < 0){
+						this._currentUpgradeDeltas["ranged"] = 0;
+					}
 				} else if(upgradeId == "ranged"){
-					this._currentUpgradeDeltas["melee"]--;
+					this._currentUpgradeDeltas["melee"]-=modifier;
+					if(this._currentUpgradeDeltas["melee"] < 0){
+						this._currentUpgradeDeltas["melee"] = 0;
+					}
 				}
 			}
 			SoundManager.playCursor();
@@ -640,7 +660,7 @@ Window_UpgradePilot.prototype.redraw = function() {
 	if(this._currentUIState == "tab_selection"){
 		$gameTemp.buttonHintManager.setHelpButtons([["tab_nav"], ["tab_selection"]]);
 	} else if(this._currentUIState == "upgrading_pilot_stats"){			
-		$gameTemp.buttonHintManager.setHelpButtons([["select_pilot_stat"], ["select_pilot_stat_upgrade"], ["confirm_pilot_upgrade"]]);
+		$gameTemp.buttonHintManager.setHelpButtons([["select_pilot_stat"], ["select_pilot_stat_upgrade", "select_pilot_stat_upgrade_quicker"], ["confirm_pilot_upgrade"]]);
 	} else if(this._currentUIState == "ability_selection"){					
 		$gameTemp.buttonHintManager.setHelpButtons([["select_ability"], ["page_nav"], ["confirm_ability_selection"]]);			
 	} else if(this._currentUIState == "ability_purchase_selection"){	
@@ -732,9 +752,7 @@ Window_UpgradePilot.prototype.redraw = function() {
 	pointsDisplayContent+="<div class='fund_entry'>";
 	pointsDisplayContent+="<div class='fund_entry_label scaled_text'>"+APPSTRINGS.PILOTUPGRADES.label_remaining_points+"</div>";
 	var remaining = $gameSystem.getCurrentFavPoints() - this.currentPointCost();
-	if($gameSystem.optionInfinitePP){
-		remaining = 999;
-	}
+	
 	pointsDisplayContent+="<div class='fund_entry_value scaled_text "+(remaining < 0 ? "underflow" : "")+"'>"+remaining+"</div>";
 	pointsDisplayContent+="</div>";
 	
