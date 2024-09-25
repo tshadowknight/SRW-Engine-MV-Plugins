@@ -1638,9 +1638,11 @@ BattleCalc.prototype.generateMapBattleResult = function(){
 	aCache.gainDonors = [];
 
 	let inflictedDamge = false;
+		
 	
 	var targets = $gameTemp.currentMapTargets;
 	targets.forEach(function(target){
+		$statCalc.invalidateAbilityCache(attacker.actor);
 		$statCalc.invalidateAbilityCache(target);
 		//temp variable used to resolve weapon effects per target in StatCalc.prototype.getActiveStatMods
 		$gameTemp.currentBattleTarget = target;
