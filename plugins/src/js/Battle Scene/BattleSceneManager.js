@@ -11,6 +11,8 @@ import SpineManager from "./SpineManager.js";
 
 import DragonBonesManager from "./dragonBones/DragonBonesManager.js";
 
+import { Spector } from 'spectorjs';
+
 export default function BattleSceneManager(){
 	this._initialized = false;
 	this._isLoading = 0;
@@ -165,6 +167,26 @@ export default function BattleSceneManager(){
 	this.createVideoPlayers();
 }
 
+BattleSceneManager.prototype.attachSpector = function(value){
+	if(!this._spectorAttached){
+		this._spectorAttached = true;
+		var spector = new Spector();
+		spector.spyCanvases();
+		spector.displayUI();	
+
+		const style = document.createElement("style");
+		
+		style.textContent = `
+			.captureMenuComponent {
+				z-index: 99999999999999999 !important;
+			}
+			.resultViewComponent  {
+				z-index: 99999999999999999 !important;
+			}
+		`;
+		document.head.appendChild(style);	
+	}
+}
 
 BattleSceneManager.prototype.setPlayUntil = function(value){
 	this._playUntil = value;	
@@ -6765,6 +6787,27 @@ BattleSceneManager.prototype.preloadEffekseerParticles = async function(){
 						var params = animCommand.params;
 						if(animCommand.type == "play_effekseer"){
 							
+							var targetContext;
+							if(params.autoRotate && _this._animationDirection == -1){
+								
+								if(params.isForeground * 1){
+									targetContext = _this._effksContextFgMirror;//_this._effksContextFg;
+								} else {
+									targetContext =  _this._effksContextMirror;//_this._effksContext;
+								}
+							} else {
+								if(params.isForeground * 1){
+									targetContext = _this._effksContextFg;
+								} else {
+									targetContext = _this._effksContext;
+								}
+							}
+							
+							promises.push(new Promise(function(resolve, reject){
+								targetContext.loadEffect("effekseer/"+params.path+".efk", 1.0, resolve);	
+							}));
+							
+							/*
 							promises.push(new Promise(function(resolve, reject){
 								_this._effksContext.loadEffect("effekseer/"+params.path+".efk", 1.0, resolve);	
 							}));	
@@ -6780,7 +6823,7 @@ BattleSceneManager.prototype.preloadEffekseerParticles = async function(){
 							promises.push(new Promise(function(resolve, reject){
 								_this._effksContextAttached.loadEffect("effekseer/"+params.path+".efk", 1.0, resolve);	
 							}));		
-							
+							*/
 						}	
 
 						if(animCommand.type == "include_animation"){

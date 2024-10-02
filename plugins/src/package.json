@@ -26,6 +26,7 @@
     "babylonjs-loaders": "^6.20.1",
     "babylonjs-materials": "^6.20.1",
     "fs-extra": "^10.1.0",
+    "spectorjs": "^0.9.30",
     "url-loader": "^4.1.1"
   }
 }
