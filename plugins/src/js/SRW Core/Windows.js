@@ -420,6 +420,11 @@
 						_this.addWaitCommand();					
 					}
 					
+					function shipPostActionMenu(){
+						_this.addCommand(APPSTRINGS.MAPMENU.deploy, 'deploy');
+						_this.addCommand(APPSTRINGS.MAPMENU.cmd_status, 'status');		
+					}
+					
 					function hitAndAwayMenu(){
 						_this.addMoveCommand();
 						_this.addWaitCommand();
@@ -493,6 +498,8 @@
 						disabledMenu();
 					} else if($statCalc.isDisabled(this._actor)){
 						statusDisabledMenu();
+					} else if($statCalc.isShip(_this._actor) && $statCalc.hasBoardedUnits(_this._actor) && !_this._actor.canInput()){
+						shipPostActionMenu();
 					} else {	
 						regularMenu();
 					}				

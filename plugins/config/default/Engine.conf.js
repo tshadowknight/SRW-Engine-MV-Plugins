@@ -30,6 +30,7 @@ var ENGINE_SETTINGS = {
 	PERSIST_CLEARS_ON_HIT: false,//if true persist clears after taking one attack, otherwise it affects all attacks in one battle phase(support attacks, etc.)
 	ALLOW_MAP_CHARGE: false, //if true the charge spirit effect also affects MAP attacks
 	DISABLE_EVASION_DECAY: false,
+	ALLOW_POST_MOVE_DEPLOY: true,
 	CURSOR_TINT_INFO: {//a blend color set for the cursor when hovering units of a certain faction
 		enabled: false,
 		colors: {
