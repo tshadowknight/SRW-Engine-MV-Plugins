@@ -1859,7 +1859,7 @@ GameState_normal.prototype.updateMapEvent = function(x, y, triggers){
 			if ((event.isType() === 'actor' || event.isType() === 'ship' || event.isType() === 'ship_event') && !$statCalc.isAI(battlerArray[1])) {
 				SoundManager.playOk();
 				$gameTemp.setActiveEvent(event);								
-				if (battlerArray[1].canInput() == true || (ENGINE_SETTINGS.ALLOW_POST_MOVE_DEPLOY && $statCalc.isShip(battlerArray[1]) && $statCalc.hasBoardedUnits(battlerArray[1]))) {
+				if (battlerArray[1].canInput() == true || (ENGINE_SETTINGS.ALLOW_POST_TURN_DEPLOY && $statCalc.isShip(battlerArray[1]) && $statCalc.hasBoardedUnits(battlerArray[1]))) {
 					$gameSystem.highlightedTiles = [];
 					$gameSystem.highlightsRefreshed = true;
 					$gameTemp.commanderAuraVisible = false;
