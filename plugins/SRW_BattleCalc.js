@@ -3,7 +3,7 @@ function BattleCalc(){
 }
 
 BattleCalc.prototype.getWeaponTerrainValue = function(terrainRank){
-	let values =  ENGINE_SETTINGS.WEAP_TERRAIN_VALUES.DAMAGE || {
+	let values =  ENGINE_SETTINGS.WEAP_TERRAIN_VALUES || {
 		"S": 1.1,
 		"A": 1.0,
 		"B": 0.8,
@@ -14,7 +14,7 @@ BattleCalc.prototype.getWeaponTerrainValue = function(terrainRank){
 }
 
 BattleCalc.prototype.getMechTerrainValue = function(terrainRank){
-	let values =  ENGINE_SETTINGS.MECH_TERRAIN_VALUES.DAMAGE || {
+	let values =  ENGINE_SETTINGS.MECH_TERRAIN_VALUES || {
 		"S": 1.1,
 		"A": 1.0,
 		"B": 0.9,
