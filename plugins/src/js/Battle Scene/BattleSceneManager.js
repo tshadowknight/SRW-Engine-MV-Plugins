@@ -2796,45 +2796,42 @@ BattleSceneManager.prototype.startScene = function(){
 		
 		
 		
-		if(!_this._animsPaused){
-			
-			
+		if(!_this._animsPaused){			
 			this.runAnimations(deltaTime);
 			
 			this._effekseerInfo.forEach(function(effekInfo){
 				_this.updateParentedEffekseerEffect(effekInfo)				
 			});
-			
-			for(let info of this._effekseerInfo){
-				if(!info.context.updateStarted){
-					info.context.updateStarted = true;
-					info.context.beginUpdate();
-				}
-				
-			}
-			
-			
-			_this._effekseerWasTranslated = false;
-			//do a 0 speed update to rerender the effect at the new location without progressing the animation
-			for(let info of this._effekseerInfo){
-				info.context.updateHandle(info.handle, 0);
-			}
+		}	
+		
+		for(let info of this._effekseerInfo){
+			if(!info.context.updateStarted){
+				info.context.updateStarted = true;
+				info.context.beginUpdate();
+			}			
+		}		
+		
+		_this._effekseerWasTranslated = false;
+		//do a 0 speed update to rerender the effect at the new location without progressing the animation
+		for(let info of this._effekseerInfo){
+			info.context.updateHandle(info.handle, 0);
+		}
 
-			for(let info of this._effekseerInfo){
-				//force reapply active triggers because sometimes they get lost during the update process
-				if(info.handle.activeTriggers){
-					for(let trigger of info.handle.activeTriggers){
-						info.handle.sendTrigger(trigger);
-					}
-				}
-				if(info.context.updateStarted){
-					info.context.updateStarted = false;
-					info.context.endUpdate();
+		for(let info of this._effekseerInfo){
+			//force reapply active triggers because sometimes they get lost during the update process
+			if(info.handle.activeTriggers){
+				for(let trigger of info.handle.activeTriggers){
+					info.handle.sendTrigger(trigger);
 				}
 			}
+			if(info.context.updateStarted){
+				info.context.updateStarted = false;
+				info.context.endUpdate();
+			}
+		}
 			
 		
-		
+		if(!_this._animsPaused){
 			_this._effksContext.update(60 / _this._engine.getFps() * ratio);
 			_this._effksContextMirror.update(60 / _this._engine.getFps() * ratio);
 			_this._effksContextFg.update(60 / _this._engine.getFps() * ratio);				

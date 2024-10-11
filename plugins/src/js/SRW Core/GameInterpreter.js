@@ -2097,13 +2097,16 @@
 							
 							var mechStats = $statCalc.getCalculatedMechStats(activeDefender.actor);
 							var startHP = 100;
+							var endHP = this._attacker.params.targetEndHP;
 							if(activeDefender.params.startHP){
 								startHP = activeDefender.params.startHP;
 							} else if(activeDefender.params.referenceEventId){
 								var unitInfo = $gameSystem.EventToUnit(activeDefender.params.referenceEventId);
 								if(unitInfo){
 									mechStats = $statCalc.getCalculatedMechStats(unitInfo[1]);//replace mechstats with live value
-									startHP = Math.floor(mechStats.currentHP / mechStats.maxHP * 100);
+									const referenceMaxHP = mechStats.currentHP / mechStats.maxHP;
+									startHP = startHP * referenceMaxHP;
+									endHP = endHP * referenceMaxHP;
 									dCache.currentAnimHP = mechStats.currentHP;
 									dCache.currentAnimEN = mechStats.currentEN;
 									
@@ -2112,7 +2115,7 @@
 									dCache.ref.SRWStats.mech.stats.calculated.maxEN = mechStats.maxEN;
 								}								
 							}
-							var damagePercent = startHP - this._attacker.params.targetEndHP;
+							var damagePercent = startHP - endHP;
 							if(this._attacker.params.damageInflicted){
 								damagePercent = this._attacker.params.damageInflicted;
 							}

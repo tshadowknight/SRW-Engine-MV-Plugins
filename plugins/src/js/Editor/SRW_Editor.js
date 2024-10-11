@@ -3490,8 +3490,8 @@ SRWEditor.prototype.showCameraState = function(){
 								newVector.z
 							);							
 						}
-						targetObj.context.update();
-						targetObj.context.draw();
+						//targetObj.context.update();
+						//targetObj.context.draw();
 					} else {
 						if(type == "pivot_rotation"){
 							var newVector = new BABYLON.Vector3().copyFrom(pivotHelper.rotation);

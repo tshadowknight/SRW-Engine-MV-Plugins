@@ -1717,6 +1717,7 @@
 		if(this._animationFrame > this._frames){
 			this.visible = false;
 			this._character.isDoingDisappearAnim = false;
+			this._animationFrame = 0;
 		} else {
 			if(this._animationFrame == 3){
 				this._character.erase();
