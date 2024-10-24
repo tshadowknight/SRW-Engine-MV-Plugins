@@ -71,7 +71,9 @@ export default function BattleSceneManager(){
 	this._activeAliases = {};
 
 	this._matrixAnimations = {};
+	this._matrixUpdates = {};
 	this._translateAnimationCtr = 0;
+	this._matrixUpdateCtr = 0;
 	this._animationBlends = {};
 	this._animationBlendCtr = 0;
 	this._sizeAnimations = {};
@@ -2648,6 +2650,38 @@ BattleSceneManager.prototype.getCurrentRatio = function(){
 
 BattleSceneManager.prototype.runAnimations = function(deltaTime){
 	const _this = this;
+	
+	Object.keys(_this._matrixUpdates).forEach(function(animationId){
+		var animation = _this._matrixUpdates[animationId];
+		var targetObj = animation.targetObj;
+		if(targetObj){
+			if(animation.type == "translate" || animation.type == "translate_relative" || animation.type == "translate_effek"){
+				targetObj.position = BABYLON.Vector3.Lerp(animation.startPosition, animation.endPosition, 1);
+				targetObj.realPosition = new BABYLON.Vector3().copyFrom(targetObj.position);
+			} else {
+				targetObj.rotation = BABYLON.Vector3.Lerp(animation.startPosition, animation.endPosition, 1);
+			}
+			
+			if(targetObj.handle){ //support for effekseer handles
+				if(targetObj.position){
+					targetObj.handle.setLocation(targetObj.position.x, targetObj.position.y, targetObj.position.z);
+				}
+				if(targetObj.rotation){
+					//targetObj.handle.setRotation(targetObj.rotation.x, targetObj.rotation.y, targetObj.rotation.z);
+					//targetObj.offsetRotation = {x: targetObj.rotation.x, y: targetObj.rotation.y, z: targetObj.rotation.z};
+					
+					if(targetObj.parent && !targetObj.ignoreParentRotation){			
+						targetObj.offsetRotation = {x: params.rotation.x, y: params.rotation.y, z: params.rotation.z};
+					} else {
+						targetObj.handle.setRotation(targetObj.rotation.x, targetObj.rotation.y, targetObj.rotation.z);
+					}	
+				}
+				_this._effekseerWasTranslated = true;
+			}	
+		}
+	});		
+	_this._matrixUpdates = {};
+	
 	Object.keys(_this._matrixAnimations).forEach(function(animationId){			
 		var animation = _this._matrixAnimations[animationId];
 		var targetObj = animation.targetObj;
@@ -2705,26 +2739,16 @@ BattleSceneManager.prototype.runAnimations = function(deltaTime){
 					targetObj.handle.setLocation(targetObj.position.x, targetObj.position.y, targetObj.position.z);
 				}
 				if(targetObj.rotation){
-					targetObj.handle.setRotation(targetObj.rotation.x, targetObj.rotation.y, targetObj.rotation.z);
-					targetObj.offsetRotation = {x: targetObj.rotation.x, y: targetObj.rotation.y, z: targetObj.rotation.z};
+					//targetObj.handle.setRotation(targetObj.rotation.x, targetObj.rotation.y, targetObj.rotation.z);
+					//targetObj.offsetRotation = {x: targetObj.rotation.x, y: targetObj.rotation.y, z: targetObj.rotation.z};
+					
+					if(targetObj.parent && !targetObj.ignoreParentRotation){			
+						targetObj.offsetRotation = {x: params.rotation.x, y: params.rotation.y, z: params.rotation.z};
+					} else {
+						targetObj.handle.setRotation(targetObj.rotation.x, targetObj.rotation.y, targetObj.rotation.z);
+					}	
 				}
 				_this._effekseerWasTranslated = true;
-				//do a 0 speed update to rerender the effect at the new location without progressing the animation
-				/*for(let info of _this._effekseerInfo){
-					info.savedSpeed = info.handle.speed;
-					info.handle.setSpeed(0);
-				}
-				targetObj.context.update();
-				for(let info of _this._effekseerInfo){
-					//force reapply active triggers because sometimes they get lost during the update process
-					if(info.handle.activeTriggers){
-						for(let trigger of info.handle.activeTriggers){
-							info.handle.sendTrigger(trigger);
-						}
-					}
-					info.handle.setSpeed(info.savedSpeed);
-					delete info.savedSpeed;
-				}*/
 			}	
 		}
 	});	
@@ -3106,6 +3130,24 @@ BattleSceneManager.prototype.registerMatrixAnimation = function(type, targetObj,
 		catmullRom: catmullRom
 	};
 }
+
+BattleSceneManager.prototype.registerMatrixUpdate = function(type, targetObj, endPosition){
+	if(type == "translate"){
+		endPosition = this.applyAnimationDirection(endPosition);
+	}	
+	
+	if(!endPosition){
+		endPosition = new BABYLON.Vector3(0, 0, 0);
+	}
+
+	this._matrixUpdates[this._matrixUpdateCtr++] = {
+		type: type, 
+		targetObj: targetObj,
+		endPosition: endPosition,
+		startPosition: new BABYLON.Vector3(0,0,0)
+	};
+}
+
 
 BattleSceneManager.prototype.registerSizeAnimation = function(targetObj, startSize, endSize, startTick, duration, easingFunction, easingMode, hide){
 	if(easingFunction && easingMode){
@@ -3575,25 +3617,24 @@ BattleSceneManager.prototype.executeAnimation = function(animation, startTick){
 			_this._matrixAnimations = {};
 		},
 		teleport: function(target, params){
-			//console.log("teleport: "+target);			
+			//console.log("teleport: "+target);			 
 			var targetObj = getTargetObject(target);
 			if(targetObj.parent_handle){
 				targetObj = targetObj.parent_handle;
 			}
 			if(targetObj){
-				targetObj.wasMoved = true;
-				//_this.stopShakeAnimations(target);
-				targetObj.position = _this.applyAnimationDirection(params.position || new BABYLON.Vector3(0,0,0));
-				targetObj.realPosition = new BABYLON.Vector3().copyFrom(targetObj.position);
-				if(targetObj.handle){
-					if(targetObj.isMirrored){
-						const targetPosition = params.position || new BABYLON.Vector3(0,0,0);
-						targetObj.handle.setLocation(targetPosition.x, targetPosition.y, targetPosition.z);
-					} else {
-						targetObj.handle.setLocation(targetObj.position.x, targetObj.position.y, targetObj.position.z);
-					}					
-					targetObj.context.update();
+				if(targetObj.parent_handle){
+					targetObj = targetObj.parent_handle;
 				}
+				targetObj.wasMoved = true;
+				var targetPosition = params.position || new BABYLON.Vector3(0,0,0);				
+				
+				if(targetObj.isMirrored){
+					_this.registerMatrixUpdate("translate_effek", targetObj, new BABYLON.Vector3(targetPosition.x, targetPosition.y, targetPosition.z));
+				} else {
+					_this.registerMatrixUpdate("translate", targetObj, new BABYLON.Vector3(targetPosition.x, targetPosition.y, targetPosition.z));
+				}
+				
 			}
 		},
 		rotate_to: function(target, params){
@@ -3605,33 +3646,32 @@ BattleSceneManager.prototype.executeAnimation = function(animation, startTick){
 				} else if(targetObj.parent_handle){
 					targetObj = targetObj.parent_handle;
 				}
+				var startRotation = new BABYLON.Vector3(0,0,0);
+				
 				var targetRotation = new BABYLON.Vector3(0,0,0);
 				
-				if(params.rotation){
+				if( params.rotation){
 					targetRotation = new BABYLON.Vector3(params.rotation.x, params.rotation.y, params.rotation.z);
 				}
 				if(_this._animationDirection == -1){
-					//targetRotation.x*=-1;
+					//targetRotation.x*=-1;					
 					if(params.aroundPivot || usesPropRotation(target)){
-						//targetRotation.y+=Math.PI;
+						//targetRotation.y+=Math.PI;						
 						//targetRotation.x = targetRotation.x * -1 + Math.PI;
+						
+						//startRotation.y+=Math.PI;
+						//startRotation.x = startRotation.x * -1 + Math.PI;
 						targetRotation.z*=-1;
+						startRotation.z*=-1;
 						targetRotation.y*=-1;
-					} else {
+						startRotation.y*=-1;
+					} else {						
 						targetRotation.y*=-1;
+						startRotation.y*=-1;
 					}
-					
-					//targetRotation.y = Math.PI - targetRotation.y;
 				}
-				targetObj.rotation = targetRotation;
-				if(targetObj.handle){//support for effekseer handles
-					if(targetObj.parent && !targetObj.ignoreParentRotation){			
-						targetObj.offsetRotation = {x: params.rotation.x, y: params.rotation.y, z: params.rotation.z};
-					} else {
-						targetObj.handle.setRotation(targetObj.rotation.x, targetObj.rotation.y, targetObj.rotation.z);
-					}					
-				}
-			}
+				_this.registerMatrixUpdate("rotate", targetObj, targetRotation);
+			}	
 		},
 		stop_matrix_animations: function(target, params){
 			const targetObj = getTargetObject(target);
