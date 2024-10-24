@@ -4782,7 +4782,7 @@ BattleSceneManager.prototype.executeAnimation = function(animation, startTick){
 			}
 		},	
 		play_effekseer: function(target, params){					
-			const effekInfo = _this._preloadedEffekseerInfo[target];
+			const effekInfo = _this._preloadedEffekseerInfo[_this._currentAnimatedAction.effekseerId+"__"+target];
 			if(effekInfo){
 				const targetContext = effekInfo.targetContext;
 				const effect = effekInfo.effect;
@@ -6809,7 +6809,7 @@ BattleSceneManager.prototype.getTexturePromise = function(texture){
 	});
 }		
 
-BattleSceneManager.prototype.preloadEffekseerEffect = function(target, params, actionIdx){
+BattleSceneManager.prototype.preloadEffekseerEffect = function(target, params, actionIdx, isEnemyAction){
 	const _this = this;
 	/*var params = animCommand.params;
 	if(animCommand.type == "play_effekseer"){
@@ -6839,7 +6839,7 @@ BattleSceneManager.prototype.preloadEffekseerEffect = function(target, params, a
 	return new Promise(function(resolve, reject){	
 		
 		var targetContext;
-		if(params.autoRotate && _this._animationDirection == -1){
+		if(params.autoRotate && isEnemyAction){
 			
 			if(params.isForeground * 1){
 				targetContext = _this._effksContextFgMirror;//_this._effksContextFg;
@@ -6862,7 +6862,7 @@ BattleSceneManager.prototype.preloadEffekseerEffect = function(target, params, a
 		var effect = targetContext.loadEffect("effekseer/"+params.path+".efk", 1.0, function(){
 			targetContext.activeCount++;
 			
-			_this._preloadedEffekseerInfo[target] = {
+			_this._preloadedEffekseerInfo[actionIdx+"__"+target] = {
 				effect: effect,
 				targetContext: targetContext
 			};
@@ -6872,7 +6872,7 @@ BattleSceneManager.prototype.preloadEffekseerEffect = function(target, params, a
 	});
 }
 
-BattleSceneManager.prototype.preloadAnimListEffekseerEffects = async function(animationList, effekseerId){
+BattleSceneManager.prototype.preloadAnimListEffekseerEffects = async function(animationList, effekseerId, isEnemyAction){
 	for(let animType of Object.keys(animationList)){
 		const batch = animationList[animType];
 		for(let entry of batch){
@@ -6880,7 +6880,7 @@ BattleSceneManager.prototype.preloadAnimListEffekseerEffects = async function(an
 				for(let animCommand of entry){
 					var params = animCommand.params;
 					if(animCommand.type == "play_effekseer"){
-						await this.preloadEffekseerEffect(animCommand.target, animCommand.params, effekseerId);							
+						await this.preloadEffekseerEffect(animCommand.target, animCommand.params, effekseerId, isEnemyAction);							
 					}
 				}
 			}			
@@ -6932,7 +6932,7 @@ BattleSceneManager.prototype.preloadEffekseerParticles = async function(){
 				});				
 			});	
 			
-			promises.push(_this.preloadAnimListEffekseerEffects(animationList, nextAction.effekseerId));
+			promises.push(_this.preloadAnimListEffekseerEffects(animationList, nextAction.effekseerId, nextAction.side == "enemy"));
 			
 			
 			if(nextAction.isDestroyed){
@@ -6978,7 +6978,7 @@ BattleSceneManager.prototype.preloadEffekseerParticles = async function(){
 						});				
 					});	
 					
-					promises.push(_this.preloadAnimListEffekseerEffects(animationList, nextAction.effekseerId));
+					promises.push(_this.preloadAnimListEffekseerEffects(animationList, nextAction.effekseerId, nextAction.side == "enemy"));
 				}
 			}
 			
