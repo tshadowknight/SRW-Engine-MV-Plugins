@@ -2176,6 +2176,17 @@ BattleSceneManager.prototype.hookBeforeRender = function(){
 				animation.accumulator+=deltaTime;
 				var t = animation.accumulator / duration;	
 				let refScale = (targetObj.defaultScale || 1) * 1;
+				
+				let xScaleFactor = 1;
+				
+				if(targetObj.spriteConfig.type == "3D"){
+					xScaleFactor*=-1;
+				}
+				
+				if(targetObj.flipX){
+					xScaleFactor*=targetObj.flipX;
+				}
+				
 				if(t < 1){
 					if(animation.easingFunction){
 						t = animation.easingFunction.ease(t);
@@ -2185,10 +2196,12 @@ BattleSceneManager.prototype.hookBeforeRender = function(){
 					var endSizeVector = new BABYLON.Vector3(animation.endSize * refScale, animation.endSize * refScale, animation.endSize * refScale);
 					var sizeVector = BABYLON.Vector3.Lerp(startSizeVector, endSizeVector, t);
 					
+					
+					
 					if(targetObj.handle){ //support for effekseer handles
 						targetObj.handle.setScale(sizeVector.x, sizeVector.y, sizeVector.z);
 					} else {
-						targetObj.scaling.x = sizeVector.x;
+						targetObj.scaling.x = sizeVector.x * xScaleFactor;
 						targetObj.scaling.y = sizeVector.y;
 						targetObj.scaling.z = sizeVector.z;
 					}					
@@ -2196,7 +2209,7 @@ BattleSceneManager.prototype.hookBeforeRender = function(){
 					if(targetObj.handle){ //support for effekseer handles
 						targetObj.handle.setScale(animation.endSize * refScale, animation.endSize * refScale, animation.endSize * refScale);
 					} else {
-						targetObj.scaling.x = animation.endSize * refScale;
+						targetObj.scaling.x = animation.endSize * refScale * xScaleFactor;
 						targetObj.scaling.y = animation.endSize * refScale;
 						targetObj.scaling.z = animation.endSize * refScale;
 					}
@@ -3774,18 +3787,36 @@ BattleSceneManager.prototype.executeAnimation = function(animation, startTick){
 		},
 		flip: function(target, params){
 			var targetObj = getTargetObject(target);
-			if(targetObj && targetObj.material){				
+			if(targetObj){				
 				var flipX = (params.x || 1);
 				if(target == "active_main" || target == "active_target"){
 					flipX*=_this._animationDirection;
 				}
-				targetObj.material.diffuseTexture.uScale = flipX;
-				if(targetObj.material.diffuseTexture.uScale == -1){
-					targetObj.material.diffuseTexture.uOffset = 1; 
-				} else {
-					targetObj.material.diffuseTexture.uOffset = 0; 
-				}				
-				targetObj.material.diffuseTexture.vScale = (params.y || 1) * 1;
+				if(targetObj.spriteConfig.type == "3D"){	
+					if(targetObj.originalXSign == null){
+						targetObj.originalXSign = Math.sign(targetObj.scaling.x);
+					}
+					
+					targetObj.flipX = flipX;					
+					if(flipX == 1){			
+						if(Math.sign(targetObj.scaling.x) != targetObj.originalXSign){
+							targetObj.scaling.x*=-1;
+						}										
+					} else if(flipX == -1){
+						if(Math.sign(targetObj.scaling.x) == targetObj.originalXSign){
+							targetObj.scaling.x*=-1;
+						}
+					}
+				} else if(targetObj.material){
+					targetObj.material.diffuseTexture.uScale = flipX;
+					if(targetObj.material.diffuseTexture.uScale == -1){
+						targetObj.material.diffuseTexture.uOffset = 1; 
+					} else {
+						targetObj.material.diffuseTexture.uOffset = 0; 
+					}				
+					targetObj.material.diffuseTexture.vScale = (params.y || 1) * 1;
+				}
+				
 			}			
 		},
 		shake: function(target, params){
