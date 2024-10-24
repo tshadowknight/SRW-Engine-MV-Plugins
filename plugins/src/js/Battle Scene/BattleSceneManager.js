@@ -113,6 +113,7 @@ export default function BattleSceneManager(){
 	this._movieBGInfo = [];
 	this._dragonBonesSpriteInfo = [];
 	this._effekseerInfo = [];
+	this._preloadedEffekseerInfo = {};
 	this._barrierEffects = [];
 	this._particleSystemsDefinitions = {};
 	this._activeParticleSystems = {};
@@ -2057,88 +2058,7 @@ BattleSceneManager.prototype.hookBeforeRender = function(){
 			}			
 		}
 		
-		if(_this._runningAnimation){
 			
-			if(ticksSinceLastUpdate >= 1 && !_this._isLoading){	
-				//_this._animTimeAccumulator = 0;
-				//console.log(ticksSinceLastUpdate);
-				if(_this.isOKHeld){
-					ticksSinceLastUpdate*=2;
-				}
-				//_this._currentAnimationTick+=ticksSinceLastUpdate;			
-				
-				
-				for(var i = 0; i <=_this._currentAnimationTick; i++){					
-					if(_this._animationList[i]){
-						let current = _this._animationList[i];
-						_this._animationList[i] = null;
-						for(var j = 0; j < current.length; j++){
-							//_this.executeAnimation(_this._animationList[i][j], i);
-							_this._animQueue.push({
-								def: current[j],
-								tick: i
-							});
-						}
-					}
-				}
-				let command = _this._animQueue.shift();
-				while(command){
-					_this.executeAnimation(command.def, command.tick);
-					command = null;
-					if(!_this._isLoading){
-						command = _this._animQueue.shift();
-					}
-				}
-				
-					
-				_this._lastAnimationTick = _this._currentAnimationTick;
-				/*if(_this._isLoading){
-					return;
-				}*/
-				//_this._lastAnimationTickTime = frameTime;
-				
-				if(_this._currentAnimationTick > _this._animationList.length){
-					if(_this._supportDefenderActive){
-						_this._supportDefenderActive = false;
-						_this._animationList[_this._currentAnimationTick  + 50] = [
-							{type: "set_sprite_frame", target: "active_support_defender", params: {name: "out"}},
-							{type: "translate", target: "active_support_defender", params: {startPosition: _this._defaultPositions.enemy_main_idle, position: new BABYLON.Vector3(-10, 0, 1), duration: 30, easingFunction: new BABYLON.SineEase(), easingMode: BABYLON.EasingFunction.EASINGMODE_EASEIN}},
-						];	
-						_this._animationList[_this._currentAnimationTick  + 60] = [
-							{type: "set_sprite_frame", target: "active_target", params: {name: "in"}},
-							{type: "translate", target: "active_target", params: {startPosition: new BABYLON.Vector3(-10, 0, 1), position: _this._defaultPositions.enemy_main_idle, duration: 30, easingFunction: new BABYLON.SineEase(), easingMode: BABYLON.EasingFunction.EASINGMODE_EASEIN}},
-							{type: "disable_support_defender", target: "", params: {}},
-						];
-						
-						_this._animationList[_this._currentAnimationTick  + 90] = [
-							{type: "set_sprite_frame", target: "active_target", params: {name: "main"}},
-							{type: "set_sprite_frame", target: "active_support_defender", params: {name: "main"}},
-						];
-						_this._animationList[_this._currentAnimationTick  + 100] = []; //padding
-					} else if(_this._doubleImageActive){
-						_this._doubleImageActive = false;
-						_this._animationList[_this._currentAnimationTick  + 50] = [
-							{type: "show_sprite", target: "active_target"},
-							{type: "translate", target: "active_target", params: {startPosition: new BABYLON.Vector3(-10, 0, 1), position: _this._defaultPositions.enemy_main_idle, duration: 30, easingFunction: new BABYLON.SineEase(), easingMode: BABYLON.EasingFunction.EASINGMODE_EASEIN}},
-						];	
-						_this._animationList[_this._currentAnimationTick  + 100] = []; //padding
-					} else {
-						if(!_this._awaitingText){
-							_this._runningAnimation = false;
-							_this.disposeAnimationSprites();
-							_this.disposeAnimationBackgrounds();
-							_this.disposeEffekseerInstances();
-							_this.disposeLights();
-							//_this.disposeSpriterBackgrounds();
-							_this.disposeRMMVBackgrounds();
-							_this.disposeMovieBackgrounds();
-							_this._textProviderOverride = null;
-							_this._animationResolve();
-						}						
-					}					
-				} 
-			}
-		}			
 		
 		
 		Object.keys(_this._animationBlends).forEach(function(blendId){			
@@ -2179,7 +2099,7 @@ BattleSceneManager.prototype.hookBeforeRender = function(){
 				
 				let xScaleFactor = 1;
 				
-				if(targetObj.spriteConfig.type == "3D"){
+				if(targetObj.spriteConfig?.type == "3D"){
 					xScaleFactor*=-1;
 				}
 				
@@ -2531,9 +2451,9 @@ BattleSceneManager.prototype.disposeEffekseerInstances = function(){
 			effekInfo.handle.stop();
 			effekInfo.context.releaseEffect(effekInfo.effect);
 			effekInfo.context.activeCount = 0;
-		}		
+		}
 	});
-	this._effekseerInfo = [];
+	this._effekseerInfo = [];	
 	
 	this.stopEffekContext(this._effksContext);
 	this.stopEffekContext(this._effksContextMirror);
@@ -2829,6 +2749,90 @@ BattleSceneManager.prototype.startScene = function(){
 			deltaTime*=5;
 		}
 		
+		var ticksSinceLastUpdate =  _this._currentAnimationTick - _this._lastAnimationTick;
+		_this._ticksSinceLastUpdate = ticksSinceLastUpdate;			
+		if(_this._runningAnimation && !_this._animsPaused){
+			
+			if(ticksSinceLastUpdate >= 1 && !_this._isLoading){	
+				//_this._animTimeAccumulator = 0;
+				//console.log(ticksSinceLastUpdate);
+				if(_this.isOKHeld){
+					ticksSinceLastUpdate*=2;
+				}
+				//_this._currentAnimationTick+=ticksSinceLastUpdate;			
+				
+				
+				for(var i = 0; i <=_this._currentAnimationTick; i++){					
+					if(_this._animationList[i]){
+						let current = _this._animationList[i];
+						_this._animationList[i] = null;
+						for(var j = 0; j < current.length; j++){
+							//_this.executeAnimation(_this._animationList[i][j], i);
+							_this._animQueue.push({
+								def: current[j],
+								tick: i
+							});
+						}
+					}
+				}
+				let command = _this._animQueue.shift();
+				while(command){
+					_this.executeAnimation(command.def, command.tick);
+					command = null;
+					if(!_this._isLoading){
+						command = _this._animQueue.shift();
+					}
+				}
+				
+					
+				_this._lastAnimationTick = _this._currentAnimationTick;
+				/*if(_this._isLoading){
+					return;
+				}*/
+				//_this._lastAnimationTickTime = frameTime;
+				
+				if(_this._currentAnimationTick > _this._animationList.length){
+					if(_this._supportDefenderActive){
+						_this._supportDefenderActive = false;
+						_this._animationList[_this._currentAnimationTick  + 50] = [
+							{type: "set_sprite_frame", target: "active_support_defender", params: {name: "out"}},
+							{type: "translate", target: "active_support_defender", params: {startPosition: _this._defaultPositions.enemy_main_idle, position: new BABYLON.Vector3(-10, 0, 1), duration: 30, easingFunction: new BABYLON.SineEase(), easingMode: BABYLON.EasingFunction.EASINGMODE_EASEIN}},
+						];	
+						_this._animationList[_this._currentAnimationTick  + 60] = [
+							{type: "set_sprite_frame", target: "active_target", params: {name: "in"}},
+							{type: "translate", target: "active_target", params: {startPosition: new BABYLON.Vector3(-10, 0, 1), position: _this._defaultPositions.enemy_main_idle, duration: 30, easingFunction: new BABYLON.SineEase(), easingMode: BABYLON.EasingFunction.EASINGMODE_EASEIN}},
+							{type: "disable_support_defender", target: "", params: {}},
+						];
+						
+						_this._animationList[_this._currentAnimationTick  + 90] = [
+							{type: "set_sprite_frame", target: "active_target", params: {name: "main"}},
+							{type: "set_sprite_frame", target: "active_support_defender", params: {name: "main"}},
+						];
+						_this._animationList[_this._currentAnimationTick  + 100] = []; //padding
+					} else if(_this._doubleImageActive){
+						_this._doubleImageActive = false;
+						_this._animationList[_this._currentAnimationTick  + 50] = [
+							{type: "show_sprite", target: "active_target"},
+							{type: "translate", target: "active_target", params: {startPosition: new BABYLON.Vector3(-10, 0, 1), position: _this._defaultPositions.enemy_main_idle, duration: 30, easingFunction: new BABYLON.SineEase(), easingMode: BABYLON.EasingFunction.EASINGMODE_EASEIN}},
+						];	
+						_this._animationList[_this._currentAnimationTick  + 100] = []; //padding
+					} else {
+						if(!_this._awaitingText){
+							_this._runningAnimation = false;
+							_this.disposeAnimationSprites();
+							_this.disposeAnimationBackgrounds();
+							_this.disposeEffekseerInstances();
+							_this.disposeLights();
+							//_this.disposeSpriterBackgrounds();
+							_this.disposeRMMVBackgrounds();
+							_this.disposeMovieBackgrounds();
+							_this._textProviderOverride = null;
+							_this._animationResolve();
+						}						
+					}					
+				} 
+			}
+		}	
 		
 		
 		
@@ -4778,91 +4782,80 @@ BattleSceneManager.prototype.executeAnimation = function(animation, startTick){
 			}
 		},	
 		play_effekseer: function(target, params){					
-			var position;
-			if(params.autoRotate){
-				position = params.position || new BABYLON.Vector3(0,0,0);
-			} else {
-				position = _this.applyAnimationDirection(params.position || new BABYLON.Vector3(0,0,0));
-			}
-			var scale = params.scale || 1;
-			let parts = String(scale).split(",");
-			let xScale;
-			let yScale;
-			let zScale;
-			if(parts.length > 1){
-				xScale = parts[0]*1 || 1;
-				yScale = parts[1]*1 || 1;
-				zScale = parts[2]*1 || 1;
-			} else {
-				xScale = scale;
-				yScale = scale;
-				zScale = scale;
-			}
-			//scale*=_this._animationDirection;
-			var speed = params.speed || 1;
-			var rotation = params.rotation || new BABYLON.Vector3(0,0,0);
-			/*if(params.autoRotate && _this._animationDirection == -1){
-				rotation.y = rotation.y * 1 + Math.PI;
-				rotation.x = rotation.x * 1 + Math.PI;
-			}*/
-			var targetContext;
-			if(params.autoRotate && _this._animationDirection == -1){
+			const effekInfo = _this._preloadedEffekseerInfo[target];
+			if(effekInfo){
+				const targetContext = effekInfo.targetContext;
+				const effect = effekInfo.effect;
 				
-				if(params.isForeground * 1){
-					targetContext = _this._effksContextFgMirror;//_this._effksContextFg;
+				var position;
+				if(params.autoRotate){
+					position = params.position || new BABYLON.Vector3(0,0,0);
 				} else {
-					targetContext =  _this._effksContextMirror;//_this._effksContext;
+					position = _this.applyAnimationDirection(params.position || new BABYLON.Vector3(0,0,0));
 				}
-			} else {
-				if(params.isForeground * 1){
-					targetContext = _this._effksContextFg;
+				var scale = params.scale || 1;
+				let parts = String(scale).split(",");
+				let xScale;
+				let yScale;
+				let zScale;
+				if(parts.length > 1){
+					xScale = parts[0]*1 || 1;
+					yScale = parts[1]*1 || 1;
+					zScale = parts[2]*1 || 1;
 				} else {
-					targetContext = _this._effksContext;
+					xScale = scale;
+					yScale = scale;
+					zScale = scale;
 				}
-			}
-			if(targetContext.activeCount == null){
-				targetContext.activeCount = 0;
-			}	
-					
-			_this._glContext.pixelStorei(_this._glContext.UNPACK_FLIP_Y_WEBGL, 0);
-			_this._isLoading++;
-			var effect = targetContext.loadEffect("effekseer/"+params.path+".efk", 1.0, function(){
-				targetContext.activeCount++;
-				var info;
-				// Play the loaded effect				
+				//scale*=_this._animationDirection;
+				var speed = params.speed || 1;
+				var rotation = params.rotation || new BABYLON.Vector3(0,0,0);
+				/*if(params.autoRotate && _this._animationDirection == -1){
+					rotation.y = rotation.y * 1 + Math.PI;
+					rotation.x = rotation.x * 1 + Math.PI;
+				}*/
+				
+								
 				var handle = targetContext.play(effect, position.x, position.y, position.z);
+
 				const _setRotation = handle.setRotation;
 				handle.setRotation = function(x, y, z){
 					_setRotation.call(this, x, y, z);
 					this.rotation = new BABYLON.Vector3(x, y, z);
 				}
-				
+
 				const _setLocation = handle.setLocation;
 				handle.setLocation = function(x, y, z){
 					_setLocation.call(this, x, y, z);
 					this.position = new BABYLON.Vector3(x, y, z);
 				}
-				
+
 				const _setSpeed = handle.setSpeed;
 				handle.setSpeed = function(speed){
 					_setSpeed.call(this, speed);
 					this.speed = speed;
 				}
-				
-				
+
+
 				handle.setSpeed(speed);
-				
+
 				handle.setRotation(rotation.x, rotation.y, rotation.z);
 				handle.setLocation(position.x, position.y, position.z);
-				
+
 				handle.setScale(xScale, yScale, zScale * (params.flipZ ? -1 : 1));
-			
-				info = {name: target, effect: effect, context: targetContext, offset: {x: position.x, y: position.y, z: position.z}, offsetRotation: {x: rotation.x, y: rotation.y, z: rotation.z}};
+							
+						
+				const info = {name: target, effect: effect, context: targetContext, offset: {x: position.x, y: position.y, z: position.z}, offsetRotation: {x: rotation.x, y: rotation.y, z: rotation.z}};
 				info.handle = handle;
+
+				//info.actionIdx = actionIdx;
+
 				if(params.autoRotate && _this._animationDirection == -1){
 					info.isMirrored = true;
 				}
 				info.ignoreParentRotation = params.ignoreParentRotation * 1;
+				_this._effekseerInfo.push(info);	
+				
 				if(params.parent){
 					var parentObj = getTargetObject(params.parent)
 					
@@ -4876,14 +4869,9 @@ BattleSceneManager.prototype.executeAnimation = function(animation, startTick){
 						info.parent = parentObj;
 					}		
 					
-					//_this.updateParentedEffekseerEffect(info);	
+					//_this.updateParentedEffekseerEffect(effekInfo);	
 				}
-				
-				_this._effekseerInfo.push(info);			
-				_this._isLoading--;
-				
-			});
-			//effect.scale = scale;
+			}
 		},	
 		remove_effekseer_parent: function(target, params){	
 			var targetObj;
@@ -6821,16 +6809,96 @@ BattleSceneManager.prototype.getTexturePromise = function(texture){
 	});
 }		
 
+BattleSceneManager.prototype.preloadEffekseerEffect = function(target, params, actionIdx){
+	const _this = this;
+	/*var params = animCommand.params;
+	if(animCommand.type == "play_effekseer"){
+		
+		var targetContext;
+		if(params.autoRotate && _this._animationDirection == -1){
+			
+			if(params.isForeground * 1){
+				targetContext = _this._effksContextFgMirror;//_this._effksContextFg;
+			} else {
+				targetContext =  _this._effksContextMirror;//_this._effksContext;
+			}
+		} else {
+			if(params.isForeground * 1){
+				targetContext = _this._effksContextFg;
+			} else {
+				targetContext = _this._effksContext;
+			}
+		}
+		
+		promises.push(new Promise(function(resolve, reject){
+			targetContext.loadEffect("effekseer/"+params.path+".efk", 1.0, resolve);	
+		}));
+		
+	}	*/
+	
+	return new Promise(function(resolve, reject){	
+		
+		var targetContext;
+		if(params.autoRotate && _this._animationDirection == -1){
+			
+			if(params.isForeground * 1){
+				targetContext = _this._effksContextFgMirror;//_this._effksContextFg;
+			} else {
+				targetContext =  _this._effksContextMirror;//_this._effksContext;
+			}
+		} else {
+			if(params.isForeground * 1){
+				targetContext = _this._effksContextFg;
+			} else {
+				targetContext = _this._effksContext;
+			}
+		}
+		if(targetContext.activeCount == null){
+			targetContext.activeCount = 0;
+		}	
+				
+		_this._glContext.pixelStorei(_this._glContext.UNPACK_FLIP_Y_WEBGL, 0);
+		//_this._isLoading++;
+		var effect = targetContext.loadEffect("effekseer/"+params.path+".efk", 1.0, function(){
+			targetContext.activeCount++;
+			
+			_this._preloadedEffekseerInfo[target] = {
+				effect: effect,
+				targetContext: targetContext
+			};
+			//_this._isLoading--;
+			resolve();
+		});
+	});
+}
+
+BattleSceneManager.prototype.preloadAnimListEffekseerEffects = async function(animationList, effekseerId){
+	for(let animType of Object.keys(animationList)){
+		const batch = animationList[animType];
+		for(let entry of batch){
+			if(entry){
+				for(let animCommand of entry){
+					var params = animCommand.params;
+					if(animCommand.type == "play_effekseer"){
+						await this.preloadEffekseerEffect(animCommand.target, animCommand.params, effekseerId);							
+					}
+				}
+			}			
+		}
+	}	
+}
 
 //workaround for a bug where spawning effekseer effects would have them render all their texture upside down
 //preloading them before the animation starts prevents this
 BattleSceneManager.prototype.preloadEffekseerParticles = async function(){
 	var _this = this;
-	
+	this._preloadedEffekseerInfo = {};
 	for(var i = 0; i < _this._actionQueue.length; i++){
 		
 		var nextAction = _this._actionQueue[i];
 		if(nextAction){		
+		
+			nextAction.effekseerId = i;
 
 			let animIdsToPreload = {};
 			
@@ -6853,46 +6921,6 @@ BattleSceneManager.prototype.preloadEffekseerParticles = async function(){
 				animationList[animType].forEach(function(batch){
 					batch.forEach(function(animCommand){
 						var params = animCommand.params;
-						if(animCommand.type == "play_effekseer"){
-							
-							var targetContext;
-							if(params.autoRotate && _this._animationDirection == -1){
-								
-								if(params.isForeground * 1){
-									targetContext = _this._effksContextFgMirror;//_this._effksContextFg;
-								} else {
-									targetContext =  _this._effksContextMirror;//_this._effksContext;
-								}
-							} else {
-								if(params.isForeground * 1){
-									targetContext = _this._effksContextFg;
-								} else {
-									targetContext = _this._effksContext;
-								}
-							}
-							
-							promises.push(new Promise(function(resolve, reject){
-								targetContext.loadEffect("effekseer/"+params.path+".efk", 1.0, resolve);	
-							}));
-							
-							/*
-							promises.push(new Promise(function(resolve, reject){
-								_this._effksContext.loadEffect("effekseer/"+params.path+".efk", 1.0, resolve);	
-							}));	
-							promises.push(new Promise(function(resolve, reject){
-								_this._effksContextMirror.loadEffect("effekseer/"+params.path+".efk", 1.0, resolve);	
-							}));	
-							promises.push(new Promise(function(resolve, reject){
-								_this._effksContextFg.loadEffect("effekseer/"+params.path+".efk", 1.0, resolve);	
-							}));	
-							promises.push(new Promise(function(resolve, reject){
-								_this._effksContextFgMirror.loadEffect("effekseer/"+params.path+".efk", 1.0, resolve);	
-							}));	
-							promises.push(new Promise(function(resolve, reject){
-								_this._effksContextAttached.loadEffect("effekseer/"+params.path+".efk", 1.0, resolve);	
-							}));		
-							*/
-						}	
 
 						if(animCommand.type == "include_animation"){
 							animIdsToPreload[animCommand.params.battleAnimId] = true;
@@ -6903,6 +6931,8 @@ BattleSceneManager.prototype.preloadEffekseerParticles = async function(){
 					});
 				});				
 			});	
+			
+			promises.push(_this.preloadAnimListEffekseerEffects(animationList, nextAction.effekseerId));
 			
 			
 			if(nextAction.isDestroyed){
@@ -6938,33 +6968,17 @@ BattleSceneManager.prototype.preloadEffekseerParticles = async function(){
 						animationList[animType].forEach(function(batch){
 							batch.forEach(function(animCommand){
 								var params = animCommand.params;
-								if(animCommand.type == "play_effekseer"){
-									
-									promises.push(new Promise(function(resolve, reject){
-										_this._effksContext.loadEffect("effekseer/"+params.path+".efk", 1.0, resolve);	
-									}));	
-									promises.push(new Promise(function(resolve, reject){
-										_this._effksContextMirror.loadEffect("effekseer/"+params.path+".efk", 1.0, resolve);	
-									}));	
-									promises.push(new Promise(function(resolve, reject){
-										_this._effksContextFg.loadEffect("effekseer/"+params.path+".efk", 1.0, resolve);	
-									}));	
-									promises.push(new Promise(function(resolve, reject){
-										_this._effksContextFgMirror.loadEffect("effekseer/"+params.path+".efk", 1.0, resolve);	
-									}));	
-									promises.push(new Promise(function(resolve, reject){
-										_this._effksContextAttached.loadEffect("effekseer/"+params.path+".efk", 1.0, resolve);	
-									}));
+								if(animCommand.type == "include_animation"){
+									stack.push(animCommand.params.battleAnimId);
 								}
-							if(animCommand.type == "include_animation"){
-								stack.push(animCommand.params.battleAnimId);
-							}
-							if(animCommand.type == "merge_complete_animation"){
-								stack.push(animCommand.params.battleAnimId);
-							}							
+								if(animCommand.type == "merge_complete_animation"){
+									stack.push(animCommand.params.battleAnimId);
+								}							
 							});
 						});				
 					});	
+					
+					promises.push(_this.preloadAnimListEffekseerEffects(animationList, nextAction.effekseerId));
 				}
 			}
 			
