@@ -151,6 +151,16 @@
 	margin: 1px;
 }
 
+#camera_info_content .prop_control{
+	width: 12px;
+	margin-left: 0px;
+	cursor: pointer;
+}
+
+#camera_info_content input{
+	width: 80%;
+}
+
 #refresh_camera {
 	width: 14px;
 	margin-left: auto;

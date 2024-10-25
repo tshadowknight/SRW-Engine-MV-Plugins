@@ -3372,12 +3372,18 @@ SRWEditor.prototype.showCameraState = function(){
 			content+="</div>"
 			content+="<div>"
 			content+="x: <input data-type='position' data-prop='x' value='"+position.x.toFixed(3)+"'></input>";
+			content+="<img data-direction=1 class='prop_control increase_prop' src='svg/plus.svg'>";
+			content+="<img data-direction=-1 class='prop_control decrease_prop' src='svg/minus.svg'>";
 			content+="</div>"
 			content+="<div>"
 			content+="y: <input data-type='position' data-prop='y' value='"+position.y.toFixed(3)+"'></input>";
+			content+="<img data-direction=1 class='prop_control increase_prop' src='svg/plus.svg'>";
+			content+="<img data-direction=-1 class='prop_control decrease_prop' src='svg/minus.svg'>";
 			content+="</div>"
 			content+="<div>"
 			content+="z: <input data-type='position' data-prop='z' value='"+position.z.toFixed(3)+"'></input>";
+			content+="<img data-direction=1 class='prop_control increase_prop' src='svg/plus.svg'>";
+			content+="<img data-direction=-1 class='prop_control decrease_prop' src='svg/minus.svg'>";
 			content+="</div>"
 			
 			var rotation = targetObj.rotation;
@@ -3395,12 +3401,18 @@ SRWEditor.prototype.showCameraState = function(){
 				content+="</div>"
 				content+="<div>"
 				content+="x: <input data-type='rotation' data-prop='x' value='"+rotation.x.toFixed(3)+"'></input>";
+				content+="<img data-direction=1 class='prop_control increase_prop' src='svg/plus.svg'>";
+				content+="<img data-direction=-1 class='prop_control decrease_prop' src='svg/minus.svg'>";
 				content+="</div>"
 				content+="<div>"
 				content+="y: <input data-type='rotation' data-prop='y' value='"+rotation.y.toFixed(3)+"'></input>";
+				content+="<img data-direction=1 class='prop_control increase_prop' src='svg/plus.svg'>";
+				content+="<img data-direction=-1 class='prop_control decrease_prop' src='svg/minus.svg'>";
 				content+="</div>"
 				content+="<div>"
 				content+="z: <input data-type='rotation' data-prop='z' value='"+rotation.z.toFixed(3)+"'></input>";
+				content+="<img data-direction=1 class='prop_control increase_prop' src='svg/plus.svg'>";
+				content+="<img data-direction=-1 class='prop_control decrease_prop' src='svg/minus.svg'>";
 				content+="</div>"
 			}	
 
@@ -3412,12 +3424,18 @@ SRWEditor.prototype.showCameraState = function(){
 					content+="</div>"
 					content+="<div>"
 					content+="x: <input data-type='pivot_rotation' data-prop='x' value='"+rotation.x.toFixed(3)+"'></input>";
+					content+="<img data-direction=1 class='prop_control increase_prop' src='svg/plus.svg'>";
+					content+="<img data-direction=-1 class='prop_control decrease_prop' src='svg/minus.svg'>";
 					content+="</div>"
 					content+="<div>"
 					content+="y: <input data-type='pivot_rotation' data-prop='y' value='"+rotation.y.toFixed(3)+"'></input>";
+					content+="<img data-direction=1 class='prop_control increase_prop' src='svg/plus.svg'>";
+					content+="<img data-direction=-1 class='prop_control decrease_prop' src='svg/minus.svg'>";
 					content+="</div>"
 					content+="<div>"
 					content+="z: <input data-type='pivot_rotation' data-prop='z' value='"+rotation.z.toFixed(3)+"'></input>";
+					content+="<img data-direction=1 class='prop_control increase_prop' src='svg/plus.svg'>";
+					content+="<img data-direction=-1 class='prop_control decrease_prop' src='svg/minus.svg'>";
 					content+="</div>"
 				}
 			}	
@@ -3517,6 +3535,41 @@ SRWEditor.prototype.showCameraState = function(){
 					}
 				});
 			});
+			
+			
+			let intervalId;
+			const clickDelta = 0.1;
+			var controls = cameraInfoContainer.querySelectorAll(".prop_control");
+			for(let control of controls){
+				control.addEventListener("mousedown", function(){
+					const direction = this.getAttribute("data-direction");
+					const delta = clickDelta * direction;
+					const targetElem = this.closest("div").querySelector("input");
+					intervalId = setInterval(function(){
+						targetElem.value= (targetElem.value * 1 + delta * 1).toFixed(3);
+						targetElem.dispatchEvent(new Event('blur', {}))
+					}, 40);
+				});
+				
+				control.addEventListener("click", function(){
+					const direction = this.getAttribute("data-direction");
+					const delta = clickDelta * direction;
+					const targetElem = this.closest("div").querySelector("input");
+					targetElem.value= (targetElem.value * 1 + delta * 1).toFixed(3);
+					targetElem.dispatchEvent(new Event('blur', {}))
+				});
+				
+				control.addEventListener("mouseup", function(){
+					if(intervalId){
+						clearInterval(intervalId);
+					}
+				});
+				control.addEventListener("mouseleave", function(){
+					if(intervalId){
+						clearInterval(intervalId);
+					}
+				});
+			}
 		} else {
 			cameraInfoContainer.innerHTML = EDITORSTRINGS.ATTACKS.label_missing_object.replace("[NAME]", name);
 		}
