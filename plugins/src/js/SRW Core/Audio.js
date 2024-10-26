@@ -33,7 +33,20 @@
 				this._seBuffers = this._seBuffers.filter(function(audio) {
 					return audio._isStarting || audio.isPlaying();
 				});
-				var buffer = this.createBuffer('se', se.name);
+				var buffer;
+				if(this._sePreloads){
+					let ctr = 0;
+					while(ctr < this._sePreloads.length && !buffer){
+						if(this._sePreloads[ctr]["_reservedSeName"] == se.name && !this._sePreloads[ctr].used){
+							buffer = this._sePreloads[ctr];
+							buffer.used = true;
+						}
+						ctr++;
+					}
+				}
+				if(!buffer){
+					buffer = this.createBuffer('se', se.name);
+				}				
 				this.updateSeParameters(buffer, se);
 				buffer._seName = se.name;
 				buffer._isStarting = true;
@@ -46,7 +59,9 @@
 			}
 		};
 		
-		
+		AudioManager.clearPreloads = function(se) {
+			this._sePreloads = [];
+		}		
 		
 		AudioManager.isPlayingSE = function(){
 			let result = false;
@@ -75,6 +90,29 @@
 					buffer.fadeOut(duration);
 				}
 			});
+		};
+		
+		AudioManager.preloadSe = async function(se) {
+			if (se.name) {
+				var buffer = await this.createBufferAsync('se', se.name);
+				buffer._reservedSeName = se.name;
+				if(!this._sePreloads){
+					this._sePreloads = [];
+				}
+				this._sePreloads.push(buffer);
+			}
+		};
+		
+		AudioManager.createBufferAsync = function(folder, name) {
+			const _this = this;
+			return new Promise(function(resolve, reject){
+				var ext = _this.audioFileExt();
+				var url = _this._path + folder + '/' + encodeURIComponent(name) + ext;			
+				const wAudio = new WebAudio(url);	
+				wAudio.addLoadListener(function() {
+					resolve(wAudio);
+				});				
+			});					
 		};
 		
 		WebAudio.prototype.play = function(loop, offset) {

@@ -3116,6 +3116,9 @@ BattleSceneManager.prototype.stopScene = function(){
 	if(this._scene){
 		this._scene.dispose();	
 	}	
+	
+	AudioManager.stopSe();
+	AudioManager.clearPreloads();
 	//this._engine.dispose();		
 }
 
@@ -6873,6 +6876,7 @@ BattleSceneManager.prototype.preloadEffekseerEffect = function(target, params, a
 }
 
 BattleSceneManager.prototype.preloadAnimListEffekseerEffects = async function(animationList, effekseerId, isEnemyAction){
+	const promises = [];
 	for(let animType of Object.keys(animationList)){
 		const batch = animationList[animType];
 		for(let entry of batch){
@@ -6880,12 +6884,13 @@ BattleSceneManager.prototype.preloadAnimListEffekseerEffects = async function(an
 				for(let animCommand of entry){
 					var params = animCommand.params;
 					if(animCommand.type == "play_effekseer"){
-						await this.preloadEffekseerEffect(animCommand.target, animCommand.params, effekseerId, isEnemyAction);							
+						promises.push(this.preloadEffekseerEffect(animCommand.target, animCommand.params, effekseerId, isEnemyAction));							
 					}
 				}
 			}			
 		}
 	}	
+	await Promise.all(promises);
 }
 
 //workaround for a bug where spawning effekseer effects would have them render all their texture upside down
@@ -7266,7 +7271,7 @@ BattleSceneManager.prototype.preloadSceneAssets = function(){
 				se.pan = 0;
 				se.pitch = params.pitch || 100;
 				se.volume = params.volume || 100;
-				AudioManager.loadStaticSe(se);
+				promises.push(AudioManager.preloadSe(se));
 			}	
 			
 			if(animCommand.type == "create_command_environment"){
@@ -7709,7 +7714,6 @@ BattleSceneManager.prototype.endScene = function(force) {
 			_this._UIcontainer.style.display = "";
 			_this._PIXIContainer.style.display = "";	
 			_this.stopScene();
-			AudioManager.stopSe();
 			_this.systemFadeFromBlack(400, 1000).then(function(){
 				//fail safe against state bugs with the system fade and swipe container
 				_this._systemFadeContainer.style.display = "none";
