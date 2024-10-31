@@ -468,6 +468,11 @@ SRWEditor.prototype.init = function(){
 			params: ["path", "position", "scale", "speed", "rotation", "parent", "isForeground", "autoRotate", "flipZ", "ignoreParentRotation"],
 			desc: "Play a predefined effekseer effect."
 		},
+		set_effekseer_color: {
+			hasTarget: true,
+			params: ["r", "g", "b", "a"],
+			desc: "Set the global color of an effekseer effect."
+		},		
 		remove_effekseer_parent: {
 			hasTarget: true,
 			params: [],
@@ -701,6 +706,7 @@ SRWEditor.prototype.init = function(){
 		r: "The red component of a color 0-255",
 		g: "The green component of a color 0-255",
 		b: "The blue component of a color 0-255",
+		a: "The alpha component of a color 0-255",
 		x_fraction: "A screen space position defined by a percentage of the width of the screen.",
 		y_fraction: "A screen space position defined by a percentage of the height of the screen.",
 		shaderName: "The name of the shader effect to apply",
@@ -826,6 +832,9 @@ SRWEditor.prototype.init = function(){
 			
 		},
 		b: function(value){
+			
+		},
+		a: function(value){
 			
 		},
 		x_fraction: function(value){

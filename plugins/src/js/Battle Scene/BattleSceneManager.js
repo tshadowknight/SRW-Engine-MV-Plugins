@@ -4889,7 +4889,7 @@ BattleSceneManager.prototype.executeAnimation = function(animation, startTick){
 				targetObj.position = targetObj.parent.getAbsolutePosition();
 				delete targetObj.parent;
 			}
-		}			,
+		},
 		play_rmmv_anim: function(target, params){
 			var position = _this.applyAnimationDirection(params.position || new BABYLON.Vector3(0,0,0));	
 			var width = params.scaleX || 5;
@@ -5033,7 +5033,19 @@ BattleSceneManager.prototype.executeAnimation = function(animation, startTick){
 				params.easingMode
 			);
 		}, 
-		
+		set_effekseer_color: function(target, params){
+			var targetObj;
+			var ctr = 0;
+			while(!targetObj && ctr < _this._effekseerInfo.length){
+				if(_this._effekseerInfo[ctr].name == target){
+					targetObj = _this._effekseerInfo[ctr].handle;
+				}
+				ctr++;
+			}
+			if(targetObj){
+				targetObj.setAllColor(params.r, params.g, params.b, params.a);
+			}
+		},
 		set_effekseer_attract_point: function(target, params){
 			var targetObj;
 			var ctr = 0;
