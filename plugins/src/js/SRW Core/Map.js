@@ -84,16 +84,18 @@
 		
 		Game_Map.prototype.getTileProperties = function(tileCoords) {
 			if(this._SRWTileProperties && this._SRWTileProperties[this._tilesetId]){
-				var bTileId = $gameMap.tileId(tileCoords.x, tileCoords.y, 3);
-				var autoTileId = $gameMap.tileId(tileCoords.x, tileCoords.y, 1);
-				var groundTileId = $gameMap.tileId(tileCoords.x, tileCoords.y, 0);
 				
-				if(this._SRWTileProperties[this._tilesetId][bTileId]){
-					return this._SRWTileProperties[this._tilesetId][bTileId];
-				} else if(this._SRWTileProperties[this._tilesetId][autoTileId]){
-					return this._SRWTileProperties[this._tilesetId][autoTileId];
-				} else if(this._SRWTileProperties[this._tilesetId][groundTileId]){
-					return this._SRWTileProperties[this._tilesetId][groundTileId];
+				const checkedLayers = [3,2,1,0];
+				const checkedTileIds = [];
+				
+				for(let layerId of checkedLayers){
+					checkedTileIds.push($gameMap.tileId(tileCoords.x, tileCoords.y, layerId));
+				}
+				
+				for(let tileId of checkedTileIds){
+					if(this._SRWTileProperties[this._tilesetId][tileId] != null){
+						return this._SRWTileProperties[this._tilesetId][tileId];
+					}
 				}
 			} else {
 				return null;

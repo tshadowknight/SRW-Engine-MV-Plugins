@@ -2619,6 +2619,22 @@ BattleSceneManager.prototype.runAnimations = function(deltaTime){
 		var animation = _this._matrixAnimations[animationId];
 		var targetObj = animation.targetObj;
 		if(targetObj){				
+		
+			if(animation.type == "translate_relative"){
+				if(!animation.startPointSet){
+					let directionFactor = _this._animationDirection;
+					if(targetObj.handle){
+						directionFactor = 1;//do not convert relative motions for effekseer handlers as mirrored instance there are handled through a mirrored renderer
+					}	
+					
+					animation.startPointSet = true;
+					animation.startPosition = new BABYLON.Vector3(targetObj.position.x, targetObj.position.y, targetObj.position.z);				
+					animation.endPosition.x =animation.startPosition.x + (animation.endPosition.x * directionFactor);
+					animation.endPosition.y+=animation.startPosition.y;
+					animation.endPosition.z+=animation.startPosition.z;
+				}				
+			}
+		
 			var duration = animation.duration * _this.getTickDuration();
 			if(animation.accumulator == null){
 				animation.accumulator = 0;
@@ -3732,10 +3748,10 @@ BattleSceneManager.prototype.executeAnimation = function(animation, startTick){
 							targetObj.position = {x: targetObj.offset.x, y: targetObj.offset.y, z: targetObj.offset.z};
 						}
 					}
-					startPosition = {x: targetObj.position.x, y:  targetObj.position.y, z: targetObj.position.z};				
+					/*startPosition = {x: targetObj.position.x, y:  targetObj.position.y, z: targetObj.position.z};				
 					targetPosition.x = startPosition.x + (targetPosition.x * directionFactor);
 					targetPosition.y+=startPosition.y;
-					targetPosition.z+=startPosition.z;
+					targetPosition.z+=startPosition.z;*/
 					_this.registerMatrixAnimation("translate_relative", targetObj, new BABYLON.Vector3(startPosition.x, startPosition.y, startPosition.z), new BABYLON.Vector3(targetPosition.x, targetPosition.y, targetPosition.z), startTick, params.duration, params.easingFunction, params.easingMode, params.hide, params.catmullRom);
 				} else {
 					if(targetObj.isMirrored){
