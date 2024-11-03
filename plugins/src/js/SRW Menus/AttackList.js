@@ -339,7 +339,7 @@ AttackList.prototype.redraw = function(softRefresh) {
 					_this.notifyTouchObserver("ok");				
 				} else {
 					_this._currentSelection = idx;
-					_this.redraw();
+					_this.requestRedraw();
 					_this.notifyObserver("redraw");
 					Graphics._updateCanvas();
 				}

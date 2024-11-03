@@ -42,6 +42,13 @@ var ENGINE_SETTINGS = {
 	},	
 	TINT_CURSOR_PER_FACTION: true,
 	CURSOR_OFFSET: 0,
+	HP_BAR_COLORS: {
+		full: "#58b3ff",
+		high: "#49d38b",
+		med: "#f7ec05",
+		low: "#eda316",
+		critical: "#e11515"
+	},
 	USE_SINGLE_MAP_SPRITE: false,
 	MAP_BUTTON_CONFIG: {
 		SPRITE_SHEET: {

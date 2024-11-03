@@ -4363,7 +4363,7 @@ StatCalc.prototype.getCurrentMP = function(actor){
 
 StatCalc.prototype.getCurrentPP = function(actor){
 	if($gameSystem.optionInfinitePP){
-		return 999;
+		return 9999;
 	}
 	if(this.isActorSRWInitialized(actor)){
 		return actor.SRWStats.pilot.PP;

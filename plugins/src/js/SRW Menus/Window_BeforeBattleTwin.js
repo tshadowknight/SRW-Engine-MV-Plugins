@@ -1362,8 +1362,7 @@ Window_BeforebattleTwin.prototype.createParticipantBlock = function(ref, action,
 		
 		content+="</div>";
 		
-		var hpPercent = Math.floor(calculatedStats.currentHP / calculatedStats.maxHP * 100);
-		content+="<div class='hp_bar'><div style='width: "+hpPercent+"%;' class='hp_bar_fill'></div></div>";
+		content+=_this.createHPBarContent(calculatedStats);
 		
 		var enPercent = Math.floor(calculatedStats.currentEN / calculatedStats.maxEN * 100);
 		content+="<div class='en_bar'><div style='width: "+enPercent+"%;' class='en_bar_fill'></div></div>";

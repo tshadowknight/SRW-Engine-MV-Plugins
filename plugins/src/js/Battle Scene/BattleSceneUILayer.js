@@ -460,7 +460,23 @@ BattleSceneUILayer.prototype.updateStatContent = function(elems, maxValue, value
 	}
 	elems.label.innerHTML = currentVal;
 	elems.maxLabel.innerHTML = maxVal;
-	elems.bar.style.width = Math.round(value / maxValue * 100) + "%";
+	
+	const percent =  Math.round(value / maxValue * 100);
+	if(type == "HP"){
+		if(percent >= 85){
+			elems.bar.style.backgroundColor = ENGINE_SETTINGS.HP_BAR_COLORS.full;
+		} else if(percent >= 50){
+			elems.bar.style.backgroundColor = ENGINE_SETTINGS.HP_BAR_COLORS.high;
+		} else if(percent >= 30){
+			elems.bar.style.backgroundColor = ENGINE_SETTINGS.HP_BAR_COLORS.med;
+		} else if(percent >= 15){
+			elems.bar.style.backgroundColor = ENGINE_SETTINGS.HP_BAR_COLORS.low;
+		} else {
+			elems.bar.style.backgroundColor = ENGINE_SETTINGS.HP_BAR_COLORS.critical;
+		}
+	}	
+
+	elems.bar.style.width = percent + "%";
 }
 
 BattleSceneUILayer.prototype.resetTextBox = function(){

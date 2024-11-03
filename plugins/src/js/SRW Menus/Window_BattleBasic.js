@@ -649,6 +649,20 @@ Window_BattleBasic.prototype.getHPRecoveredAnimInfo = function(action) {
 	return result;
 }
 
+Window_BattleBasic.prototype.updateHPBarColor = function(fillElem, percent) {
+	if(percent >= 85){
+		fillElem.style.backgroundColor = ENGINE_SETTINGS.HP_BAR_COLORS.full;
+	} else if(percent >= 50){
+		fillElem.style.backgroundColor = ENGINE_SETTINGS.HP_BAR_COLORS.high;
+	} else if(percent >= 30){
+		fillElem.style.backgroundColor = ENGINE_SETTINGS.HP_BAR_COLORS.med;
+	} else if(percent >= 15){
+		fillElem.style.backgroundColor = ENGINE_SETTINGS.HP_BAR_COLORS.low;
+	} else {
+		fillElem.style.backgroundColor = ENGINE_SETTINGS.HP_BAR_COLORS.critical;
+	}
+}
+
 Window_BattleBasic.prototype.animateHP = function(type, startPercent, endPercent) {
 	var _this = this;
 	var containerInfo = this._participantComponents[type];
@@ -671,7 +685,9 @@ Window_BattleBasic.prototype.animateHP = function(type, startPercent, endPercent
 			clearInterval(hpDrainInterval);
 			elem.style.display = "none";
 		}
+		_this.updateHPBarColor(fillElem, fillElem.style.width.replace("%", ""));
 	}, stepDuration);
+	_this.updateHPBarColor(fillElem, fillElem.style.width.replace("%", ""));
 }
 
 

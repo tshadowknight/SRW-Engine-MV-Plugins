@@ -725,7 +725,7 @@ Window_UpgradePilot.prototype.redraw = function() {
 	fundDisplayContent+="<div class='fund_entry_label scaled_text'>"+APPSTRINGS.PILOTUPGRADES.label_remaining_PP+"</div>";
 	var remaining = $statCalc.getCurrentPP(pilotData) - this.currentCost();
 	if($gameSystem.optionInfinitePP){
-		remaining = 999;
+		remaining = 9999;
 	}
 	fundDisplayContent+="<div class='fund_entry_value scaled_text "+(remaining < 0 ? "underflow" : "")+"'>"+remaining+"</div>";
 	fundDisplayContent+="</div>";

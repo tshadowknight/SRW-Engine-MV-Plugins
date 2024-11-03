@@ -451,6 +451,7 @@ Window_BeforeBattle.prototype.update = function() {
 };
 
 Window_BeforeBattle.prototype.createParticipantBlock = function(ref, action, isSupport, allyOrEnemy) {
+	const _this = this;
 	var content = "";
 	content+="<div class='participant_block "+allyOrEnemy+"'>";
 	content+="<div class='scaled_text action_row'>";
@@ -595,8 +596,7 @@ Window_BeforeBattle.prototype.createParticipantBlock = function(ref, action, isS
 		
 		content+="</div>";
 		
-		var hpPercent = Math.floor(calculatedStats.currentHP / calculatedStats.maxHP * 100);
-		content+="<div class='hp_bar'><div style='width: "+hpPercent+"%;' class='hp_bar_fill'></div></div>";
+		content+=_this.createHPBarContent(calculatedStats);
 		
 		var enPercent = Math.floor(calculatedStats.currentEN / calculatedStats.maxEN * 100);
 		content+="<div class='en_bar'><div style='width: "+enPercent+"%;' class='en_bar_fill'></div></div>";

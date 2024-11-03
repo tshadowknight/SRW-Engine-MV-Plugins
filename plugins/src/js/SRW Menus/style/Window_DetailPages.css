@@ -156,6 +156,7 @@
     height: 100%;	
 	display: inline-block;
 	margin-left: 2%;
+	z-index: 1;
 }
 
 #detail_pages .right_items {
