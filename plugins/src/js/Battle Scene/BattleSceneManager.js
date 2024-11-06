@@ -6842,30 +6842,6 @@ BattleSceneManager.prototype.getTexturePromise = function(texture){
 
 BattleSceneManager.prototype.preloadEffekseerEffect = function(target, params, actionIdx, isEnemyAction){
 	const _this = this;
-	/*var params = animCommand.params;
-	if(animCommand.type == "play_effekseer"){
-		
-		var targetContext;
-		if(params.autoRotate && _this._animationDirection == -1){
-			
-			if(params.isForeground * 1){
-				targetContext = _this._effksContextFgMirror;//_this._effksContextFg;
-			} else {
-				targetContext =  _this._effksContextMirror;//_this._effksContext;
-			}
-		} else {
-			if(params.isForeground * 1){
-				targetContext = _this._effksContextFg;
-			} else {
-				targetContext = _this._effksContext;
-			}
-		}
-		
-		promises.push(new Promise(function(resolve, reject){
-			targetContext.loadEffect("effekseer/"+params.path+".efk", 1.0, resolve);	
-		}));
-		
-	}	*/
 	
 	return new Promise(function(resolve, reject){	
 		
@@ -6907,15 +6883,17 @@ BattleSceneManager.prototype.preloadAnimListEffekseerEffects = async function(an
 	const promises = [];
 	for(let animType of Object.keys(animationList)){
 		const batch = animationList[animType];
-		for(let entry of batch){
-			if(entry){
-				for(let animCommand of entry){
-					var params = animCommand.params;
-					if(animCommand.type == "play_effekseer"){
-						promises.push(this.preloadEffekseerEffect(animCommand.target, animCommand.params, effekseerId, isEnemyAction));							
+		if(batch){		
+			for(let entry of batch){
+				if(entry){
+					for(let animCommand of entry){
+						var params = animCommand.params;
+						if(animCommand.type == "play_effekseer"){
+							promises.push(this.preloadEffekseerEffect(animCommand.target, animCommand.params, effekseerId, isEnemyAction));							
+						}
 					}
-				}
-			}			
+				}			
+			}
 		}
 	}	
 	await Promise.all(promises);
@@ -6960,13 +6938,17 @@ BattleSceneManager.prototype.preloadEffekseerParticles = async function(){
 						}
 						if(animCommand.type == "merge_complete_animation"){
 							animIdsToPreload[animCommand.params.battleAnimId] = true;
-						}						
+						}		
+
+						if(animCommand.type == "next_phase"){
+							promises.push(_this.preloadAnimListEffekseerEffects({"next_phase": [animCommand.params.commands]}, nextAction.effekseerId, nextAction.side == "enemy"));
+						}		
 					});
 				});				
 			});	
 			
-			promises.push(_this.preloadAnimListEffekseerEffects(animationList, nextAction.effekseerId, nextAction.side == "enemy"));
 			
+			promises.push(_this.preloadAnimListEffekseerEffects(animationList, nextAction.effekseerId, nextAction.side == "enemy"));
 			
 			if(nextAction.isDestroyed){
 				var animId = $statCalc.getBattleSceneInfo(nextAction.action.ref).deathAnimId;
