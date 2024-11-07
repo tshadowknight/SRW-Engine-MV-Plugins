@@ -2604,7 +2604,7 @@ BattleSceneManager.prototype.runAnimations = function(deltaTime){
 					//targetObj.offsetRotation = {x: targetObj.rotation.x, y: targetObj.rotation.y, z: targetObj.rotation.z};
 					
 					if(targetObj.parent && !targetObj.ignoreParentRotation){			
-						targetObj.offsetRotation = {x: params.rotation.x, y: params.rotation.y, z: params.rotation.z};
+						targetObj.offsetRotation = {x: targetObj.rotation.x, y: targetObj.rotation.y, z: targetObj.rotation.z};
 					} else {
 						targetObj.handle.setRotation(targetObj.rotation.x, targetObj.rotation.y, targetObj.rotation.z);
 					}	
@@ -6889,8 +6889,26 @@ BattleSceneManager.prototype.preloadAnimListEffekseerEffects = async function(an
 					for(let animCommand of entry){
 						var params = animCommand.params;
 						if(animCommand.type == "play_effekseer"){
-							promises.push(this.preloadEffekseerEffect(animCommand.target, animCommand.params, effekseerId, isEnemyAction));							
+							promises.push(this.preloadEffekseerEffect(animCommand.target, animCommand.params, effekseerId, isEnemyAction));				
 						}
+						if(animCommand.type == "next_phase"){
+							if(animCommand.params.commands){							
+								for(let innerAnimCommand of animCommand.params.commands){								
+									if(innerAnimCommand.type == "play_effekseer"){
+										promises.push(this.preloadEffekseerEffect(innerAnimCommand.target, innerAnimCommand.params, effekseerId, isEnemyAction));		
+									}								
+								}
+							}
+							if(animCommand.params.cleanUpCommands){		
+								for(let innerAnimCommand of animCommand.params.cleanUpCommands){							
+									if(innerAnimCommand.type == "play_effekseer"){
+										promises.push(this.preloadEffekseerEffect(innerAnimCommand.target, innerAnimCommand.params, effekseerId, isEnemyAction));		
+									}								
+								}	
+							}							
+							//promises.push(this.preloadEffekseerEffect({"next_phase": [animCommand.params.commands]}, nextAction.effekseerId, nextAction.side == "enemy"));
+							//promises.push(this.preloadEffekseerEffect({"next_phase": [animCommand.params.cleanUpCommands]}, nextAction.effekseerId, nextAction.side == "enemy"));
+						}	
 					}
 				}			
 			}
@@ -6940,9 +6958,7 @@ BattleSceneManager.prototype.preloadEffekseerParticles = async function(){
 							animIdsToPreload[animCommand.params.battleAnimId] = true;
 						}		
 
-						if(animCommand.type == "next_phase"){
-							promises.push(_this.preloadAnimListEffekseerEffects({"next_phase": [animCommand.params.commands]}, nextAction.effekseerId, nextAction.side == "enemy"));
-						}		
+							
 					});
 				});				
 			});	
@@ -7380,8 +7396,15 @@ BattleSceneManager.prototype.preloadSceneAssets = function(){
 								batch.forEach(function(animCommand){
 									handleAnimCommand(animCommand, animId, animType, tick);
 									if(animCommand.type == "next_phase"){
-										for(let command of animCommand.params.commands){
-											handleAnimCommand(command, animId, animType, tick);	
+										if(animCommand.params.commands){
+											for(let command of animCommand.params.commands){
+												handleAnimCommand(command, animId, animType, tick);	
+											}
+										}
+										if(animCommand.params.cleanUpCommands){
+											for(let command of animCommand.params.cleanUpCommands){
+												handleAnimCommand(command, animId, animType, tick);	
+											}
 										}
 									}	
 									if(animCommand.type == "include_animation"){
