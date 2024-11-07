@@ -26,6 +26,7 @@ export default function BattleSceneManager(){
 	this._previousBgScrollDirection = 1;
 	var cameraMainIdle = new BABYLON.Vector3(0, 1.15, -6.5);
 	
+	
 	this._materialCache = {};
 	
 	this._activeTextureCache = {};
@@ -89,6 +90,9 @@ export default function BattleSceneManager(){
 	this._fadeAnimationCtr = 0;
 	this._effekserDynParamAnimations = {};
 	this._effekserDynParamAnimationCtr = 0;
+	
+	this._nextEffekseerUniqueId = 0;
+	
 	this._bgScrolls = {};
 	this._bgScrollCounter = 0;
 	
@@ -4801,7 +4805,7 @@ BattleSceneManager.prototype.executeAnimation = function(animation, startTick){
 			}
 		},	
 		play_effekseer: function(target, params){					
-			const effekInfo = _this._preloadedEffekseerInfo[_this._currentAnimatedAction.effekseerId+"__"+target];
+			const effekInfo = _this._preloadedEffekseerInfo[_this._currentAnimatedAction.effekseerId+"__"+params.path];
 			if(effekInfo){
 				const targetContext = effekInfo.targetContext;
 				const effect = effekInfo.effect;
@@ -6866,16 +6870,21 @@ BattleSceneManager.prototype.preloadEffekseerEffect = function(target, params, a
 				
 		_this._glContext.pixelStorei(_this._glContext.UNPACK_FLIP_Y_WEBGL, 0);
 		//_this._isLoading++;
-		var effect = targetContext.loadEffect("effekseer/"+params.path+".efk", 1.0, function(){
-			targetContext.activeCount++;
-			
-			_this._preloadedEffekseerInfo[actionIdx+"__"+target] = {
-				effect: effect,
-				targetContext: targetContext
-			};
-			//_this._isLoading--;
+		if(!_this._preloadedEffekseerInfo[actionIdx+"__"+params.path]){
+			var effect = targetContext.loadEffect("effekseer/"+params.path+".efk", 1.0, function(){
+				targetContext.activeCount++;
+				
+				_this._preloadedEffekseerInfo[actionIdx+"__"+params.path] = {
+					effect: effect,
+					targetContext: targetContext
+				};
+				//_this._isLoading--;
+				resolve();
+			});
+		} else {
 			resolve();
-		});
+		}
+		
 	});
 }
 
@@ -6889,20 +6898,20 @@ BattleSceneManager.prototype.preloadAnimListEffekseerEffects = async function(an
 					for(let animCommand of entry){
 						var params = animCommand.params;
 						if(animCommand.type == "play_effekseer"){
-							promises.push(this.preloadEffekseerEffect(animCommand.target, animCommand.params, effekseerId, isEnemyAction));				
+							await this.preloadEffekseerEffect(animCommand.target, animCommand.params, effekseerId, isEnemyAction);				
 						}
 						if(animCommand.type == "next_phase"){
 							if(animCommand.params.commands){							
 								for(let innerAnimCommand of animCommand.params.commands){								
 									if(innerAnimCommand.type == "play_effekseer"){
-										promises.push(this.preloadEffekseerEffect(innerAnimCommand.target, innerAnimCommand.params, effekseerId, isEnemyAction));		
+										await this.preloadEffekseerEffect(innerAnimCommand.target, innerAnimCommand.params, effekseerId, isEnemyAction);		
 									}								
 								}
 							}
 							if(animCommand.params.cleanUpCommands){		
 								for(let innerAnimCommand of animCommand.params.cleanUpCommands){							
 									if(innerAnimCommand.type == "play_effekseer"){
-										promises.push(this.preloadEffekseerEffect(innerAnimCommand.target, innerAnimCommand.params, effekseerId, isEnemyAction));		
+										await this.preloadEffekseerEffect(innerAnimCommand.target, innerAnimCommand.params, effekseerId, isEnemyAction);		
 									}								
 								}	
 							}							
@@ -6914,7 +6923,7 @@ BattleSceneManager.prototype.preloadAnimListEffekseerEffects = async function(an
 			}
 		}
 	}	
-	await Promise.all(promises);
+	//await Promise.all(promises);
 }
 
 //workaround for a bug where spawning effekseer effects would have them render all their texture upside down
