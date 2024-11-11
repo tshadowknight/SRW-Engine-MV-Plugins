@@ -2100,17 +2100,22 @@ $SRWConfig.pilotAbilties = function(){
 	
 	this.addDefinition(
 		103, 
-		"Debug Counter", 
-		"The unit may attack first during the enemy phase. Chance depends on level.", 
-		true,
+		"Aegis", 
+		"At 130+ Will, 50% chance to reduce damage taken from Ranged weapons by 50%.", 
+		false,
 		false,
 		function(actor, level){
-			return [{type: "counter_rate", modType: "addFlat", value: 1}];
+			return [
+				{type: "percent_barrier", subType: "ranged", value: 0.1, cost: 0, success_rate: 1}
+			];
 		},
 		function(actor, level){
 			return true;
 		},
-		[20,30,40,50,60,70,80,90,100],
-		9
+		[0],
+		4,
+		function(actor, level){
+			return true;
+		}
 	);
 }

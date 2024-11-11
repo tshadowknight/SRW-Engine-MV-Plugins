@@ -1469,13 +1469,14 @@ BattleCalc.prototype.generateBattleResult = function(isPrediction){
 	
 	for(var i = 0; i < actions.length; i++){
 		$statCalc.invalidateAbilityCache($gameTemp.currentBattleEnemy);
-		if($gameTemp.currentBattleEnemy.subTwin){
+		//subtwins are handled automatically when the main is invalidated, invalidating the subtwin breaks the invalidated event tracking causing the main twin to lose its abilities!
+		/*if($gameTemp.currentBattleEnemy.subTwin){
 			$statCalc.invalidateAbilityCache($gameTemp.currentBattleEnemy.subTwin);
-		}
+		}*/
 		$statCalc.invalidateAbilityCache($gameTemp.currentBattleActor);
-		if($gameTemp.currentBattleActor.subTwin){
+		/*if($gameTemp.currentBattleActor.subTwin){
 			$statCalc.invalidateAbilityCache($gameTemp.currentBattleActor.subTwin);
-		}
+		}*/
 		actions[i].execute(i);
 	}
 	
