@@ -2097,4 +2097,20 @@ $SRWConfig.pilotAbilties = function(){
 		[0],
 		1
 	);
+	
+	this.addDefinition(
+		103, 
+		"Debug Counter", 
+		"The unit may attack first during the enemy phase. Chance depends on level.", 
+		true,
+		false,
+		function(actor, level){
+			return [{type: "counter_rate", modType: "addFlat", value: 1}];
+		},
+		function(actor, level){
+			return true;
+		},
+		[20,30,40,50,60,70,80,90,100],
+		9
+	);
 }

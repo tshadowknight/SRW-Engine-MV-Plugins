@@ -1407,7 +1407,7 @@ BattleCalc.prototype.generateBattleResult = function(isPrediction){
 		$gameTemp.defenderCounterActivated = true;
 	
 		if(defenderTwin){
-			appendTargetingActions(defenderTwin, defenderTwinTarget, null, attackerSide);
+			appendTargetingActions(defenderTwin, defenderTwinTarget, null, defenderSide);
 		}
 		
 		appendTargetingActions(defender, defenderTarget, null, defenderSide);	
