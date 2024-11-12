@@ -1242,7 +1242,7 @@ Window_BattleBasic.prototype.update = function() {
 						
 						var nextAnimation = nextAnimations[i];
 						var componentInfo = _this._participantComponents[nextAnimation.target];
-						var target = _this._participantComponents[nextAnimation.target].container;
+						let target = _this._participantComponents[nextAnimation.target].container;
 						target.className = "";
 						void target.offsetWidth;
 						target.className = "participant_container "+componentInfo.side;
@@ -1296,7 +1296,7 @@ Window_BattleBasic.prototype.update = function() {
 							
 
 							if(nextAnimation.special.barrier){
-								var target = _this._participantComponents[nextAnimation.special.barrier.target].barrier;
+								let target = _this._participantComponents[nextAnimation.special.barrier.target].barrier;
 								target.style.display = "block";
 								setTimeout(function(){ target.style.display = "none" }, 600 * _this.getAnimTimeRatio());	
 							}								
@@ -1311,7 +1311,7 @@ Window_BattleBasic.prototype.update = function() {
 							}	
 
 							if(nextAnimation.special.evade){
-								var target = _this._participantComponents[nextAnimation.special.evade.target].evadeLabel;
+								let target = _this._participantComponents[nextAnimation.special.evade.target].evadeLabel;
 								target.style.display = "block";
 								setTimeout(function(){ target.style.display = "none" }, 200 * _this.getAnimTimeRatio());	
 
@@ -1324,14 +1324,14 @@ Window_BattleBasic.prototype.update = function() {
 							}		
 
 							if(nextAnimation.special.counterActivated){
-								var target = _this._participantComponents[nextAnimation.special.counterActivated.target].counterLabel;
+								let target = _this._participantComponents[nextAnimation.special.counterActivated.target].counterLabel;
 								target.style.display = "block";
 								setTimeout(function(){ target.style.display = "none" }, 200 * _this.getAnimTimeRatio());	
 							}	
 
 
 							if(nextAnimation.special.special_evade){
-								var target = _this._participantComponents[nextAnimation.special.special_evade.target].specialEvadeLabel;
+								let target = _this._participantComponents[nextAnimation.special.special_evade.target].specialEvadeLabel;
 								var def = nextAnimation.special.special_evade;
 								target.style.display = "block";
 								target.innerHTML = def.name;
