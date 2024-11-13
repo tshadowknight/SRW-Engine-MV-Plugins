@@ -463,16 +463,16 @@ BattleSceneUILayer.prototype.updateStatContent = function(elems, maxValue, value
 	
 	const percent =  Math.round(value / maxValue * 100);
 	if(type == "HP"){
-		if(percent >= 85){
-			elems.bar.style.backgroundColor = ENGINE_SETTINGS.HP_BAR_COLORS.full;
-		} else if(percent >= 50){
-			elems.bar.style.backgroundColor = ENGINE_SETTINGS.HP_BAR_COLORS.high;
-		} else if(percent >= 30){
-			elems.bar.style.backgroundColor = ENGINE_SETTINGS.HP_BAR_COLORS.med;
-		} else if(percent >= 15){
-			elems.bar.style.backgroundColor = ENGINE_SETTINGS.HP_BAR_COLORS.low;
+		if(percent >= ENGINE_SETTINGS.HP_BAR_COLORS.full.percent){
+			elems.bar.style.backgroundColor = ENGINE_SETTINGS.HP_BAR_COLORS.full.color;
+		} else if(percent >= ENGINE_SETTINGS.HP_BAR_COLORS.high.percent){
+			elems.bar.style.backgroundColor = ENGINE_SETTINGS.HP_BAR_COLORS.high.color;
+		} else if(percent >= ENGINE_SETTINGS.HP_BAR_COLORS.med.percent){
+			elems.bar.style.backgroundColor = ENGINE_SETTINGS.HP_BAR_COLORS.med.color;
+		} else if(percent >= ENGINE_SETTINGS.HP_BAR_COLORS.low.percent){
+			elems.bar.style.backgroundColor = ENGINE_SETTINGS.HP_BAR_COLORS.low.color;
 		} else {
-			elems.bar.style.backgroundColor = ENGINE_SETTINGS.HP_BAR_COLORS.critical;
+			elems.bar.style.backgroundColor = ENGINE_SETTINGS.HP_BAR_COLORS.critical.color;
 		}
 	}	
 

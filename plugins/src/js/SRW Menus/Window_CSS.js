@@ -880,15 +880,17 @@ Window_CSS.prototype.createHPBarContent = function(calculatedStats) {
 	let content = "";
 	var hpPercent = Math.floor(calculatedStats.currentHP / calculatedStats.maxHP * 100);
 	let fillColor = ENGINE_SETTINGS.HP_BAR_COLORS.critical;
-	if(hpPercent >= 85){
-		fillColor = ENGINE_SETTINGS.HP_BAR_COLORS.full;
-	} else if(hpPercent >= 50){
-		fillColor = ENGINE_SETTINGS.HP_BAR_COLORS.high;
-	} else if(hpPercent >= 30){
-		fillColor = ENGINE_SETTINGS.HP_BAR_COLORS.med;
-	} else if(hpPercent >= 15){
-		fillColor = ENGINE_SETTINGS.HP_BAR_COLORS.low;
-	} 
+	if(hpPercent >= ENGINE_SETTINGS.HP_BAR_COLORS.full.percent){
+		fillColor =  ENGINE_SETTINGS.HP_BAR_COLORS.full.color;
+	} else if(hpPercent >= ENGINE_SETTINGS.HP_BAR_COLORS.high.percent){
+		fillColor =  ENGINE_SETTINGS.HP_BAR_COLORS.high.color;
+	} else if(hpPercent >= ENGINE_SETTINGS.HP_BAR_COLORS.med.percent){
+		fillColor =  ENGINE_SETTINGS.HP_BAR_COLORS.med.color;
+	} else if(hpPercent >= ENGINE_SETTINGS.HP_BAR_COLORS.low.percent){
+		fillColor =  ENGINE_SETTINGS.HP_BAR_COLORS.low.color;
+	} else {
+		fillColor =  ENGINE_SETTINGS.HP_BAR_COLORS.critical.color;
+	}
 
 	content+="<div class='hp_bar'><div style='width: "+hpPercent+"%; background-color: "+fillColor+";' class='hp_bar_fill'></div></div>";
 	return content;

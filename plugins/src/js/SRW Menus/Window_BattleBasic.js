@@ -650,16 +650,16 @@ Window_BattleBasic.prototype.getHPRecoveredAnimInfo = function(action) {
 }
 
 Window_BattleBasic.prototype.updateHPBarColor = function(fillElem, percent) {
-	if(percent >= 85){
-		fillElem.style.backgroundColor = ENGINE_SETTINGS.HP_BAR_COLORS.full;
-	} else if(percent >= 50){
-		fillElem.style.backgroundColor = ENGINE_SETTINGS.HP_BAR_COLORS.high;
-	} else if(percent >= 30){
-		fillElem.style.backgroundColor = ENGINE_SETTINGS.HP_BAR_COLORS.med;
-	} else if(percent >= 15){
-		fillElem.style.backgroundColor = ENGINE_SETTINGS.HP_BAR_COLORS.low;
+	if(percent >= ENGINE_SETTINGS.HP_BAR_COLORS.full.percent){
+		fillElem.style.backgroundColor = ENGINE_SETTINGS.HP_BAR_COLORS.full.color;
+	} else if(percent >= ENGINE_SETTINGS.HP_BAR_COLORS.high.percent){
+		fillElem.style.backgroundColor = ENGINE_SETTINGS.HP_BAR_COLORS.high.color;
+	} else if(percent >= ENGINE_SETTINGS.HP_BAR_COLORS.med.percent){
+		fillElem.style.backgroundColor = ENGINE_SETTINGS.HP_BAR_COLORS.med.color;
+	} else if(percent >= ENGINE_SETTINGS.HP_BAR_COLORS.low.percent){
+		fillElem.style.backgroundColor = ENGINE_SETTINGS.HP_BAR_COLORS.low.color;
 	} else {
-		fillElem.style.backgroundColor = ENGINE_SETTINGS.HP_BAR_COLORS.critical;
+		fillElem.style.backgroundColor = ENGINE_SETTINGS.HP_BAR_COLORS.critical.color;
 	}
 }
 
@@ -679,13 +679,17 @@ Window_BattleBasic.prototype.animateHP = function(type, startPercent, endPercent
 		if(ctr <= steps){
 			fillElem.style.width=startPercent - (step * ctr)+"%";;
 		} else {
+			
 			fillElem.style.width=endPercent;
+		}
+		if(ctr >= steps + 50){//linger a bit on the final hp value
+			_this.updateHPBarColor(fillElem, fillElem.style.width.replace("%", ""));
 		}
 		if(ctr >= steps + 100){//linger a bit on the final hp value
 			clearInterval(hpDrainInterval);
 			elem.style.display = "none";
 		}
-		_this.updateHPBarColor(fillElem, fillElem.style.width.replace("%", ""));
+		
 	}, stepDuration);
 	_this.updateHPBarColor(fillElem, fillElem.style.width.replace("%", ""));
 }
