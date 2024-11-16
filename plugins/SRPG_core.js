@@ -4839,14 +4839,7 @@ SceneManager.isInSaveScene = function(){
 
     //戦闘処理の実行
     Scene_Map.prototype.srpgBattleStart = function(actionArray, targetArray) {		
-		$statCalc.setCurrentAttack($gameTemp.currentBattleActor, $gameTemp.actorAction.attack);	
-		if($gameTemp.currentBattleActor.subTwin){
-			$statCalc.setCurrentAttack($gameTemp.currentBattleActor.subTwin, $gameTemp.actorTwinAction.attack);	
-		}
-		$statCalc.setCurrentAttack($gameTemp.currentBattleEnemy, $gameTemp.enemyAction.attack);	
-		if($gameTemp.currentBattleEnemy.subTwin){
-			$statCalc.setCurrentAttack($gameTemp.currentBattleEnemy.subTwin, $gameTemp.enemyTwinAction.attack);	
-		}
+		
 		$battleCalc.generateBattleResult();
 		
 				

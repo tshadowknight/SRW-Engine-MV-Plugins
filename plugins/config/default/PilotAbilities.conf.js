@@ -2118,4 +2118,27 @@ $SRWConfig.pilotAbilties = function(){
 			return true;
 		}
 	);
+	
+	this.addDefinition(
+		104, 
+		"Recoil Test", 
+		"Attacking deals 30% damage to the unit.", 
+		false,
+		false,
+		function(actor, level){			
+			return [
+				{type: "hp_drain", modType: "addFlat", value: -0.3}
+			];
+			
+			
+		},
+		function(actor, level){
+			return true;
+		},
+		[0],
+		4,
+		function(actor, level){
+			return true;
+		}
+	);
 }

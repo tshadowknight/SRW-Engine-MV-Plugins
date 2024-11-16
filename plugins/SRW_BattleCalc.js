@@ -745,6 +745,16 @@ BattleCalc.prototype.prepareBattleCache = function(actionObject, type){
 
 BattleCalc.prototype.generateBattleResult = function(isPrediction){
 	var _this = this;
+	
+	$statCalc.setCurrentAttack($gameTemp.currentBattleActor, $gameTemp.actorAction.attack);	
+	if($gameTemp.currentBattleActor.subTwin){
+		$statCalc.setCurrentAttack($gameTemp.currentBattleActor.subTwin, $gameTemp.actorTwinAction.attack);	
+	}
+	$statCalc.setCurrentAttack($gameTemp.currentBattleEnemy, $gameTemp.enemyAction.attack);	
+	if($gameTemp.currentBattleEnemy.subTwin){
+		$statCalc.setCurrentAttack($gameTemp.currentBattleEnemy.subTwin, $gameTemp.enemyTwinAction.attack);	
+	}
+	
 	$statCalc.invalidateAbilityCache($gameTemp.currentBattleEnemy);
 	$statCalc.invalidateAbilityCache($gameTemp.currentBattleActor);
 	

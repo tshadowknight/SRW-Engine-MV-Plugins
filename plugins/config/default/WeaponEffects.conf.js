@@ -312,4 +312,18 @@ $SRWConfig.weaponEffects = function(){
 			return true;
 		}
 	);
+	
+	this.addDefinition(
+		23, 
+		"Damage up Debug", 
+		"Will increased by 10.", 
+		false,
+		false,
+		function(actor, level){
+			return [{type: "final_damage", modType: "mult", value: 2}];
+		},
+		function(actor, level){
+			return true;
+		}
+	);
 }
