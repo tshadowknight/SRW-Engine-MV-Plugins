@@ -349,7 +349,12 @@ BattleSceneManager.prototype.init = function(attachControl){
 			this._container.replaceChild(canvas, this._canvas);
 			this._canvas = canvas;
 		}	
-		this._glContext = this._canvas.getContext("webgl", { antialias: false });	
+		this._glContext = this._canvas.getContext("webgl2", { antialias: false });	
+		this._glContext.getExtension("EXT_color_buffer_float");
+		this._glContext.getExtension("EXT_color_buffer_half_float");
+		if(this._glContext.drawingBufferStorage){
+			this._glContext.drawingBufferStorage(this._glContext.RGBA16F, this._canvas.width, this._canvas.height);
+		}
 		if(ENGINE_SETTINGS.BATTLE_SCENE.RENDER_WIDTH > 0){
 			this._canvas.setAttribute("width", ENGINE_SETTINGS.BATTLE_SCENE.RENDER_WIDTH);
 		}
