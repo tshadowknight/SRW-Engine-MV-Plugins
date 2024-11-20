@@ -6459,7 +6459,8 @@ StatCalc.prototype.applyHPRegen = function(type, factionId){
 			if(_this.isBoarded(actor)){
 				_this.recoverHPPercent(actor, 20);	
 			} else {
-				_this.recoverHPPercent(actor, _this.applyStatModsToValue(actor, 0, ["HP_regen"]));			
+				_this.recoverHPPercent(actor, _this.applyStatModsToValue(actor, 0, ["HP_regen"]));	
+				_this.recoverHP(actor, _this.applyStatModsToValue(actor, 0, ["HP_regen_flat"]));			
 				_this.recoverHPPercent(actor, _this.getCurrentTerrainMods(actor).hp_regen);	
 				_this.recoverHPPercent(actor, ENGINE_SETTINGS.DEFAULT_HP_REGEN || 0);	
 			}
