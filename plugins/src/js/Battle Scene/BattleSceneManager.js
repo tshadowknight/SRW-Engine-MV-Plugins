@@ -350,11 +350,11 @@ BattleSceneManager.prototype.init = function(attachControl){
 			this._canvas = canvas;
 		}	
 		this._glContext = this._canvas.getContext("webgl2", { antialias: false });	
-		this._glContext.getExtension("EXT_color_buffer_float");
-		this._glContext.getExtension("EXT_color_buffer_half_float");
-		if(this._glContext.drawingBufferStorage){
-			this._glContext.drawingBufferStorage(this._glContext.RGBA16F, this._canvas.width, this._canvas.height);
-		}
+		//this._glContext.getExtension("EXT_color_buffer_float");
+		//this._glContext.getExtension("EXT_color_buffer_half_float");
+		//if(this._glContext.drawingBufferStorage){
+			//this._glContext.drawingBufferStorage(this._glContext.RGBA16F, this._canvas.width, this._canvas.height);
+		//}
 		if(ENGINE_SETTINGS.BATTLE_SCENE.RENDER_WIDTH > 0){
 			this._canvas.setAttribute("width", ENGINE_SETTINGS.BATTLE_SCENE.RENDER_WIDTH);
 		}
@@ -715,8 +715,22 @@ BattleSceneManager.prototype.initScene = function(){
 		[this._camera] // The list of cameras to be attached to
 	);
 	if(ENGINE_SETTINGS.BATTLE_SCENE.FXAA_ON){
-		pipeline.fxaaEnabled = true;
+		//pipeline.fxaaEnabled = true;
+		//var postProcess = new BABYLON.FxaaPostProcess("fxaa", 1.0, this._camera);
+		const passProcess = new BABYLON.PassPostProcess("Scene copy",
+			1.0,
+			this._camera,
+			0,
+			this._scene.getEngine(),
+			false,
+			BABYLON.Engine.TEXTURETYPE_FLOAT
+		);
+
+		const fxaaPostProcess = new BABYLON.FxaaPostProcess("fxaa", 1.0, this._camera);
+		//passProcess.fxaaEnabled = true;
 	}
+
+	
 	
 
 	// Add lights to the scene

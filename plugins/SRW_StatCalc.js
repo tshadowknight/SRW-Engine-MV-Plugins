@@ -7371,7 +7371,10 @@ StatCalc.prototype.getActiveStatMods = function(actor, actorKey, excludedSkills)
 						const isFriendly = $gameSystem.isFriendly(actor, $gameTemp.currentBattleTarget.factionId);
 						const tmp = effects.filter(effect => effect.targeting == "all" || (isFriendly && effect.targeting == "ally") || (!isFriendly && effect.targeting == "enemy"));
 						accumulateFromAbilityList(tmp, $weaponEffectManager);
-					}							
+					}		
+					if($gameTemp.currentMapTargets){
+						accumulateFromAbilityList(effects, $weaponEffectManager);
+					}	
 				}
 			}	
 			

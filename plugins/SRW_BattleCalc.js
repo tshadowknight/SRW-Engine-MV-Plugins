@@ -1095,6 +1095,8 @@ BattleCalc.prototype.generateBattleResult = function(isPrediction){
 					if(damageResult.damage > 0 && this._isSupportAttack && !$statCalc.applyStatModsToValue(this._attacker.actor, 0, ["full_support_damage"])){
 						damageResult.damage = Math.max(Math.floor(damageResult.damage * ENGINE_SETTINGS.SUPPORT_ATTACK_RATIO), 10);				
 					}
+					
+					
 				}
 				
 				
@@ -1614,6 +1616,7 @@ BattleCalc.prototype.generateMapBattleResult = function(){
 	var _this = this;
 	
 	
+	
 	$gameTemp.battleEffectCache = {};
 	$gameTemp.sortedBattleActorCaches = [];
 	var attacker;
@@ -1622,6 +1625,10 @@ BattleCalc.prototype.generateMapBattleResult = function(){
 	} else {
 		attacker = {actor: $gameTemp.currentBattleActor, action: $gameTemp.actorAction};
 	}
+	
+	$statCalc.setCurrentAttack(attacker.actor, attacker.action.attack);	
+	$statCalc.invalidateAbilityCache(attacker.actor);		
+	
 	var gainRecipient = attacker.actor;
 	
 	_this.prepareBattleCache(attacker, "initiator");
@@ -1634,6 +1641,15 @@ BattleCalc.prototype.generateMapBattleResult = function(){
 	}
 	if(weaponref.totalAmmo != -1){
 		aCache.ammoUsed = 1;
+	}
+	
+	if(aCache.action.attack && 
+		(
+			$statCalc.applyStatModsToValue(attacker.actor, 0, ["self_destruct"])
+		)	
+	){
+		aCache.isDestroyed = true;
+		aCache.selfDestructed = true;
 	}
 	
 	var MPCost = weaponref.MPCost;
@@ -1726,7 +1742,16 @@ BattleCalc.prototype.generateMapBattleResult = function(){
 						false,
 						false	
 					);
-				}				
+				}	
+
+				if(aCache.action.attack && 
+						(
+							$statCalc.applyStatModsToValue(attacker.actor, 0, ["self_destruct_hit"])
+						)	
+					){
+						aCache.isDestroyed = true;
+						aCache.selfDestructed = true;
+					}				
 			} 
 			dCache.isHit = isHit;
 			dCache.type = "defender";

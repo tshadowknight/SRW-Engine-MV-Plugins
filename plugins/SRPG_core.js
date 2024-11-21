@@ -2441,8 +2441,16 @@ SceneManager.isInSaveScene = function(){
 		}
 		$gameTemp.clearMoveTable();
 		if($gameTemp.mapAttackOccurred){
+			let actorIsDestroyed = false;
 			Object.keys($gameTemp.battleEffectCache).forEach(function(cacheRef){
 				var battleEffect = $gameTemp.battleEffectCache[cacheRef];
+				
+				if(battleEffect.isActor && (battleEffect.type == "initiator" || battleEffect.type == "defender")){
+					if(battleEffect.isDestroyed) {
+						actorIsDestroyed = true;
+					} 					
+				}
+				
 				if(battleEffect.ref && !battleEffect.ref.isActor()){
 					battleEffect.ref.setSquadMode("normal");
 				}
@@ -2500,14 +2508,19 @@ SceneManager.isInSaveScene = function(){
 				}
 			});	
 			$gameTemp.mapAttackOccurred = false;
-			if($gameTemp.isEnemyAttack){
-				this.srpgAfterAction();
+			if(actorIsDestroyed){
+				this.srpgPrepareNextAction();
 			} else {
-				$gameParty.gainGold($gameTemp.rewardsInfo.fundGain);	
-				$gameTemp.rewardsDisplayTimer = 20;	
-				$gameSystem.setSubBattlePhase("rewards_display");				
-				$gameTemp.pushMenu = "rewards";
-			}			
+				if($gameTemp.isEnemyAttack){
+					this.srpgAfterAction();
+				} else {
+					$gameParty.gainGold($gameTemp.rewardsInfo.fundGain);	
+					$gameTemp.rewardsDisplayTimer = 20;	
+					$gameSystem.setSubBattlePhase("rewards_display");				
+					$gameTemp.pushMenu = "rewards";
+				}
+			}
+						
 		} else if($gameTemp.battleOccurred){
 			var actorIsDestroyed = false;
 			if($gameTemp.supportAttackCandidates){
