@@ -1643,14 +1643,6 @@ BattleCalc.prototype.generateMapBattleResult = function(){
 		aCache.ammoUsed = 1;
 	}
 	
-	if(aCache.action.attack && 
-		(
-			$statCalc.applyStatModsToValue(attacker.actor, 0, ["self_destruct"])
-		)	
-	){
-		aCache.isDestroyed = true;
-		aCache.selfDestructed = true;
-	}
 	
 	var MPCost = weaponref.MPCost;
 	if(MPCost != -1){
@@ -1673,6 +1665,16 @@ BattleCalc.prototype.generateMapBattleResult = function(){
 		$statCalc.invalidateAbilityCache(target);
 		//temp variable used to resolve weapon effects per target in StatCalc.prototype.getActiveStatMods
 		$gameTemp.currentBattleTarget = target;
+		
+		if(aCache.action.attack && 
+			(
+				$statCalc.applyStatModsToValue(attacker.actor, 0, ["self_destruct"])
+			)	
+		){
+			aCache.isDestroyed = true;
+			aCache.selfDestructed = true;
+		}
+		
 		
 		var defender = {actor: target, action: {type: "none"}};
 		if(target != attacker.actor){
