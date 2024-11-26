@@ -2141,4 +2141,50 @@ $SRWConfig.pilotAbilties = function(){
 			return true;
 		}
 	);
+	
+	this.addDefinition(
+		105, 
+		"Map Spirit Test", 
+		"Cast Disrupt at the start of your turn.", 
+		false,
+		false,
+		function(actor, level){			
+			return [
+				{type: "auto_spirit", modType: "addFlat", value: 3}
+			];
+			
+			
+		},
+		function(actor, level){
+			return true;
+		},
+		[0],
+		4,
+		function(actor, level){
+			return true;
+		}
+	);
+	
+	this.addDefinition(
+		106, 
+		"Map Spirit Test 2", 
+		"Cast Disrupt at the start of your turn.", 
+		false,
+		false,
+		function(actor, level){			
+			return [
+				{type: "auto_spirit", modType: "addFlat", value: 7}
+			];
+			
+			
+		},
+		function(actor, level){
+			return true;
+		},
+		[0],
+		4,
+		function(actor, level){
+			return true;
+		}
+	);
 }

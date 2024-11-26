@@ -1329,28 +1329,58 @@ GameState_auto_spirits.prototype.update = function(scene){
 		$gameTemp.spiritWindowDoneHandler = function(){
 			handleAutoSpirits()
 		}	
+
+		$gameTemp.autoMapSpiritDoneHandler = function(){
+			handleAutoSpirits()
+		}	
 		function handleAutoSpirits(){
 			$gameTemp.popMenu = true;
+			
+
 			if($gameTemp.autoSpirits.length){
-				$gameTemp.queuedActorEffects = [];
-				var currentActor = $gameTemp.autoSpirits[0].actor;
+				let currentMapSpirit;
+				let currentMapSpiritTargetingInfo;
 				var remaining = [];
-				$gameTemp.autoSpirits.forEach(function(autoSpirit){
-					if(autoSpirit.actor == currentActor){							
-						$gameTemp.spiritTargetActor = autoSpirit.actor;
-						$gamePlayer.locate(autoSpirit.actor.event.posX(), autoSpirit.actor.event.posY());
-						$spiritManager.applyEffect(autoSpirit.spirit, autoSpirit.actor, [autoSpirit.actor], 0);
-						$gameTemp.queuedActorEffects.push({type: "spirit", parameters: {idx: autoSpirit.spirit, target: autoSpirit.actor}})
+				$gameTemp.autoSpirits.forEach(function(autoSpirit){				
+					var initialTargetingResult = $spiritManager.performInitialTargeting(autoSpirit.spirit, null, {x: 0, y: 0});
+					if(!currentMapSpirit && (initialTargetingResult.type == "enemy_all" || initialTargetingResult.type == "ally_all")){
+						currentMapSpirit = autoSpirit;
+						currentMapSpiritTargetingInfo = initialTargetingResult;
 					} else {
 						remaining.push(autoSpirit);
 					}
+					$gameTemp.autoSpirits = remaining;
 				});
-				
-				$gameTemp.autoSpirits = remaining;
-				
-				
-				$gameSystem.setSubBattlePhase('spirit_activation');				
-				$gameTemp.pushMenu = "spirit_activation";		
+
+				if(currentMapSpirit){
+					$gameTemp.setActiveEvent($statCalc.getReferenceEvent(currentMapSpirit.actor));	
+					$spiritManager.applyEffect(currentMapSpirit.spirit, currentMapSpirit.actor, currentMapSpiritTargetingInfo.targets, 0);
+					$gameTemp.queuedEffectSpiritId = currentMapSpirit.spirit; 
+					$gameTemp.mapSpiritContext = "auto";
+					$gameTemp.mapSpiritAnimationStarted = false;
+					$gameSystem.setSubBattlePhase("map_spirit_animation");		
+				} else {
+					$gameTemp.queuedActorEffects = [];
+					var currentActor = $gameTemp.autoSpirits[0].actor;
+					var remaining = [];
+					$gameTemp.autoSpirits.forEach(function(autoSpirit){					
+						if(autoSpirit.actor == currentActor){							
+							$gameTemp.spiritTargetActor = autoSpirit.actor;
+							$gamePlayer.locate(autoSpirit.actor.event.posX(), autoSpirit.actor.event.posY());
+							$spiritManager.applyEffect(autoSpirit.spirit, autoSpirit.actor, [autoSpirit.actor], 0);
+							$gameTemp.queuedActorEffects.push({type: "spirit", parameters: {idx: autoSpirit.spirit, target: autoSpirit.actor}})
+						} else {
+							remaining.push(autoSpirit);
+						}
+					});
+					
+					$gameTemp.autoSpirits = remaining;
+					
+					
+					$gameSystem.setSubBattlePhase('spirit_activation');				
+					$gameTemp.pushMenu = "spirit_activation";	
+				}
+					
 			} else {
 				scene.handlingAutoSpirits = false;
 				if($gameTemp.AIActors.length){
@@ -2375,13 +2405,19 @@ GameState_map_spirit_animation.prototype.update = function(scene){
 		$gameTemp.animCharacter = activeEvent;
 		activeEvent.requestAnimation(spiritInfo.animId);
 	} else {
+		
 		if(!$gameTemp.animCharacter.isAnimationPlaying()){
-			$gameTemp.animCharacter = null;
-			$gameTemp.mapSpiritAnimationStarted = false;
-			$gameSystem.setSubBattlePhase("actor_command_window");
-			$gameSystem.setSrpgActorCommandWindowNeedRefresh($gameSystem.EventToUnit($gameTemp.activeEvent().eventId()));
-			scene._mapSrpgActorCommandWindow.activate();	
-			scene._mapSrpgActorCommandWindow.show()
+			if($gameTemp.mapSpiritContext == "auto"){
+				$gameTemp.mapSpiritContext = null;//hacky state flow control used when doing auto map spirits
+				$gameTemp.autoMapSpiritDoneHandler();
+			} else {
+				$gameTemp.animCharacter = null;
+				$gameTemp.mapSpiritAnimationStarted = false;
+				$gameSystem.setSubBattlePhase("actor_command_window");
+				$gameSystem.setSrpgActorCommandWindowNeedRefresh($gameSystem.EventToUnit($gameTemp.activeEvent().eventId()));
+				scene._mapSrpgActorCommandWindow.activate();	
+				scene._mapSrpgActorCommandWindow.show()
+			}			
 		}
 		$gameTemp.mapSpiritAnimationDuration--;
 	}	
