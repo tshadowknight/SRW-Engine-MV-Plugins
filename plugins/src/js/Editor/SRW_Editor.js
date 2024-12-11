@@ -503,6 +503,11 @@ SRWEditor.prototype.init = function(){
 			params: ["id"],
 			desc: "Send the trigger with the specified id to the target effekseer effect."
 		},
+		set_effekseer_frame: {
+			hasTarget: true,
+			params: ["frame"],
+			desc: "Set the target effekseer effect to the specified frame."
+		},
 		set_effekseer_attract_point: {
 			hasTarget: true,
 			params: ["position"],
@@ -644,9 +649,9 @@ SRWEditor.prototype.init = function(){
 			desc: "Play a sound effect."
 		},
 		kill_se:  {
-			hasTarget: false,
+			hasTarget: true,
 			params: [],
-			desc: "Mute all playing sound effects."
+			desc: "Mute the target sound effect or all playing sound effects if none specified."
 		},
 		show_portrait_noise: {
 			hasTarget: false,
@@ -816,6 +821,7 @@ SRWEditor.prototype.init = function(){
 		animId: "The id of the RMMV animation.",
 		loop: "If set to 1 the animation will continue looping.",
 		noFlash: "If set to 1 the flashing effects of the RMMV animation are not shown.",
+		frame: "Specify a frame for an animation",
 		noSfx: "If set to 1 the built in sound effects of the animation will not play.",
 		delay: "The delay between frames of the animation, default 4.",
 		fps: "The frames per second of the movie file",
@@ -1295,6 +1301,9 @@ SRWEditor.prototype.init = function(){
 			
 		},
 		noFlash: function(value){
+			
+		},
+		frame: function(value){
 			
 		},
 		delay: function(value){

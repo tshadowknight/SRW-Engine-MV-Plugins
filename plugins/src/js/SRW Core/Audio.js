@@ -92,6 +92,18 @@
 			});
 		};
 		
+		AudioManager.stopSe = function(seName) {
+			let tmp = [];
+			this._seBuffers.forEach(function(buffer) {
+				if(seName == null || buffer._seName == seName){
+					buffer.stop();
+				} else {
+					tmp.push(buffer);
+				}
+			});
+			this._seBuffers = tmp;
+		};
+		
 		AudioManager.preloadSe = async function(se) {
 			if (se.name) {
 				var buffer = await this.createBufferAsync('se', se.name);

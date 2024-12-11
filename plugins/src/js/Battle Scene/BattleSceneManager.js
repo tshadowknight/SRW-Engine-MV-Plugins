@@ -696,6 +696,10 @@ BattleSceneManager.prototype.initScene = function(){
 	// Add a camera to the scene and attach it to the canvas
 	//var camera = new BABYLON.ArcRotateCamera("Camera", Math.PI / 2, Math.PI / 2, 2, new BABYLON.Vector3(0,0,5), scene);
 	this._camera = new BABYLON.FreeCamera("FreeCamera", this._defaultPositions.camera_main_idle, scene);
+	this._cameraParent = _this.createBg("CameraParent", "", new BABYLON.Vector3(0,0,0), 0, 1, null, true);
+	this._cameraParent.isVisible = false;
+	this._camera.parent = this._cameraParent;
+	
 	if(this._attachControl){
 		this._camera.attachControl(this._canvas, true);
 		//hack to add up down controls to the camera
@@ -1862,6 +1866,21 @@ BattleSceneManager.prototype.advanceTick = function(){
 	}
 }
 
+
+BattleSceneManager.prototype.setWeightForAllAnimatables = function(animatables, weight, prevOrNext){
+	for(let animatable of animatables){
+		if(animatable.target.id.indexOf("step_") == 0){
+			if(prevOrNext == "previous"){
+				animatable.weight = 0;
+			} else if(prevOrNext == "next"){
+				animatable.weight = 1;
+			}
+		} else {
+			animatable.weight = weight;
+		}		
+	}
+}
+
 BattleSceneManager.prototype.hookBeforeRender = function(){
 	var _this = this;
 	function scrollBg(bg, animRatio, step){
@@ -2096,8 +2115,11 @@ BattleSceneManager.prototype.hookBeforeRender = function(){
 				var t = blendInfo.accumulator / duration;		
 				
 				if(t < 1){
-					blendInfo.prevAnim.setWeightForAllAnimatables(1-t);
-					blendInfo.nextAnim.setWeightForAllAnimatables(t);
+					//blendInfo.prevAnim.setWeightForAllAnimatables(1-t);
+					//blendInfo.nextAnim.setWeightForAllAnimatables(t);
+
+					_this.setWeightForAllAnimatables(blendInfo.prevAnim.animatables, 1-t, "previous");
+					_this.setWeightForAllAnimatables(blendInfo.nextAnim.animatables, t, "next");
 				} else {
 					blendInfo.prevAnim.setWeightForAllAnimatables(0);
 					blendInfo.prevAnim.stop()
@@ -3366,7 +3388,9 @@ BattleSceneManager.prototype.getTargetObject = function(name){
 	let obj;
 	if(name == "Camera"){
 		return _this._camera;
-	} else if(name == "bgs_parent"){
+	} else if(name == "camera_parent"){
+		return _this._cameraParent;
+	}else if(name == "bgs_parent"){
 		return _this._bgsParent;
 	} else if(name == "active_main"){
 		if(_this._supportAttackerActive){
@@ -4929,6 +4953,19 @@ BattleSceneManager.prototype.executeAnimation = function(animation, startTick){
 				delete targetObj.parent;
 			}
 		},
+		set_effekseer_frame: function(target, params){
+			var targetObj;
+			var ctr = 0;
+			while(!targetObj && ctr < _this._effekseerInfo.length){
+				if(_this._effekseerInfo[ctr].name == target){
+					targetObj = _this._effekseerInfo[ctr].handle;
+				}
+				ctr++;
+			}
+			if(targetObj){
+				targetObj.setFrame(params.frame * 1);
+			}
+		},
 		play_rmmv_anim: function(target, params){
 			var position = _this.applyAnimationDirection(params.position || new BABYLON.Vector3(0,0,0));	
 			var width = params.scaleX || 5;
@@ -5274,6 +5311,14 @@ BattleSceneManager.prototype.executeAnimation = function(animation, startTick){
 					if(!targetObj.lastAnim){
 						targetObj.lastAnim = "main";
 					}
+					if(params.name == "main"){
+						const preMainAnimKey = "pre_main";
+						if(targetObj.animationRef[preMainAnimKey]){
+							let animInfo = targetObj.animationRef[preMainAnimKey];
+							animInfo.start(false, 1, animInfo.from * 1, animInfo.to * 1, false);
+						}
+					}
+
 					const speed = (params.speed || 1) * 1;
 					if(params.playAll){
 						for(let animKey in targetObj.animationRef){
@@ -5423,6 +5468,10 @@ BattleSceneManager.prototype.executeAnimation = function(animation, startTick){
 			}			
 				
 			_this._camera.position.x = _this._defaultPositions.camera_main_idle.x * _this._animationDirection * -1;
+
+			_this._cameraParent.x = 0;
+			_this._cameraParent.y = 0;
+			_this._cameraParent.z = 0;
 			
 			if(_this._actorSprite && _this._actorSprite.sprite.parent_handle.wasMoved){
 				_this._actorSprite.sprite.parent_handle.position.x+=targetOffset;
@@ -5795,7 +5844,7 @@ BattleSceneManager.prototype.executeAnimation = function(animation, startTick){
 			AudioManager.playSe(se);
 		},
 		kill_se: function(target, params){
-			AudioManager.stopSe()
+			AudioManager.stopSe(target)
 		},
 		fade_out_se: function(target, params){
 			AudioManager.fadeOutSe(params.seId, (params.duration || 60) / 60);

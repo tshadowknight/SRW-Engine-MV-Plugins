@@ -514,7 +514,9 @@
 		};
 
 		Window_ActorCommand.prototype.addWaitCommand = function() {
-			this.addCommand(APPSTRINGS.MAPMENU.cmd_wait, 'wait');
+			if(!ENGINE_SETTINGS.HIDE_WAIT_COMMAND){
+				this.addCommand(APPSTRINGS.MAPMENU.cmd_wait, 'wait');
+			}			
 		};
 		
 		Window_ActorCommand.prototype.addMoveCommand = function() {
