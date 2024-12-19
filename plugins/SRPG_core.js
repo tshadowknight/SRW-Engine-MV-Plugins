@@ -324,6 +324,18 @@ var _defaultPlayerSpeed = parameters['defaultPlayerSpeed'] || 4;
 		this.frameCount++;
 	};
 	
+	Graphics._centerElement = function(element) {
+		var width = Math.ceil(element.width * this._realScale);
+		var height = Math.ceil(element.height * this._realScale);
+		element.style.position = 'absolute';
+		element.style.margin = 'auto';
+		element.style.top = 0;
+		element.style.left = 0;
+		element.style.right = 0;
+		element.style.bottom = 0;
+		element.style.width = width + 'px';
+		element.style.height = height + 'px';
+	};
 
 	var Graphics_updateCanvas = Graphics._updateCanvas;
 	Graphics._updateCanvas = function(windowId){

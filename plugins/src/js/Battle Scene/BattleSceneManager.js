@@ -718,6 +718,9 @@ BattleSceneManager.prototype.initScene = function(){
 		this._scene, // The scene instance
 		[this._camera] // The list of cameras to be attached to
 	);
+	
+	
+	
 	if(ENGINE_SETTINGS.BATTLE_SCENE.FXAA_ON){
 		//pipeline.fxaaEnabled = true;
 		//var postProcess = new BABYLON.FxaaPostProcess("fxaa", 1.0, this._camera);
@@ -733,8 +736,20 @@ BattleSceneManager.prototype.initScene = function(){
 		const fxaaPostProcess = new BABYLON.FxaaPostProcess("fxaa", 1.0, this._camera);
 		//passProcess.fxaaEnabled = true;
 	}
-
 	
+	/*this._lensEffects = new BABYLON.LensRenderingPipeline('lens', {
+		//edge_blur: 0,
+		//chromatic_aberration: 0,
+		//distortion: 0,
+		dof_focus_distance: 1000,
+		dof_aperture: 0,			// set this very high for tilt-shift effect
+		grain_texture: new BABYLON.Texture(),
+		//grain_amount: 0,
+		//dof_pentagon: false,
+		//dof_gain: 0,
+		//dof_threshold: 0,
+		//dof_darken: 0
+	}, this._scene, 1.0, this._camera);*/
 	
 
 	// Add lights to the scene
