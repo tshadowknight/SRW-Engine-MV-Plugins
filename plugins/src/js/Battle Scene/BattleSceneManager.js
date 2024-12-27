@@ -7031,7 +7031,6 @@ BattleSceneManager.prototype.preloadEffekseerParticles = async function(){
 			} else {
 				animId = _this.getDefaultAnim(attack);//default
 			}				
-			
 			var animationList = _this._animationBuilder.buildAnimation(animId, _this);
 			if(!animationList){
 				alert("Animation "+animId+" does not have a definition!");
@@ -8031,18 +8030,11 @@ BattleSceneManager.prototype.processActionQueue = function() {
 					
 					var attack = nextAction.action.attack;
 					var animId;
-					if(typeof attack.animId != "undefined" && attack.animId != -1){
-						if(isBetweenFriendlies){
-							animId = attack.vsAllyAnimId;
-						} else {
-							animId = attack.animId;
-						}
-						
-					} else {
-						/*_this.playDefaultAttackAnimation(nextAction).then(function(){
-							_this.processActionQueue();
-						});*/
-						
+					if(isBetweenFriendlies && (typeof attack.vsAllyAnimId != "undefined" && attack.vsAllyAnimId != -1)){						
+						animId = attack.vsAllyAnimId;										
+					} else if(typeof attack.animId != "undefined" && attack.animId != -1){
+						animId = attack.animId;
+					} else {						
 						animId = _this.getDefaultAnim(attack);
 					}
 					_this.lastAnimId = animId;

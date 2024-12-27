@@ -1819,6 +1819,7 @@
 			$statCalc.initSRWStats(enemy);
 			params.unit = enemy;
 			enemy._mechClass = params.mechId;	
+			enemy.factionId = 0;
 			$statCalc.initSRWStats(enemy);
 			if(params.referenceEventId != null){
 				enemy.event = $gameMap.event(params.referenceEventId)
@@ -1874,12 +1875,18 @@
 			var unit = params.unit;
 			
 			var weapon;
-			if(typeof params.weapon == "object"){
-				weapon = params.weapon;
-			} else {
-				weapon = $statCalc.getActorMechWeapon(unit, params.weapon)
+			if(params.weapon != null){
+				if(typeof params.weapon == "object"){
+					weapon = params.weapon;
+				} else {
+					weapon = $statCalc.getActorMechWeapon(unit, params.weapon)
+				}
+				if(weapon == null){
+					const weaponDefinition = $dataWeapons[params.weapon];
+					const weaponProperties = weaponDefinition.meta;
+					weapon = $statCalc.parseWeaponDef(null, false, weaponDefinition, weaponProperties);
+				}
 			}
-			
 			var action;
 			if(params.action == "attack"){		
 				action = {
