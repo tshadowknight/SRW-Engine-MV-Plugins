@@ -946,6 +946,8 @@ BattleCalc.prototype.generateBattleResult = function(isPrediction){
 		
 		const isBuffingAttack = isBetweenFriendlies && interactionType == Game_System.INTERACTION_STATUS;
 		aCache.isBuffingAttack = isBuffingAttack;
+
+		aCache.actionOrder = orderIdx;
 		
 		aCache.side = this._side;
 		if(aCache.action.type != "attack"){
@@ -999,7 +1001,7 @@ BattleCalc.prototype.generateBattleResult = function(isPrediction){
 		}
 		defenders = tmp;
 		
-		aCache.actionOrder = orderIdx;
+		
 		
 		for(var i = 0; i < defenders.length; i++){		
 			var attackedRef = "";

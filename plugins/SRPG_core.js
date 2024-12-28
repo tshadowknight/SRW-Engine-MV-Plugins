@@ -2669,6 +2669,7 @@ SceneManager.isInSaveScene = function(){
 	Scene_Map.prototype.srpgPrepareNextAction = function(){
 		$gameTemp.rewardsInfo = null;	
 		var battler = $gameSystem.EventToUnit($gameTemp.activeEvent().eventId())[1];
+		$statCalc.invalidateAbilityCache(battler);
 		$gameTemp.activeEvent().lastMoveCount = 0;
 		if(!$gameTemp.eraseActorAfterTurn && (battler.SRPGActionTimes() >= 1 && !$gameTemp.isPostMove && $statCalc.applyStatModsToValue(battler, 0, ["hit_and_away"])) && $gameSystem.isBattlePhase() != "AI_phase"){
 			$gameTemp.isHitAndAway = true;
