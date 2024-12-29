@@ -1044,6 +1044,9 @@ BattleCalc.prototype.generateBattleResult = function(isPrediction){
 					hasPercentBarrier: false
 				};
 				var isSupportDefender = false;
+				if(sCache){
+					aCache["attacked_support"] = sCache;
+				}
 				if(isHit){
 					if(isHit && sCache && !sCache.hasActed){
 						isHit = 1;

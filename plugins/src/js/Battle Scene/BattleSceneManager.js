@@ -7435,7 +7435,15 @@ BattleSceneManager.prototype.preloadSceneAssets = function(){
 						_this.preloadDefaultFrames(nextAction.attacked.ref.subTwin, promises);
 					}
 				}
-				
+				if(nextAction.attacked_support){
+					_this.preloadDefaultFrames(nextAction.attacked_support.ref, promises);
+				}
+				if(nextAction.attacked_all_sub){
+					_this.preloadDefaultFrames(nextAction.attacked_all_sub.ref, promises);
+					if(nextAction.attacked_all_sub.ref.subTwin){
+						_this.preloadDefaultFrames(nextAction.attacked_all_sub.ref.subTwin, promises);
+					}
+				}
 				
 
 			
