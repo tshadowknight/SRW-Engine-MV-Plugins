@@ -2743,6 +2743,9 @@ SRWEditor.prototype.showEnvironmentEditorControls = function(){
 			content+="<div class='bg_label'>"+EDITORSTRINGS.BG.label_height+": </div><input data-dataid='height' class='param_value' value='"+(bg.height || 0)+"'></input>";
 			content+="</div>";
 			content+="<div class='param_values'>";
+			content+="<div class='bg_label'>"+EDITORSTRINGS.BG.label_x_offset+": </div><input data-dataid='xoffset' class='param_value' value='"+(bg.xoffset || 0)+"'></input>";
+			content+="</div>";
+			content+="<div class='param_values'>";
 			content+="<div class='bg_label'>"+EDITORSTRINGS.BG.label_y_offset+": </div><input data-dataid='yoffset' class='param_value' value='"+(bg.yoffset || 0)+"'></input>";
 			content+="<div class='bg_label'>"+EDITORSTRINGS.BG.label_z_offset+": </div><input data-dataid='zoffset' class='param_value' value='"+(bg.zoffset || 0)+"'></input>";
 			content+="</div>";

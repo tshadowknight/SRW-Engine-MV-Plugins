@@ -1924,8 +1924,12 @@ BattleSceneManager.prototype.hookBeforeRender = function(){
 						const roundingStep = 1 / refWidth;
 						if(texture.uOffsetAccumulator == null){
 							texture.uOffsetAccumulator = texture.uOffset_ || 0;
+							if(bg.scrollOffset * 1){
+								texture.uOffsetAccumulator+=bg.scrollOffset * 1;
+							}
 						}
 						texture.uOffsetAccumulator+=(step * animRatio / 100) * (100 / bg.sizeInfo.width) * -1 * direction;
+						
 						if(texture.uOffsetAccumulator > 1){
 							texture.uOffsetAccumulator-=1;
 						} else if(texture.uOffsetAccumulator < 0){
@@ -6851,7 +6855,7 @@ BattleSceneManager.prototype.createEnvironment = function(ref){
 							_this._bgLayerInfo[bgId] = bg.path;
 							await _this.preloadTexture("img/SRWBattlebacks/"+bg.path+".png", "Environment Creation Fixed BG");
 						} else {
-							_this.createScrollingBg("bg"+ctr, bgId, bg.path, {width: bg.width, height: bg.height}, bg.yoffset, bg.zoffset, maxZOffset - bg.zoffset);
+							_this.createScrollingBg("bg"+ctr, bgId, bg.path, {width: bg.width, height: bg.height}, bg.yoffset, bg.zoffset, maxZOffset - bg.zoffset, bg.xoffset);
 						}	
 					}	
 					ctr++;
@@ -6864,7 +6868,7 @@ BattleSceneManager.prototype.createEnvironment = function(ref){
 	});
 }	 
 
-BattleSceneManager.prototype.createScrollingBg = function(id, bgId, path, size, yOffset, zOffset, alphaIndex){
+BattleSceneManager.prototype.createScrollingBg = function(id, bgId, path, size, yOffset, zOffset, alphaIndex, scrollOffset){
 	var _this = this;
 	if(!size){
 		size = {
@@ -6893,6 +6897,7 @@ BattleSceneManager.prototype.createScrollingBg = function(id, bgId, path, size, 
 			const pathParts = path.split("/");
 			bg.envRefId = pathParts[pathParts.length - 1];
 			bg.alphaIndex = alphaIndex;
+			bg.scrollOffset = scrollOffset;
 			_this._bgs.push(bg);
 		} else {
 			bg = instanceRef.createInstance(id + "_" + i);

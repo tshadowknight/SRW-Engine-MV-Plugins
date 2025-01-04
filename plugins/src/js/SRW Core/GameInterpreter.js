@@ -95,6 +95,7 @@
 				msg+="<br>";
 				if(e.message){
 					msg+=e.message;
+					console.error(e.stack);
 				} else {
 					msg+=e;
 				}

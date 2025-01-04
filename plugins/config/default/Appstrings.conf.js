@@ -832,6 +832,7 @@ EDITORSTRINGS.BG = {
 	label_fixed: "Fixed",
 	label_width: "Width",
 	label_height: "Height",
+	label_x_offset: "U Offset(0-1)",
 	label_y_offset: "Y Offset",
 	label_z_offset: "Z Offset",
 	
