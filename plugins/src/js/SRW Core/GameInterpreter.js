@@ -614,9 +614,10 @@
 			
 			event._appearSpriteInitialized = false;
 			event._destroySpriteInitialized = false;
-			
-			let parts = $dataClasses[mechClass].meta.srpgOverworld.split(",");
-			ImageManager.loadCharacter(parts[0]);
+			if($dataClasses[mechClass].meta.srpgOverworld){
+				let parts = $dataClasses[mechClass].meta.srpgOverworld.split(",");
+				ImageManager.loadCharacter(parts[0]);
+			}		
 			
 			if(typeof squadId == "undefined" || squadId == ""){
 				squadId = -1;

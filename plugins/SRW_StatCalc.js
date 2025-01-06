@@ -4642,7 +4642,7 @@ StatCalc.prototype.canBeOnTerrain = function(actor, terrain){
 		}
 		if(actor.isSubTwin){
 			var mainTwin = this.getMainTwin(actor);
-			if(mainTwin && !(mainTwin.SRWStats.mech.enabledTerrainTypes[terrain] * 1 || this.applyStatModsToValue(mainTwin, 0, [terrainDef.abilityName]))){
+			if(mainTwin && this.isActorSRWInitialized(mainTwin) && !(mainTwin.SRWStats.mech.enabledTerrainTypes[terrain] * 1 || this.applyStatModsToValue(mainTwin, 0, [terrainDef.abilityName]))){
 				validTwin = false;
 			}
 		}
