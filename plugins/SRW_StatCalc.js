@@ -1851,7 +1851,10 @@ StatCalc.prototype.initSRWStats = function(actor, level, itemIds, preserveVolati
 	if(actor.isActor() && !actor.isSubTwin){
 		var subTwinId = this.getSubTwinId(actor);
 		var subTwinActor = $gameActors.actor(subTwinId);
-		if(subTwinActor){
+		if(subTwinActor == actor){
+			console.log("Attempted to make an actor its own subtwin!");
+		}
+		if(subTwinActor && subTwinActor != actor){
 			subTwinActor.isSubTwin = true;		
 			
 			//_this.initSRWStats(subTwinActor, 1, [], preserveVolatile);
@@ -1868,6 +1871,15 @@ StatCalc.prototype.initSRWStats = function(actor, level, itemIds, preserveVolati
 	
 	this.updateTerrainInfo(actor);
 }
+
+StatCalc.prototype.resetTwinState = function(actor){
+	actor.isSubTwin = false;
+	actor.subTwinId = null;
+	if(actor.subTwin){
+		actor.subTwin.isSubTwin = false;
+	}
+	actor.subTwin = null;
+}	
 
 StatCalc.prototype.getSubTwinId = function(actor){
 	return actor.subTwinId;

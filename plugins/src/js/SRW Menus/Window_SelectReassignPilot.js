@@ -195,8 +195,11 @@ Window_SelectReassignPilot.prototype.update = function() {
 				if(target.type == "main"){
 					var targetPilot = this.getCurrentSelection().actor;
 					var currentPilot = $statCalc.getCurrentPilot(mechId);
+					let subTwinId;
 					if(currentPilot){
 						currentPilot._classId = 0;
+						currentPilot.isSubPilot = false;		
+						$statCalc.resetTwinState(currentPilot);
 						$statCalc.initSRWStats(currentPilot);						
 						$gameSystem.clearActorDeployInfo(currentPilot.actorId());
 						$gameSystem.overwritePilotFallbackInfo(currentPilot);
@@ -220,6 +223,7 @@ Window_SelectReassignPilot.prototype.update = function() {
 					
 					targetPilot._classId = mechId;
 					targetPilot.isSubPilot = false;
+					$statCalc.resetTwinState(targetPilot);
 					$statCalc.initSRWStats(targetPilot);
 					$gameSystem.clearActorDeployInfo(targetPilot.actorId());
 					$gameSystem.overwritePilotFallbackInfo(targetPilot);
@@ -231,6 +235,7 @@ Window_SelectReassignPilot.prototype.update = function() {
 					if(targetPilot){
 						targetPilot._classId = 0;
 						targetPilot.isSubPilot = true;
+						$statCalc.resetTwinState(targetPilot);
 						$statCalc.initSRWStats(targetPilot);						
 						$gameSystem.clearActorDeployInfo(targetPilot.actorId());
 						$gameSystem.overwritePilotFallbackInfo(targetPilot);

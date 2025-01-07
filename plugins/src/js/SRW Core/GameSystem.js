@@ -383,7 +383,16 @@
 				});
 			}
 			
-			
+			//clean up previous sub twinning state to avoid previous state remaining applied which can lead to crashes due to circular references
+			this._availableUnits.forEach(function(actor){
+				var refEvent = $statCalc.getReferenceEvent(actor);
+				if(!ignoreEventDeploys || !refEvent || !refEvent.isScriptedDeploy){
+					actor.isSubTwin = false;
+					actor.subTwin = null;
+					actor.subTwinId = null;
+				}
+			});
+
 			this.dummyId = 0;
 			this._availableUnits.forEach(function(actor){
 				var refEvent = $statCalc.getReferenceEvent(actor);
@@ -2058,6 +2067,14 @@
 					sortedCandidates.push(entry);
 				}
 			});
+
+			//if any entries only contain a valid sub move the sub to the main slot
+			for(let entry of sortedCandidates){
+				if(entry.sub && entry.main == null){
+					entry.main = entry.sub;
+					entry.sub = null;
+				}
+			}
 			
 			tmp.forEach(function(candidate){
 				if(!usedActors[candidate.actorId()]){
