@@ -5167,6 +5167,22 @@ BattleSceneManager.prototype.executeAnimation = function(animation, startTick){
 				targetObj.stopRoot();
 			}
 		},
+		set_effekseer_paused: function(target, params){
+			var targetObj;
+			var ctr = 0;
+			while(!targetObj && ctr < _this._effekseerInfo.length){
+				if(_this._effekseerInfo[ctr].name == target){
+					targetObj = _this._effekseerInfo[ctr].handle;
+				}
+				ctr++;
+			}
+			if(targetObj){
+				targetObj.setPaused(params.paused * 1);
+			}
+		},
+
+
+		
 		set_sprite_index: function(target, params){
 			var targetObj = getTargetObject(target);
 			if(targetObj && targetObj.playAnimation){
@@ -7142,7 +7158,7 @@ BattleSceneManager.prototype.preloadDynamicUnitModel = async function(target, pa
 	let flipX = false;
 	let position;
 	if(params.position){
-		position = params.position;
+		position = new BABYLON.Vector3(params.position.x, params.position.y, params.position.z);
 	} else {
 		position = new BABYLON.Vector3(0, 0, 0);
 	}

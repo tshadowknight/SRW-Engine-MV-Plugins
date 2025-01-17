@@ -498,6 +498,11 @@ SRWEditor.prototype.init = function(){
 			params: [],
 			desc: "Stop the root of the effekseer effect, letting the particle system fade out."
 		},
+		set_effekseer_paused:{
+			hasTarget: true,
+			params: ["paused"],
+			desc: "Pause or unpause the effekseer effect."
+		}, 
 		send_effekseer_trigger: {
 			hasTarget: true,
 			params: ["id"],
@@ -827,7 +832,8 @@ SRWEditor.prototype.init = function(){
 		fps: "The frames per second of the movie file",
 		muted: "If set to 1 the audio of the video is not played",
 		fade_in: "Number of frames the movie will fade in for",
-		isFront: "If set to 1 the element will be shown in front of the units, otherwise behind."
+		isFront: "If set to 1 the element will be shown in front of the units, otherwise behind.",
+		paused: "The new pause state, 1 to pause 0 to resume."
 	}
 	
 	_this._paramDisplayHandlers = {
@@ -1317,7 +1323,10 @@ SRWEditor.prototype.init = function(){
 		},
 		noSfx: function(value){
 			
-		}
+		},
+		paused: function(value){
+			
+		},
 	}
 	
 	_this._currentSequenceType = "mainAnimation";
