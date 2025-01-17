@@ -5299,11 +5299,14 @@ BattleSceneManager.prototype.executeAnimation = function(animation, startTick){
 							battleEffect = targetAction;					
 						}
 						
-						if(battleEffect.side == "actor"){
-							flipX = false;
-						} else {
-							flipX = true;
+						if(battleEffect){
+							if(battleEffect.side == "actor"){
+								flipX = false;
+							} else {
+								flipX = true;
+							}
 						}
+						
 						
 						var imgPath = targetObj.spriteConfig.path;
 						
@@ -7166,6 +7169,19 @@ BattleSceneManager.prototype.preloadDynamicUnitModel = async function(target, pa
 	const currentPilot = $statCalc.getCurrentPilot(params.mechId, true);
 	$statCalc.initSRWStatsIfUninitialized(currentPilot)
 	const spriteConfig = _this.createSpriteInfo(currentPilot);
+	var basePath = spriteConfig.path;
+	var spriteId = spriteConfig.id;
+	var path;
+	if(!spriteConfig){
+		path = "";
+	} else if(spriteConfig.type == "default"){
+		path = basePath+"/"+spriteId;
+		let promises = [];
+		this.preloadDefaultFrames(currentPilot, promises);
+		await Promise.all(promises);
+	} else {
+		path = basePath;
+	}
 	
 	var spriteInfo;
 	var spriteParent = _this.createBg(name, "", position, 0, 1, null, true);
@@ -7180,16 +7196,13 @@ BattleSceneManager.prototype.preloadDynamicUnitModel = async function(target, pa
 		xOffset*=-1;
 	}
 	if(!spriteConfig || spriteConfig.type == "default"){
-		spriteInfo = _this.createPlanarSprite(name+"_displayed", spriteConfig.path,  new BABYLON.Vector3(xOffset, spriteConfig.yOffset, 0), frameSize, flipX, spriteConfig.referenceSize);		
-		spriteInfo.sprite.setPivotMatrix(BABYLON.Matrix.Translation(-0, spriteInfo.size.height/2, -0), false);
-	} else if(spriteConfig.type == "spriter"){
-		spriteInfo = _this.createSpriterSprite(name+"_displayed", spriteConfig.path,  new BABYLON.Vector3(xOffset, spriteConfig.yOffset, 0), flipX);
-		pivotYOffset+=spriteConfig.referenceSize / 2;			
-	} else if(spriteConfig.type == "dragonbones"){
-		spriteInfo = _this.createDragonBonesSprite(name+"_displayed", spriteConfig.path, spriteConfig.armatureName, new BABYLON.Vector3(xOffset, spriteConfig.yOffset, 0), flipX, spriteConfig.dragonbonesWorldSize, spriteConfig.canvasDims);
-		pivotYOffset+=spriteConfig.referenceSize / 2 - spriteConfig.yOffset;			
+		var imgSize = $statCalc.getBattleSceneImageSize(currentPilot) || _this._defaultSpriteSize;
+		
+
+		spriteInfo = _this.createPlanarSprite(name+"_displayed", path,  new BABYLON.Vector3(xOffset, spriteConfig.yOffset, 0), imgSize, flipX, spriteConfig.referenceSize);		
+		spriteInfo.sprite.setPivotMatrix(BABYLON.Matrix.Translation(-0, spriteInfo.size.height/2, -0), false);	
 	} else if(spriteConfig.type == "spine"){
-		spriteInfo = _this.createSpineSprite(name+"_displayed", spriteConfig.path,  new BABYLON.Vector3(xOffset, spriteConfig.yOffset, 0), flipX, "main", spriteConfig.referenceSize, spriteConfig.canvasDims.width, spriteConfig.canvasDims.height);
+		spriteInfo = _this.createSpineSprite(name+"_displayed", path,  new BABYLON.Vector3(xOffset, spriteConfig.yOffset, 0), flipX, "main", spriteConfig.referenceSize, spriteConfig.canvasDims.width, spriteConfig.canvasDims.height);
 		pivotYOffset+=spriteConfig.referenceSize / 2 - spriteConfig.yOffset;				
 	} else if(spriteConfig.type == "3D"){
 		spriteInfo = await _this.createUnitModel(name+"_displayed", spriteConfig.path,  new BABYLON.Vector3(xOffset, spriteConfig.yOffset, 0), flipX, spriteConfig.animGroup, "main",  spriteConfig.scale, new BABYLON.Vector3(0, BABYLON.Tools.ToRadians(spriteConfig.rotation || 0), 0), spriteConfig.BBHack, spriteConfig.shadowParent);
