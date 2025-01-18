@@ -798,7 +798,7 @@ SRWEditor.prototype.init = function(){
 		animationLoop: "The animation frame from where to loop. 0 or empty to not loop.",
 		animationDelay: "The time between animation frames in ticks.",
 		path: "The file path of the asset.",
-		size: "The size of the asset.",
+		size: "The size of the asset. Use comma separated x,y dimensions for non-square sizes.",
 		alpha: "The alpha of the object.",
 		billboardMode: "Set the billboarding mode for the object: 'none' or 'full'",
 		isPilotCutin: "If 1, path is ignored and the active main pilot's defined cutin is used",

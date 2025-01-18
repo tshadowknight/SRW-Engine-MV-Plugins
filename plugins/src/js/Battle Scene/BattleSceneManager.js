@@ -5212,6 +5212,13 @@ BattleSceneManager.prototype.executeAnimation = function(animation, startTick){
 				} else if(target == "active_target" || target == "active_support_defender"){
 					battleEffect = targetAction;
 				}
+				if(!battleEffect){
+					for(let entry of _this._instantiatedUnits){
+						if(entry.name == target){
+							battleEffect = {ref: entry.ref};
+						}
+					}
+				}
 				
 				
 				var imgPath = $statCalc.getBattleSceneImage(battleEffect.ref);
@@ -7168,6 +7175,9 @@ BattleSceneManager.prototype.preloadDynamicUnitModel = async function(target, pa
 	
 	const currentPilot = $statCalc.getCurrentPilot(params.mechId, true);
 	$statCalc.initSRWStatsIfUninitialized(currentPilot)
+	
+	_this._dynamicUnitsUnderPreload[target] = currentPilot;
+	
 	const spriteConfig = _this.createSpriteInfo(currentPilot);
 	var basePath = spriteConfig.path;
 	var spriteId = spriteConfig.id;
@@ -7309,6 +7319,8 @@ BattleSceneManager.prototype.preloadSceneAssets = function(){
 		
 		promises.push(_this.preloadTexture("img/SRWBattlebacks/shadow.png"));
 		
+		_this._dynamicUnitsUnderPreload = {};
+		
 		function handleAnimCommand(animCommand, animId, animType, tick){
 			var target = animCommand.target;
 			var params = animCommand.params;
@@ -7369,6 +7381,9 @@ BattleSceneManager.prototype.preloadSceneAssets = function(){
 						if(entry.name == target){
 							battleEffect = {ref: entry.ref};
 						}
+					}
+					if(!battleEffect &&  _this._dynamicUnitsUnderPreload[target]){
+						battleEffect = {ref: _this._dynamicUnitsUnderPreload[target]};
 					}
 				}						
 				if(battleEffect){
@@ -7558,6 +7573,7 @@ BattleSceneManager.prototype.preloadSceneAssets = function(){
 		}
 		
 		Promise.all(promises).then(() => {
+			_this._dynamicUnitsUnderPreload = {};
 			_this.isPreloading = false;
 			resolve();
 		});	
