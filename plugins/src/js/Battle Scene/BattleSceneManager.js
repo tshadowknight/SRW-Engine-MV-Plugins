@@ -7319,7 +7319,8 @@ BattleSceneManager.prototype.preloadSceneAssets = function(){
 		
 		promises.push(_this.preloadTexture("img/SRWBattlebacks/shadow.png"));
 		
-		_this._dynamicUnitsUnderPreload = {};
+		_this._dynamicUnitsUnderPreload = {}; //tracks dynamic units created during preload by target name so information is available to link them to battle actors for sprite frame preloading
+		_this._preloadAliases = {}; //track assigned aliases during preload so that default sprite mode units can get preloaded correctly if they were aliased
 		
 		function handleAnimCommand(animCommand, animId, animType, tick){
 			var target = animCommand.target;
@@ -7345,6 +7346,11 @@ BattleSceneManager.prototype.preloadSceneAssets = function(){
 			if(animCommand.type == "create_unit_model"){				
 				promises.push(_this.preloadDynamicUnitModel(target, params));			
 			}
+			
+			if(animCommand.type == "register_alias"){						
+				_this._preloadAliases[params.id] = target;
+			}	
+			
 			
 			if(animCommand.type == "create_bg"){
 				
@@ -7385,6 +7391,13 @@ BattleSceneManager.prototype.preloadSceneAssets = function(){
 					if(!battleEffect &&  _this._dynamicUnitsUnderPreload[target]){
 						battleEffect = {ref: _this._dynamicUnitsUnderPreload[target]};
 					}
+					if(!battleEffect){
+						let alias = _this._preloadAliases[target];
+						if(alias && _this._dynamicUnitsUnderPreload[alias]){
+							battleEffect = {ref: _this._dynamicUnitsUnderPreload[alias]};
+						}						
+					}
+					
 				}						
 				if(battleEffect){
 					var battleSceneInfo = $statCalc.getBattleSceneInfo(battleEffect.ref);
@@ -7574,6 +7587,7 @@ BattleSceneManager.prototype.preloadSceneAssets = function(){
 		
 		Promise.all(promises).then(() => {
 			_this._dynamicUnitsUnderPreload = {};
+			_this._preloadAliases = {};
 			_this.isPreloading = false;
 			resolve();
 		});	
