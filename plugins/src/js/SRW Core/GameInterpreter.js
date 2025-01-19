@@ -2449,4 +2449,16 @@
 		Game_Interpreter.prototype.reloadRelativeUnits = function(params) {
 			$statCalc.applyRelativeTransforms();
 		}
+
+		Game_Interpreter.prototype.getFactionCount = function(factionId) {
+			let result = 0;
+			$statCalc.iterateAllActors(null, function(actor, event){
+				if(actor && event && !event.isErased()){
+					if($gameSystem.getFactionId(actor) == factionId){
+						result++;
+					}
+				}
+			});
+			return result;
+		}
 	}
