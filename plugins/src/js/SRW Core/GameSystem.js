@@ -509,7 +509,8 @@
 			for(var i = 21; i <= 60; i++){
 				$gameVariables.setValue(i, 0);
 			}
-		
+
+			$gameSystem.incrementSaveTurn();//increment for turn 1
 			$gameVariables.setValue(_turnVarID, 1); 
 			$gameSystem.resetSearchedItemList();
 			$gameSystem.textLog = [];			
@@ -1629,6 +1630,11 @@
 			var oldValue = $gameVariables.value(_turnVarID);
 			$gameVariables.setValue(_turnVarID, oldValue + 1);
 			
+			var oldValue = $gameVariables.value(_turnCountVariable);
+			$gameVariables.setValue(_turnCountVariable, oldValue + 1);
+		};
+
+		Game_System.prototype.incrementSaveTurn = function() {
 			var oldValue = $gameVariables.value(_turnCountVariable);
 			$gameVariables.setValue(_turnCountVariable, oldValue + 1);
 		};
