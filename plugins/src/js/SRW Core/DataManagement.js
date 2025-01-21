@@ -457,6 +457,8 @@
 				$statCalc.invalidateAbilityCache();
 				$statCalc.invalidateZoneCache();
 				$statCalc.softRefreshUnits();
+
+				$SRWGameState.requestNewState("normal");
 				
 				SceneManager._scene.fadeOutAll()
 				SceneManager.goto(Scene_Map);

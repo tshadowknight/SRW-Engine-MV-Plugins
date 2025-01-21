@@ -440,6 +440,10 @@
 	color: #FFFFFF;
 }
 
+#equip_weapon .transfer_selection .item_slot .mechIcon{
+	width: 10%;
+}
+
 #equip_weapon .transfer_selection .item_slot .mech_pic_container{
 	width: 65%;
 }

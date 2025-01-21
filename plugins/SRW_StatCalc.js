@@ -6803,16 +6803,18 @@ StatCalc.prototype.getRemainingAmmoRatio = function(actor){
 		var ctr = 0;
 		let totalAmmo = 0;
 		let currentAmmo = 0;
-		while(!hasUsedAmmo && ctr < weapons.length){
+		while(ctr < weapons.length){
 			var weapon = weapons[ctr++];
 			if(weapon.totalAmmo != -1){
 				totalAmmo+=weapon.totalAmmo;
 				currentAmmo+=_this.getCurrentAmmo(actor, weapon);
 			}			
 		}
-		return currentAmmo / totalAmmo;
+		if(totalAmmo > 0){
+			return currentAmmo / totalAmmo;
+		}		
 	} 	
-	return 0;
+	return 1;
 }
 
 StatCalc.prototype.hasHealTargets = function(actor, percent){

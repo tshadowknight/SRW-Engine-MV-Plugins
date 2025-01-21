@@ -141,7 +141,7 @@ BattleAnimationBuilder.prototype.shiftTicks = function(id, sequence, startTick, 
 		var newTick;
 		if(tick * 1 >= startTick * 1){
 			newTick = tick * 1 + amount * 1;
-			if(def[newTick] != null){
+			if(tmp[newTick] != null){
 				throw("Shifting would result in a collision between existing and shifted ticks!\nThe Shift operation was cancelled!");
 			}			
 		} else {

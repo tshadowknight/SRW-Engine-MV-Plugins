@@ -175,7 +175,7 @@ Window_ModeSelection.prototype.update = function() {
 		if(Input.isTriggered('cancel') || TouchInput.isCancelled()){		
 			if(this._callbacks["closed"]){
 				this.doFadeOut();
-				setTimeout(() => {this._callbacks["closed"]();}, 1000);				
+				setTimeout(() => {$gameTemp.buttonHintManager.hide(); $gameTemp.popMenu = true; this._callbacks["closed"]();}, 1000);				
 			}
 		}			
 		this.resetTouchState();

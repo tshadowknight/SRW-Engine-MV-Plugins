@@ -431,6 +431,10 @@
 	color: #FFFFFF;
 }
 
+#upgrade_equip_weapon .transfer_selection .item_slot .mechIcon{
+	width: 10%;
+}
+
 #upgrade_equip_weapon .transfer_selection .item_slot .mech_pic_container{
 	width: 65%;
 }

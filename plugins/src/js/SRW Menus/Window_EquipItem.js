@@ -239,7 +239,7 @@ Window_EquipItem.prototype.update = function() {
 					this._currentUIState = "slot_selection";
 					this.refreshAllUnits();
 				} else if(this.getAvailableCount(inventoryInfo[itemIdx]) > 0){
-					if(this.getAvailableCount(inventoryInfo[itemIdx]) - inventoryInfo[itemIdx].holders.length > 0){
+					if(this.getAvailableCount(inventoryInfo[itemIdx]) - this.getAvailableHoldersCount(itemIdx) > 0){
 						var mech = this.getCurrentSelection();
 						$inventoryManager.addItemHolder(itemIdx, _this.getTargetMechId(mech.id), this._currentSelection);
 						mech.items = $statCalc.getActorMechItems(mech.id);
@@ -308,10 +308,22 @@ Window_EquipItem.prototype.getAvailableCount = function(itemInfo) {
 	return result;
 }
 
+Window_EquipItem.prototype.getAvailableHoldersCount = function(itemIdx) {
+	let result = 0;
+	var inventoryInfo = $inventoryManager.getCurrentInventory();
+	var holders = inventoryInfo[itemIdx].holders;
+	for(let holder of holders){
+		if(!$inventoryManager.islockedForTransfer(holder.mechId) || $SRWSaveManager.getUnlockedUnits()[holder.mechId]){
+			result++;
+		}
+	}
+	return result;
+}
+
 Window_EquipItem.prototype.getTransferCandidates = function() {
 	var inventoryInfo = $inventoryManager.getCurrentInventory();
 	var transferCandidates = inventoryInfo[this._itemList.getCurrentSelection().idx].holders;
-	transferCandidates.filter((x) => !$inventoryManager.islockedForTransfer(x.mechId) && !$SRWSaveManager.getUnlockedUnits()[x.mechId]);
+	transferCandidates = transferCandidates.filter((x) => !$inventoryManager.islockedForTransfer(x.mechId) || $SRWSaveManager.getUnlockedUnits()[x.mechId]);
 	return transferCandidates;
 }
 

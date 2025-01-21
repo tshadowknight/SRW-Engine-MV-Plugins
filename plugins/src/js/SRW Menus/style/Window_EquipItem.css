@@ -446,6 +446,10 @@
 	color: #FFFFFF;
 }
 
+#equip_item .transfer_selection .item_slot .mechIcon{
+	width: 10%;
+}
+
 #equip_item .transfer_selection .item_slot .mech_pic_container{
 	width: 65%;
 }
