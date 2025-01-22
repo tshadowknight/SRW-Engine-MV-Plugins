@@ -1806,8 +1806,8 @@ BattleCalc.prototype.generateMapBattleResult = function(){
 	});
 	
 	if(inflictedDamge){
-		if($statCalc.getActiveSpirits(aCache).fortune){
-			$statCalc.clearSpirit(attacker.actor, "fortune");
+		if($statCalc.getActiveSpirits(gainRecipient).fortune){
+			$statCalc.clearSpirit(gainRecipient, "fortune");
 		}	
 		
 		if($statCalc.getActiveSpirits(gainRecipient).gain){

@@ -2753,6 +2753,7 @@ StatCalc.prototype.transform = function(actor, idx, force, forcedId, noRestore){
 				//undeployed pilost must be checked to properly transform with a subpilot to main pilot transition
 				var targetActor = this.getCurrentPilot(transformIntoId, true);
 				if(targetActor && targetActor.actorId() != actor.actorId() && actor.event){
+					this.syncStageTemp(targetActor, actor);
 					targetActor.event = actor.event;
 					actor.event = null;
 					$gameSystem.setEventToUnit(targetActor.event.eventId(), 'actor', targetActor.actorId());
@@ -2806,8 +2807,9 @@ StatCalc.prototype.transformOnDestruction = function(actor, force){
 		let actionsResult = this.applyDeployActions(actor.SRWStats.pilot.id, actor.SRWStats.mech.id);
 		
 		if(targetActorId != null){
-			var targetActor = $gameActors.actor(targetActorId);
+			var targetActor = $gameActors.actor(targetActorId);			
 			if(targetActor.actorId() != actor.actorId()){
+				this.syncStageTemp(targetActor, actor);
 				if(this.isActorSRWInitialized(targetActor)){
 					targetActor.event = actor.event;
 					actor.event = null;
@@ -2900,8 +2902,9 @@ StatCalc.prototype.swapPilot = function(actor, newActorId){
 		this.reloadSRWStats(targetPilot, false, true);
 		targetPilot.SRWStats.mech = currentMechData;
 		
-		//abilities used tracking should be shared beween all pilots in a mech
-		targetPilot.SRWStats.stageTemp.abilityUsed = actor.SRWStats.stageTemp.abilityUsed;
+		//abilities used tracking and items used tracking should be shared beween all pilots in a mech
+		this.syncStageTemp(targetPilot, actor);
+		
 		event.refreshImage();	
 		
 		//workaround for issue where the deploy list loses track of the original pilot 
@@ -2916,6 +2919,11 @@ StatCalc.prototype.swapPilot = function(actor, newActorId){
 		});
 		$gameSystem.setDeployInfo(deployInfo);
 	}
+}
+
+StatCalc.prototype.syncStageTemp = function(targetActor, sourceActor){
+	targetActor.SRWStats.stageTemp.abilityUsed = sourceActor.SRWStats.stageTemp.abilityUsed;
+	targetActor.SRWStats.stageTemp.inventoryConsumed = sourceActor.SRWStats.stageTemp.inventoryConsumed;
 }
 
 StatCalc.prototype.split = function(actor){
