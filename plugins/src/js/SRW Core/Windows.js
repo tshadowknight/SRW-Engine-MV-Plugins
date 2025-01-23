@@ -947,7 +947,11 @@
 			if(actor.SRWStats.pilot.stats.calculated.currentMP < useInfo.cost){
 				canPayCost = false;
 			}
-		}		
+		} else if(Number.isInteger(useInfo)){
+			var timesUsed = actor.SRWStats.stageTemp.abilityUsed[item] || 0;
+			canPayCost = timesUsed < useInfo;
+			
+		}
 		return itemDef.isActiveHandler(actor) && canPayCost;
 	};	
 	
