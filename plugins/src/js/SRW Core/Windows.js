@@ -940,16 +940,16 @@
 				canPayCost = false;
 			} 
 		} else if(useInfo.type == "EN"){
-			if(actor.SRWStats.mech.stats.calculated.currentEN < useInfo.cost){
+			if(actor.SRWStats.mech.stats.calculated.currentEN * 1 < useInfo.cost * 1){
 				canPayCost = false;
 			}
 		} else if(useInfo.type == "MP"){
-			if(actor.SRWStats.pilot.stats.calculated.currentMP < useInfo.cost){
+			if(actor.SRWStats.pilot.stats.calculated.currentMP * 1 < useInfo.cost * 1){
 				canPayCost = false;
 			}
 		} else if(Number.isInteger(useInfo)){
 			var timesUsed = actor.SRWStats.stageTemp.abilityUsed[item] || 0;
-			canPayCost = timesUsed < useInfo;
+			canPayCost = timesUsed * 1 < useInfo * 1;
 			
 		}
 		return itemDef.isActiveHandler(actor) && canPayCost;
