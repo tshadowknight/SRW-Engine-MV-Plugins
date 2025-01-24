@@ -1537,6 +1537,7 @@
 			$gameTemp.showEnemyDefendIndicator = false;
 			$gameTemp.currentFaction = factionId;
 			if(factionId > 2){
+				$gameSystem.expireAbilityZones();
 				$gameSystem.srpgTurnEnd();
 				return;
 			}
@@ -1580,7 +1581,7 @@
 			$statCalc.clearSpiritOnAll("actor", "disrupt");
 			$statCalc.clearSpiritOnAll("actor", "analyse");
 			$statCalc.clearTempEffectsOnAll();
-			$gameSystem.expireAbilityZones();
+			
 			$statCalc.applyTurnStartWill("enemy", factionId);
 			$statCalc.applyENRegen("enemy", factionId);
 			$statCalc.applyMPRegen("enemy", factionId);
