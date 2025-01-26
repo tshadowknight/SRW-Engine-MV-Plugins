@@ -2700,10 +2700,15 @@ SceneManager.isInSaveScene = function(){
 		
 		if(hasDefeatedOpponent && hasContinuousAction){
 			$statCalc.setHasUsedContinuousAction(battler);
+			battler.setSrpgTurnEnd(false);		
 		} else if($statCalc.getActiveSpirits(battler).zeal){
 			$statCalc.clearSpirit(battler, "zeal");
+			//ensure the unit can act after zeal
+			//circumvents issue with pilots that start as subpilots still being marked as turn ended from the previous stage when swapping into them
+			battler.setSrpgTurnEnd(false);		
 		} else if($statCalc.consumeAdditionalAction(battler)){
 			//do not end turn if an action could be consumed
+			battler.setSrpgTurnEnd(false);		
 		} else {
 			if (battler.SRPGActionTimes() <= 1) {
 				battler.setSrpgTurnEnd(true);

@@ -5658,9 +5658,7 @@ BattleSceneManager.prototype.executeAnimation = function(animation, startTick){
 				}
 				
 				if(!action.isHit){
-					additions[startTick + params.duration] = [
-						{type: "set_sprite_frame", target: target, params:{name: "main"}},
-					];	
+					additions[startTick + params.duration].push({type: "set_sprite_frame", target: target, params:{name: "main"}});	
 				}
 				
 				if(action.isHit && !action.isDestroyed){
@@ -5789,6 +5787,18 @@ BattleSceneManager.prototype.executeAnimation = function(animation, startTick){
 					});
 				}	
 			}			
+
+		
+			if(originalAction.attacked?.specialEvasion){
+				var patternId = originalAction.attacked?.specialEvasion.dodgePattern;
+				if(patternId != null && ENGINE_SETTINGS.DODGE_PATTERNS[patternId]){
+					if(ENGINE_SETTINGS.DODGE_PATTERNS[patternId].treat_as_block){
+						popUpNotifications.push({text: originalAction.attacked.specialEvasion.name, additionalClass: "evasion"});	
+					}
+							
+				}
+			}
+
 			_this._UILayerManager.setPopupNotification(action.isActor ? "actor" : "enemy", popUpNotifications);
 						
 			if(originalAction.HPRestored){
@@ -6175,8 +6185,14 @@ BattleSceneManager.prototype.constructAnimationList = function(cacheRef, attackD
 			}			
 		}
 	}
-	
-	if(cacheRef.hits){
+	let isBlockingMiss = false;
+	if(cacheRef.attacked?.specialEvasion){
+		var patternId = cacheRef.attacked.specialEvasion.dodgePattern;
+		if(patternId != null && ENGINE_SETTINGS.DODGE_PATTERNS[patternId]){
+			isBlockingMiss =  ENGINE_SETTINGS.DODGE_PATTERNS[patternId].treat_as_block;
+		}
+	}
+	if(cacheRef.hits || isBlockingMiss){
 		mergeAnimList(attackDef.onHit);
 		if(attackDef.onHitOverwrite){
 			overwriteAnimList(attackDef.onHitOverwrite);

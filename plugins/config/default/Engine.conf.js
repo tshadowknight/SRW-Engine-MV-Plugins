@@ -185,6 +185,7 @@ var ENGINE_SETTINGS = {
 		2: {basic_anim: "no_damage", full_anim: null, full_anim_return: null, se: "SRWParry"},
 		3: {basic_anim: "no_damage", full_anim: null, full_anim_return: null, se: "SRWJamming"},
 		4: {basic_anim: "no_damage", full_anim: null, full_anim_return: null, se: "SRWShootDown"},		
+		5: {basic_anim: "no_damage", full_anim: null, full_anim_return: null, se: "SRWShootDown", treat_as_block: true},//use the treat as block setting to force a hit animation to play instead of a miss animation
 	},
 	PURCHASABLE_ABILITIES: [
 		11, //support attack
