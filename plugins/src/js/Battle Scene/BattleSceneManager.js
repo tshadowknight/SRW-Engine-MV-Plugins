@@ -172,6 +172,8 @@ export default function BattleSceneManager(){
 	this._textBoxState = true;
 	
 	this.createVideoPlayers();
+
+	this._shadowFloor = 0;
 }
 
 BattleSceneManager.prototype.attachSpector = function(value){
@@ -1956,10 +1958,11 @@ BattleSceneManager.prototype.hookBeforeRender = function(){
 				} else {
 					refPosition = spriteInfo.sprite.parent_handle.position;
 				}
-			
+				
 				shadowSprite.position.x = refPosition.x + ((shadowSprite.shadowInfo.offsetX || 0) * (shadowSprite.shadowInfo.type == "enemy" ? -1 : 1));
 				shadowSprite.position.z = refPosition.z + 0.1;//(shadowSprite.shadowInfo.offsetZ || 0);
-				var scale = Math.max(4 - spriteInfo.sprite.parent_handle.position.y, 0) / 4;
+				shadowSprite.position.y = _this._shadowFloor;
+				var scale = Math.max(4 - spriteInfo.sprite.parent_handle.position.y, _this._shadowFloor) / 4;
 				
 				shadowSprite.scaling.x = scale;
 				shadowSprite.scaling.y = scale;
@@ -5979,7 +5982,9 @@ BattleSceneManager.prototype.executeAnimation = function(animation, startTick){
 				_this.mergeAnimList(tmp);	
 			}				
 		}, 
-		
+		set_shadow_floor: function(target, params){
+			_this._shadowFloor = (params.floor || 0 ) * 1;
+		}
 	};
 	
 	animationHandlers["set_model_animation"] = animationHandlers["set_sprite_frame"];
@@ -7621,6 +7626,7 @@ BattleSceneManager.prototype.showScene = async function() {
 	_this._PIXIContainer.style.display = "block";	
 	_this._systemFadeContainer.style.display = "block";
 	_this._swipeContainer.style.display = "block";
+	_this._shadowFloor = 0;
 	//_this.resetScene();
 	_this._assetsPreloaded = false;
 	await _this.readBattleCache();	

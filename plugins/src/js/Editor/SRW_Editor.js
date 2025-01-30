@@ -697,6 +697,10 @@ SRWEditor.prototype.init = function(){
 			hasTarget: false,
 			params: ["battleAnimId"],
 		},
+		set_shadow_floor: {
+			hasTarget: false,
+			params: ["floor"],
+		},		
 		set_text_provider: {
 			hasTarget: false,
 			params: ["id"],
@@ -833,7 +837,8 @@ SRWEditor.prototype.init = function(){
 		muted: "If set to 1 the audio of the video is not played",
 		fade_in: "Number of frames the movie will fade in for",
 		isFront: "If set to 1 the element will be shown in front of the units, otherwise behind.",
-		paused: "The new pause state, 1 to pause 0 to resume."
+		paused: "The new pause state, 1 to pause 0 to resume.",
+		floor: "The y coordinate where the shadows will be drawn"
 	}
 	
 	_this._paramDisplayHandlers = {
@@ -1291,6 +1296,9 @@ SRWEditor.prototype.init = function(){
 		battleAnimId: function(value){
 			
 		},
+		floor: function(value){
+			
+		},		
 		animId: function(value){
 			
 		},
