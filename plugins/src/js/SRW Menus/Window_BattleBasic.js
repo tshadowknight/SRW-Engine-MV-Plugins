@@ -579,6 +579,17 @@ Window_BattleBasic.prototype.createTerrainScrolls = function() {
 	this.createTerrainScroll("enemy");
 }
 
+Window_BattleBasic.prototype.applyFactionClass = function(container, factionId) {
+	container.classList.add(
+		{
+			"player": "ally",
+			0: "enemy",
+			1: "green",
+			2: "yellow"
+		}[factionId]
+	);
+}
+
 Window_BattleBasic.prototype.createTerrainScroll = function(side) {
 	const _this = this;
 	let direction;
@@ -593,25 +604,45 @@ Window_BattleBasic.prototype.createTerrainScroll = function(side) {
 		participantInfo = _this._participantInfo.enemy;
 		targetContainer = _this._enemySideTerrain;
 	}
-	
-	const scrollInfo = _this.getTerrainScrollInfo(participantInfo);
-	const scrollMod = scrollInfo.scrollMod || 1;
-	let content = "";
-	let ctr = 0;
-	for(let entry of scrollInfo.layers){
-		content+="<div class='layer img_bg' data-side='"+side+"' data-scrollduration='"+entry.scroll * scrollMod+"' data-imgscale='"+(scrollInfo.scale || 1)+"' data-img='"+("img/SRWBattlebacks/"+entry.path)+".png' style='z-index: "+(ctr++)+";' data-xoff='"+(scrollInfo.offsets.x || 0)+"' data-yoff='"+(scrollInfo.offsets.y || 0)+"'></div>"
+	if(ENGINE_SETTINGS.USE_CUSTOM_BASIC_BATTLE_BGS){
+		const scrollInfo = _this.getTerrainScrollInfo(participantInfo);
+		const scrollMod = scrollInfo.scrollMod || 1;
+		let content = "";
+		let ctr = 0;
+		for(let entry of scrollInfo.layers){
+			content+="<div class='layer img_bg' data-side='"+side+"' data-scrollduration='"+entry.scroll * scrollMod+"' data-imgscale='"+(scrollInfo.scale || 1)+"' data-img='"+("img/SRWBattlebacks/"+entry.path)+".png' style='z-index: "+(ctr++)+";' data-xoff='"+(scrollInfo.offsets.x || 0)+"' data-yoff='"+(scrollInfo.offsets.y || 0)+"'></div>"
+		}
+		targetContainer.innerHTML = content;	
+		
+		
+	} else {
+		targetContainer.classList.remove("ally");
+		targetContainer.classList.remove("enemy");
+		targetContainer.classList.remove("green");
+		targetContainer.classList.remove("yellow");
+
+		if(side == "actor" && $gameTemp.currentBattleActor){
+			const factionId = $gameSystem.getFactionId($gameTemp.currentBattleActor);
+			this.applyFactionClass(_this._allySideTerrainOuter, factionId);			
+			
+		} else if($gameTemp.currentBattleEnemy){
+			const factionId = $gameSystem.getFactionId($gameTemp.currentBattleEnemy);
+			this.applyFactionClass(this._enemySideTerrainOuter, factionId);
+		}
 	}
-	targetContainer.innerHTML = content;	
-	
-	const shadowDisplay = scrollInfo.showShadows ? "block" : "none";
-	
-	if(side == "actor"){
+	//const shadowDisplay = scrollInfo.showShadows ? "block" : "none";
+
+
+		
+	if(side == "actor" && $gameTemp.currentBattleActor){
+		const shadowDisplay = !$statCalc.isBattleShadowHiddenOnCurrentTerrain($gameTemp.currentBattleActor) ? "block" : "none";
 		this._participantComponents["actor"].shadow.style.display = shadowDisplay;
 		this._participantComponents["actor_twin"].shadow.style.display = shadowDisplay;
 		this._participantComponents["actor_supporter"].shadow.style.display = shadowDisplay;
 		this._participantComponents["actor_supporter_twin"].shadow.style.display = shadowDisplay;		
 		
-	} else {
+	} else if($gameTemp.currentBattleEnemy){
+		const shadowDisplay = !$statCalc.isBattleShadowHiddenOnCurrentTerrain($gameTemp.currentBattleEnemy) ? "block" : "none";
 		this._participantComponents["enemy"].shadow.style.display = shadowDisplay;
 		this._participantComponents["enemy_twin"].shadow.style.display = shadowDisplay;
 		this._participantComponents["enemy_supporter"].shadow.style.display = shadowDisplay;

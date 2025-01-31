@@ -1261,10 +1261,29 @@
 
 #battle_basic #battle_basic_ally_container {
 	right: -2%;
+	
+	
 }
 
 #battle_basic_enemy_container {
 	left: -3%;
+	
+}
+
+.terrain_scroll_container.ally {
+	background: linear-gradient(0deg, rgba(3,58,122,1) 0%, rgba(109,141,249,1) 100%);
+}
+
+.terrain_scroll_container.enemy {
+	background: linear-gradient(0deg, rgba(122,3,3,1) 0%, rgba(249,109,109,1) 100%);
+}
+
+.terrain_scroll_container.green {
+	background: linear-gradient(0deg, rgba(0,89,15,1) 0%, rgba(106,222,96,1) 100%);
+}
+
+.terrain_scroll_container.yellow {
+	background: linear-gradient(0deg, rgba(83,89,0,1) 0%, rgba(210,222,96,1) 100%);
 }
 
 #battle_basic .terrain_scroll {

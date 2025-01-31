@@ -18,7 +18,7 @@ BASIC_BATTLE_BGS = {
 			y: 70
 		},
 		scrollMod: 3,
-		showShadows: true
+		
 	},
 	4: {//the key is the environment to which the bgs are linked(id from Battle Environment editor)
 		layers: [
@@ -39,7 +39,7 @@ BASIC_BATTLE_BGS = {
 			y: 70
 		},
 		scrollMod: 3,
-		showShadows: true
+		
 	},
 	3: {//the key is the environment to which the bgs are linked(id from Battle Environment editor)
 		layers: [
@@ -89,7 +89,7 @@ BASIC_BATTLE_BGS = {
 			y: 70
 		},
 		scrollMod: 3,
-		showShadows: true
+		
 	},
 	7: {//the key is the environment to which the bgs are linked(id from Battle Environment editor)
 		layers: [
@@ -109,7 +109,7 @@ BASIC_BATTLE_BGS = {
 			y: 100
 		},
 		scrollMod: 3,
-		showShadows: true
+		
 	},
 	8: {//the key is the environment to which the bgs are linked(id from Battle Environment editor)
 		layers: [
@@ -131,7 +131,7 @@ BASIC_BATTLE_BGS = {
 			y: 70
 		},
 		scrollMod: 3,
-		showShadows: true
+		
 	},
 	9: {//the key is the environment to which the bgs are linked(id from Battle Environment editor)
 		layers: [
@@ -149,7 +149,7 @@ BASIC_BATTLE_BGS = {
 			y: 70
 		},
 		scrollMod: 3,
-		showShadows: true
+		
 	},
 	10: {//the key is the environment to which the bgs are linked(id from Battle Environment editor)
 		layers: [
@@ -172,7 +172,7 @@ BASIC_BATTLE_BGS = {
 			y: 100
 		},
 		scrollMod: 3,
-		showShadows: true
+		
 	},
 	12: {//the key is the environment to which the bgs are linked(id from Battle Environment editor)
 		layers: [
@@ -192,7 +192,7 @@ BASIC_BATTLE_BGS = {
 			y: 100
 		},
 		scrollMod: 3,
-		showShadows: true
+		
 	},
 	13: {//the key is the environment to which the bgs are linked(id from Battle Environment editor)
 		layers: [
@@ -212,7 +212,7 @@ BASIC_BATTLE_BGS = {
 			y: 100
 		},
 		scrollMod: 3,
-		showShadows: true
+		
 	},
 	14: {//the key is the environment to which the bgs are linked(id from Battle Environment editor)
 		layers: [
@@ -230,6 +230,6 @@ BASIC_BATTLE_BGS = {
 			y: 100
 		},
 		scrollMod: 3,
-		showShadows: true
+		
 	}
 };

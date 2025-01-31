@@ -2,7 +2,7 @@ var ENGINE_SETTINGS = {
 	GAMEID: "SRWMV",
 	CUSTOM_TITLE_SCREEN: "",
 	PLACE_PARALLAX_ABOVE_MAP: true,
-	FONT_SCALE: 1,//used to scale the text in CSS menus.
+		FONT_SCALE: 1,//used to scale the text in CSS menus.
 	FONT_LINE_HEIGHT_SCALE: 0,//used to offset text in CSS menus.
 	FONT_SIZE: 28,//font size in RPG Maker text boxes. Also affects the line height in the message window.
 	LINE_HEIGHT: 36,//line height in RPG Maker text boxes.
@@ -12,6 +12,7 @@ var ENGINE_SETTINGS = {
 	PRELOAD_AUDIO: true,
 	DEFAULT_BASIC_ANIM_RATE: 4,
 	BASIC_BATTLE_ANIM_MODE: "normal", //normal = use anims set in editor, none = do not use, attribute = use animation linked to weapon attribute
+	USE_CUSTOM_BASIC_BATTLE_BGS: true, //if true using the scrolling backgrounds from BasicBattleBgs.conf
 	RPG_MAKER_INV_LIMIT: 1,
 	ENABLE_EQUIPABLES: true,
 	ALLOW_DUPLICATE_EQUIPS: false,

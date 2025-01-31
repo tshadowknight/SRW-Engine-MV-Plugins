@@ -4212,7 +4212,7 @@ BattleSceneManager.prototype.executeAnimation = function(animation, startTick){
 				];
 				
 				_this._animationList[insertStartTick + 160] = [
-					{type: "show_sprite", target: "active_main", params: {}},	
+					//{type: "show_sprite", target: "active_main", params: {}},	
 					{type: "enable_support_defender"},
 				];				
 				
