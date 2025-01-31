@@ -12,7 +12,7 @@ var ENGINE_SETTINGS = {
 	PRELOAD_AUDIO: true,
 	DEFAULT_BASIC_ANIM_RATE: 4,
 	BASIC_BATTLE_ANIM_MODE: "normal", //normal = use anims set in editor, none = do not use, attribute = use animation linked to weapon attribute
-	USE_CUSTOM_BASIC_BATTLE_BGS: true, //if true using the scrolling backgrounds from BasicBattleBgs.conf. If false default colors are used, additional shadows are forced to enabled.
+	USE_CUSTOM_BASIC_BATTLE_BGS: true, //if true using the scrolling backgrounds from BasicBattleBgs.conf. If false default colors are used, additionally shadows are forced to enabled.
 	GRADIENT_BATLE_BATTLE_BG_COLORS: {//the colors used for the different factions if USE_CUSTOM_BASIC_BATTLE_BGS is set to false.
 		ally: "linear-gradient(0deg, rgba(3,58,122,1) 0%, rgba(109,141,249,1) 100%)",
 		enemy: "linear-gradient(0deg, rgba(122,3,3,1) 0%, rgba(249,109,109,1) 100%)",
