@@ -586,7 +586,7 @@ Window_BattleBasic.prototype.applyFactionClass = function(container, factionId) 
 		1: "green",
 		2: "yellow"
 	}[factionId];
-	container.style.background = ENGINE_SETTINGS.GRADIENT_BATLE_BATTLE_BG_COLORS[factionType];
+	container.style.background = ENGINE_SETTINGS.GRADIENT_BATTLE_BATTLE_BG_COLORS[factionType];
 }
 
 Window_BattleBasic.prototype.createTerrainScroll = function(side) {
@@ -620,14 +620,14 @@ Window_BattleBasic.prototype.createTerrainScroll = function(side) {
 		
 	} else {
 		targetContainer.style.background = "";	
-		shadowDisplay = true;
+		shadowDisplay = "block";
 		if(side == "actor" && $gameTemp.currentBattleActor){
 			const factionId = $gameSystem.getFactionId($gameTemp.currentBattleActor);
 			this.applyFactionClass(_this._allySideTerrainOuter, factionId);			
 			
 		} else if($gameTemp.currentBattleEnemy){
 			const factionId = $gameSystem.getFactionId($gameTemp.currentBattleEnemy);
-			this.applyFactionClass(this._enemySideTerrainOuter, factionId);
+			this.applyFactionClass(this._enemySideTerrainOuter, factionId);	
 		}
 	}
 	
