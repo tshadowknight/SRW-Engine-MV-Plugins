@@ -768,9 +768,16 @@ BattleCalc.prototype.generateBattleResult = function(isPrediction){
 	if($gameTemp.supportAttackCandidates){
 		supportAttacker = $gameTemp.supportAttackCandidates[$gameTemp.supportAttackSelected];
 	}
+	if(supportAttacker){
+		$statCalc.invalidateAbilityCache(supportAttacker.actor);
+		$statCalc.setCurrentAttack(supportAttacker.actor, supportAttacker.action.attack);	
+	}
 	var supportDefender; 
 	if($gameTemp.supportDefendCandidates){
 		supportDefender = $gameTemp.supportDefendCandidates[$gameTemp.supportDefendSelected];
+	}
+	if(supportDefender){
+		$statCalc.invalidateAbilityCache(supportDefender.actor);
 	}
 	
 	$gameVariables.setValue(_lastActorSupportAttackId, null);
@@ -1795,6 +1802,13 @@ BattleCalc.prototype.generateMapBattleResult = function(){
 					fundGain = 0;
 				} else {
 					fundGain = $statCalc.applyStatModsToValue(gainRecipient, fundGain, ["fund_gain_destroy"]);
+
+					if(ENGINE_SETTINGS.DIFFICULTY_MODS && ENGINE_SETTINGS.DIFFICULTY_MODS.enabled > 0){
+						const modSet = ENGINE_SETTINGS.DIFFICULTY_MODS.levels[$gameSystem.getCurrentDifficultyLevel()];
+						if(modSet && modSet.fundsMultiplier != null){
+							fundGain*=modSet.fundsMultiplier;
+						}
+					}
 				}
 				
 				aCache.expGain+= expGain;

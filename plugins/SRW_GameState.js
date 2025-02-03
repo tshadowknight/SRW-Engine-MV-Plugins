@@ -876,12 +876,14 @@ GameState_actor_support.prototype.updateMapEvent = function(x, y, triggers){
 						let gainRecipientIds = [actor.actorId()].concat($statCalc.getSubPilots(actor));
 						
 						var gainResults = [];	
-						var expResults = [];						
+						var expResults = [];		
+						//lock in the referenced level beforehand to avoid issues for units with self healing capabilities leveling up in the middle of calculating results which may affect sub pilot gains.
+						const supportTargetLevel = candidate.SRWStats.pilot.level;
 						for(let id of gainRecipientIds){
 							const actor = $gameActors.actor(id);							
 							if(actor){
 								var attackerLevel = actor.SRWStats.pilot.level;
-								var defenderLevel = candidate.SRWStats.pilot.level;
+								var defenderLevel = supportTargetLevel;
 								var defenderTotalYield = baseYield;
 								
 								var totalExp = eval(ENGINE_SETTINGS.EXP_YIELD.LEVEL_SCALING_FORMULA);
