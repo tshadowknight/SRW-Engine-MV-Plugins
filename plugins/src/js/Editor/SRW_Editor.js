@@ -213,7 +213,7 @@ SRWEditor.prototype.init = function(){
 		},
 		shake: {
 			hasTarget: true,
-			params: ["magnitude_x", "speed_x", "magnitude_y", "speed_y", "magnitude_z", "speed_z", "duration", "fadeInTicks", "fadeOutTicks"],
+			params: ["magnitude_x", "speed_x", "magnitude_y", "speed_y", "magnitude_z", "speed_z", "duration", "fadeInTicks", "fadeOutTicks", "magnitude_variance", "speed_variance"],
 			desc: "Shake the screen on the x and y axis with the specified magnitude."
 		},
 		set_opacity_texture: {
@@ -773,6 +773,8 @@ SRWEditor.prototype.init = function(){
 		speed_z: "The speed of the shaking effect along the z-axis",
 		fadeInTicks: "The number of ticks the shake effect will ramp up for",
 		fadeOutTicks: "The number of ticks the shake effect will ramp down for",
+		magnitude_variance: "How much the magnitude varies over time",
+		speed_variance: "With what speed the magnitude variance is applied",
 		startFade: "The initial opacity of the object, between 0-1.",
 		endFade: "The final opacity of the object, between 0-1.",
 		time: "The duration of the command in ticks.",
@@ -1124,6 +1126,12 @@ SRWEditor.prototype.init = function(){
 		
 		},
 		fadeOutTicks: function(value){
+		
+		},
+		magnitude_variance: function(value){
+		
+		},
+		speed_variance: function(value){
 		
 		},
 		startFade: function(value){

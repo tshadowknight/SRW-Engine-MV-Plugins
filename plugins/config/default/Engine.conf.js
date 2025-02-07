@@ -536,4 +536,12 @@ var ENGINE_SETTINGS = {
 			}
 		]
 	}
+	/*
+	//map a face file to another face file based on a deployed unit
+	//used to automatically change portraits after mech transformation
+	variableUnitPortraits: {
+	"Original_face_name": [
+		{deployedId: 56, filename: "Changed_face_name"},
+	],
+} */
 }

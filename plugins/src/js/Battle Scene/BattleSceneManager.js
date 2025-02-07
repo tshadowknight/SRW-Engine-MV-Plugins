@@ -2790,10 +2790,12 @@ BattleSceneManager.prototype.runAnimations = function(deltaTime){
 				} else if(currentTick > (animation.duration - animation.fadeOutTicks)){
 					fade = (animation.duration - currentTick) / animation.fadeOutTicks;
 				}
+
+				const variance = 1 + (Math.sin((animation.speed_variance || 0) * currentTick) * (animation.magnitude_variance || 0) / 10);
 				
-				targetObj.position.x = targetObj.realPosition.x + Math.sin(currentTick * animation.speed_x) * animation.magnitude_x / 10 * fade;		
-				targetObj.position.y = targetObj.realPosition.y + Math.sin(currentTick * animation.speed_y) * animation.magnitude_y / 10 * fade;
-				targetObj.position.z = targetObj.realPosition.z + Math.sin(currentTick * animation.speed_z) * animation.magnitude_z / 10 * fade;						
+				targetObj.position.x = targetObj.realPosition.x + Math.sin(currentTick * animation.speed_x) * animation.magnitude_x / 10 * fade * variance;		
+				targetObj.position.y = targetObj.realPosition.y + Math.sin(currentTick * animation.speed_y) * animation.magnitude_y / 10 * fade * variance;
+				targetObj.position.z = targetObj.realPosition.z + Math.sin(currentTick * animation.speed_z) * animation.magnitude_z / 10 * fade * variance;						
 			} else {
 				targetObj.position = targetObj.realPosition;
 				delete _this._shakeAnimations[animationId];
@@ -3296,7 +3298,7 @@ BattleSceneManager.prototype.registerEffekseerDynamicParamAnimation = function(t
 	};
 }
 	
-BattleSceneManager.prototype.registerShakeAnimation = function(targetObj, magnitude_x, speed_x, magnitude_y, speed_y, magnitude_z, speed_z, startTick, duration, fadeInTicks, fadeOutTicks){	
+BattleSceneManager.prototype.registerShakeAnimation = function(targetObj, magnitude_x, speed_x, magnitude_y, speed_y, magnitude_z, speed_z, startTick, duration, fadeInTicks, fadeOutTicks, magnitude_variance, speed_variance){	
 	this._shakeAnimations[this._shakeAnimationCtr++] = {		
 		targetObj: targetObj,
 		magnitude_x: magnitude_x,
@@ -3308,7 +3310,9 @@ BattleSceneManager.prototype.registerShakeAnimation = function(targetObj, magnit
 		startTick: startTick,
 		duration: duration,
 		fadeInTicks: fadeInTicks,
-		fadeOutTicks: fadeOutTicks		
+		fadeOutTicks: fadeOutTicks,
+		magnitude_variance: magnitude_variance,
+		speed_variance: speed_variance
 	};
 }
 
@@ -3916,7 +3920,7 @@ BattleSceneManager.prototype.executeAnimation = function(animation, startTick){
 			if(targetObj){				
 				_this.stopShakeAnimations(target);
 				targetObj.realPosition = new BABYLON.Vector3().copyFrom(targetObj.position);
-				_this.registerShakeAnimation(targetObj, params.magnitude_x || 0, params.speed_x || 1, params.magnitude_y || 0, params.speed_y || 1, params.magnitude_z || 0, params.speed_z || 1, startTick, params.duration, params.fadeInTicks || 0, params.fadeOutTicks || 0);
+				_this.registerShakeAnimation(targetObj, params.magnitude_x || 0, params.speed_x || 1, params.magnitude_y || 0, params.speed_y || 1, params.magnitude_z || 0, params.speed_z || 1, startTick, params.duration, params.fadeInTicks || 0, params.fadeOutTicks || 0, params.magnitude_variance || 0, params.speed_variance || 0);
 			}			
 		},
 		set_camera_target: function(target, params){
