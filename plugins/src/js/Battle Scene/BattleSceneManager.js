@@ -5637,7 +5637,7 @@ BattleSceneManager.prototype.executeAnimation = function(animation, startTick){
 				
 				
 				additions[startTick + params.duration] = [];
-				if(!params.noDamage){
+				if(!params.noDamage && action.isHit){
 					additions[startTick + params.duration].push({type: "show_damage", target: target, params:{}});		
 					
 				}
