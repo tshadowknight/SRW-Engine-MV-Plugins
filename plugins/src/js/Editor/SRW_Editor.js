@@ -465,7 +465,7 @@ SRWEditor.prototype.init = function(){
 		},	
 		play_effekseer: {
 			hasTarget: true,
-			params: ["path", "position", "scale", "speed", "rotation", "parent", "isForeground", "autoRotate", "flipZ", "ignoreParentRotation"],
+			params: ["path", "position", "scale", "speed", "rotation", "parent", "attachForShake", "isForeground", "autoRotate", "flipZ", "ignoreParentRotation"],
 			desc: "Play a predefined effekseer effect."
 		},
 		set_effekseer_color: {
@@ -813,6 +813,7 @@ SRWEditor.prototype.init = function(){
 		columnCount: "The number of columns in the spritesheet.",
 		isBackground: "If 1 the layer will be a background layer.",
 		isForeground: "If 1 the layer will render as render group 4, otherwise render group 2. Higher number render groups are drawn last.",
+		attachForShake: "If 1 effect will be attached to the node that gets shaken during shake animations instead of the parent node.",
 		autoRotate: "If 1 the effect will be automatically rotated for enemies.",
 		flipZ: "If 1 the effect will have its z scale inverted.",
 		ignoreParentRotation: "If 1 the parent node's rotation will not be applied.",
@@ -1263,6 +1264,9 @@ SRWEditor.prototype.init = function(){
 		
 		},
 		isForeground: function(value){
+		
+		},
+		attachForShake: function(value){
 		
 		},
 		autoRotate: function(value){
@@ -4055,12 +4059,21 @@ SRWEditor.prototype.showAttackEditorControls = function(){
 					
 			
 					var xInput = referenceNode.querySelector(".param_value[data-dataid='x']");	
-					xInput.value = ((data.x || data._x || 0).toFixed(3)) * $battleSceneManager.getAnimationDirection();
+					if(prop == "position"){
+						xInput.value = ((data.x || data._x || 0).toFixed(3)) * $battleSceneManager.getAnimationDirection();
+					}	else {
+						xInput.value = ((data.x || data._x || 0).toFixed(3));
+					}		
 					var event = new Event('change');
 					xInput.dispatchEvent(event);
 					
 					var yInput = referenceNode.querySelector(".param_value[data-dataid='y']");	
-					yInput.value = (data.y || data._y || 0).toFixed(3);
+					if(prop == "rotation"){
+						yInput.value = (data.y || data._y || 0).toFixed(3) * $battleSceneManager.getAnimationDirection();;
+					} else {
+						yInput.value = (data.y || data._y || 0).toFixed(3);
+					}	
+					
 					var event = new Event('change');
 					yInput.dispatchEvent(event);
 					

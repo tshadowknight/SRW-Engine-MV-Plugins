@@ -141,7 +141,8 @@ var ENGINE_SETTINGS = {
 		/*DAMAGE_OFFSETS: {top: 20, left: 62},
 		DAMAGE_TWIN_OFFSET: {top: 10, left: 40},*/
 		RENDER_WIDTH: 1110,
-		RENDER_HEIGHT: 624
+		RENDER_HEIGHT: 624,
+		SHOW_FADE_BELOW_TEXTBOX: false
 	},
 	MASTERY_REWARDS: {
 		PP: {AMOUNT: 5, SCOPE: "deployed"}, //scope is deployed, unlocked, or all

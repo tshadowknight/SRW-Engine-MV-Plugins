@@ -900,10 +900,10 @@ BattleSceneManager.prototype.runShaderEffect = function(id, effect, postEffect){
 	//effect.setBool('iPlaying', true);
 	effect.setFloat('iTime', _this._shaderManagement[id].currentTime);
 	params.forEach(function(paramDef){
-		if(paramDef.type == "vector2" && paramDef.value != null){
+		if((paramDef.type == "vector2" || paramDef.type == "vector2_f") && paramDef.value != null){
 			effect.setVector2(paramDef.name, paramDef.value);
 		}
-		if(paramDef.type == "vector3" && paramDef.value != null){
+		if((paramDef.type == "vector3" || paramDef.type == "vector3_f") && paramDef.value != null){
 			effect.setVector3(paramDef.name, paramDef.value);
 		}
 		if(paramDef.type == "float" && paramDef.value != null){
@@ -3704,13 +3704,20 @@ BattleSceneManager.prototype.executeAnimation = function(animation, startTick){
 									valueParts[0] =  1 - valueParts[0];
 								}
 								value = new BABYLON.Vector2(valueParts[0] * 1, valueParts[1] * 1);
+							} else if(type == "vector2_f"){
+								var valueParts = value.split(",");				
+								valueParts[0] =  1 - valueParts[0];							
+								value = new BABYLON.Vector2(valueParts[0] * 1, valueParts[1] * 1);
 							} else if(type == "vector3"){
 								var valueParts = value.split(",");
 								if(_this._animationDirection == -1){
 									valueParts[0] =  1 - valueParts[0];
 								}
 								value = new BABYLON.Vector3(valueParts[0] * 1, valueParts[1] * 1, valueParts[2] * 1);
-							}
+							} else if(type == "vector3_f"){
+								var valueParts = value.split(",");
+								value = new BABYLON.Vector3(valueParts[0] * 1, valueParts[1] * 1, valueParts[2] * 1);
+							} 
 							shaderParams.push({
 								type: type,
 								name: varName, 
@@ -4953,7 +4960,7 @@ BattleSceneManager.prototype.executeAnimation = function(animation, startTick){
 					
 					if(params.isBarrier * 1 && parentObj.pivothelper){
 						parentObj = parentObj.pivothelper;
-					} else if(parentObj.parent_handle){
+					} else if(!params.attachForShake && parentObj.parent_handle){
 						parentObj = parentObj.parent_handle;
 					}
 					
@@ -6564,9 +6571,17 @@ BattleSceneManager.prototype.resetFadeState = function() {
 	var newDiv = document.createElement("div");
 	newDiv.id = "fade_container";
 	newDiv.classList.add("fade_container");
+
+	if(ENGINE_SETTINGS.BATTLE_SCENE.SHOW_FADE_BELOW_TEXTBOX){
+		newDiv.style.zIndex = 51;
+	}
 	
 	this._fadeContainer.replaceWith(newDiv);
 	this._fadeContainer = newDiv;
+
+	this._fadeContainer.width = Graphics._width;
+	this._fadeContainer.height = Graphics._height;
+	Graphics._centerElement(this._fadeContainer);
 }
 
 BattleSceneManager.prototype.resetSystemFadeState = function() {
@@ -6582,6 +6597,9 @@ BattleSceneManager.prototype.swipeToBlack = function(direction, inOrOut, holdDur
 	var _this = this;
 	return new Promise(function(resolve, reject){
 		//_this.resetFadeState();
+		if(ENGINE_SETTINGS.BATTLE_SCENE.SHOW_FADE_BELOW_TEXTBOX){
+			_this._swipeContainer.style.zIndex = 51;
+		}
 		var swipeClass;
 		if(direction == "left"){
 			swipeClass = "swipe_left";
