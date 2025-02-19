@@ -5203,55 +5203,6 @@ BattleSceneManager.prototype.executeAnimation = function(animation, startTick){
 				targetObj.playAnimation(params.index, params.index, false, 100);
 			}
 		},
-		set_sprite_animation: function(target, params){
-			params = JSON.parse(JSON.stringify(params));
-			var targetObj = getTargetObject(target);				
-			var targetObj = getTargetObject(target);
-			var action = _this._currentAnimatedAction;
-			var targetAction = _this._currentAnimatedAction.attacked;
-			if(targetObj){
-				if(ENGINE_SETTINGS.SINGLE_BATTLE_SPRITE_MODE){
-					params.name = "main";
-				}
-				var sampleMode;
-				if(ENGINE_SETTINGS.BATTLE_SCENE.SPRITES_FILTER_MODE == "TRILINEAR"){
-					sampleMode = BABYLON.Texture.TRILINEAR_SAMPLINGMODE
-				} else if(ENGINE_SETTINGS.BATTLE_SCENE.SPRITES_FILTER_MODE == "NEAREST"){
-					sampleMode = BABYLON.Texture.NEAREST_NEAREST
-				}
-				
-				var battleEffect;
-				if(target == "active_main" || target == "active_support_attacker"){
-					battleEffect = action;
-				} else if(target == "active_target" || target == "active_support_defender"){
-					battleEffect = targetAction;
-				}
-				if(!battleEffect){
-					for(let entry of _this._instantiatedUnits){
-						if(entry.name == target){
-							battleEffect = {ref: entry.ref};
-						}
-					}
-				}
-				
-				
-				var imgPath = $statCalc.getBattleSceneImage(battleEffect.ref);
-				
-				targetObj.material.diffuseTexture = _this.getCachedTexture("img/SRWBattleScene/"+imgPath+"/"+params.name+".png"); 
-				targetObj.material.diffuseTexture.hasAlpha = true;
-				targetObj.material.useAlphaFromDiffuseTexture  = true;
-				targetObj.material.transparencyMode = BABYLON.Material.MATERIAL_ALPHATEST;
-				
-				
-				targetObj.material.specularColor = new BABYLON.Color3(0, 0, 0);
-				//targetObj.material.emissiveColor = new BABYLON.Color3(1, 1, 1);
-				//targetObj.material.ambientColor = new BABYLON.Color3(0, 0, 0);
-				if(params.animationFrames){
-					params.animationDelay*=_this.getTickDuration();
-					_this.registerBgAnimation(targetObj, startTick, params.frameSize, params.lineCount, params.columnCount, 0, params.animationFrames*1, params.animationLoop*1, params.animationDelay, params.holdFrame*1);
-				}
-			}
-		},
 		set_sprite_frame: function(target, params){
 			params = JSON.parse(JSON.stringify(params));
 			var targetObj = getTargetObject(target);
@@ -5998,6 +5949,7 @@ BattleSceneManager.prototype.executeAnimation = function(animation, startTick){
 		}
 	};
 	
+	animationHandlers["set_sprite_animation"] = animationHandlers["set_sprite_frame"];
 	animationHandlers["set_model_animation"] = animationHandlers["set_sprite_frame"];
 	if(animationHandlers[animation.type] && _this._currentAnimatedAction){
 		animationHandlers[animation.type](animation.target, animation.params || {});
@@ -6578,10 +6530,11 @@ BattleSceneManager.prototype.resetFadeState = function() {
 	
 	this._fadeContainer.replaceWith(newDiv);
 	this._fadeContainer = newDiv;
-
-	this._fadeContainer.width = Graphics._width;
-	this._fadeContainer.height = Graphics._height;
-	Graphics._centerElement(this._fadeContainer);
+	if(!$gameTemp || !$gameTemp.editMode){
+		this._fadeContainer.width = Graphics._width;
+		this._fadeContainer.height = Graphics._height;
+		Graphics._centerElement(this._fadeContainer);
+	}	
 }
 
 BattleSceneManager.prototype.resetSystemFadeState = function() {
