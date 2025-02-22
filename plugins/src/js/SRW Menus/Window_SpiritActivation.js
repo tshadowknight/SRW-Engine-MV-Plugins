@@ -44,17 +44,12 @@ Window_SpiritActivation.prototype.initialize = function() {
 	
 	Object.keys($spiritManager.getSpiritDefinitions()).forEach(function(id){
 		var spiritAnimInfo = $spiritManager.getSpiritDisplayInfo(id).animInfo;	
-		try {
-			if(spiritAnimInfo.name){
-				ImageManager.loadNormalBitmap('img/SRWMapEffects/'+spiritAnimInfo.name+".png");
-			} else if(spiritAnimInfo.src){
-				ImageManager.loadBitmapPromise(_this.makeSpiritAnimationURL(spiritAnimInfo.src));
-			}
-		} catch(e){
-			console.log("Could not load spirit "+ id + ": ");
-			console.trace();
+		console.log("Loading Spirit Assets: " + id)	
+		if(spiritAnimInfo.name){
+			ImageManager.loadNormalBitmap('img/SRWMapEffects/'+spiritAnimInfo.name+".png");
+		} else if(spiritAnimInfo.src){
+			ImageManager.loadBitmapPromise(_this.makeSpiritAnimationURL(spiritAnimInfo.src));
 		}
-		
 	});
 }
 
