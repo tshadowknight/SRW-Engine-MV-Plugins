@@ -5567,11 +5567,17 @@ BattleSceneManager.prototype.executeAnimation = function(animation, startTick){
 				_this._enemyTwinSupporterSprite.sprite.parent_handle.position.x+=targetOffset;
 			}
 			
+			//this should be done through UV scrolling, but changing the UV on the same frame as the camera position causes flickering?
 			_this._bgs.forEach(function(bg){	
-				bg.position.x+=targetOffset;	
+				if(!bg.inactive){
+					bg.position.x+=targetOffset;	
+				}
+				
 			});
 			_this._bgInstances.forEach(function(bg){	
-				bg.position.x+=targetOffset;	
+				if(!bg.inactive){
+					bg.position.x+=targetOffset;	
+				}
 			});
 			
 			

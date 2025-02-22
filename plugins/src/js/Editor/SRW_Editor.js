@@ -4478,7 +4478,12 @@ SRWEditor.prototype.playBattleScene = function(){
 		}
 		let songId = "";
 		if(_this._playBGM){
-			songId = $songManager.getActorSongInfo(_this._currentActor) || "Battle1";			
+			if(_this._enemySideAttack){
+				songId = $songManager.getEnemySongInfo(_this._currentEnemy) || "Battle1";	
+			} else {
+				songId = $songManager.getActorSongInfo(_this._currentActor) || "Battle1";	
+			}
+					
 		}
 		var demoConfig = {
 			enemyFirst: _this._enemySideAttack, // if 0 the actor will move first, if 1 the enemy will move first. This also affects the supports. If 0, the actor support will be attacking otherwise defending. If 1, the enemy support will be attacking otherwise defending.

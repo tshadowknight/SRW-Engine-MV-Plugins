@@ -39,6 +39,10 @@ SRWSongManager.prototype.getActorSongInfo = function(actorId){
 	return $gameSystem.customActorSongInfo[actorId] || this._actorSongMapping[actorId];
 }
 
+SRWSongManager.prototype.getEnemySongInfo = function(enemyId){
+	return this._enemySongMapping[enemyId];
+}
+
 SRWSongManager.prototype.setSpecialTheme = function(songId){
 	$gameSystem._specialTheme = songId;
 }
