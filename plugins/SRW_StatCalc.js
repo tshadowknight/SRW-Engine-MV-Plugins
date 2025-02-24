@@ -3585,6 +3585,8 @@ StatCalc.prototype.getBattleSceneInfo = function(actor){
 		result.rotation = parseInt(mechProperties.mechBattleSceneSpriteRotation) || 0;
 		
 		result.animGroup = mechProperties.mechBattleSceneAnimGroup;
+
+		result.barrierScale = mechProperties.mechBattleSceneBarrierScale;
 		
 		let defaultAttachments = [];
 		let parts = (mechProperties.mechBattleSceneDefaultAttachments || "").split(",");

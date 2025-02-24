@@ -1276,6 +1276,7 @@ BattleSceneManager.prototype.updateMainSprite = async function(type, name, sprit
 		if(!spriteConfig || spriteConfig.type == "default"){
 			spriteInfo = _this.createPlanarSprite(name+"_displayed", path,  new BABYLON.Vector3(xOffset, spriteConfig.yOffset, 0), frameSize, flipX, spriteConfig.referenceSize);		
 			spriteInfo.sprite.setPivotMatrix(BABYLON.Matrix.Translation(-0, spriteInfo.size.height/2, -0), false);
+			pivotYOffset+=spriteConfig.centerYOffset;	
 		} else if(spriteConfig.type == "spriter"){
 			spriteInfo = _this.createSpriterSprite(name+"_displayed", path,  new BABYLON.Vector3(xOffset, spriteConfig.yOffset, 0), flipX);
 			pivotYOffset+=spriteConfig.referenceSize / 2;			
@@ -2512,15 +2513,20 @@ BattleSceneManager.prototype.disposeAnimationBackgrounds = function(){
 	this._animationBackgroundsInfo = [];
 }
 
-BattleSceneManager.prototype.disposeEffekseerInstances = function(){
+BattleSceneManager.prototype.disposeEffekseerInstances = function(preserveSysEffects){
+	const tmp = []
 	this._effekseerInfo.forEach(function(effekInfo){
-		if(effekInfo.handle){
-			effekInfo.handle.stop();
-			effekInfo.context.releaseEffect(effekInfo.effect);
-			effekInfo.context.activeCount = 0;
-		}
+		if(!effekInfo.isSysEffect || !preserveSysEffects){
+			if(effekInfo.handle){
+				effekInfo.handle.stop();
+				effekInfo.context.releaseEffect(effekInfo.effect);
+				effekInfo.context.activeCount = 0;
+			}
+		} else {
+			tmp.push(effekInfo);
+		}		
 	});
-	this._effekseerInfo = [];	
+	this._effekseerInfo = tmp;	
 	
 	this.stopEffekContext(this._effksContext);
 	this.stopEffekContext(this._effksContextMirror);
@@ -2906,7 +2912,7 @@ BattleSceneManager.prototype.startScene = function(){
 							_this._runningAnimation = false;
 							_this.disposeAnimationSprites();
 							_this.disposeAnimationBackgrounds();
-							_this.disposeEffekseerInstances();
+							_this.disposeEffekseerInstances(true);
 							_this.disposeLights();
 							//_this.disposeSpriterBackgrounds();
 							_this.disposeRMMVBackgrounds();
@@ -4881,7 +4887,13 @@ BattleSceneManager.prototype.executeAnimation = function(animation, startTick){
 			}
 		},	
 		play_effekseer: function(target, params){					
-			const effekInfo = _this._preloadedEffekseerInfo[_this._currentAnimatedAction.effekseerId+"__"+params.path];
+			let effekInfo;
+			if(params.path == "sys_barrier"){
+				effekInfo = _this._preloadedEffekseerInfo["ub__sys_barrier"];
+			} else {
+				effekInfo = _this._preloadedEffekseerInfo[_this._currentAnimatedAction.effekseerId+"__"+params.path];
+			}
+				
 			if(effekInfo){
 				const targetContext = effekInfo.targetContext;
 				const effect = effekInfo.effect;
@@ -4946,6 +4958,7 @@ BattleSceneManager.prototype.executeAnimation = function(animation, startTick){
 						
 				const info = {name: target, effect: effect, context: targetContext, offset: {x: position.x, y: position.y, z: position.z}, offsetRotation: {x: rotation.x, y: rotation.y, z: rotation.z}};
 				info.handle = handle;
+				info.isSysEffect = params.isSysEffect;
 
 				//info.actionIdx = actionIdx;
 
@@ -5127,6 +5140,19 @@ BattleSceneManager.prototype.executeAnimation = function(animation, startTick){
 				targetObj.activeTriggers.push(params.id * 1);
 			}
 		}, 
+		set_effekseer_input: function(target, params){
+			var targetObj;
+			var ctr = 0;
+			while(!targetObj && ctr < _this._effekseerInfo.length){
+				if(_this._effekseerInfo[ctr].name == target){
+					targetObj = _this._effekseerInfo[ctr].handle;
+				}
+				ctr++;
+			}
+			if(targetObj){
+				targetObj.setDynamicInput(params.paramId, params.value * 1);
+			}			
+		},
 		animate_effekseer_input: function(target, params){
 			var targetObj;
 			var ctr = 0;
@@ -5300,7 +5326,7 @@ BattleSceneManager.prototype.executeAnimation = function(animation, startTick){
 					additions[startTick + 1] = [									
 						//{type: "send_effekseer_trigger", target: target+"sys_barrier", params:{id: 0}},
 						//{type: "send_effekseer_trigger", target: target+"sys_barrier", params:{id: 2}}
-						{type: "animate_effekseer_input", target: target+"sys_barrier", params:{
+						{type: "animate_effekseer_input", target: _this._activeSysBarrier, params:{
 							paramId: 0,
 							startValue: 1,
 							endValue: 0,
@@ -5666,16 +5692,16 @@ BattleSceneManager.prototype.executeAnimation = function(animation, startTick){
 				}
 				
 				if(!action.barrierBroken && _this._debugBarriers != 2){
-					additions[startTick + params.duration].push([									
-						//{type: "send_effekseer_trigger", target: target+"sys_barrier", params:{id: 1}},
-						//{type: "send_effekseer_trigger", target: target+"sys_barrier", params:{id: 0}}
-						{type: "animate_effekseer_input", target: target+"sys_barrier", params:{
+					additions[startTick + params.duration].push(									
+						{type: "animate_effekseer_input", target: _this._activeSysBarrier, params:{
 							paramId: 0,
 							startValue: 1,
 							endValue: 0,
 							duration: 30
 						}}
-					]);	
+					);	
+
+									
 				}									
 	
 				
@@ -5711,15 +5737,86 @@ BattleSceneManager.prototype.executeAnimation = function(animation, startTick){
 			var additions = [];
 			if((action.attacked && action.attacked.hasBarrier) || _this._debugBarriers > 0){				
 				targetObj.lastAnimation = "block";
-				additions[startTick + 1] = [									
-					{type: "play_effekseer", target: target+"sys_barrier", params:{path: "sys_barrier", parent: target, scale: 3.5, isBarrier: true}},
-					{type: "animate_effekseer_input", target: target+"sys_barrier", params:{
-						paramId: 0,
-						startValue: 0,
-						endValue: 1,
-						duration: 30
-					}}
-				];							
+				let scale = $statCalc.getBattleSceneInfo(action.attacked.ref).barrierScale || 3.5;
+				let color;
+				if(action.attacked.barrierColors){
+					for(let bColor of action.attacked.barrierColors){
+						if(bColor){
+							bColor = bColor.replace("#", "");
+							if(!color){
+								color = hexToRgbArray(bColor);
+							} else {
+								color = colorMixer(color, hexToRgbArray(bColor), 0.5);
+							}
+						}						
+					}
+				} 
+				if(!color){
+					color = ENGINE_SETTINGS.BATTLE_SCENE.DEFAULT_BARRIER_COLOR || "#7c00e6";
+					color = color.replace("#", "");
+					color = hexToRgbArray(color);
+				}
+				
+				function hexToRgb(hex) {
+					var bigint = parseInt(hex, 16);
+					var r = (bigint >> 16) & 255;
+					var g = (bigint >> 8) & 255;
+					var b = bigint & 255;
+				
+					return {
+						r: r,
+						g: g,
+						b: b
+					};
+				}
+
+				function hexToRgbArray(hex) {
+					const values = hexToRgb(hex);
+					return [values.r, values.g, values.b];
+				}
+
+				//colorChannelA and colorChannelB are ints ranging from 0 to 255
+				function colorChannelMixer(colorChannelA, colorChannelB, amountToMix){
+					var channelA = colorChannelA*amountToMix;
+					var channelB = colorChannelB*(1-amountToMix);
+					return parseInt(channelA+channelB);
+				}
+				//rgbA and rgbB are arrays, amountToMix ranges from 0.0 to 1.0
+				//example (red): rgbA = [255,0,0]
+				function colorMixer(rgbA, rgbB, amountToMix){
+					var r = colorChannelMixer(rgbA[0],rgbB[0],amountToMix);
+					var g = colorChannelMixer(rgbA[1],rgbB[1],amountToMix);
+					var b = colorChannelMixer(rgbA[2],rgbB[2],amountToMix);
+					return [r, g, b];
+				}
+
+				const encodedColorValue = color[0] * 65536 + color[1] * 256 + color[2];			
+				additions[startTick + 1] = [];
+
+				//account for multiple activations during the same battle scene(support attacks)
+				let targetName = target+"sys_barrier";
+				let ctr = 0;
+				while(_this.getTargetObject(targetName) != null){
+					targetName = targetName + "_" + ctr;
+					ctr++;
+				}
+
+				_this._activeSysBarrier = targetName;
+
+				additions[startTick + 1].push({type: "play_effekseer", target: _this._activeSysBarrier, params:{path: "sys_barrier", parent: target, scale: scale, isBarrier: true, isSysEffect: true}});
+
+				additions[startTick + 1].push({type: "animate_effekseer_input", target: _this._activeSysBarrier, params:{
+					paramId: 0,
+					startValue: 0,
+					endValue: 1,
+					duration: 30
+				}});
+				additions[startTick + 1].push({type: "set_effekseer_input", target: _this._activeSysBarrier, params:{
+					paramId: 1,
+					value: encodedColorValue
+				}});
+
+						
 			}
 			_this.mergeAnimList(additions);	
 		},
@@ -7106,6 +7203,9 @@ BattleSceneManager.prototype.preloadAnimListEffekseerEffects = async function(an
 BattleSceneManager.prototype.preloadEffekseerParticles = async function(){
 	var _this = this;
 	this._preloadedEffekseerInfo = {};
+
+	await this.preloadEffekseerEffect("sys_barrier", {path: "sys_barrier"}, "ub");
+
 	for(var i = 0; i < _this._actionQueue.length; i++){
 		
 		var nextAction = _this._actionQueue[i];

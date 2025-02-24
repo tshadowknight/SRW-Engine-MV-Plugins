@@ -533,6 +533,7 @@ BattleCalc.prototype.performDamageCalculation = function(attackerInfo, defenderI
 		}
 		
 		result.barrierNames = [];
+		result.barrierColors = [];
 		if(!noBarrier && (!$statCalc.applyStatModsToValue(attackerInfo.actor, 0, ["pierce_barrier"]) || $statCalc.applyStatModsToValue(defenderInfo.actor, 0, ["always_barrier"])) && !activeAttackerSpirits.fury){			
 			var totalBarrierCost = 0;
 			
@@ -540,6 +541,7 @@ BattleCalc.prototype.performDamageCalculation = function(attackerInfo, defenderI
 			var percentBarrierAmount = 1;
 			var percentBarrierCost = 0;
 			var barrierName = "";
+			var barrierColor = "";
 			
 			var percentEffect = $statCalc.getModDefinitions(defenderInfo.actor, ["percent_barrier"]); 
 			
@@ -552,6 +554,7 @@ BattleCalc.prototype.performDamageCalculation = function(attackerInfo, defenderI
 							percentBarrierAmount = effect.value;
 							percentBarrierCost = effect.cost;
 							barrierName = effect.name;
+							barrierColor = effect.color;
 						}						
 					}
 				}
@@ -569,6 +572,7 @@ BattleCalc.prototype.performDamageCalculation = function(attackerInfo, defenderI
 							percentBarrierAmount = effect.value;
 							percentBarrierCost = effect.cost;
 							barrierName = effect.name;
+							barrierColor = effect.color;
 						}						
 					}
 				}
@@ -580,6 +584,7 @@ BattleCalc.prototype.performDamageCalculation = function(attackerInfo, defenderI
 					result.hasPercentBarrier = true;
 					finalDamage = Math.floor(finalDamage * percentBarrierAmount);
 					result.barrierNames.push(barrierName);
+					result.barrierColors.push(barrierColor);
 				} 			
 			}
 			
@@ -599,6 +604,7 @@ BattleCalc.prototype.performDamageCalculation = function(attackerInfo, defenderI
 							reductionBarrierAmount = effect.value;
 							reductionBarrierCost = effect.cost || 0;
 							barrierName = effect.name;
+							barrierColor = effect.color;
 						}
 					}
 				}
@@ -616,6 +622,7 @@ BattleCalc.prototype.performDamageCalculation = function(attackerInfo, defenderI
 							reductionBarrierAmount = effect.value;
 							reductionBarrierCost = effect.cost;
 							barrierName = effect.name;
+							barrierColor = effect.color;
 						}
 					}
 				}
@@ -628,6 +635,7 @@ BattleCalc.prototype.performDamageCalculation = function(attackerInfo, defenderI
 					result.hasReductionBarrier = true;
 					finalDamage-=reductionBarrierAmount;
 					result.barrierNames.push(barrierName);
+					result.barrierColors.push(barrierColor);
 					if(finalDamage < 0){
 						finalDamage = 0;
 					}
@@ -653,6 +661,7 @@ BattleCalc.prototype.performDamageCalculation = function(attackerInfo, defenderI
 							thresholdBarrierAmount = effect.value;
 							thresholdBarrierCost = effect.cost;
 							barrierName = effect.name;
+							barrierColor = effect.color;
 						}
 					}
 				}
@@ -663,6 +672,7 @@ BattleCalc.prototype.performDamageCalculation = function(attackerInfo, defenderI
 				if(totalBarrierCost <= $statCalc.getCurrenEN(defenderInfo.actor)){
 					result.hasThresholdBarrier = true;
 					result.barrierNames.push(barrierName);
+					result.barrierColors.push(barrierColor);
 					if(finalDamage < thresholdBarrierAmount) {
 						finalDamage = 0;
 					} else {
@@ -1125,6 +1135,7 @@ BattleCalc.prototype.generateBattleResult = function(isPrediction){
 				activeDefenderCache.barrierBroken = damageResult.thresholdBarrierBroken;
 				
 				dCache.barrierNames = damageResult.barrierNames;
+				dCache.barrierColors = damageResult.barrierColors;
 				
 				dCache.attackedBy = aCache;
 				

@@ -725,6 +725,7 @@
 				refundPilotPP: true,
 				addFunds: true,
 				setEventHP: true,
+				setEventHPPercent: true,
 				addSubPilot: true,
 				removeSubPilot: true,
 				setPortraitOverlay: true,

@@ -1259,10 +1259,18 @@
 					}
 					$gameParty.gainGold(amount * 1);
 				}
+				
 				if (command === 'setEventHP') {
 					var actor = $gameSystem.EventToUnit(args[0])[1];				
 					$statCalc.setHP(actor, (args[1] || 1) * 1);	
 				}		
+
+				if (command === 'setEventHPPercent') {
+					var actor = $gameSystem.EventToUnit(args[0])[1];				
+					var mechStats = $statCalc.getCalculatedMechStats(actor);
+					$statCalc.setHP(actor, Math.floor(mechStats.maxHP * args[1] / 100));		
+				}
+				
 				
 				if (command === 'addSubPilot') {					
 					var targetMech = $statCalc.getMechData($dataClasses[args[0] * 1], true);

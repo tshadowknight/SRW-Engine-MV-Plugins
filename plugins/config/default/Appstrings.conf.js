@@ -1062,6 +1062,7 @@ EDITORSTRINGS.MECH = {
 	label_death_anim: "Death Animation",
 	label_system_default: "System Default",
 	label_default_attachments: "Default Attachments",
+	label_barrier_scale: "Barrier Scale",
 	
 	label_spawn: "Spawn",
 	label_animation: "Animation",

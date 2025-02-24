@@ -1684,6 +1684,12 @@ MechUI.prototype.initPropertyHandlers = function(){
 				content+="</select>";
 				content+="</div>";
 				content+="</div>";
+
+				content+="<div title='' class='row'>";
+				content+=_this.createValueInput("mechBattleSceneBarrierScale", EDITORSTRINGS.MECH.label_barrier_scale, "", "");
+				content+="</div>";
+
+				
 				
 				content+="</div>";
 				return content;
@@ -1812,7 +1818,8 @@ MechUI.prototype.initPropertyHandlers = function(){
 				
 				hookedProperties = [			
 					"mechBattleSceneSprite",			
-					"mechBattleSceneDefaultAttachments"						
+					"mechBattleSceneDefaultAttachments",
+					"mechBattleSceneBarrierScale"			
 				];
 				if(spriteType == "DragonBones"){
 					hookedProperties.push("mechBattleSceneArmatureName");
