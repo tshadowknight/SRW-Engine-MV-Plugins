@@ -5321,20 +5321,22 @@ BattleSceneManager.prototype.executeAnimation = function(animation, startTick){
 					}
 				}
 				
-				if(params.name == "hurt" && ((action.attacked.barrierBroken && _this._debugBarriers == 0) || _this._debugBarriers == 2)){					
-					var additions = [];					
-					additions[startTick + 1] = [									
-						//{type: "send_effekseer_trigger", target: target+"sys_barrier", params:{id: 0}},
-						//{type: "send_effekseer_trigger", target: target+"sys_barrier", params:{id: 2}}
-						{type: "animate_effekseer_input", target: _this._activeSysBarrier, params:{
-							paramId: 0,
-							startValue: 1,
-							endValue: 0,
-							duration: 30
-						}}
-						
-					];												
-					_this.mergeAnimList(additions);				
+				if(params.name == "hurt" && ((action.attacked.barrierBroken && _this._debugBarriers == 0) || _this._debugBarriers == 2)){			
+					if(_this._activeSysBarrier){
+						var additions = [];					
+						additions[startTick + 1] = [									
+							//{type: "send_effekseer_trigger", target: target+"sys_barrier", params:{id: 0}},
+							//{type: "send_effekseer_trigger", target: target+"sys_barrier", params:{id: 2}}
+							{type: "animate_effekseer_input", target: _this._activeSysBarrier, params:{
+								paramId: 0,
+								startValue: 1,
+								endValue: 0,
+								duration: 30
+							}}
+							
+						];												
+						_this.mergeAnimList(additions);	
+					}										
 				}
 				
 				targetObj.lastAnimation = params.name;
@@ -5691,19 +5693,20 @@ BattleSceneManager.prototype.executeAnimation = function(animation, startTick){
 					
 				}
 				
-				if(!action.barrierBroken && _this._debugBarriers != 2){
-					additions[startTick + params.duration].push(									
-						{type: "animate_effekseer_input", target: _this._activeSysBarrier, params:{
-							paramId: 0,
-							startValue: 1,
-							endValue: 0,
-							duration: 30
-						}}
-					);	
-
-									
-				}									
+				if(_this._activeSysBarrier){
+					if(!action.barrierBroken && _this._debugBarriers != 2){
+						additions[startTick + params.duration].push(									
+							{type: "animate_effekseer_input", target: _this._activeSysBarrier, params:{
+								paramId: 0,
+								startValue: 1,
+								endValue: 0,
+								duration: 30
+							}}
+						);	
 	
+										
+					}
+				}
 				
 				
 				var action = _this.getTargetAction(target);
