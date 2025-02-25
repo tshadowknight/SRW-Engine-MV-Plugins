@@ -30,29 +30,6 @@ BattleSceneUILayer.prototype.initialize = function() {
 	});
 }
 
-BattleSceneUILayer.prototype.fadeOutTextBox = function(immediate){
-	var _this = this;
-	if(immediate){
-		this._textDisplay.style.transition = "none";
-	}
-	this._textDisplay.classList.add("fadeOut");
-	if(immediate){
-		setTimeout(function(){_this._textDisplay.style.transition = "";}, 100);
-	}
-	
-}
-
-BattleSceneUILayer.prototype.fadeInTextBox = function(immediate){
-	var _this = this;
-	if(immediate){
-		this._textDisplay.style.transition = "none";
-	}
-	this._textDisplay.classList.remove("fadeOut");
-	if(immediate){
-		setTimeout(function(){_this._textDisplay.style.transition = "";}, 100);
-	}
-}
-
 BattleSceneUILayer.prototype.updateTwinDisplay = function(info){
 	this.resetDisplay();
 	this._allyStats.style.display = "";
@@ -121,25 +98,6 @@ BattleSceneUILayer.prototype.createComponents = function() {
 	Window_CSS.prototype.createComponents.call(this);
 	
 	var windowNode = this.getWindowNode();
-	
-	this._textDisplay = document.createElement("div");
-	this._textDisplay.id = this.createId("text_display");
-	
-	var content = "";
-	content+="<div id='icon_and_noise_container'>";
-	content+="<div id='icon_container'></div>";
-	
-	content+="<canvas width=144 height=144 id='noise'></canvas>";
-	content+="</div>";
-	
-	this._textDisplay.innerHTML = content;
-	this._textDisplayNameAndContent = document.createElement("div");
-	this._textDisplayNameAndContent.id = this.createId("text_display_name_and_content");		
-	this._textDisplay.appendChild(this._textDisplayNameAndContent);
-	windowNode.appendChild(this._textDisplay);
-	
-	this._noiseCanvas = this._textDisplay.querySelector("#noise");
-	this._noiseCtx = this._noiseCanvas.getContext("2d");
 	
 	this._damageDisplay = document.createElement("div");
 	this._damageDisplay.id = this.createId("damage_display");	
@@ -479,39 +437,6 @@ BattleSceneUILayer.prototype.updateStatContent = function(elems, maxValue, value
 	elems.bar.style.width = percent + "%";
 }
 
-BattleSceneUILayer.prototype.resetTextBox = function(){
-	this._currentEntityType = -1;
-	this._currentIconClassId = -1;
-	this._currentName = "";
-	this._currentText = {}; 	
-	this.showTextBox();
-}
-
-BattleSceneUILayer.prototype.setTextBox = function(entityType, entityId, displayName, textInfo, showNoise, immediate){
-	var _this = this;
-	return new Promise(function(resolve, reject){
-		var time = Date.now();
-		if(!_this._lastTextTime || time - _this._lastTextTime > 1000 || immediate){
-
-			_this._lastTextTime = time;
-			_this._currentEntityType = entityType;
-			_this._currentIconClassId = entityId;
-			_this._currentName = displayName;
-			_this._currentText = JSON.parse(JSON.stringify(textInfo)); 
-			if(showNoise){
-				_this.showNoise();
-			}
-			_this.showTextBox().then(function(){				
-				setTimeout(resolve, 500);
-			});					
-		} else {
-			setTimeout(function(){
-				_this.setTextBox(entityType, entityId, displayName, textInfo, showNoise);
-				resolve();
-			}, 1000);
-		}
-	});		
-}
 
 BattleSceneUILayer.prototype.showAllyNotification = function(text){
 	this.setNotification("actor", text);
@@ -627,93 +552,6 @@ BattleSceneUILayer.prototype.showDamage = function(entityType, amount, offsets, 
 	displayCharacter();
 }
 
-BattleSceneUILayer.prototype.showTextBox = function() {
-	var _this = this;
-	var lines = [];
-	if(!Array.isArray(_this._currentText)){
-		lines = [_this._currentText];
-	} else {
-		lines = _this._currentText;
-	}
-	return new Promise(function(resolve, reject){
-		_this.showTextLines(lines, resolve);
-	});	
-}
-
-BattleSceneUILayer.prototype.showTextLines = function(lines, callback) {	
-	var _this = this;
-	var line = lines.shift();
-	if(line){
-		var textDisplayContent = "";		
-		textDisplayContent+="<div id='name_container' class='scaled_text'>";	
-		if(line.displayName){
-			var characterDef = $scriptCharactersLoader.getData()[line.displayName];
-			if(characterDef && ENGINE_SETTINGS.variableUnitPortraits){
-				var expressionInfo = characterDef.expressions[0];
-				var keyParts = expressionInfo.face.split("_");
-				keyParts.pop();
-				var faceKey = keyParts.join("_");
-				
-				var substitutionCandidates = ENGINE_SETTINGS.variableUnitPortraits[faceKey];
-				let active;
-				if(substitutionCandidates){
-					substitutionCandidates.forEach(function(entry){
-						if($statCalc.isMechDeployed(entry.deployedId)){
-							active = entry;
-						}
-					});
-				}
-				if(active){
-					textDisplayContent+= $dataClasses[active.deployedId].name;
-				} else {
-					textDisplayContent+=line.displayName;
-				}
-				
-			} else {
-				textDisplayContent+=line.displayName;
-			}			
-		} else {
-			textDisplayContent+=_this._currentName;
-		}		
-		textDisplayContent+="</div>";
-		textDisplayContent+="<div id='text_container' class='text_container scaled_text'>";	
-		if(line.text){
-			textDisplayContent+=(line.text || "");//"\u300C "+(line.text || "")+" \u300D";
-		} else {
-			textDisplayContent+="";
-		}		
-		textDisplayContent+="</div>";
-		
-		_this._textDisplayNameAndContent.innerHTML = textDisplayContent;
-		_this.updateScaledDiv(_this._textDisplay, true, false);
-		
-		var iconContainer = _this._textDisplay.querySelector("#icon_and_noise_container");
-		_this.updateScaledDiv(iconContainer);		
-		
-		var actorIcon = _this._container.querySelector("#icon_container");
-		actorIcon.innerHTML = "";
-		if(_this._currentIconClassId != -1 && _this._currentEntityType != -1){			
-			/*if(_this._currentEntityType == "actor"){
-				_this.loadActorFace(_this._currentIconClassId, actorIcon);
-			} else {
-				_this.loadEnemyFace(_this._currentIconClassId, actorIcon);
-			}*/	
-			_this.loadFaceByParams(line.faceName, line.faceIndex, actorIcon);
-			
-		} 
-		
-		this.updateCanvas();
-		var duration = 90 * 1000/60;
-		if(line.duration){
-			duration = line.duration * 1000/60;
-		}
-
-		setTimeout(function(){_this.showTextLines(lines, callback)}, duration);
-	} else {
-		callback();
-	}	
-}
-
 BattleSceneUILayer.prototype.showNoise = function() {
 	var _this = this;
 	_this._runNoise = true;
@@ -795,17 +633,9 @@ BattleSceneUILayer.prototype.updateUnitIcons = function(){
 	this.loadImages();
 }
 
-BattleSceneUILayer.prototype.hideNoise = function() {
-	this._runNoise = false;
-	if(this._noiseCanvas){
-		this._noiseCanvas.className = "";	
-	}	
-}	
 
 BattleSceneUILayer.prototype.redraw = function() {	
-	var _this = this;
-	_this.showTextBox();	
-	
+	var _this = this;	
 	
 	//_this.updateScaledImage(_this._spiritAnimImage);
 	//_this.updateScaledDiv(_this._spiritAnim);

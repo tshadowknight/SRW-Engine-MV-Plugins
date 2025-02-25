@@ -1569,6 +1569,10 @@ SRWEditor.prototype.prepareBattleScenePreview = function(){
 	document.querySelector("#attack_editor .preview_window").appendChild($battleSceneManager._swipeContainer);
 	$battleSceneManager._swipeContainer.style.width = "";
 	$battleSceneManager._swipeContainer.style.height = "";
+
+	document.querySelector("#attack_editor .preview_window").appendChild($battleSceneManager._TextContainer);
+	$battleSceneManager._TextContainer.style.width = "";
+	$battleSceneManager._TextContainer.style.height = "";
 	
 	//$battleSceneManager.init(true);	
 	

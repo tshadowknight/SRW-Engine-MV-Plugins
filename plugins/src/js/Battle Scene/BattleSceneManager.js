@@ -6,6 +6,7 @@ import Sprite_Animation_Babylon from "./Sprite_Animation_Babylon.js";
 import Sprite_Screen_Animation_Babylon from "./Sprite_Screen_Animation_Babylon.js";
 
 import BattleSceneUILayer from "./BattleSceneUILayer.js";
+import BattleSceneTextLayer from "./BattleSceneTextLayer.js";
 import SpriterManager from "./SpriterManager.js";
 import SpineManager from "./SpineManager.js";
 
@@ -315,6 +316,10 @@ BattleSceneManager.prototype.initContainer = async function(){
 	this._UIcontainer = document.createElement("div");
 	this._UIcontainer.id = "battle_scene_ui_layer";	
 	document.body.appendChild(this._UIcontainer);		
+
+	this._TextContainer = document.createElement("div");
+	this._TextContainer.id = "battle_scene_text_layer";	
+	document.body.appendChild(this._TextContainer);		
 	
 	this._PIXIContainer = document.createElement("div");
 	this._PIXIContainer.id = "battle_scene_pixi_layer";	
@@ -336,6 +341,7 @@ BattleSceneManager.prototype.init = function(attachControl){
 		this._initialized = true;
 		BABYLON.RenderingManager.MAX_RENDERINGGROUPS = 8;
 		this._UILayerManager = new BattleSceneUILayer("battle_scene_ui_layer");	
+		this._TextlayerManager = new BattleSceneTextLayer("battle_scene_text_layer");
 		this._animationBuilder = new BattleAnimationBuilder();
 		this._environmentBuilder = new BattleEnvironmentBuilder();
 		
@@ -396,6 +402,7 @@ BattleSceneManager.prototype.init = function(attachControl){
 		//this.createNativeParticleSystem("native_test", "native_test", new BABYLON.Vector3(0, 0, 0))//debug
 		
 		this._UILayerManager.redraw();
+		this._TextlayerManager.redraw();
 		//await _this.initEffekseerParticles();
 		
 		
@@ -3677,10 +3684,10 @@ BattleSceneManager.prototype.executeAnimation = function(animation, startTick){
 			}
 		},
 		fade_in_textbox: function(target, params){
-			_this._UILayerManager.fadeInTextBox(params.immediate * 1);
+			_this._TextlayerManager.fadeInTextBox(params.immediate * 1);
 		},
 		fade_out_textbox: function(target, params){
-			_this._UILayerManager.fadeOutTextBox(params.immediate * 1);
+			_this._TextlayerManager.fadeOutTextBox(params.immediate * 1);
 		},
 		effect_shockwave: function(target, params){
 			var x_fraction = params.x_fraction;
@@ -3958,7 +3965,7 @@ BattleSceneManager.prototype.executeAnimation = function(animation, startTick){
 			var battleText = _this._battleTextManager.getText(entityType, action.ref, type, action.isActor ? "enemy" : "actor", _this.getBattleTextId(_this._currentAnimatedAction));
 			
 			_this._awaitingText = true;
-			_this._UILayerManager.setTextBox(entityType, entityId, action.ref.SRWStats.pilot.name, battleText).then(function(){
+			_this._TextlayerManager.setTextBox(entityType, entityId, action.ref.SRWStats.pilot.name, battleText).then(function(){
 				_this._awaitingText = false;
 			});
 		},
@@ -3969,7 +3976,7 @@ BattleSceneManager.prototype.executeAnimation = function(animation, startTick){
 			var entityId = action.ref.SRWStats.pilot.id;
 			var battleText = _this._battleTextManager.getText(entityType, action.ref, "evade", action.isActor ? "enemy" : "actor", _this.getBattleTextId(_this._currentAnimatedAction));
 			_this._awaitingText = true;
-			_this._UILayerManager.setTextBox(entityType, entityId, action.ref.SRWStats.pilot.name, battleText).then(function(){
+			_this._TextlayerManager.setTextBox(entityType, entityId, action.ref.SRWStats.pilot.name, battleText).then(function(){
 				_this._awaitingText = false;
 			});
 		},
@@ -3980,7 +3987,7 @@ BattleSceneManager.prototype.executeAnimation = function(animation, startTick){
 			var entityId = action.ref.SRWStats.pilot.id;
 			var battleText = _this._battleTextManager.getText(entityType, action.ref, "destroyed", action.isActor ? "enemy" : "actor", _this.getBattleTextId(_this._currentAnimatedAction));
 			_this._awaitingText = true;
-			_this._UILayerManager.setTextBox(entityType, entityId, action.ref.SRWStats.pilot.name, battleText).then(function(){
+			_this._TextlayerManager.setTextBox(entityType, entityId, action.ref.SRWStats.pilot.name, battleText).then(function(){
 				_this._awaitingText = false;
 			});
 		},
@@ -4006,7 +4013,7 @@ BattleSceneManager.prototype.executeAnimation = function(animation, startTick){
 			
 			var battleText = _this._battleTextManager.getText(entityType, textProvider, "attacks", action.isActor ? "enemy" : "actor", _this.getBattleTextId(_this._currentAnimatedAction), params.id, attackTextProviderId);
 			_this._awaitingText = true;
-			_this._UILayerManager.setTextBox(entityType, entityId, action.ref.SRWStats.pilot.name, battleText, false, true).then(function(){
+			_this._TextlayerManager.setTextBox(entityType, entityId, action.ref.SRWStats.pilot.name, battleText, false, true).then(function(){
 				_this._awaitingText = false;
 			});
 		},
@@ -4014,14 +4021,14 @@ BattleSceneManager.prototype.executeAnimation = function(animation, startTick){
 			_this._textProviderOverride = params.id;
 		},
 		clear_attack_text: function(target, params){
-			_this._UILayerManager.resetTextBox();
+			_this._TextlayerManager.resetTextBox();
 		},
 		show_support_defender_text: function(target, params){
 			var action = _this._currentAnimatedAction.attacked;
 			var entityType = action.isActor ? "actor" : "enemy";
 			var entityId = action.ref.SRWStats.pilot.id;
 			var battleText = _this._battleTextManager.getText(entityType, action.ref, "support_defend", entityType, _this.getBattleTextId({ref: _this._currentAnimatedAction.attacked.defended}));
-			_this._UILayerManager.setTextBox(entityType, entityId, action.ref.SRWStats.pilot.name, battleText);			
+			_this._TextlayerManager.setTextBox(entityType, entityId, action.ref.SRWStats.pilot.name, battleText);			
 			_this._UILayerManager.setNotification(entityType, "Support Defend");
 		},
 		enable_support_defender: function(target, params){
@@ -4261,7 +4268,7 @@ BattleSceneManager.prototype.executeAnimation = function(animation, startTick){
 			var entityId = action.ref.SRWStats.pilot.id;
 			var battleText = _this._battleTextManager.getText(entityType, action.ref, "evade", action.isActor ? "enemy" : "actor", _this.getBattleTextId(_this._currentAnimatedAction));
 			
-			_this._UILayerManager.setTextBox(entityType, entityId, action.ref.SRWStats.pilot.name, battleText);
+			_this._TextlayerManager.setTextBox(entityType, entityId, action.ref.SRWStats.pilot.name, battleText);
 			
 			var hasSpecialEvasion = false;
 			if(action.specialEvasion){
@@ -5834,7 +5841,7 @@ BattleSceneManager.prototype.executeAnimation = function(animation, startTick){
 			var battleText = _this._battleTextManager.getText(entityType, action.ref, "destroyed", action.isActor ? "enemy" : "actor", _this.getBattleTextId(_this._currentAnimatedAction));
 			
 			_this._awaitingText = true;
-			_this._UILayerManager.setTextBox(entityType, entityId, action.ref.SRWStats.pilot.name, battleText, true).then(function(){
+			_this._TextlayerManager.setTextBox(entityType, entityId, action.ref.SRWStats.pilot.name, battleText, true).then(function(){
 				_this._awaitingText = false;
 			});
 			
@@ -6046,10 +6053,10 @@ BattleSceneManager.prototype.executeAnimation = function(animation, startTick){
 			_this.showEnvironment({commandBgId: params.id});
 		},		
 		show_portrait_noise: function(target, params){
-			_this._UILayerManager.showNoise();
+			_this._TextlayerManager.showNoise();
 		},
 		hide_portrait_noise: function(target, params){
-			_this._UILayerManager.hideNoise();
+			_this._TextlayerManager.hideNoise();
 		},
 		set_bg_scroll_ratio: function(target, params){
 			if(params.smooth * 1){
@@ -6688,9 +6695,9 @@ BattleSceneManager.prototype.resetFadeState = function() {
 	newDiv.id = "fade_container";
 	newDiv.classList.add("fade_container");
 
-	if(ENGINE_SETTINGS.BATTLE_SCENE.SHOW_FADE_BELOW_TEXTBOX){
+	/*if(ENGINE_SETTINGS.BATTLE_SCENE.SHOW_FADE_BELOW_TEXTBOX){
 		newDiv.style.zIndex = 51;
-	}
+	}*/
 	
 	this._fadeContainer.replaceWith(newDiv);
 	this._fadeContainer = newDiv;
@@ -6714,9 +6721,9 @@ BattleSceneManager.prototype.swipeToBlack = function(direction, inOrOut, holdDur
 	var _this = this;
 	return new Promise(function(resolve, reject){
 		//_this.resetFadeState();
-		if(ENGINE_SETTINGS.BATTLE_SCENE.SHOW_FADE_BELOW_TEXTBOX){
+		/*if(ENGINE_SETTINGS.BATTLE_SCENE.SHOW_FADE_BELOW_TEXTBOX){
 			_this._swipeContainer.style.zIndex = 51;
-		}
+		}*/
 		var swipeClass;
 		if(direction == "left"){
 			swipeClass = "swipe_left";
@@ -6899,10 +6906,10 @@ BattleSceneManager.prototype.resetScene = function() {
 	_this._spriteManagers = {};
 	_this.setBgScrollRatio(1);
 	_this.setAnimRatio(1);
-	_this._UILayerManager.hideNoise();
-	_this._UILayerManager.resetTextBox();
+	_this._TextlayerManager.hideNoise();
+	_this._TextlayerManager.resetTextBox();
 	if(_this._textBoxState != false){
-		_this._UILayerManager.fadeInTextBox();
+		_this._TextlayerManager.fadeInTextBox();
 	}
 	
 	_this._animationList = [];
@@ -7766,6 +7773,7 @@ BattleSceneManager.prototype.showScene = async function() {
 	_this._sceneCanEnd = false;
 	_this._sceneIsEnding = false;
 	_this._UIcontainer.style.display = "block";	
+	_this._TextContainer.style.display = "block";	
 	_this._PIXIContainer.style.display = "block";	
 	_this._systemFadeContainer.style.display = "block";
 	_this._swipeContainer.style.display = "block";
@@ -7806,7 +7814,7 @@ BattleSceneManager.prototype.showScene = async function() {
 		_this._assetsPreloaded = true;
 		await _this.readBattleCache();			
 		
-		_this._UILayerManager.resetTextBox();
+		_this._TextlayerManager.resetTextBox();
 		if(_this._participantInfo.actor.participating){
 			var ref = _this._participantInfo.actor.effect.ref;
 			var stats = $statCalc.getCalculatedMechStats(ref);
@@ -8039,6 +8047,7 @@ BattleSceneManager.prototype.endScene = function(force) {
 			_this.disposeTextureCache();
 			_this.disposeDynamicModels();
 			_this._UIcontainer.style.display = "";
+			_this._TextContainer.style.display = "";
 			_this._PIXIContainer.style.display = "";	
 			_this.stopScene();
 			$gameSystem.setSubBattlePhase('after_battle');
@@ -8073,6 +8082,7 @@ BattleSceneManager.prototype.endScene = function(force) {
 			_this.disposeTextureCache();
 			_this.disposeDynamicModels();
 			_this._UIcontainer.style.display = "";
+			_this._TextContainer.style.display = "";
 			_this._PIXIContainer.style.display = "";	
 			_this.stopScene();
 			_this.systemFadeFromBlack(400, 1000).then(function(){
@@ -8138,13 +8148,14 @@ BattleSceneManager.prototype.processActionQueue = function() {
 				}
 				var battleText = _this._battleTextManager.getText(entityType, nextAction.ref, textType, nextAction.isActor ? "actor" : "enemy", _this.getBattleTextId(nextAction.attackedBy), null, null);
 				
-				_this._UILayerManager.setTextBox(entityType, entityId, nextAction.ref.SRWStats.pilot.name, battleText);
+				_this._TextlayerManager.setTextBox(entityType, entityId, nextAction.ref.SRWStats.pilot.name, battleText);
 			}
 			setTimeout(function(){
 				_this.systemFadeToBlack(100, 1000).then(function(){					
 					_this.stopScene();
 					_this._UIcontainer.style.display = "";
 					_this._PIXIContainer.style.display = "";	
+					_this._TextContainer.style.display = "";
 					_this.systemFadeFromBlack(1000).then(function(){
 						$gameSystem.setSubBattlePhase('after_battle');
 						if(!$gameTemp.editMode){
@@ -8166,8 +8177,8 @@ BattleSceneManager.prototype.processActionQueue = function() {
 		
 		
 		if(nextAction && nextAction.hasActed && nextAction.action.type != "defend" && nextAction.action.type != "evade" && nextAction.action.type != "none"){
-			_this._UILayerManager.resetTextBox();
-			_this._UILayerManager.hideNoise();
+			_this._TextlayerManager.resetTextBox();
+			_this._TextlayerManager.hideNoise();
 			_this._battleTextManager.clearAttackGroupId();
 			
 			_this.doingFadeTransition = false;
@@ -8244,7 +8255,7 @@ BattleSceneManager.prototype.processActionQueue = function() {
 						
 						battleText = _this._battleTextManager.getText(entityType, nextAction.ref, textType, nextAction.isActor ? "enemy" : "actor", _this.getBattleTextId(nextAction.attacked));
 					}				
-					await _this._UILayerManager.setTextBox(entityType, entityId, nextAction.ref.SRWStats.pilot.name, battleText);
+					await _this._TextlayerManager.setTextBox(entityType, entityId, nextAction.ref.SRWStats.pilot.name, battleText);
 				}
 				
 				function startAnimation(){					
@@ -8607,7 +8618,7 @@ BattleSceneManager.prototype.showEnvironmentScene = async function() {
 	if(_this._enemySupporterSprite){
 		_this._enemySupporterSprite.sprite.setEnabled(false);
 	}
-	_this._UILayerManager.resetTextBox();
+	_this._TextlayerManager.resetTextBox();
 	_this._camera.position.copyFrom(_this._defaultPositions.camera_main_idle);
 	_this._camera.rotation.copyFrom(_this._defaultRotations.camera_main_idle);
 	//_this.stopScene();
@@ -8620,16 +8631,16 @@ BattleSceneManager.prototype.showEnvironmentScene = async function() {
 BattleSceneManager.prototype.showText = function(entityType, ref, name, type, subType, target, targetIdx, attackId, supported) {
 	var _this = this;
 	var battleText = _this._battleTextManager.getText(entityType, ref, type, subType, target, targetIdx, attackId, supported);
-	_this._UILayerManager.setTextBox(entityType, ref.actorId, name, battleText);
+	_this._TextlayerManager.setTextBox(entityType, ref.actorId, name, battleText);
 }
 
 BattleSceneManager.prototype.toggleTextBox = function(state) {	
 	this._textBoxState = state;
 	if(this._UILayerManager){
 		if(state){
-			this._UILayerManager.fadeInTextBox(true);
+			this._TextlayerManager.fadeInTextBox(true);
 		} else {
-			this._UILayerManager.fadeOutTextBox(true);
+			this._TextlayerManager.fadeOutTextBox(true);
 		}	
 	}	
 }

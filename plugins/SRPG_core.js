@@ -365,6 +365,12 @@ var _defaultPlayerSpeed = parameters['defaultPlayerSpeed'] || 4;
 				battleSceneUILayer.height = this._height;
 				this._centerElement(battleSceneUILayer);
 			}	
+			var battleSceneTextLayer = document.querySelector("#battle_scene_text_layer");
+			if(battleSceneTextLayer){
+				battleSceneTextLayer.width = this._width;
+				battleSceneTextLayer.height = this._height;
+				this._centerElement(battleSceneTextLayer);
+			}			
 			var fadeContainer = document.querySelector("#fade_container");
 			if(fadeContainer){
 				fadeContainer.width = this._width;

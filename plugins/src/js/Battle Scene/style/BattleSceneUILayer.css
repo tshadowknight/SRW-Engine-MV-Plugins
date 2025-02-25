@@ -1,4 +1,45 @@
-#battle_scene_ui_layer_text_display {
+
+#battle_scene_text_layer #noise.fade_in {
+	animation-name: fade_in;
+	animation-duration: 3s;
+	animation-fill-mode: forwards;
+}
+
+@keyframes fade_in {
+	0% { opacity: 0;}
+	100% { opacity: 1;}
+}
+
+#battle_scene_text_layer .text_container {
+	--fontsize: 2.2px;
+	height: 70%;
+	max-width: 80%;
+}
+
+#battle_scene_text_layer {
+	position: fixed;
+	width: 0px;
+	height: 0px;	
+	top: 0;
+	left: 0;
+	z-index: 52;
+	margin: auto;
+	font-family: GameFont;
+	overflow: hidden;
+	background: none;
+	pointer-events: none;
+	display: none;
+}
+
+#battle_scene_text_layer .bg_fade_container{
+	-webkit-mask-image: none;
+}
+
+#battle_scene_text_layer .bg_container{
+	background: none;
+}
+
+#battle_scene_text_layer_text_display {
 	position: absolute;
 	left: 0;
 	bottom: 0;
@@ -11,22 +52,22 @@
 	transition: background .25s ease-out;
 }
 
-#battle_scene_ui_layer_text_display  #name_container{
+#battle_scene_text_layer_text_display  #name_container{
 	--fontsize: 2.2px;
 }
 
-#battle_scene_ui_layer_text_display.fadeOut {
+#battle_scene_text_layer_text_display.fadeOut {
 	background-color: rgba(255,255,255,0.1);
 }
 
-#battle_scene_ui_layer_text_display_name_and_content {	
+#battle_scene_text_layer_text_display_name_and_content {	
 	width: 100%;
 	height: 100%;
 	align-items: center;	
 	margin-top: 2%;
 }
 
-#battle_scene_ui_layer #icon_and_noise_container {
+#battle_scene_text_layer #icon_and_noise_container {
 	--widthpixels: 110;
 	--heightpixels: 110;
 	background-color: rgba(255, 255, 255, 0.5);	
@@ -40,7 +81,7 @@
 	height: 100%;
 }
 
-#battle_scene_ui_layer #noise {
+#battle_scene_text_layer #noise {
 	width: 100%;
 	height: 100%;
 	position: absolute;
@@ -48,11 +89,11 @@
 	display: none;
 }
 
-#battle_scene_ui_layer #noise.active {
+#battle_scene_text_layer #noise.active {
 	display: block;
 }
 
-#battle_scene_ui_layer #icon_container {
+#battle_scene_text_layer #icon_container {
 	overflow: hidden;
 }
 
