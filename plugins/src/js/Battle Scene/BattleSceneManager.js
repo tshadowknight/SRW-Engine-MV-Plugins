@@ -8599,6 +8599,7 @@ BattleSceneManager.prototype.showEnvironmentScene = async function() {
 	_this._sceneCanEnd = false;
 	_this._sceneIsEnding = false;
 	_this._UIcontainer.style.display = "block";	
+	_this._TextContainer.style.display = "block";
 	_this._PIXIContainer.style.display = "block";	
 	_this._systemFadeContainer.style.display = "block";
 	_this._swipeContainer.style.display = "block";
