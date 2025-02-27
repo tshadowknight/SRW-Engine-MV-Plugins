@@ -1463,7 +1463,6 @@ BattleSceneManager.prototype.prepareModel = function(root, name, position, flipX
 	let directionFactor = flipX ? -1 : 1;
 	root.scaling = new BABYLON.Vector3(scale * directionFactor * -1, scale, scale);
 	root.defaultScale = scale;
-	root.flipX = directionFactor;
 	if(rotation){
 		root.rotation =  new BABYLON.Vector3(rotation.x ,rotation.y * directionFactor, rotation.z);
 	}
@@ -5330,7 +5329,7 @@ BattleSceneManager.prototype.executeAnimation = function(animation, startTick){
 				}
 				
 				if(params.name == "hurt" && ((action.attacked.barrierBroken && _this._debugBarriers == 0) || _this._debugBarriers == 2)){			
-					if(_this._activeSysBarrier){
+					if(_this._activeSysBarrier && !ENGINE_SETTINGS.BATTLE_SCENE.FADE_BARRIER_DURING_NEXT_PHASE){
 						var additions = [];					
 						additions[startTick + 1] = [									
 							//{type: "send_effekseer_trigger", target: target+"sys_barrier", params:{id: 0}},
@@ -5686,21 +5685,14 @@ BattleSceneManager.prototype.executeAnimation = function(animation, startTick){
 							}
 						}						
 					}
-				}								
+				}				
+					
 				
-				if(!hasSpecialEvasion && !params.noReposition){					
-					_this.registerMatrixAnimation("translate", targetObj.parent_handle, _this.applyAnimationDirection(targetObj.parent_handle.position), targetPostion, startTick, params.duration);						
+				if(!hasSpecialEvasion && !params.noReposition){
+					
+					_this.registerMatrixAnimation("translate", targetObj.parent_handle, _this.applyAnimationDirection(targetObj.parent_handle.position), targetPostion, startTick, params.duration);
 				}
-
-				if(!hasSpecialEvasion){
-					var targetRotation = new BABYLON.Vector3(0,0,0);
-					if(targetObj.pivothelper){
-						_this.registerMatrixAnimation("rotate", targetObj.pivothelper, targetObj.pivothelper.rotation, targetRotation, startTick, params.duration || 50, params.easingFunction, params.easingMode);
-					}
-					if(targetObj.parent_handle){
-						_this.registerMatrixAnimation("rotate", targetObj.parent_handle, targetObj.parent_handle.rotation, targetRotation, startTick, params.duration || 50, params.easingFunction, params.easingMode);
-					}
-				}
+				
 				
 				additions[startTick + params.duration] = [];
 				if(!params.noDamage && action.isHit){
@@ -5709,7 +5701,7 @@ BattleSceneManager.prototype.executeAnimation = function(animation, startTick){
 				}
 				
 				if(_this._activeSysBarrier){
-					if(!action.barrierBroken && _this._debugBarriers != 2){
+					if(!action.barrierBroken && _this._debugBarriers != 2 && !ENGINE_SETTINGS.BATTLE_SCENE.FADE_BARRIER_DURING_NEXT_PHASE){
 						additions[startTick + params.duration].push(									
 							{type: "animate_effekseer_input", target: _this._activeSysBarrier, params:{
 								paramId: 0,
@@ -5833,7 +5825,17 @@ BattleSceneManager.prototype.executeAnimation = function(animation, startTick){
 					paramId: 1,
 					value: encodedColorValue
 				}});
-
+				if(ENGINE_SETTINGS.BATTLE_SCENE.FADE_BARRIER_DURING_NEXT_PHASE){
+					if(!additions[startTick + 25]){
+						additions[startTick + 25] = [];
+					}
+					additions[startTick + 25].push({type: "animate_effekseer_input", target: _this._activeSysBarrier, params:{
+						paramId: 0,
+						startValue: 1,
+						endValue: 0,
+						duration: 30
+					}});
+				}
 						
 			}
 			_this.mergeAnimList(additions);	
@@ -8359,31 +8361,49 @@ BattleSceneManager.prototype.processActionQueue = function() {
 					if(_this._active_main){
 						_this._active_main.parent_handle.rotation = new BABYLON.Vector3(0,0,0);	
 						_this._active_main.pivothelper.rotation = new BABYLON.Vector3(0,0,0);
+						_this.applyMutator(_this._active_main, (mesh) => {
+							mesh.renderingGroupId = 2;
+						});
 					}
 					
 					if(_this._active_twin){
 						_this._active_twin.parent_handle.rotation = new BABYLON.Vector3(0,0,0);	
 						_this._active_twin.pivothelper.rotation = new BABYLON.Vector3(0,0,0);
+						_this.applyMutator(_this._active_twin, (mesh) => {
+							mesh.renderingGroupId = 2;
+						});
 					}
 					
 					if(_this._active_support_attacker){
 						_this._active_support_attacker.parent_handle.rotation = new BABYLON.Vector3(0,0,0);	
 						_this._active_support_attacker.pivothelper.rotation = new BABYLON.Vector3(0,0,0);
+						_this.applyMutator(_this._active_support_attacker, (mesh) => {
+							mesh.renderingGroupId = 2;
+						});
 					}
 					
 					if(_this._active_support_defender){
 						_this._active_support_defender.parent_handle.rotation = new BABYLON.Vector3(0,0,0);	
 						_this._active_support_defender.pivothelper.rotation = new BABYLON.Vector3(0,0,0);
+						_this.applyMutator(_this._active_support_defender, (mesh) => {
+							mesh.renderingGroupId = 2;
+						});
 					}
 					
 					if(_this._active_target){
 						_this._active_target.parent_handle.rotation = new BABYLON.Vector3(0,0,0);
 						_this._active_target.pivothelper.rotation = new BABYLON.Vector3(0,0,0);
+						_this.applyMutator(_this._active_target, (mesh) => {
+							mesh.renderingGroupId = 2;
+						});
 					}
 					
 					if(_this._active_target_twin){
 						_this._active_target_twin.parent_handle.rotation = new BABYLON.Vector3(0,0,0);		
 						_this._active_target_twin.pivothelper.rotation = new BABYLON.Vector3(0,0,0);
+						_this.applyMutator(_this._active_target_twin, (mesh) => {
+							mesh.renderingGroupId = 2;
+						});
 					}
 							
 								

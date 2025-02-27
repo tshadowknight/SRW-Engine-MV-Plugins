@@ -143,7 +143,8 @@ var ENGINE_SETTINGS = {
 		RENDER_WIDTH: 1110,
 		RENDER_HEIGHT: 624,
 		SHOW_FADE_BELOW_TEXTBOX: false,
-		DEFAULT_BARRIER_COLOR: "#7c00e6"
+		DEFAULT_BARRIER_COLOR: "#7c00e6",
+		FADE_BARRIER_DURING_NEXT_PHASE: true,//if true the barrier will only be shown briefly during the next phase command
 	},
 	MASTERY_REWARDS: {
 		PP: {AMOUNT: 5, SCOPE: "deployed"}, //scope is deployed, unlocked, or all
