@@ -1463,6 +1463,7 @@ BattleSceneManager.prototype.prepareModel = function(root, name, position, flipX
 	let directionFactor = flipX ? -1 : 1;
 	root.scaling = new BABYLON.Vector3(scale * directionFactor * -1, scale, scale);
 	root.defaultScale = scale;
+	root.flipX = directionFactor;
 	if(rotation){
 		root.rotation =  new BABYLON.Vector3(rotation.x ,rotation.y * directionFactor, rotation.z);
 	}
@@ -5685,14 +5686,21 @@ BattleSceneManager.prototype.executeAnimation = function(animation, startTick){
 							}
 						}						
 					}
-				}				
-					
+				}								
 				
-				if(!hasSpecialEvasion && !params.noReposition){
-					
-					_this.registerMatrixAnimation("translate", targetObj.parent_handle, _this.applyAnimationDirection(targetObj.parent_handle.position), targetPostion, startTick, params.duration);
+				if(!hasSpecialEvasion && !params.noReposition){					
+					_this.registerMatrixAnimation("translate", targetObj.parent_handle, _this.applyAnimationDirection(targetObj.parent_handle.position), targetPostion, startTick, params.duration);						
 				}
-				
+
+				if(!hasSpecialEvasion){
+					var targetRotation = new BABYLON.Vector3(0,0,0);
+					if(targetObj.pivothelper){
+						_this.registerMatrixAnimation("rotate", targetObj.pivothelper, targetObj.pivothelper.rotation, targetRotation, startTick, params.duration || 50, params.easingFunction, params.easingMode);
+					}
+					if(targetObj.parent_handle){
+						_this.registerMatrixAnimation("rotate", targetObj.parent_handle, targetObj.parent_handle.rotation, targetRotation, startTick, params.duration || 50, params.easingFunction, params.easingMode);
+					}
+				}
 				
 				additions[startTick + params.duration] = [];
 				if(!params.noDamage && action.isHit){
