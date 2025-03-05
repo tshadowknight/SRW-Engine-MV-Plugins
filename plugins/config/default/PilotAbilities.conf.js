@@ -2187,4 +2187,20 @@ $SRWConfig.pilotAbilties = function(){
 			return true;
 		}
 	);
+
+	this.addDefinition(
+		107, 
+		"Sniper", 
+		"Crits deal an additional 1.25x damage.", 
+		false,
+		true,
+		function(actor, level){
+			return [{type: "crit_damage", modType: "mult", value: 1.25}];
+		},
+		function(actor, level){
+			return true;
+		},
+		[0],
+		1,
+	);
 }

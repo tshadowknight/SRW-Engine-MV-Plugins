@@ -48,7 +48,7 @@ var ENGINE_SETTINGS = {
 		}
 	},	
 	TINT_CURSOR_PER_FACTION: true,
-	HIDE_WAIT_COMMAND: false,
+	HIDE_WAIT_COMMAND: true,
 	CURSOR_OFFSET: 0,
 	HP_BAR_COLORS: {
 		full: {color: "#58b3ff", percent: 85},

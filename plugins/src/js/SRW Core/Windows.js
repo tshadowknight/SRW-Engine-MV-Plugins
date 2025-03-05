@@ -350,7 +350,7 @@
 					};
 			
 					var hasTarget = $statCalc.getAllInRange(this._actor, false, $gameTemp.isPostMove, true).length > 0;
-					var hasMapWeapon = $statCalc.hasMapWeapon(battler);
+					var hasMapWeapon = $statCalc.hasMapWeaponWithTargets(battler);
 					
 					function boardingMenu(){
 						_this.addCommand(APPSTRINGS.MAPMENU.board, 'board');
@@ -427,12 +427,12 @@
 					
 					function hitAndAwayMenu(){
 						_this.addMoveCommand();
-						_this.addWaitCommand();
+						_this.addWaitCommand(true);
 					}
 					
 					function disabledMenu(){
 						_this.addCommand(APPSTRINGS.MAPMENU.cmd_status, 'status');	
-						_this.addWaitCommand();
+						_this.addWaitCommand(true);
 					}
 					
 					function statusDisabledMenu(){
@@ -448,7 +448,7 @@
 							}	
 						}
 						_this.addCommand(APPSTRINGS.MAPMENU.cmd_status, 'status');	
-						_this.addWaitCommand();								
+						_this.addWaitCommand(true);								
 					}
 					
 					function postMoveMenu(){
@@ -471,7 +471,7 @@
 							_this.addCommand(APPSTRINGS.MAPMENU.cmd_swap_pilot, 'swap_pilot');
 						}	
 						
-						_this.addWaitCommand();
+						_this.addWaitCommand(true);
 					}
 					
 					function deployMenu(){
@@ -513,10 +513,10 @@
 			this.addCommand(_textSrpgEquip, 'equip', this._actor.canSrpgEquip());
 		};
 
-		Window_ActorCommand.prototype.addWaitCommand = function() {
-			if(!ENGINE_SETTINGS.HIDE_WAIT_COMMAND){
+		Window_ActorCommand.prototype.addWaitCommand = function(force) {
+			if(!ENGINE_SETTINGS.HIDE_WAIT_COMMAND || force){
 				this.addCommand(APPSTRINGS.MAPMENU.cmd_wait, 'wait');
-			}			
+			}
 		};
 		
 		Window_ActorCommand.prototype.addMoveCommand = function() {

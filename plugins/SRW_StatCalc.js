@@ -5312,6 +5312,39 @@ StatCalc.prototype.hasMapWeapon = function(actor){
 	}
 }
 
+StatCalc.prototype.hasMapWeaponWithTargets = function(actor){
+	if(this.isActorSRWInitialized(actor)){
+		//hack to avoid needing to move the map attack handling functions to another module
+		const sceneManager = SceneManager._scene;
+		let hasMapWeapon = false;
+		if(sceneManager && sceneManager.getBestMapAttackTargets){
+			const event = this.getReferenceEvent(actor);
+			var mapWeapons = $statCalc.getActiveMapWeapons(actor, false);
+			var bestMapAttack;
+			
+			if(mapWeapons.length){
+				mapWeapons.forEach(function(mapWeapon){
+					let targetString;
+					if(!mapWeapon.ignoresEnemies && !mapWeapon.ignoresFriendlies){
+						targetString = null;//either
+					} else if(!mapWeapon.ignoresFriendlies){
+						targetString = "actor";
+					} else if(!mapWeapon.ignoresEnemies){
+						targetString = "enemy";
+					}
+					var targetInfo = sceneManager.getBestMapAttackTargets(event, mapWeapon, targetString);
+					if(targetInfo.targets.length){
+						hasMapWeapon = true;
+					}
+				});
+			}
+		}		
+		return hasMapWeapon;
+	} else {
+		return false;
+	}
+}
+
 StatCalc.prototype.incrementNonMapAttackCounter = function(actor){
 	if(this.isActorSRWInitialized(actor)){
 		actor.SRWStats.stageTemp.nonMapAttackCounter++;

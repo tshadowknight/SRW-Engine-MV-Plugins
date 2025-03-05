@@ -3394,7 +3394,7 @@ SceneManager.isInSaveScene = function(){
 		var bestPosition;
 		var bestTargets = [];
 		
-		directions.forEach(function(direction){		
+		directions.forEach(function(direction){
 			var targetResults = _this.getMapAttackTargets(originEvent, attack, type, direction);
 			targetResults.forEach(function(targetResult){
 				if(targetResult.targets.length > maxTargets){

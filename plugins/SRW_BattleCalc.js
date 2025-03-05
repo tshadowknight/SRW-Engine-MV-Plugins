@@ -478,6 +478,7 @@ BattleCalc.prototype.performDamageCalculation = function(attackerInfo, defenderI
 		if(isCritical && !noCrit && !isSupportDefender){
 			result.isCritical = isCritical;
 			finalDamage*=SRW_CONSTANTS.CRIT_DMG;
+			finalDamage =  $statCalc.applyStatModsToValue(attackerInfo.actor, finalDamage, ["crit_damage"]);
 		}
 		
 		if(defenderInfo.action.type == "defend"){
