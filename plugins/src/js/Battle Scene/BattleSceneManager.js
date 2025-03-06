@@ -8357,53 +8357,53 @@ BattleSceneManager.prototype.processActionQueue = function() {
 							_this._active_target = _this._actorSprite.sprite;		
 						}	
 					}
+
+					function updateRenderingGroup(elem){
+						if(ENGINE_SETTINGS.BATTLE_SCENE.USE_RENDER_GROUPS){
+							_this.applyMutator(elem, (mesh) => {
+								mesh.renderingGroupId = 2;
+							});
+						} else {
+							_this.applyMutator(elem, (mesh) => {
+								mesh.renderingGroupId = 0;
+							});
+						}
+					}
 					
 					if(_this._active_main){
 						_this._active_main.parent_handle.rotation = new BABYLON.Vector3(0,0,0);	
 						_this._active_main.pivothelper.rotation = new BABYLON.Vector3(0,0,0);
-						_this.applyMutator(_this._active_main, (mesh) => {
-							mesh.renderingGroupId = 2;
-						});
+						updateRenderingGroup(_this._active_main);
 					}
 					
 					if(_this._active_twin){
 						_this._active_twin.parent_handle.rotation = new BABYLON.Vector3(0,0,0);	
 						_this._active_twin.pivothelper.rotation = new BABYLON.Vector3(0,0,0);
-						_this.applyMutator(_this._active_twin, (mesh) => {
-							mesh.renderingGroupId = 2;
-						});
+						updateRenderingGroup(_this._active_twin);
 					}
 					
 					if(_this._active_support_attacker){
 						_this._active_support_attacker.parent_handle.rotation = new BABYLON.Vector3(0,0,0);	
 						_this._active_support_attacker.pivothelper.rotation = new BABYLON.Vector3(0,0,0);
-						_this.applyMutator(_this._active_support_attacker, (mesh) => {
-							mesh.renderingGroupId = 2;
-						});
+						updateRenderingGroup(_this._active_support_attacker);
 					}
 					
 					if(_this._active_support_defender){
 						_this._active_support_defender.parent_handle.rotation = new BABYLON.Vector3(0,0,0);	
 						_this._active_support_defender.pivothelper.rotation = new BABYLON.Vector3(0,0,0);
-						_this.applyMutator(_this._active_support_defender, (mesh) => {
-							mesh.renderingGroupId = 2;
-						});
+						updateRenderingGroup(_this._active_support_defender);
 					}
 					
 					if(_this._active_target){
 						_this._active_target.parent_handle.rotation = new BABYLON.Vector3(0,0,0);
 						_this._active_target.pivothelper.rotation = new BABYLON.Vector3(0,0,0);
-						_this.applyMutator(_this._active_target, (mesh) => {
-							mesh.renderingGroupId = 2;
-						});
+						updateRenderingGroup(_this._active_target);
 					}
 					
 					if(_this._active_target_twin){
 						_this._active_target_twin.parent_handle.rotation = new BABYLON.Vector3(0,0,0);		
 						_this._active_target_twin.pivothelper.rotation = new BABYLON.Vector3(0,0,0);
-						_this.applyMutator(_this._active_target_twin, (mesh) => {
-							mesh.renderingGroupId = 2;
-						});
+						updateRenderingGroup(_this._active_target_twin);
 					}
 							
 								
