@@ -573,10 +573,15 @@ GameState_actor_map_target.prototype.update = function(scene){
 			SoundManager.playCancel();
 			var event = $gameTemp.activeEvent();
 			var battlerArray = $gameSystem.EventToUnit(event.eventId());
-			$gameTemp.clearMoveTable();
-			
+			$gameTemp.clearMoveTable();		
+
 			$gameTemp.pushRangeListToMoveList();
 			$gameTemp.setResetMoveList(true);
+
+			$gameSystem.highlightedActionTiles = [];
+			$gameSystem.reloadMoveHighlights();
+			$gameSystem.highlightsRefreshed = true;
+
 			$gameSystem.setSrpgActorCommandWindowNeedRefresh(battlerArray);
 			if($gameTemp.isPostMove){
 				$gameSystem.setSubBattlePhase('post_move_command_window');

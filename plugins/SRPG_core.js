@@ -3384,6 +3384,29 @@ SceneManager.isInSaveScene = function(){
 		}
 		return result;
 	}
+
+	Scene_Map.prototype.actorMapWeaponHasTargets = function(actor, weapon) {
+		if(!actor){
+			return false;
+		}
+		if(!weapon){
+			return false;
+		}
+		const event = $statCalc.getReferenceEvent(actor);
+		if(!event){
+			return false;
+		}
+		let targetString;
+		if(!weapon.ignoresEnemies && !weapon.ignoresFriendlies){
+			targetString = null;//either
+		} else if(!weapon.ignoresFriendlies){
+			targetString = "actor";
+		} else if(!weapon.ignoresEnemies){
+			targetString = "enemy";
+		}
+		var targetInfo = this.getBestMapAttackTargets(event, weapon, targetString);
+		return !!targetInfo.targets.length;
+	}
 	
 	Scene_Map.prototype.getBestMapAttackTargets = function(originEvent, attack, type) {
 		var _this = this;				

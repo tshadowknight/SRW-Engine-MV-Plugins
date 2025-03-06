@@ -5184,14 +5184,26 @@ StatCalc.prototype.canUseWeaponDetail = function(actor, weapon, postMoveEnabledO
 					detail.target = true;
 				}
 			}
-		} else if($gameTemp.isEnemyAttack){
-			canUse = false;
-			detail.isMap = true;
+		} else {
+			if($gameTemp.isEnemyAttack){
+				canUse = false;
+				detail.isMap = true;
+	
+			}  else if(rangeTarget){
+				canUse = false;
+				detail.isMap2 = true;
+			} else {
+				//hack to avoid needing to move the map attack handling functions to another module
+				const sceneManager = SceneManager._scene;		
+				if(sceneManager && sceneManager.getBestMapAttackTargets){
+					if(!sceneManager.actorMapWeaponHasTargets(actor, weapon)){
+						canUse = false;
+						detail.target = true;
+					}
 
-		}  else if(rangeTarget){
-			canUse = false;
-			detail.isMap2 = true;
-		} 				
+				}
+			}			
+		}				
 
 		if(weapon.HPThreshold != -1){
 			var stats = this.getCalculatedMechStats(actor);
@@ -5318,22 +5330,10 @@ StatCalc.prototype.hasMapWeaponWithTargets = function(actor){
 		const sceneManager = SceneManager._scene;
 		let hasMapWeapon = false;
 		if(sceneManager && sceneManager.getBestMapAttackTargets){
-			const event = this.getReferenceEvent(actor);
-			var mapWeapons = $statCalc.getActiveMapWeapons(actor, false);
-			var bestMapAttack;
-			
+			var mapWeapons = $statCalc.getActiveMapWeapons(actor, false);	
 			if(mapWeapons.length){
 				mapWeapons.forEach(function(mapWeapon){
-					let targetString;
-					if(!mapWeapon.ignoresEnemies && !mapWeapon.ignoresFriendlies){
-						targetString = null;//either
-					} else if(!mapWeapon.ignoresFriendlies){
-						targetString = "actor";
-					} else if(!mapWeapon.ignoresEnemies){
-						targetString = "enemy";
-					}
-					var targetInfo = sceneManager.getBestMapAttackTargets(event, mapWeapon, targetString);
-					if(targetInfo.targets.length){
+					if(sceneManager.actorMapWeaponHasTargets(actor, mapWeapon)){
 						hasMapWeapon = true;
 					}
 				});
