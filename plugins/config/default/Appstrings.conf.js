@@ -338,6 +338,7 @@ APPSTRINGS.ATTACKLIST = {
 	label_no_all: "An ALL attack is required!",
 	label_no_regular: "A single target attack is required!",
 	label_no_map_support: "Can't support with a map attack!",
+	label_no_map_targets: "NO ",
 	label_HP_gated: "Can only be used when below {HP_THRESHOLD} percent HP!",
 	label_inner_combo: "The unit is participating in a combo attack!",
 	label_sub_twin_combo: "A sub twin cannot initiate a combo attack!",

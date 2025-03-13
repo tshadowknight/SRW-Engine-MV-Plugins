@@ -257,8 +257,6 @@ DetailBarAttackSummary.prototype.redraw = function(){
 				detailContent+=APPSTRINGS.ATTACKLIST.label_no_map_counter;
 			} else if(detail.isMap2){
 				detailContent+=APPSTRINGS.ATTACKLIST.label_no_map_support;
-			} else if(detail.isMap3){
-				detailContent+=APPSTRINGS.ATTACKLIST.label_no_map_targets;
 			} else if(detail.terrain){
 				detailContent+=APPSTRINGS.ATTACKLIST.label_no_terrain;
 			} else if(detail.isAll){

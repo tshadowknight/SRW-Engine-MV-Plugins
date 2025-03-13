@@ -7343,10 +7343,10 @@ BattleSceneManager.prototype.earlyPreloadSceneAssets = async function(){
 	_this.preloadSceneAssets();
 }
 
-BattleSceneManager.prototype.preloadDynamicUnitModel = async function(target, params){
+BattleSceneManager.prototype.preloadDynamicUnitModel = async function(target, params, flipX){
 	const _this = this;
 	const name = target;
-	let flipX = false;
+
 	let position;
 	if(params.position){
 		position = new BABYLON.Vector3(params.position.x, params.position.y, params.position.z);
@@ -7354,8 +7354,12 @@ BattleSceneManager.prototype.preloadDynamicUnitModel = async function(target, pa
 		position = new BABYLON.Vector3(0, 0, 0);
 	}
 	
-	const currentPilot = $statCalc.getCurrentPilot(params.mechId, true);
-	$statCalc.initSRWStatsIfUninitialized(currentPilot)
+	let currentPilot = $statCalc.createEmptyActor();
+
+	var mechData = $statCalc.getMechData($dataClasses[params.mechId], true);
+	$statCalc.calculateSRWMechStats(mechData, false, currentPilot);	
+	currentPilot.SRWStats.mech = mechData;
+
 	
 	_this._dynamicUnitsUnderPreload[target] = currentPilot;
 	
@@ -7503,7 +7507,7 @@ BattleSceneManager.prototype.preloadSceneAssets = function(){
 		_this._dynamicUnitsUnderPreload = {}; //tracks dynamic units created during preload by target name so information is available to link them to battle actors for sprite frame preloading
 		_this._preloadAliases = {}; //track assigned aliases during preload so that default sprite mode units can get preloaded correctly if they were aliased
 		
-		function handleAnimCommand(animCommand, animId, animType, tick){
+		function handleAnimCommand(animCommand, animId, animType, tick, flipX){
 			var target = animCommand.target;
 			var params = animCommand.params;
 			
@@ -7525,7 +7529,7 @@ BattleSceneManager.prototype.preloadSceneAssets = function(){
 			}
 			
 			if(animCommand.type == "create_unit_model"){				
-				promises.push(_this.preloadDynamicUnitModel(target, params));			
+				promises.push(_this.preloadDynamicUnitModel(target, params, flipX));			
 			}
 			
 			if(animCommand.type == "register_alias"){						
@@ -7736,16 +7740,16 @@ BattleSceneManager.prototype.preloadSceneAssets = function(){
 							Object.keys(animationList[animType]).forEach(function(tick){
 								const batch = animationList[animType][tick];
 								batch.forEach(function(animCommand){
-									handleAnimCommand(animCommand, animId, animType, tick);
+									handleAnimCommand(animCommand, animId, animType, tick, nextAction.side == "enemy");
 									if(animCommand.type == "next_phase"){
 										if(animCommand.params.commands){
 											for(let command of animCommand.params.commands){
-												handleAnimCommand(command, animId, animType, tick);	
+												handleAnimCommand(command, animId, animType, tick, nextAction.side == "enemy");	
 											}
 										}
 										if(animCommand.params.cleanUpCommands){
 											for(let command of animCommand.params.cleanUpCommands){
-												handleAnimCommand(command, animId, animType, tick);	
+												handleAnimCommand(command, animId, animType, tick, nextAction.side == "enemy");	
 											}
 										}
 									}	
