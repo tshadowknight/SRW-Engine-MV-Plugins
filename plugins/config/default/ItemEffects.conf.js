@@ -924,4 +924,23 @@ $SRWConfig.itemEffects = function(){
 		},
 		500
 	);
+
+	this.addDefinition(
+		52, 
+		"High-Performance Radar+", 
+		"Weapon Range +1. Including range 1 weapons.", 
+		false,
+		false,
+		function(actor, level){
+			return [ 
+				{type: "range", modType: "addFlat", value: 1},
+				{type: "rangeOne", modType: "addFlat", value: 1}
+			];
+		},
+		function(actor, level){
+			return true;
+		},
+		null,
+		750
+	);
 }

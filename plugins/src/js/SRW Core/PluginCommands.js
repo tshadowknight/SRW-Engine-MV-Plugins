@@ -79,6 +79,9 @@
 				if (command === 'lockUnit') {
 					$SRWSaveManager.setUnitLocked(args[0]);
 				}
+				if (command === 'LockUnit') {
+					$SRWSaveManager.setUnitLocked(args[0]);
+				}
 				if (command === 'SetLevel') {
 					$SRWSaveManager.setPilotLevel(args[0], args[1]);
 				}
@@ -88,6 +91,9 @@
 				if (command === 'addKills') {
 					$SRWSaveManager.addKills(args[0], args[1]);
 				}		
+				if (command === 'AddKills') {
+					$SRWSaveManager.addKills(args[0], args[1]);
+				}	
 				if (command === 'addPP') {
 					$SRWSaveManager.addPP(args[0], args[1]);
 				}

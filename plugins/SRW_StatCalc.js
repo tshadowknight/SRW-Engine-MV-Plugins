@@ -7083,6 +7083,7 @@ StatCalc.prototype.getRealWeaponRange = function(actor, weapon){
 	if(this.isActorSRWInitialized(actor)){			
 		var result = weapon.range;
 		if(result == 1){
+			result = this.applyStatModsToValue(actor, result, ["rangeOne"]);
 			return 1;
 		}
 		if(actor.SRWStats.pilot.activeSpirits.snipe){
