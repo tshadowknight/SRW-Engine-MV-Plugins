@@ -468,6 +468,9 @@ BattleSceneManager.prototype.disposeTextureCache = function(){
 BattleSceneManager.prototype.disposeDynamicModels = function(){
 	for(let unitModel of this._instantiatedUnits){
 		unitModel.sprite.dispose();
+		if(unitModel.sprite.shadowSprite){
+			unitModel.sprite.shadowSprite.dispose();
+		}
 	}
 	this._instantiatedUnits = [];
 }
@@ -2492,6 +2495,13 @@ BattleSceneManager.prototype.hookBeforeRender = function(){
 		updateShadow(_this._enemyTwinSprite);
 		updateShadow(_this._actorTwinSupporterSprite);
 		updateShadow(_this._enemyTwinSupporterSprite);
+
+		if(_this._instantiatedUnits){
+			for(let unit of _this._instantiatedUnits){
+				updateShadow(unit);
+			}
+		}
+		
 	});
 }
 
@@ -4093,6 +4103,11 @@ BattleSceneManager.prototype.executeAnimation = function(animation, startTick){
 				_this._enemySupporterShadow,
 				_this._enemyTwinSupporterShadow
 			];
+			if(_this._instantiatedUnits){
+				for(let unit of _this._instantiatedUnits){
+					targets.push(unit);
+				}
+			}
 			for(let target of targets){
 				if(target){
 					_this.registerFadeAnimation(target, params.startFade, params.endFade, startTick, params.duration, params.easingFunction, params.easingMode);
@@ -6882,6 +6897,7 @@ BattleSceneManager.prototype.setBgMode = function(mode) {
 		_this._actorTwinSupporterShadow.isVisible = false;
 		_this._enemySupporterShadow.isVisible = false;
 		_this._enemyTwinSupporterShadow.isVisible = false;
+		
 	} else {
 		_this._actorShadow.isVisible = true;
 		_this._actorTwinShadow.isVisible = true;
@@ -6892,6 +6908,14 @@ BattleSceneManager.prototype.setBgMode = function(mode) {
 		_this._enemySupporterShadow.isVisible = true;
 		_this._enemyTwinSupporterShadow.isVisible = true;
 	}	
+
+	if(_this._instantiatedUnits){
+		for(let unit of _this._instantiatedUnits){
+			if(unit.sprite.shadowSprite){
+				unit.sprite.shadowSprite.isVisible = _this._bgMode != "sky";
+			}
+		}
+	}
 }
 
 BattleSceneManager.prototype.resetScene = function() {
@@ -7441,6 +7465,10 @@ BattleSceneManager.prototype.preloadDynamicUnitModel = async function(target, pa
 	
 	spriteInfo.name = target;
 	spriteInfo.ref = currentPilot;
+
+//	const shadowInfo = $statCalc.getBattleSceneShadowInfo(currentPilot);
+//	this.configureSprite(spriteInfo, "dynamicShadow", shadowInfo, "actor");		
+	
 	
 	this._instantiatedUnits.push(spriteInfo);
 	
