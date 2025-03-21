@@ -2167,6 +2167,9 @@ BattleSceneManager.prototype.hookBeforeRender = function(){
 			var animation = _this._sizeAnimations[animationId];
 			var targetObj = animation.targetObj;
 			if(targetObj){				
+				if(targetObj.pivothelper){
+					targetObj = targetObj.pivothelper;
+				}
 				var duration = animation.duration * _this.getTickDuration();
 				if(animation.accumulator == null){
 					animation.accumulator = 0;
