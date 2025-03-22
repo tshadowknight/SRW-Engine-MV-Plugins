@@ -1041,7 +1041,7 @@
 				}
 							
 				if (command === 'lockCombine') {	
-					$gameSystem.lockCombination(args[0]);
+					$gameSystem.lockCombine(args[0]);
 				}
 				
 				if (command === 'lockAllCombines') {	
