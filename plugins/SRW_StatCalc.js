@@ -3025,7 +3025,7 @@ StatCalc.prototype.split = function(actor){
 						event.appear();
 						event.locate(space.x, space.y);
 					}
-					
+					$gameSystem.setEventToUnit(actor.event.eventId(), 'actor', actor.actorId());
 					//}
 					event.refreshImage();
 					actor.initImages(actor.SRWStats.mech.classData.meta.srpgOverworld.split(","));
