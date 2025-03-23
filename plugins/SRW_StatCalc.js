@@ -3094,6 +3094,7 @@ StatCalc.prototype.combine = function(actor, forced){
 					var actor = $gameActors.actor(combineResult.participants[i]);
 					if(actor.event)	{
 						actor.event.erase();
+						$gameSystem.clearEventToUnit(actor.event.eventId());
 					}					
 				}
 			}
@@ -3109,6 +3110,8 @@ StatCalc.prototype.combine = function(actor, forced){
 			targetActor.initImages(targetActor.SRWStats.mech.classData.meta.srpgOverworld.split(","));
 			targetActor.event.refreshImage();
 			
+			$gameSystem.setEventToUnit(targetActor.event.eventId(), 'actor', targetActor.actorId());
+
 			//this.setSuperState(targetActor, hasFlyer, true);
 			let sortedStates = Object.keys(potentialSuperStates).sort((a,b) => {return $terrainTypeManager.getTerrainDefinition(b).priority - $terrainTypeManager.getTerrainDefinition(a).priority});
 			let newState = -1;
@@ -4950,28 +4953,26 @@ StatCalc.prototype.getCombinationWeaponParticipants = function(actor, weapon){
 		function validateParticipant(actor){
 			var hasARequiredWeapon = false;
 					
-			if(!actor.isSubPilot){
-				var weapons = _this.getCurrentWeapons(actor);
-				var ctr = 0;			
-				while(!hasARequiredWeapon && ctr < weapons.length){					
-					if(requiredWeaponsLookup[weapons[ctr].id]){
-						var currentWeapon = weapons[ctr];
-						var canUse = true;
-						if(_this.getCurrentWill(actor) < currentWeapon.willRequired){
-							canUse = false;
-						}
-						if(currentWeapon.requiredEN != -1 && _this.getCurrenEN(actor) < currentWeapon.ENCost){
-							canUse = false;
-						}						
-						if(_this.getCurrentAmmo(actor, currentWeapon) == 0){
-							canUse = false;
-						}							
-						if(canUse){
-							hasARequiredWeapon = true;								
-						}						
+			var weapons = _this.getCurrentWeapons(actor);
+			var ctr = 0;			
+			while(!hasARequiredWeapon && ctr < weapons.length){					
+				if(requiredWeaponsLookup[weapons[ctr].id]){
+					var currentWeapon = weapons[ctr];
+					var canUse = true;
+					if(_this.getCurrentWill(actor) < currentWeapon.willRequired){
+						canUse = false;
 					}
-					ctr++;
+					if(currentWeapon.requiredEN != -1 && _this.getCurrenEN(actor) < currentWeapon.ENCost){
+						canUse = false;
+					}						
+					if(_this.getCurrentAmmo(actor, currentWeapon) == 0){
+						canUse = false;
+					}							
+					if(canUse){
+						hasARequiredWeapon = true;								
+					}						
 				}
+				ctr++;
 			}
 			
 			return hasARequiredWeapon;
