@@ -4950,26 +4950,28 @@ StatCalc.prototype.getCombinationWeaponParticipants = function(actor, weapon){
 		function validateParticipant(actor){
 			var hasARequiredWeapon = false;
 					
-			var weapons = _this.getCurrentWeapons(actor);
-			var ctr = 0;			
-			while(!hasARequiredWeapon && ctr < weapons.length){					
-				if(requiredWeaponsLookup[weapons[ctr].id]){
-					var currentWeapon = weapons[ctr];
-					var canUse = true;
-					if(_this.getCurrentWill(actor) < currentWeapon.willRequired){
-						canUse = false;
+			if(!actor.isSubPilot){
+				var weapons = _this.getCurrentWeapons(actor);
+				var ctr = 0;			
+				while(!hasARequiredWeapon && ctr < weapons.length){					
+					if(requiredWeaponsLookup[weapons[ctr].id]){
+						var currentWeapon = weapons[ctr];
+						var canUse = true;
+						if(_this.getCurrentWill(actor) < currentWeapon.willRequired){
+							canUse = false;
+						}
+						if(currentWeapon.requiredEN != -1 && _this.getCurrenEN(actor) < currentWeapon.ENCost){
+							canUse = false;
+						}						
+						if(_this.getCurrentAmmo(actor, currentWeapon) == 0){
+							canUse = false;
+						}							
+						if(canUse){
+							hasARequiredWeapon = true;								
+						}						
 					}
-					if(currentWeapon.requiredEN != -1 && _this.getCurrenEN(actor) < currentWeapon.ENCost){
-						canUse = false;
-					}						
-					if(_this.getCurrentAmmo(actor, currentWeapon) == 0){
-						canUse = false;
-					}							
-					if(canUse){
-						hasARequiredWeapon = true;								
-					}						
+					ctr++;
 				}
-				ctr++;
 			}
 			
 			return hasARequiredWeapon;
