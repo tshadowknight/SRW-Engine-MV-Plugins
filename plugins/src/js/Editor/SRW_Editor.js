@@ -297,6 +297,11 @@ SRWEditor.prototype.init = function(){
 			params: ["startFade", "endFade", "duration", "easingFunction", "easingMode"],
 			desc: "Fade in the unit shadows."
 		},				
+		set_hard_shadows: {
+			hasTarget: false,
+			params: ["hard"],
+			desc: "If set to 1 shadows will render without alpha blending."
+		},	
 		fade_swipe: {
 			hasTarget: false,
 			params: ["time"],
@@ -776,6 +781,7 @@ SRWEditor.prototype.init = function(){
 		magnitude_variance: "How much the magnitude varies over time",
 		speed_variance: "With what speed the magnitude variance is applied",
 		startFade: "The initial opacity of the object, between 0-1.",
+		hard: "If 1 alphablending will be turned off, otherwise alphablending will be enabled",
 		endFade: "The final opacity of the object, between 0-1.",
 		time: "The duration of the command in ticks.",
 		speed: "The speed of the effect.",
@@ -1136,6 +1142,9 @@ SRWEditor.prototype.init = function(){
 		
 		},
 		startFade: function(value){
+		
+		},
+		hard: function(value){
 		
 		},
 		endFade: function(value){

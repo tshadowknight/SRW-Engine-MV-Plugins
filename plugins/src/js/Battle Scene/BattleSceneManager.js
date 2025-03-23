@@ -1961,8 +1961,20 @@ BattleSceneManager.prototype.hookBeforeRender = function(){
 	function updateShadow(spriteInfo){
 		if(spriteInfo){
 			var shadowSprite = spriteInfo.sprite.shadowSprite;
-			if(shadowSprite){			
-			
+			if(shadowSprite){		
+				//shadowSprite.renderingGroupId = 4;
+				//shadowSprite.material.needDepthPrePass = true;
+				if(_this._useHardShadows){
+					shadowSprite.material.alpha = 1;
+					//shadowSprite.material.diffuseTexture.hasAlpha = false;
+					shadowSprite.material.useAlphaFromDiffuseTexture  = false;
+					shadowSprite.material.transparencyMode = BABYLON.Material.MATERIAL_ALPHATEST;
+				} else {
+					shadowSprite.material.alpha = 1;
+					//shadowSprite.material.diffuseTexture.hasAlpha = true;
+					shadowSprite.material.useAlphaFromDiffuseTexture  = true;
+					shadowSprite.material.transparencyMode = BABYLON.Material.MATERIAL_ALPHATESTANDBLEND;
+				}	
 				let refPosition;
 				if(spriteInfo.shadowParentNode){
 					refPosition = spriteInfo.shadowParentNode.getAbsolutePosition();
@@ -2832,6 +2844,7 @@ BattleSceneManager.prototype.runAnimations = function(deltaTime){
 BattleSceneManager.prototype.startScene = function(){
 	var _this = this;
 	//_this.initScene();
+	
 	this._isLoading = 0;
 	Input.clear();
 	this._container.style.display = "block";
@@ -4093,6 +4106,9 @@ BattleSceneManager.prototype.executeAnimation = function(animation, startTick){
 				_this.registerFadeAnimation(targetObj, params.startFade, params.endFade, startTick, params.duration, params.easingFunction, params.easingMode);
 			}
 		},	
+		set_hard_shadows: function(target, params){
+			_this._useHardShadows = params.hard;
+		},
 		fade_in_shadows: function(target, params){
 			var targetObj = getTargetObject(target);
 			
@@ -6927,6 +6943,7 @@ BattleSceneManager.prototype.resetScene = function() {
 	
 	this._isEnvPreview = false;
 	this._textProviderOverride = null;
+	this._useHardShadows = false;
 	
 	_this.disposeBarrierEffects();
 	
@@ -7469,8 +7486,8 @@ BattleSceneManager.prototype.preloadDynamicUnitModel = async function(target, pa
 	spriteInfo.name = target;
 	spriteInfo.ref = currentPilot;
 
-//	const shadowInfo = $statCalc.getBattleSceneShadowInfo(currentPilot);
-//	this.configureSprite(spriteInfo, "dynamicShadow", shadowInfo, "actor");		
+	const shadowInfo = $statCalc.getBattleSceneShadowInfo(currentPilot);
+	this.configureSprite(spriteInfo, "dynamicShadow", shadowInfo, "actor");		
 	
 	
 	this._instantiatedUnits.push(spriteInfo);
