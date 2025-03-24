@@ -1337,6 +1337,10 @@
 			return $gameTemp.lastActorAttack;
 		}
 
+		Game_Interpreter.prototype.didEnemyAttack = function() {
+			return !!$gameTemp.didEnemyAttack;
+		}
+
 		Game_Interpreter.prototype.isActorHitBy = function(actorId, weaponId, includeSupport) {
 			var result = false;
 			if($gameTemp.unitHitInfo && $gameTemp.unitHitInfo.actor){

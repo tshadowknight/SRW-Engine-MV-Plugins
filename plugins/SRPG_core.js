@@ -2734,12 +2734,14 @@ SceneManager.isInSaveScene = function(){
 			for(let refKey in $gameTemp.battleEffectCache){
 				const ref = $gameTemp.battleEffectCache[refKey].ref;
 				if(ref){
+					if(!ref.isActor() && $gameTemp.battleEffectCache[refKey].attacked){
+						$gameTemp.didEnemyAttack = true;
+					}
 					delete ref._cacheReference;
 					delete ref._supportCacheReference;
 				}
 			}
-		}		
-		
+		}				
 		$gameTemp.battleEffectCache = null;
        
 	   $gameSystem.setSubBattlePhase('check_item_pickup');	

@@ -1647,7 +1647,7 @@ GameState_normal.prototype.update = function(scene){
 		$gameTemp.isPendingSaveMenu = false;
 		return;
 	}*/
-	
+	$gameTemp.didEnemyAttack = false;
 	$gameTemp.activeShip = null;
 	$gameTemp.actorAction = {};
 	$gameTemp.enemyAction = {};
@@ -2026,7 +2026,7 @@ GameState_enemy_command.prototype.constructor = GameState_enemy_command;
 
 GameState_enemy_command.prototype.update = function(scene){
 	if (!$gameMap.isEventRunning()) {
-		
+		$gameTemp.didEnemyAttack = false;
 		$gameTemp.AIWaitTimer--;
 		if($gameTemp.AIWaitTimer < 0){		
 			$gameTemp.unitHitInfo = {};
@@ -2045,6 +2045,7 @@ GameState_enemy_move.prototype.constructor = GameState_enemy_move;
 
 GameState_enemy_move.prototype.update = function(scene){
 	if (!$gameMap.isEventRunning()) {
+		
 		$gameTemp.AIWaitTimer--;
 		if($gameTemp.AIWaitTimer < 0){	
 			scene.srpgInvokeAIMove();			
