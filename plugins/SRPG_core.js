@@ -2730,6 +2730,7 @@ SceneManager.isInSaveScene = function(){
         $gameTroop.clearSrpgBattleEnemys();
 		
 		//delete stale battle cache references from previous participants
+		//set didEnemyAttack flag for checks in after_action scripts
 		if($gameTemp.battleEffectCache){
 			for(let refKey in $gameTemp.battleEffectCache){
 				const ref = $gameTemp.battleEffectCache[refKey].ref;

@@ -1,7 +1,7 @@
 
 #battle_scene_text_layer #noise.fade_in {
 	animation-name: fade_in;
-	animation-duration: 3s;
+	animation-duration: 6s;
 	animation-fill-mode: forwards;
 }
 
@@ -87,6 +87,8 @@
 	position: absolute;
     top: 0;
 	display: none;
+	image-rendering: pixelated; 
+	image-rendering: crisp-edges;
 }
 
 #battle_scene_text_layer #noise.active {
@@ -112,7 +114,7 @@
 
 #battle_scene_ui_layer #noise.fade_in {
 	animation-name: fade_in;
-	animation-duration: 1s;
+	animation-duration: 3s;
 	animation-fill-mode: forwards;
 }
 

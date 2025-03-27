@@ -66,7 +66,10 @@ BattleSceneTextLayer.prototype.createComponents = function() {
 	content+="<div id='icon_and_noise_container'>";
 	content+="<div id='icon_container'></div>";
 	
-	content+="<canvas width=144 height=144 id='noise'></canvas>";
+	const pixelSize = ENGINE_SETTINGS.BATTLE_SCENE.NOISE_PIXEL_SIZE || 1;
+	const canvasDim = 144 / pixelSize;
+
+	content+="<canvas width="+canvasDim+" height="+canvasDim+" id='noise'></canvas>";
 	content+="</div>";
 	
 	this._textDisplay.innerHTML = content;
@@ -225,6 +228,27 @@ BattleSceneTextLayer.prototype.showNoise = function() {
 
 BattleSceneTextLayer.prototype.registerNoiseUpdate = function() {
 	var _this = this;	
+
+	let opacityUpdater = ENGINE_SETTINGS.BATTLE_SCENE.NOISE_OPACITY || ((ctr) => {
+		if(ctr == 0){
+			return 255;
+		}
+		if(ctr == 30){
+			return 255;
+		}
+
+		if(ctr == 60){
+			return 255;
+		}
+
+		if(ctr == 75){
+			return 255;
+		}
+
+		if(ctr > 90){
+			return (ctr - 30) * 2;
+		}
+	});
 	if(!_this._noiseUpdate){
 		_this._noiseUpdate = function noise(){	
 			if(_this._noiseCtx){
@@ -235,12 +259,15 @@ BattleSceneTextLayer.prototype.registerNoiseUpdate = function() {
 				for (var i = 0, n = pix.length; i < n; i += 4) {
 				// var c = 7 + Math.sin(i/50000 + time/7); // A sine wave of the form sin(ax + bt)
 					pix[i] = pix[i+1] = pix[i+2] = 255 * Math.random() + 50; // Set a random gray
-					pix[i+3] = _this._noiseCtr * 4;
+					pix[i+3] = opacityUpdater(_this._noiseCtr);
+
+					if(!_this._runNoise){
+						pix[i+3] = 0;
+					}
+					
 				}
 
-				if(!_this._runNoise){
-					pix[i+3] = 0;
-				}
+				
 				_this._noiseCtx.putImageData(imgd, 0, 0);
 				//time = (time + 1) % canvas.height;
 			

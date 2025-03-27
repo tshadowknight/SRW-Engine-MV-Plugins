@@ -4932,7 +4932,7 @@ BattleSceneManager.prototype.executeAnimation = function(animation, startTick){
 			if(params.path == "sys_barrier"){
 				effekInfo = _this._preloadedEffekseerInfo["ub__sys_barrier"];
 			} else {
-				effekInfo = _this._preloadedEffekseerInfo[_this._currentAnimatedAction.effekseerId+"__"+params.path];
+				effekInfo = _this._preloadedEffekseerInfo[_this._currentAnimatedAction.effekseerId+"__"+target+"__"+params.path];
 			}
 				
 			if(effekInfo){
@@ -7206,11 +7206,13 @@ BattleSceneManager.prototype.preloadEffekseerEffect = function(target, params, a
 				
 		_this._glContext.pixelStorei(_this._glContext.UNPACK_FLIP_Y_WEBGL, 0);
 		//_this._isLoading++;
-		if(!_this._preloadedEffekseerInfo[actionIdx+"__"+params.path]){
+		const preloadKey = actionIdx+"__"+target+"__"+params.path;
+		if(!_this._preloadedEffekseerInfo[preloadKey]){
+			_this._preloadedEffekseerInfo[preloadKey] = {};//avoid double loading
 			var effect = targetContext.loadEffect("effekseer/"+params.path+".efk", 1.0, function(){
 				targetContext.activeCount++;
 				
-				_this._preloadedEffekseerInfo[actionIdx+"__"+params.path] = {
+				_this._preloadedEffekseerInfo[preloadKey] = {
 					effect: effect,
 					targetContext: targetContext
 				};

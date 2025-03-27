@@ -145,6 +145,7 @@ var ENGINE_SETTINGS = {
 		SHOW_FADE_BELOW_TEXTBOX: false,
 		DEFAULT_BARRIER_COLOR: "#7c00e6",
 		FADE_BARRIER_DURING_NEXT_PHASE: true,//if true the barrier will only be shown briefly during the next phase command
+		NOISE_PIXEL_SIZE: 1
 	},
 	MASTERY_REWARDS: {
 		PP: {AMOUNT: 5, SCOPE: "deployed"}, //scope is deployed, unlocked, or all
