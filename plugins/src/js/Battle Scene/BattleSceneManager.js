@@ -4099,7 +4099,18 @@ BattleSceneManager.prototype.executeAnimation = function(animation, startTick){
 			}
 			_this._UILayerManager.setStat(action, "HP");
 			_this._UILayerManager.setStat(action, "EN");
-		},		
+		},	
+		store_active_main_visibility: function(target, params){
+			var targetObj = getTargetObject("active_main");
+			_this._storedActiveMainVisbility = targetObj.isVisible;
+		},
+		restore_active_main_visibility: function(target, params){
+			var targetObj = getTargetObject("active_main");
+			if(_this._storedActiveMainVisbility !== undefined){
+				targetObj.isVisible = _this._storedActiveMainVisbility;
+				delete _this._storedActiveMainVisbility;
+			}			
+		},
 		fade_in_bg: function(target, params){
 			var targetObj = getTargetObject(target);
 			if(targetObj){
@@ -4232,11 +4243,13 @@ BattleSceneManager.prototype.executeAnimation = function(animation, startTick){
 			_this._animationList[insertStartTick + 25] = [{type: "create_target_environment"}, {type: "updateBgMode", target: "active_target"}];
 			if(params.cleanUpCommands){				
 				_this._animationList[insertStartTick + 26] = params.cleanUpCommands;						
-			}				
+			}		
+
 			
 			//support defend animation
 			if(_this._currentAnimatedAction.attacked && _this._currentAnimatedAction.attacked.type == "support defend"){
 				_this.delayAnimationList(insertStartTick + 27, 170);
+				_this._animationList[insertStartTick + 27] =  [{type: "store_active_main_visibility", target: ""}];
 				_this._animationList[insertStartTick + 30] = [
 					{type: "teleport", target: "Camera", params: {position: _this._defaultPositions.camera_main_idle}},
 					{type: "teleport", target: "active_target", params: {position: _this._defaultPositions.enemy_main_idle}},
@@ -4272,6 +4285,8 @@ BattleSceneManager.prototype.executeAnimation = function(animation, startTick){
 				_this._animationList[insertStartTick + 160] = [
 					//{type: "show_sprite", target: "active_main", params: {}},	
 					{type: "enable_support_defender"},
+					{type: "hide_sprite", target: "active_target", params: {}},		
+					{type: "restore_active_main_visibility", target: ""}		
 				];				
 				
 				if(params.commands){
@@ -7206,7 +7221,10 @@ BattleSceneManager.prototype.preloadEffekseerEffect = function(target, params, a
 				
 		_this._glContext.pixelStorei(_this._glContext.UNPACK_FLIP_Y_WEBGL, 0);
 		//_this._isLoading++;
-		const preloadKey = actionIdx+"__"+target+"__"+params.path;
+		let preloadKey = actionIdx+"__"+target+"__"+params.path;
+		if(target == "sys_barrier"){
+			preloadKey = "ub__sys_barrier";
+		}
 		if(!_this._preloadedEffekseerInfo[preloadKey]){
 			_this._preloadedEffekseerInfo[preloadKey] = {};//avoid double loading
 			var effect = targetContext.loadEffect("effekseer/"+params.path+".efk", 1.0, function(){
