@@ -1005,10 +1005,10 @@ Window_BeforebattleTwin.prototype.update = function() {
 };
 
 
-Window_BeforebattleTwin.prototype.createPercentIndicator = function(allyOrEnemy, action, ref, cssClass){
+Window_BeforebattleTwin.prototype.createPercentIndicator = function(allyOrEnemy, action, ref, isSupport){
 	var _this = this;
 	var content = "";
-	content+="<div class='scaled_text percent_indicator "+cssClass+"'>";
+	content+="<div class='scaled_text percent_indicator'>";
 	var hitRates = [];
 	var critRates = [];
 	if(action.type == "attack"){	
@@ -1118,12 +1118,14 @@ Window_BeforebattleTwin.prototype.createPercentIndicator = function(allyOrEnemy,
 				if(allyOrEnemy == "ally"){				
 					critRate = $battleCalc.performCritCalculation(
 						{actor: initiator, action: initiatorAction, isInitiator: !$gameTemp.isEnemyAttack},
-						{actor: defenderInfo[i].defender, action: defenderInfo[i].defenderAction, isInitiator: $gameTemp.isEnemyAttack}
+						{actor: defenderInfo[i].defender, action: defenderInfo[i].defenderAction, isInitiator: $gameTemp.isEnemyAttack},
+						isSupport == "support"
 					);					
 				} else {				
 					critRate = $battleCalc.performCritCalculation(				
 						{actor: initiator, action: initiatorAction, isInitiator: $gameTemp.isEnemyAttack},
-						{actor: defenderInfo[i].defender, action: defenderInfo[i].defenderAction, isInitiator: !$gameTemp.isEnemyAttack}
+						{actor: defenderInfo[i].defender, action: defenderInfo[i].defenderAction, isInitiator: !$gameTemp.isEnemyAttack},
+						isSupport == "support"
 					);			
 				}			
 				critRates[realIdx] = critRate;					
@@ -1296,11 +1298,11 @@ Window_BeforebattleTwin.prototype.createParticipantBlock = function(ref, action,
 	content+="</div>";
 	content+="<div class='main_row'>";
 	if(allyOrEnemy == "ally"){
-		content+=this.createPercentIndicator(allyOrEnemy, action, ref);
+		content+=this.createPercentIndicator(allyOrEnemy, action, ref, isSupport);
 		content+=createMainContent();
 	} else {
 		content+=createMainContent();
-		content+=this.createPercentIndicator(allyOrEnemy, action, ref);		
+		content+=this.createPercentIndicator(allyOrEnemy, action, ref, isSupport);		
 	}
 	
 	content+=this.createAttributeEffectivenessBlock(ref, "attribute1");

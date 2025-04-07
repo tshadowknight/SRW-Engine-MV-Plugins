@@ -117,11 +117,11 @@ BattleCalc.prototype.performExpCalculation = function(attacker, defender){
 	return Math.floor(totalExp);
 }
 
-BattleCalc.prototype.performCritCalculation = function(attackerInfo, defenderInfo){
+BattleCalc.prototype.performCritCalculation = function(attackerInfo, defenderInfo, isSupportAttacker){
 	var result = 0;
 	var attackerAction = attackerInfo.action;
 	var activeSpirits = $statCalc.getActiveSpirits(attackerInfo.actor);
-	if(activeSpirits.valor || activeSpirits.soul){
+	if(!isSupportAttacker && (activeSpirits.valor || activeSpirits.soul)){
 		return -1;
 	}
 	if(attackerAction.type == "attack"){
@@ -431,7 +431,7 @@ BattleCalc.prototype.performDamageCalculation = function(attackerInfo, defenderI
 		
 		var finalDamage = (initialAttack - initialDefend) * (1 - terrainDefenseFactor/100);
 		var isCritical = false;
-		if(Math.random() < this.performCritCalculation(attackerInfo, defenderInfo)){
+		if(Math.random() < this.performCritCalculation(attackerInfo, defenderInfo, isSupportAttacker)){
 			isCritical = true;
 		}				
 		

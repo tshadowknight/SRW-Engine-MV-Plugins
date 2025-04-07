@@ -4032,7 +4032,8 @@ BattleSceneManager.prototype.executeAnimation = function(animation, startTick){
 			let textProvider;
 			
 			if(_this._textProviderOverride){
-				textProvider = $gameActors.actor(_this._textProviderOverride);
+				textProvider = $gameActors.actor(_this._textProviderOverride); 
+				$statCalc.initSRWStatsIfUninitialized(textProvider);
 			} else{
 				textProvider = action.ref;
 			}
