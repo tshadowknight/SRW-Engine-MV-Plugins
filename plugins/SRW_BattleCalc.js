@@ -497,6 +497,9 @@ BattleCalc.prototype.performDamageCalculation = function(attackerInfo, defenderI
 		var vengeanceRatio = $statCalc.applyStatModsToValue(attackerInfo.actor, 0, ["vengeance"]);
 		if(vengeanceRatio){
 			var missingHP = attackerMechStats.maxHP - attackerMechStats.currentHP;		
+			if(finalDamage < 0){
+				finalDamage = 0;
+			}
 			finalDamage+=Math.floor(missingHP * vengeanceRatio);
 		}		
 		

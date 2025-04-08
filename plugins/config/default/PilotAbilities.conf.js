@@ -1568,7 +1568,7 @@ $SRWConfig.pilotAbilties = function(){
 		false,
 		function(actor, level){
 			return [
-				{type: "ability_command", cmdId: 1},				
+				{type: "ability_command", cmdId: 2},				
 			];
 		},
 		function(actor, level){

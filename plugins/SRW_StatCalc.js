@@ -5801,7 +5801,11 @@ StatCalc.prototype.isFreeSpace = function(position, type, factionConfig){
 	return isFree;
 }
 
-StatCalc.prototype.getAdjacentFreeSpace = function(position, type, eventId, sourcePosition, hardBias, usedPositions){
+StatCalc.prototype.getAdjacentFreeStandableSpace = function(actor, position, type){
+	return this.getAdjacentFreeSpace(position, type, null, null, null, null, true, actor);
+}
+
+StatCalc.prototype.getAdjacentFreeSpace = function(position, type, eventId, sourcePosition, hardBias, usedPositions, onlyStandable, refActor){
 	var occupiedCoordLookup = {};
 	this.iterateAllActors(type, function(actor, event){			
 		if(!event.isErased() && event.eventId() != eventId){
@@ -5828,7 +5832,9 @@ StatCalc.prototype.getAdjacentFreeSpace = function(position, type, eventId, sour
 				if(sourcePosition){
 					sourceDistance = Math.hypot(sourcePosition.x-i, sourcePosition.y-j);
 				}
-				candidates.push({position: {x: i, y: j}, distance: Math.hypot(position.x-i, position.y-j), sourceDistance: sourceDistance});
+				if(!onlyStandable || this.canStandOnTile(refActor, {x: i, y: j})){
+					candidates.push({position: {x: i, y: j}, distance: Math.hypot(position.x-i, position.y-j), sourceDistance: sourceDistance});
+				}				
 			}
 		}
 	}
