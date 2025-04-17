@@ -110,5 +110,44 @@ $SRWConfig.abilityCommands = function(){
 			return $gameSystem.canActorSetZones(1) && !$gameSystem.isZoneDeployed("abi_3_"+actor.actorId());
         },
         102 //the animation that should be played when the ability is used, -1 if none
-    ); 
+    );
+
+    this.addDefinition(
+        4, //the id of the command
+        "Ranged Chalice", //the display name of the command
+        "Recover HP and EN to full up to twice per stage for all units within 5 range.", //the display description of the command
+        {type: "ammo", cost: 2}, //the cost for use
+        function(actor){ //the function that applies the effect of the command to the user
+			const range = 5;
+			const refEvent = $statCalc.getReferenceEvent(actor);
+			if(refEvent){
+				const position = {x: refEvent.posX(), y: refEvent.posY()};
+				$statCalc.iterateAllActors("actor", function(actor, event){
+					const inInRange = ((Math.abs(event.posX() - position.x) + Math.abs(event.posY() - position.y)) <= range);
+					if(inInRange){
+						$statCalc.recoverHPPercent(actor, 100);
+						$statCalc.recoverENPercent(actor, 100);
+					}
+				});			
+			}
+			
+        }, function(actor){ //the function that checks if the command can be used
+			let hasValidTarget = false;
+			const range = 5;
+			const refEvent = $statCalc.getReferenceEvent(actor);
+			if(refEvent){
+				const position = {x: refEvent.posX(), y: refEvent.posY()};
+				$statCalc.iterateAllActors("actor", function(actor, event){
+					const inInRange = ((Math.abs(event.posX() - position.x) + Math.abs(event.posY() - position.y)) <= range);
+					if(inInRange){
+						if($statCalc.canRecoverEN(actor) || $statCalc.canRecoverHP(actor)){
+							hasValidTarget = true;
+						}
+					}
+				});			
+			}
+            return hasValidTarget;
+        },
+        42 //the animation that should be played when the ability is used, -1 if none
+    );	
 }

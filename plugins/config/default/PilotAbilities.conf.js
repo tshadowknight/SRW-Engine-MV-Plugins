@@ -2203,4 +2203,20 @@ $SRWConfig.pilotAbilties = function(){
 		[0],
 		1,
 	);
+
+	this.addDefinition(
+		108, 
+		"Ranged Chalice",
+		"Recover HP and EN to full up to twice per stage.",
+		false,
+		false,
+		function(actor, level){
+			return [
+				{type: "ability_command", cmdId: 4},				
+			];
+		},
+		function(actor, level){
+			return true;		
+		}
+	);	
 }

@@ -997,7 +997,7 @@ MechList.prototype.getCurrentSelection = function(){
 	
 	if(unit){
 		let mech;
-		if(unit.isSubPilot){
+		if(unit.isSubPilot && unit.mainPilot){
 			mech = unit.mainPilot.SRWStats.mech;
 		} else {
 			mech = unit.SRWStats.mech;

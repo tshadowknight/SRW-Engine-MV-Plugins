@@ -1988,7 +1988,7 @@ StatCalc.prototype.getMechData = function(mech, forActor, items, previousWeapons
 		result.hasVariableSubPilots = false;
 		result.allowedSubPilots = {};
 		for(var i = 0; i < 10; i++){
-			if(mechProperties["mechAllowedSubPilots"+(i+1)] && mechProperties["mechSubPilots"+(i+1)]){
+			if(mechProperties["mechAllowedSubPilots"+(i+1)]){
 				result.hasVariableSubPilots = true;
 				result.allowedSubPilots[i] = parsePilotList(mechProperties["mechAllowedSubPilots"+(i+1)]);
 			}
@@ -5837,6 +5837,9 @@ StatCalc.prototype.getAdjacentFreeSpace = function(position, type, eventId, sour
 				}				
 			}
 		}
+	}
+	if(!candidates.length){
+		return null;
 	}
 	if(hardBias && sourcePosition){// place preference on hitting the bias position
 		return candidates.sort(function(a, b){
