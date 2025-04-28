@@ -7305,9 +7305,12 @@ BattleSceneManager.prototype.preloadEffekseerParticles = async function(){
 			var animId;
 			if(attack && typeof attack.animId != "undefined" && attack.animId != -1){
 				animId = attack.animId;
-			} else {
+			} else if(attack){
 				animId = _this.getDefaultAnim(attack);//default
 			}				
+			if(animId == null){
+				next;
+			}
 			var animationList = _this._animationBuilder.buildAnimation(animId, _this);
 			if(!animationList){
 				alert("Animation "+animId+" does not have a definition!");
@@ -7731,12 +7734,12 @@ BattleSceneManager.prototype.preloadSceneAssets = function(){
 				var animId;
 				if(attack && typeof attack.animId != "undefined" && attack.animId != -1){
 					animId = attack.animId;
-				} else {
+				} else if(attack){
 					animId = _this.getDefaultAnim(attack);//default
 				}
-				animIdsToPreload[animId] = true;
-				var preloadCtr = 0;
-				
+				if(animId != null){
+					animIdsToPreload[animId] = true;
+				}				
 				
 				_this.preloadDefaultFrames(nextAction.ref, promises);
 				if(nextAction.ref.subTwin){

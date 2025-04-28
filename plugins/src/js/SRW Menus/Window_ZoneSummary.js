@@ -51,26 +51,28 @@ Window_ZoneSummary.prototype.redraw = function() {
 	let ctr = 0;
 	for(let entry of zoneInfo){
 		let displayInfo = $abilityZoneManager.getAbilityDisplayInfo(entry.abilityId);
-		let isFriendly = $gameSystem.isFriendly($gameSystem.EventToUnit(entry.ownerEventId)[1], "player");
-		if(stackCount < 4 || ctr < 4){
-			content+="<div class='entry "+(isFriendly ? "friendly" : "")+"'>";
-			content+="<div class='label scaled_text fitted_text '>";
-			content+=displayInfo.name;
-			content+="</div>";
-			
-			content+="<div class='level_indic scaled_text fitted_text'>";
-			content+=APPSTRINGS.ZONE_STATUS.label_level+Math.min(stackCount, displayInfo.upgradeCount);
-			content+="</div>";
-			
-			content+="</div>";
-		} else if(ctr == 4){
-			content+="<div class='scaled_text fitted_text entry'>";
-			content+="<div class='label'>";
-			content+="...";
-			content+="</div>";
-			content+="</div>";
+		const actorInfo = $gameSystem.EventToUnit(entry.ownerEventId);
+		if(actorInfo){		
+			let isFriendly = $gameSystem.isFriendly(actorInfo[1], "player");
+			if(stackCount < 4 || ctr < 4){
+				content+="<div class='entry "+(isFriendly ? "friendly" : "")+"'>";
+				content+="<div class='label scaled_text fitted_text '>";
+				content+=displayInfo.name;
+				content+="</div>";
+				
+				content+="<div class='level_indic scaled_text fitted_text'>";
+				content+=APPSTRINGS.ZONE_STATUS.label_level+Math.min(stackCount, displayInfo.upgradeCount);
+				content+="</div>";
+				
+				content+="</div>";
+			} else if(ctr == 4){
+				content+="<div class='scaled_text fitted_text entry'>";
+				content+="<div class='label'>";
+				content+="...";
+				content+="</div>";
+				content+="</div>";
+			}
 		}
-		
 		ctr++;
 	}	
 	content+="</div>";

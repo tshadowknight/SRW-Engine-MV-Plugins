@@ -548,7 +548,7 @@ Window_BeforebattleTwin.prototype.update = function() {
 		}		
 		
 		if(!Input.isTriggered('ok') && !Input.isLongPressed('ok') && !Input.isPressed('ok')){
-			if(!$statCalc.isAI($gameTemp.currentBattleActor)){			
+			if(!$statCalc.isAI($gameTemp.currentBattleActor) && !$statCalc.isDisabled($gameTemp.currentBattleActor)){			
 				if(Input.isTriggered('pageup') || Input.isRepeated('pageup')){
 					this.requestRedraw();
 					if(this._currentUIState == "main_selection"){

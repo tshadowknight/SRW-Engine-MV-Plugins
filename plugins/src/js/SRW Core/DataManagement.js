@@ -466,7 +466,8 @@
 					$gameTemp.continueLoaded = true;
 				}			
 			} catch(e){
-				console.log("Attempted to load non existant continue save!");
+				console.log("Failed to load continue save");
+				console.trace();
 			}		
 			return true;		
 		};
