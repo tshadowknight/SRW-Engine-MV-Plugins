@@ -33,6 +33,8 @@ export default function BattleSceneManager(){
 	this._activeTextureCache = {};
 	
 	this._instantiatedUnits = [];
+
+	this._renderTargets = {};
 	
 	this._defaultPositions = {
 		// "camera_root": new BABYLON.Vector3(0, 0, -5),
@@ -475,6 +477,14 @@ BattleSceneManager.prototype.disposeDynamicModels = function(){
 	this._instantiatedUnits = [];
 }
 
+BattleSceneManager.prototype.disposeRenderTargets = function(){
+	for(let targetId in this._renderTargets){
+		const entry = this._renderTargets[targetId];
+		entry.camera.dispose();
+		entry.texture.dispose();
+	}
+	this._renderTargets = {};
+}
 
 BattleSceneManager.prototype.dispose = function(){
 	function destroyCanvas(canvas){
@@ -507,7 +517,7 @@ BattleSceneManager.prototype.dispose = function(){
 	this._animationList = [];
 	this.disposeTextureCache();
 	this.disposeDynamicModels();
-	
+	this.disposeRenderTargets();
 }
 
 BattleSceneManager.prototype.initEffekseerParticles = async function(){
@@ -1056,7 +1066,7 @@ BattleSceneManager.prototype.createBg = function(name, img, position, size, alph
 	return bg;
 }
 
-BattleSceneManager.prototype.createSceneBg = function(name, path, position, size, alpha, billboardMode, flipX, clamp, unlit, uScale, vScale, uOffset, vOffset){
+BattleSceneManager.prototype.createSceneBg = function(name, path, position, size, alpha, billboardMode, flipX, clamp, unlit, uScale, vScale, uOffset, vOffset, renderTargetId){
 	var width;
 	var height;
 	if(typeof size != "undefined"){
@@ -1077,8 +1087,13 @@ BattleSceneManager.prototype.createSceneBg = function(name, path, position, size
 	var material = new BABYLON.StandardMaterial(name, this._scene);
 	
 	
-	
-	material.diffuseTexture = this.getCachedTexture("img/SRWBattleScene/"+path+".png");//new BABYLON.Texture(this.getCachedTexture("img/SRWBattleScene/"+path+".png"), this._scene, false, true, BABYLON.Texture.NEAREST_NEAREST);
+	if(renderTargetId){
+		if(this._renderTargets[renderTargetId]){
+			material.diffuseTexture = this._renderTargets[renderTargetId].texture;
+		}
+	} else {
+		material.diffuseTexture = this.getCachedTexture("img/SRWBattleScene/"+path+".png");//new BABYLON.Texture(this.getCachedTexture("img/SRWBattleScene/"+path+".png"), this._scene, false, true, BABYLON.Texture.NEAREST_NEAREST);
+	}
 	material.diffuseTexture.hasAlpha = true;
 	//
 	material.diffuseTexture.uScale = uScale || 1;
@@ -3513,6 +3528,13 @@ BattleSceneManager.prototype.getTargetObject = function(name){
 				ctr++;
 			}
 		}
+
+		if(!obj){//check dynamic unit models
+			var ctr = 0;
+			if(_this._renderTargets[name] != null){
+				obj = _this._renderTargets[name].camera;
+			}
+		}
 		
 		if(!obj){//check sprites
 			var ctr = 0;
@@ -4480,6 +4502,32 @@ BattleSceneManager.prototype.executeAnimation = function(animation, startTick){
 				});
 			}			
 		},
+		create_render_target: function(target, params){
+			let position;
+			if(!_this._renderTargets[target]){
+				if(params.position){
+					position = _this.applyAnimationDirection(params.position);
+				} else {
+					position = new BABYLON.Vector3(0, 0, 0);
+				}		
+	
+				const camera = new BABYLON.FreeCamera("render_target_cam_"+(_this._renderTargets.length), position, _this._scene);
+				if(params.rotation){
+					camera.rotation = _this.applyAnimationDirection(params.rotation);
+				}
+				const renderTarget = new BABYLON.RenderTargetTexture("render_target_tex_"+(_this._renderTargets.length), {width: ENGINE_SETTINGS.BATTLE_SCENE.RENDER_WIDTH, height: ENGINE_SETTINGS.BATTLE_SCENE.RENDER_HEIGHT}, _this._scene, true);
+				renderTarget.activeCamera = camera;
+				renderTarget.renderList = null;
+				_this._scene.customRenderTargets.push(renderTarget);			
+	
+				_this._renderTargets[target] = {
+					camera: camera,
+					texture: renderTarget
+				}	
+			} else {
+				console.log("Render target "+target+" already defined.");
+			}			
+		},
 		create_bg: function(target, params){
 			var position;
 			if(params.position){
@@ -4506,7 +4554,7 @@ BattleSceneManager.prototype.executeAnimation = function(animation, startTick){
 			} else {
 				path = params.path;
 			}
-			var bg = _this.createSceneBg(target, path, _this.applyAnimationDirection(position), size, alpha, params.billboardMode, _this._animationDirection == -1 ? true : false, params.clamp, params.unlit, (params.uScale || 0) * 1, (params.vScale || 0) * 1, (params.uOffset || 0) * 1, (params.vOffset || 0) * 1);
+			var bg = _this.createSceneBg(target, path, _this.applyAnimationDirection(position), size, alpha, params.billboardMode, _this._animationDirection == -1 ? true : false, params.clamp, params.unlit, (params.uScale || 0) * 1, (params.vScale || 0) * 1, (params.uOffset || 0) * 1, (params.vOffset || 0) * 1, params.renderTargetId);
 			if(params.rotation){
 				bg.rotation = _this.applyAnimationDirection(params.rotation);
 			}
@@ -6972,6 +7020,7 @@ BattleSceneManager.prototype.resetScene = function() {
 	_this.disposeRMMVBackgrounds();
 	_this.disposeTextureCache();
 	_this.disposeDynamicModels();
+	_this.disposeRenderTargets();
 	
 	_this._spriteManagers = {};
 	_this.setBgScrollRatio(1);
@@ -7610,18 +7659,19 @@ BattleSceneManager.prototype.preloadSceneAssets = function(){
 			
 			
 			if(animCommand.type == "create_bg"){
-				
-				let path;
-				if(params.isPilotCutin){
-					path = _this._actionQueue[0].ref.SRWStats.pilot.cutinPath;
-				} else {
-					path = params.path;
-				}
-				
-				//var bg = _this.createSceneBg(animCommand.target+"_preload", path, new BABYLON.Vector3(0,0,-1000), 1, 1, 0);
-				//promises.push(_this.getBgPromise(bg));
-				//_this._animationBackgroundsInfo.push(bg);
-				promises.push(_this.preloadTexture("img/SRWBattleScene/"+path+".png", imgReportingContext));
+				if(!params.renderTargetId){
+					let path;
+					if(params.isPilotCutin){
+						path = _this._actionQueue[0].ref.SRWStats.pilot.cutinPath;
+					} else {
+						path = params.path;
+					}
+					
+					//var bg = _this.createSceneBg(animCommand.target+"_preload", path, new BABYLON.Vector3(0,0,-1000), 1, 1, 0);
+					//promises.push(_this.getBgPromise(bg));
+					//_this._animationBackgroundsInfo.push(bg);
+					promises.push(_this.preloadTexture("img/SRWBattleScene/"+path+".png", imgReportingContext));
+				}				
 			}	
 			if(animCommand.type == "create_movie_bg"){
 				var r = new XMLHttpRequest();			
@@ -8132,6 +8182,7 @@ BattleSceneManager.prototype.endScene = function(force) {
 			_this.disposeRMMVBackgrounds();			
 			_this.disposeTextureCache();
 			_this.disposeDynamicModels();
+			_this.disposeRenderTargets();
 			_this._UIcontainer.style.display = "";
 			_this._TextContainer.style.display = "";
 			_this._PIXIContainer.style.display = "";	
@@ -8167,6 +8218,7 @@ BattleSceneManager.prototype.endScene = function(force) {
 			_this._animationList = [];
 			_this.disposeTextureCache();
 			_this.disposeDynamicModels();
+			_this.disposeRenderTargets();
 			_this._UIcontainer.style.display = "";
 			_this._TextContainer.style.display = "";
 			_this._PIXIContainer.style.display = "";	

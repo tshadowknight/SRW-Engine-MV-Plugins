@@ -362,10 +362,15 @@ SRWEditor.prototype.init = function(){
 		},
 		create_bg: {
 			hasTarget: true,
-			params: ["isPilotCutin", "path", "parent", "position", "size", "alpha", "billboardMode", "rotation", "lineCount", "columnCount", "animationLoop", "animationFrames", "animationDelay", "holdFrame", "scrollSpeed", "clamp", "uScale", "vScale", "uOffset", "vOffset"],//, "unlit", "frameSize", 
+			params: ["isPilotCutin", "renderTargetId", "path", "parent", "position", "size", "alpha", "billboardMode", "rotation", "lineCount", "columnCount", "animationLoop", "animationFrames", "animationDelay", "holdFrame", "scrollSpeed", "clamp", "uScale", "vScale", "uOffset", "vOffset"],//, "unlit", "frameSize", 
 			aliases: {"animationLoop": "loopFromFrame", "animationFrames": "loopToFrame"},
 			desc: "Create a new background."
 		},
+		create_render_target: {
+			hasTarget: true,
+			params: ["position", "rotation"],//, "unlit", "frameSize", 
+			desc: "Create a new render target + camera."
+		},		
 		set_bg_scroll_speed: {
 			hasTarget: true,
 			params: ["scrollSpeed", "duration", "easingFunction", "easingMode"],
@@ -814,6 +819,7 @@ SRWEditor.prototype.init = function(){
 		alpha: "The alpha of the object.",
 		billboardMode: "Set the billboarding mode for the object: 'none' or 'full'",
 		isPilotCutin: "If 1, path is ignored and the active main pilot's defined cutin is used",
+		renderTargetId: "The id of the render target + camera that will render to this texture",
 		frameSize: "The size of the frames in the spritesheet.",
 		lineCount: "The number of lines in the spritesheet.",
 		columnCount: "The number of columns in the spritesheet.",
@@ -1258,6 +1264,9 @@ SRWEditor.prototype.init = function(){
 		
 		},
 		isPilotCutin: function(value){
+		
+		}, 
+		renderTargetId: function(value){
 		
 		}, 
 		frameSize: function(value){
