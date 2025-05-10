@@ -1145,7 +1145,7 @@
 	};
 
 	Sprite_AttributeIndicator.prototype.update = function() {
-		if(ENGINE_SETTINGS.USE_WEAPON_ATTRIBUTE){			
+		if(ENGINE_SETTINGS.ENABLE_ATTRIBUTE_SYSTEM){			
 			var type = this._character.isType();
 			this._isEnemy = type === 'enemy';
 			var eventId = this._character.eventId();
