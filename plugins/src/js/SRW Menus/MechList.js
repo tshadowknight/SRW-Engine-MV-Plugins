@@ -965,7 +965,7 @@ MechList.prototype.defineContent = function(){
 			compareFunction: function(a, b){
 				let attrA = String($statCalc.getParticipantAttribute(a, "attribute1") || "");
 				let attrB = String($statCalc.getParticipantAttribute(b, "attribute1") || "");
-				return attrA.localeCompare(attrB);
+				return attrA.localeCompare(attrB) * _this._sortDirection;
 			}
 		};
 	}

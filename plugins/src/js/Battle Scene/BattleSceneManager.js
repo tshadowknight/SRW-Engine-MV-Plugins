@@ -7358,7 +7358,7 @@ BattleSceneManager.prototype.preloadEffekseerParticles = async function(){
 				animId = _this.getDefaultAnim(attack);//default
 			}				
 			if(animId == null){
-				next;
+				continue;
 			}
 			var animationList = _this._animationBuilder.buildAnimation(animId, _this);
 			if(!animationList){
