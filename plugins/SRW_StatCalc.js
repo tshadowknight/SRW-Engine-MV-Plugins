@@ -3751,7 +3751,7 @@ StatCalc.prototype.getWeaponValidHolders = function(weaponId){
 	}
 	
 	let result = {};
-	for(let i = 1; i < $dataClasses.length; i++){
+	for(let i = 1; i < $dataActors.length; i++){
 		if(!banList[i]){
 			result[i] = true;
 		}
