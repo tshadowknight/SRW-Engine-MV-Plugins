@@ -360,6 +360,11 @@ SRWEditor.prototype.init = function(){
 			params: ["excludedObj"],
 			desc: "Excluded a specific object form receiving light from the target light"
 		},
+		toggle_frustum_culling: {
+			hasTarget: false,
+			params: ["state"],
+			desc: "Toggle frustum culling on and off"
+		},
 		create_bg: {
 			hasTarget: true,
 			params: ["isPilotCutin", "renderTargetId", "path", "parent", "position", "size", "alpha", "billboardMode", "rotation", "lineCount", "columnCount", "animationLoop", "animationFrames", "animationDelay", "holdFrame", "scrollSpeed", "clamp", "uScale", "vScale", "uOffset", "vOffset"],//, "unlit", "frameSize", 
@@ -748,6 +753,7 @@ SRWEditor.prototype.init = function(){
 		shockwave_intensity: "The intensity of the shockwave effect.",
 		lightIntensity: "The intensity of the light",
 		excludedObj: "The object that will be excluded from the target light source",
+		state: "The new state for the setting",
 		includeOnly: "Specifiy one target object that will be the sole recipient of this light source",
 		immediate: "If 1 the change will be instant.",
 		position: "A position defined by an x, y and z coordinate.",
@@ -918,6 +924,9 @@ SRWEditor.prototype.init = function(){
 			
 		},	
 		excludedObj: function(value){
+			
+		},	
+		state: function(value){
 			
 		},	
 		includeOnly: function(value){

@@ -3044,7 +3044,7 @@ BattleSceneManager.prototype.startScene = function(){
 	
 	//render the effekseer layer once per frame
 	function renderEffekseerLayer(layerId){
-		if(!_this._effekseerLayerRendered[layerId]){
+		if(_this._scene.activeCamera == _this._camera && !_this._effekseerLayerRendered[layerId]){
 			
 			let targetContext;
 			let targetContextMirror;
@@ -4010,7 +4010,7 @@ BattleSceneManager.prototype.executeAnimation = function(animation, startTick){
 			} else {
 				type = "damage";
 			}
-			var battleText = _this._battleTextManager.getText(entityType, action.ref, type, action.isActor ? "enemy" : "actor", _this.getBattleTextId(_this._currentAnimatedAction));
+			var battleText = _this._battleTextManager.getText(entityType, action.ref, type, _this.getBattleTextTargetType(action), _this.getBattleTextId(_this._currentAnimatedAction));
 			
 			_this._awaitingText = true;
 			_this._TextlayerManager.setTextBox(entityType, entityId, action.ref.SRWStats.pilot.name, battleText).then(function(){
@@ -4022,7 +4022,7 @@ BattleSceneManager.prototype.executeAnimation = function(animation, startTick){
 			var action = _this._currentAnimatedAction.attacked;
 			var entityType = action.isActor ? "actor" : "enemy";
 			var entityId = action.ref.SRWStats.pilot.id;
-			var battleText = _this._battleTextManager.getText(entityType, action.ref, "evade", action.isActor ? "enemy" : "actor", _this.getBattleTextId(_this._currentAnimatedAction));
+			var battleText = _this._battleTextManager.getText(entityType, action.ref, "evade", _this.getBattleTextTargetType(action), _this.getBattleTextId(_this._currentAnimatedAction));
 			_this._awaitingText = true;
 			_this._TextlayerManager.setTextBox(entityType, entityId, action.ref.SRWStats.pilot.name, battleText).then(function(){
 				_this._awaitingText = false;
@@ -4033,7 +4033,7 @@ BattleSceneManager.prototype.executeAnimation = function(animation, startTick){
 			var action = _this._currentAnimatedAction.attacked;
 			var entityType = action.isActor ? "actor" : "enemy";
 			var entityId = action.ref.SRWStats.pilot.id;
-			var battleText = _this._battleTextManager.getText(entityType, action.ref, "destroyed", action.isActor ? "enemy" : "actor", _this.getBattleTextId(_this._currentAnimatedAction));
+			var battleText = _this._battleTextManager.getText(entityType, action.ref, "destroyed", _this.getBattleTextTargetType(action), _this.getBattleTextId(_this._currentAnimatedAction));
 			_this._awaitingText = true;
 			_this._TextlayerManager.setTextBox(entityType, entityId, action.ref.SRWStats.pilot.name, battleText).then(function(){
 				_this._awaitingText = false;
@@ -4060,7 +4060,7 @@ BattleSceneManager.prototype.executeAnimation = function(animation, startTick){
 				textProvider = action.ref;
 			}
 			
-			var battleText = _this._battleTextManager.getText(entityType, textProvider, "attacks", action.isActor ? "enemy" : "actor", _this.getBattleTextId(_this._currentAnimatedAction), params.id, attackTextProviderId);
+			var battleText = _this._battleTextManager.getText(entityType, textProvider, "attacks", _this.getBattleTextTargetType(action), _this.getBattleTextId(_this._currentAnimatedAction), params.id, attackTextProviderId);
 			_this._awaitingText = true;
 			_this._TextlayerManager.setTextBox(entityType, entityId, action.ref.SRWStats.pilot.name, battleText, false, true).then(function(){
 				_this._awaitingText = false;
@@ -4338,7 +4338,7 @@ BattleSceneManager.prototype.executeAnimation = function(animation, startTick){
 			
 			var entityType = action.isActor ? "actor" : "enemy";
 			var entityId = action.ref.SRWStats.pilot.id;
-			var battleText = _this._battleTextManager.getText(entityType, action.ref, "evade", action.isActor ? "enemy" : "actor", _this.getBattleTextId(_this._currentAnimatedAction));
+			var battleText = _this._battleTextManager.getText(entityType, action.ref, "evade", _this.getBattleTextTargetType(action), _this.getBattleTextId(_this._currentAnimatedAction));
 			
 			_this._TextlayerManager.setTextBox(entityType, entityId, action.ref.SRWStats.pilot.name, battleText);
 			
@@ -4501,6 +4501,13 @@ BattleSceneManager.prototype.executeAnimation = function(animation, startTick){
 					targetObj.excludedMeshes.push(mesh);
 				});
 			}			
+		},
+		toggle_frustum_culling: function(target, params){
+			if(params.state * 1){
+				_this._scene._skipFrustumClipping = false;
+			} else {
+				_this._scene._skipFrustumClipping = true;
+			}
 		},
 		create_render_target: function(target, params){
 			let position;
@@ -5946,7 +5953,7 @@ BattleSceneManager.prototype.executeAnimation = function(animation, startTick){
 			var action = _this.getTargetAction(target);
 			var entityType = action.isActor ? "actor" : "enemy";
 			var entityId = action.ref.SRWStats.pilot.id;
-			var battleText = _this._battleTextManager.getText(entityType, action.ref, "destroyed", action.isActor ? "enemy" : "actor", _this.getBattleTextId(_this._currentAnimatedAction));
+			var battleText = _this._battleTextManager.getText(entityType, action.ref, "destroyed", _this.getBattleTextTargetType(action), _this.getBattleTextId(_this._currentAnimatedAction));
 			
 			_this._awaitingText = true;
 			_this._TextlayerManager.setTextBox(entityType, entityId, action.ref.SRWStats.pilot.name, battleText, true).then(function(){
@@ -6009,11 +6016,11 @@ BattleSceneManager.prototype.executeAnimation = function(animation, startTick){
 				action.currentAnimHP-=originalAction.damageInflicted;
 			}
 			
-			
+			 
 			
 			
 			if(originalAction.inflictedCritical){
-				_this._UILayerManager.setNotification(action.isActor ? "enemy" : "actor", "CRITICAL!");
+				_this._UILayerManager.setNotification(side, "CRITICAL!");
 			}
 			var popUpNotifications = [];
 			if(action.isHit && action.barrierNames){
@@ -6380,6 +6387,11 @@ BattleSceneManager.prototype.playCounterTwinAnimation = function(){
 	
 	this._animationList[80] = []; //padding
 	return this.startAnimation();
+}
+
+BattleSceneManager.prototype.getBattleTextTargetType = function(action){
+	return $gameSystem.isFriendly(action.ref, "player") ? "enemy" : "actor";
+	//return action.isActor ? "enemy" : "actor";
 }
 
 BattleSceneManager.prototype.playCounterTwinMainIntroAnimation = function(){
@@ -8391,7 +8403,7 @@ BattleSceneManager.prototype.processActionQueue = function() {
 							textType = "retaliate";
 						}
 						
-						battleText = _this._battleTextManager.getText(entityType, nextAction.ref, textType, nextAction.isActor ? "enemy" : "actor", _this.getBattleTextId(nextAction.attacked));
+						battleText = _this._battleTextManager.getText(entityType, nextAction.ref, textType, _this.getBattleTextTargetType(nextAction), _this.getBattleTextId(nextAction.attacked));
 					}				
 					await _this._TextlayerManager.setTextBox(entityType, entityId, nextAction.ref.SRWStats.pilot.name, battleText);
 				}
