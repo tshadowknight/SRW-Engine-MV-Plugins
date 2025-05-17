@@ -6390,6 +6390,9 @@ BattleSceneManager.prototype.playCounterTwinAnimation = function(){
 }
 
 BattleSceneManager.prototype.getBattleTextTargetType = function(action){
+	if(action.attacked?.ref){
+		return action.attacked.ref.isActor() ? "actor" : "enemy";
+	}
 	return $gameSystem.isFriendly(action.ref, "player") ? "enemy" : "actor";
 	//return action.isActor ? "enemy" : "actor";
 }
