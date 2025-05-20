@@ -159,6 +159,12 @@ BattleSceneUILayer.prototype.createComponents = function() {
 
 BattleSceneUILayer.prototype.createStatsRowContent = function(label, labelFirst) {
 	var content = "";
+	if(label == "EN"){
+		label = APPSTRINGS.GENERAL.label_EN;
+	}
+	if(label == "HP"){
+		label = APPSTRINGS.GENERAL.label_HP;
+	}
 	if(labelFirst){
 		content+="<div class='label scaled_text'>"
 		content+=label
