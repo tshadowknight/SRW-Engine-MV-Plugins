@@ -166,8 +166,8 @@ Window_UnitSummary.prototype.redraw = async function() {
 			
 			content+="<div class='mech_stats_container'>";
 			content+="<div class='mech_hp_en_container scaled_text'>";
-			content+="<div class='hp_label scaled_text'>HP</div>";
-			content+="<div class='en_label scaled_text'>EN</div>";
+			content+="<div class='hp_label scaled_text'>"+APPSTRINGS.GENERAL.label_HP+"</div>";
+			content+="<div class='en_label scaled_text'>"+APPSTRINGS.GENERAL.label_EN+"</div>";
 
 				
 			content+="<div class='hp_display'>";

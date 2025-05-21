@@ -318,7 +318,7 @@ Window_SpiritSelection.prototype.update = function() {
 						this.requestRedraw();
 					}
 				}				
-			} else {
+			} else if(spiritList[selectedIdx] != null && spiritList[selectedIdx].idx != ""){
 				var type = $spiritManager.getSpiritDef(spiritList[selectedIdx].idx).targetType;
 			
 				if(spiritList[selectedIdx] && spiritList[selectedIdx].level <= currentLevel && type == "self"){	

@@ -25,8 +25,8 @@ DetailBarPilot.prototype.redraw = function(){
 	var calculatedStats = mechData.stats.calculated;
 	detailContent+="<div id='detail_list_icon'></div>";//icon 
 	detailContent+="<div class='mech_hp_en_container scaled_text'>";
-	detailContent+="<div class='hp_label scaled_text'>HP</div>";
-	detailContent+="<div class='en_label scaled_text'>EN</div>";
+	detailContent+="<div class='hp_label scaled_text'>"+APPSTRINGS.GENERAL.label_HP+"</div>";
+	detailContent+="<div class='en_label scaled_text'>"+APPSTRINGS.GENERAL.label_EN+"</div>";
 
 	detailContent+="<div class='hp_display'>";
 	detailContent+="<div class='current_hp scaled_text'>"+calculatedStats.currentHP+"</div>";

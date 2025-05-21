@@ -579,8 +579,8 @@ Window_BeforeBattle.prototype.createParticipantBlock = function(ref, action, isS
 		var calculatedStats = $statCalc.getCalculatedMechStats(ref);
 		
 		content+="<div class='mech_hp_en_container scaled_text'>";
-		content+="<div class='hp_label scaled_text'>HP</div>";
-		content+="<div class='en_label scaled_text'>EN</div>";
+		content+="<div class='hp_label scaled_text'>"+APPSTRINGS.GENERAL.label_HP+"</div>";
+		content+="<div class='en_label scaled_text'>"+APPSTRINGS.GENERAL.label_EN+"</div>";
 
 		content+="<div class='hp_display'>";
 		content+="<div class='current_hp scaled_text'>"+$statCalc.getCurrentHPDisplay(ref)+"</div>";

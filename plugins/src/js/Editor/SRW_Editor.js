@@ -50,6 +50,8 @@ SRWEditor.prototype.init = function(){
 	head.appendChild(link);*/
 	
 	_this.initTitles();
+
+	$gameSystem.initFactionInfo(); //init faction info, needed to correctly display enemy battle text in animation preview
 	
 	_this._svgPath = "svg/editor/";
 	

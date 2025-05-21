@@ -543,23 +543,8 @@
 			$gameVariables.setValue(_victoryConditionText, APPSTRINGS.GENERAL.label_default_victory_condition);	
 			$gameVariables.setValue(_defeatConditionText, APPSTRINGS.GENERAL.label_default_defeat_condition);
 			
-			$gameSystem.factionConfig = {
-				0: {
-					attacksPlayers:true,
-					attacksFactions: [1,2],
-					active: true
-				},
-				1: {
-					attacksPlayers:false,
-					attacksFactions: [0],
-					active: false
-				},
-				2: {
-					attacksPlayers:false,
-					attacksFactions: [0],
-					active: false
-				}
-			};
+			this.initFactionInfo();
+			
 			$gameTemp.preventedDeathQuotes = {};
 			$gameTemp.updatePlayerSpriteVisibility();
 			
@@ -582,6 +567,26 @@
 				$gameMap.initSRWTileProperties();
 			}			
 		};		
+
+		Game_System.prototype.initFactionInfo = function(id) {
+			this.factionConfig = {
+				0: {
+					attacksPlayers:true,
+					attacksFactions: [1,2],
+					active: true
+				},
+				1: {
+					attacksPlayers:false,
+					attacksFactions: [0],
+					active: false
+				},
+				2: {
+					attacksPlayers:false,
+					attacksFactions: [0],
+					active: false
+				}
+			};		
+		}
 		
 		Game_System.prototype.enableFaction = function(id) {
 			if(this.factionConfig[id]){
