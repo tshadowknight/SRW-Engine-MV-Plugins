@@ -190,7 +190,7 @@ SRWEditor.prototype.init = function(){
 		},
 		rotate_to: {
 			hasTarget: true,
-			params: ["aroundPivot", "rotation"],
+			params: ["aroundPivot", "fixMirrored", "rotation"],
 			desc: "Immediately set to rotation of an object."
 		},
 		translate: {
@@ -200,7 +200,7 @@ SRWEditor.prototype.init = function(){
 		},
 		rotate: {
 			hasTarget: true,
-			params: ["aroundPivot", "startRotation", "rotation", "duration", "easingFunction", "easingMode"],
+			params: ["aroundPivot", "fixMirrored", "startRotation", "rotation", "duration", "easingFunction", "easingMode"],
 			desc: "Rotate an object from the start rotation to the end rotation."
 		},
 		resize: {
@@ -778,7 +778,8 @@ SRWEditor.prototype.init = function(){
 		hide: "Hide the target object after the command has finished.",
 		catmullRom: "Describes two addtional points for a Catmull-Rom spline.",
 		startRotation: "A rotation defined by an x, y and z component. The rotations are described with radian values.",
-		aroundPivot: "If 1 the rotation will be done around the pivot helper instead of the element origin. Only avaialable for unit sprites.",
+		aroundPivot: "If 1 the rotation will be done around the pivot helper instead of the element origin. Only avaialable for unit sprites. If set Z index will always be mirrored for enemy side animations.",
+		fixMirrored: "If 1 the y rotation will not be inverted if the target is a mirrored effekseer effect",
 		startSize: "The initial size of the target object.",
 		endSize: "The final size of the target object.",
 		x: "If 1 the object will be flipped along its x-axis.",
@@ -1095,6 +1096,9 @@ SRWEditor.prototype.init = function(){
 			return _this._paramDisplayHandlers.rotation(value);
 		},
 		aroundPivot: function(value){
+		
+		},
+		fixMirrored: function(value){
 		
 		},
 		startSize: function(value){

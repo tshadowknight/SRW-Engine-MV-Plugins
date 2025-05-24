@@ -3830,7 +3830,7 @@ BattleSceneManager.prototype.executeAnimation = function(animation, startTick){
 				if( params.rotation){
 					targetRotation = new BABYLON.Vector3(params.rotation.x, params.rotation.y, params.rotation.z);
 				}
-				if(_this._animationDirection == -1){
+				if(_this._animationDirection == -1 && (!params.fixMirrored || !targetObj.isMirrored)){
 					//targetRotation.x*=-1;					
 					if(params.aroundPivot || usesPropRotation(target)){
 						//targetRotation.y+=Math.PI;						
@@ -3923,7 +3923,7 @@ BattleSceneManager.prototype.executeAnimation = function(animation, startTick){
 				if( params.rotation){
 					targetRotation = new BABYLON.Vector3(params.rotation.x, params.rotation.y, params.rotation.z);
 				}
-				if(_this._animationDirection == -1){
+				if(_this._animationDirection == -1 && (!params.fixMirrored || !targetObj.isMirrored)){
 					//targetRotation.x*=-1;					
 					if(params.aroundPivot || usesPropRotation(target)){
 						//targetRotation.y+=Math.PI;						

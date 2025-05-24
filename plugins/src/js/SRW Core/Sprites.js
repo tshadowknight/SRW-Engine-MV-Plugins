@@ -1524,8 +1524,16 @@
 					//this._character.refreshImage();
 					$statCalc.getMainTwin(battlerArray[1]).subTwin = null;
 				} else if(this._character.isDoingMainTwinDeath){	
-					$statCalc.swapEvent(this._character, true);
-					$statCalc.getMainTwin(battlerArray[1]).subTwin = null;
+					if(!this._character.isDoingMultiKill){
+						$statCalc.swapEvent(this._character, true);
+						$statCalc.getMainTwin(battlerArray[1]).subTwin = null;
+					} else {
+						if(battlerArray[1].SRWStats.dropBoxItems && battlerArray[1].SRWStats.dropBoxItems.length){
+							$gameSystem.deployItemBox(this._character, battlerArray[1].SRWStats.dropBoxItems);
+						} else {
+							this._character.erase();	
+						}
+					}					
 					//battlerArray[1].subTwin.isSubTwin = false;
 					//battlerArray[1].subTwin = null;
 				} else {	

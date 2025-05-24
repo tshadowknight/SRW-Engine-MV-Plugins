@@ -2485,10 +2485,14 @@ GameState_process_death.prototype.update = function(scene){
 	if(scene._startDeath){
 		scene._currentDeath.event.isDoingSubTwinDeath = false;
 		scene._currentDeath.event.isDoingMainTwinDeath = false;
+		scene._currentDeath.event.isDoingMultiKill = false;
 		if(scene._currentDeath.actor.isSubTwin){
 			$statCalc.swapEvent($statCalc.getMainTwin(scene._currentDeath.actor).event, true);						
 			scene._currentDeath.event.isDoingSubTwinDeath = true;
 		} else if($statCalc.isMainTwin(scene._currentDeath.actor)){
+			if($gameTemp.battleEffectCache[scene._currentDeath.actor.subTwin._cacheReference].isDestroyed){
+				scene._currentDeath.event.isDoingMultiKill = true;
+			}
 			scene._currentDeath.event.isDoingMainTwinDeath = true;
 		}
 		scene._startDeath = false;

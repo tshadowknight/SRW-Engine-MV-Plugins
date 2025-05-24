@@ -57,6 +57,7 @@
 					if(isNaN(args[1] * 1) || args[1] * 1 < 0){
 						throw "Invalid mech "+args[1]+" for assignUnit command.";
 					}
+					const previousPilot = $statCalc.getCurrentPilot(args[1], true, false, false, true);
 					actor._classId = args[1] * 1;
 					actor.isSubPilot = !!(args[2] * 1);
 					//actor._intermissionClassId = args[1] * 1; 
@@ -66,6 +67,10 @@
 						let actionsResult = $statCalc.applyDeployActions(args[0], args[1], true);
 						if(!actionsResult){
 							$gameSystem.overwritePilotFallbackInfo(actor);
+							if(previousPilot){
+								previousPilot._classId = 0;
+								$gameSystem.overwritePilotFallbackInfo(previousPilot);
+							}
 						}
 					}					
 				}

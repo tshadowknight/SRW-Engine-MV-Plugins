@@ -2280,6 +2280,13 @@ SceneManager.isInSaveScene = function(){
 		$gameTemp.currentMapTargets = [];
 		$gameTemp.deathQueue = [];
 		$gameTemp.destroyTransformQueue = [];
+
+		let multiKilledSubTwins = {};
+		let multiKilledMainTwins = {};
+
+		Object.keys($gameTemp.battleEffectCache).forEach(function(cacheRef){
+
+		});
 		
 		Object.keys($gameTemp.battleEffectCache).forEach(function(cacheRef){
 			var battleEffect = $gameTemp.battleEffectCache[cacheRef];
@@ -2289,7 +2296,7 @@ SceneManager.isInSaveScene = function(){
 					$gameTemp.destroyTransformQueue.push({actor: battleEffect.ref, event: battleEffect.ref.event});
 				} else {
 					//battleEffect.ref.event._erased = true;
-					$gameTemp.deathQueue.push({actor: battleEffect.ref, event: $statCalc.getReferenceEvent(battleEffect.ref), destroyer: battleEffect.destroyer});
+					$gameTemp.deathQueue.push({actor: battleEffect.ref, event: $statCalc.getReferenceEvent(battleEffect.ref), destroyer: battleEffect.destroyer, isMultiKill: multiKilledMainTwins[cacheRef]});
 					if($statCalc.isShip(battleEffect.ref)){
 						var boardedUnits = $statCalc.getBoardedUnits(battleEffect.ref)
 						for(var i = 0; i < boardedUnits.length; i++){
