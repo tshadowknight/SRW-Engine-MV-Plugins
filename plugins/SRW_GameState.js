@@ -2490,9 +2490,9 @@ GameState_process_death.prototype.update = function(scene){
 			$statCalc.swapEvent($statCalc.getMainTwin(scene._currentDeath.actor).event, true);						
 			scene._currentDeath.event.isDoingSubTwinDeath = true;
 		} else if($statCalc.isMainTwin(scene._currentDeath.actor)){
-			if($gameTemp.battleEffectCache[scene._currentDeath.actor.subTwin._cacheReference].isDestroyed){
-				scene._currentDeath.event.isDoingMultiKill = true;
-			}
+			//if($gameTemp.battleEffectCache[scene._currentDeath.actor.subTwin._cacheReference].isDestroyed){
+			//	scene._currentDeath.event.isDoingMultiKill = true;
+			//}
 			scene._currentDeath.event.isDoingMainTwinDeath = true;
 		}
 		scene._startDeath = false;
@@ -2557,6 +2557,13 @@ GameState_process_death_queue.prototype.update = function(scene){
 			this.erasedActors = [];
 		}
 		scene._currentDeath = $gameTemp.deathQueue.shift();
+		
+		//await events doing their death anim already, should only happen in case of a multikill on a twin
+		if(scene._currentDeath.event.isDoingDeathAnim){
+			$gameTemp.deathQueue.push(scene._currentDeath);
+			return;
+		}
+		
 		this.erasedActors.push(scene._currentDeath.actor);
 		if($gameTemp.deathQueue.length){
 			scene._deathTimer = 10;
