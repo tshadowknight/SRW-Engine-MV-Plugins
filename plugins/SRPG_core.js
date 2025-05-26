@@ -2684,7 +2684,7 @@ SceneManager.isInSaveScene = function(){
 		var battler = $gameSystem.EventToUnit($gameTemp.activeEvent().eventId())[1];
 		$statCalc.invalidateAbilityCache(battler);
 		$gameTemp.activeEvent().lastMoveCount = 0;
-		if(!$gameTemp.eraseActorAfterTurn && (battler.SRPGActionTimes() >= 1 && !$gameTemp.isPostMove && $statCalc.applyStatModsToValue(battler, 0, ["hit_and_away"])) && $gameSystem.isBattlePhase() != "AI_phase"){
+		if(!$gameTemp.eraseActorAfterTurn && (battler.SRPGActionTimes() >= 1 && !$gameTemp.isPostMove && !(battler.battleMode() == "fixed") && $statCalc.applyStatModsToValue(battler, 0, ["hit_and_away"])) && $gameSystem.isBattlePhase() != "AI_phase"){
 			$gameTemp.isHitAndAway = true;
 			$gamePlayer.locate($gameTemp.activeEvent().posX(), $gameTemp.activeEvent().posY());
 			$gameSystem.setSrpgActorCommandWindowNeedRefresh($gameSystem.EventToUnit($gameTemp.activeEvent().eventId()));

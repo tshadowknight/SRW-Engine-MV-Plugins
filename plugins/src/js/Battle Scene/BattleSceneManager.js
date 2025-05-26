@@ -3700,7 +3700,7 @@ BattleSceneManager.prototype.executeAnimation = function(animation, startTick){
 		},
 		set_opacity_texture: function(target, params){
 			var targetObj = getTargetObject(target);
-			if(targetObj){
+			if(targetObj?.material?.opacityTexture){
 				targetObj.material.opacityTexture = _this.getCachedTexture("img/SRWBattleScene/opacityTextures/"+params.path+".png");
 			}
 		},
