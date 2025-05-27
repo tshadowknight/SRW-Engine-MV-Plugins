@@ -5404,7 +5404,7 @@ StatCalc.prototype.iterateAllActors = function(type, func){
 		actorCollection = actorCollection.concat($gameSystem._availableMechs);
 		
 		actorCollection.forEach(function(actor) {			
-			if(actor && _this.isActorSRWInitialized(actor)){
+			if(actor && _this.isActorSRWInitialized(actor) && actor.event){
 				if(!type || (type == "actor" && actor.isActor()) || (type == "enemy" && !actor.isActor())){
 					func(actor, actor.event);
 				}			
