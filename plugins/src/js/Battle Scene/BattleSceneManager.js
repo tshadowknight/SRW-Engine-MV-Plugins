@@ -4060,7 +4060,7 @@ BattleSceneManager.prototype.executeAnimation = function(animation, startTick){
 				textProvider = action.ref;
 			}
 			
-			var battleText = _this._battleTextManager.getText(entityType, textProvider, "attacks", _this.getBattleTextTargetType(action), _this.getBattleTextId(_this._currentAnimatedAction), params.id, attackTextProviderId);
+			var battleText = _this._battleTextManager.getText(entityType, textProvider, "attacks", _this.getBattleTextTargetType(action), _this.getBattleTextId(_this._currentAnimatedAction.attacked), params.id, attackTextProviderId);
 			_this._awaitingText = true;
 			_this._TextlayerManager.setTextBox(entityType, entityId, action.ref.SRWStats.pilot.name, battleText, false, true).then(function(){
 				_this._awaitingText = false;

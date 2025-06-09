@@ -83,7 +83,15 @@ $SRWConfig.spirits = function(){
 			$statCalc.setSpirit(target, "disrupt");
 		},
 		"enemy_all",
-		null,
+		function(actor){
+			var actors = $statCalc.getAllActors("enemy");
+			var isValid = false;
+			var ctr = 0;
+			while(!isValid && ctr < actors.length){
+				isValid = !$statCalc.getActiveSpirits(actors[ctr++]).disrupt;
+			}
+			return isValid;
+		},
 		null,
 		{
 			animId: 56
