@@ -193,6 +193,16 @@ Window_SpiritSelection.prototype.update = function() {
 			this.refresh();
 			return;	
 		}
+
+		function getTwinSpiritInfo(){
+			let actor;
+			if(_this._currentSlot == 0){
+				actor = $gameTemp.currentMenuUnit.actor;
+			} else {
+				actor = $gameTemp.currentMenuUnit.actor.subTwin;
+			}
+			return $statCalc.getTwinSpirit(actor);
+		}
 		
 		if(Input.isTriggered('ok') || this._touchOK){			
 			var actor = this.getAvailableActors()[this.getCurrentActor()];
@@ -219,17 +229,20 @@ Window_SpiritSelection.prototype.update = function() {
 
 			if(spiritList[selectedIdx] && (spiritList[selectedIdx].level <= currentLevel ||_this._twinSpiritSelection) && ((!_this._twinSpiritSelection && this.getSpiritEnabledState(selectedIdx) > 0) || (_this._twinSpiritSelection && enabledState > 0) || spiritIsAlreadyBatched)){
 				var spirits = [];				
-				var type = $spiritManager.getSpiritDef(spiritList[selectedIdx].idx).targetType;
+				var type;
+				
+				if(_this._twinSpiritSelection){
+					let twinSpiritInfo = getTwinSpiritInfo();
+					
+					type = $spiritManager.getSpiritDef(twinSpiritInfo.idx).targetType;	
+				} else {
+					type = $spiritManager.getSpiritDef(spiritList[selectedIdx].idx).targetType;
+				}
 				
 				if(type == "self"){
 					if(_this._twinSpiritSelection){
 						
-						if(_this._currentSlot == 0){
-							actor = $gameTemp.currentMenuUnit.actor;
-						} else {
-							actor = $gameTemp.currentMenuUnit.actor.subTwin;
-						}
-						var twinSpiritInfo = $statCalc.getTwinSpirit(actor);
+						let twinSpiritInfo = getTwinSpiritInfo();
 						//var displayInfo = $spiritManager.getSpiritDisplayInfo(twinSpiritInfo.idx);
 						this.getCurrentBatchedSpirits(0)[twinSpiritInfo.idx] = {actor: $gameTemp.currentMenuUnit.actor, target: $gameTemp.currentMenuUnit.actor, spiritInfo: twinSpiritInfo};
 						this.getCurrentBatchedSpirits(1)[twinSpiritInfo.idx] = {actor: $gameTemp.currentMenuUnit.actor.subTwin, target: $gameTemp.currentMenuUnit.actor.subTwin, spiritInfo: twinSpiritInfo};
@@ -276,8 +289,16 @@ Window_SpiritSelection.prototype.update = function() {
 						_this._callbacks["selectedMultiple"](spirits);
 					}
 				} else {
-					var spiritInfo = JSON.parse(JSON.stringify(spiritList[selectedIdx]));
-					spiritInfo.caster = actor;
+					var spiritInfo;
+					if(_this._twinSpiritSelection){
+						spiritInfo = JSON.parse(JSON.stringify(getTwinSpiritInfo()));
+						spiritInfo.caster = $gameTemp.currentMenuUnit.actor;
+						spiritInfo.additionalCaster = $gameTemp.currentMenuUnit.actor.subTwin;
+					} else {
+						spiritInfo = JSON.parse(JSON.stringify(spiritList[selectedIdx]));		
+						spiritInfo.caster = actor;
+					}
+					
 					spiritInfo.target = $gameTemp.currentMenuUnit.actor;
 					if(this._callbacks["selected"]){
 						this._callbacks["selected"](spiritInfo);

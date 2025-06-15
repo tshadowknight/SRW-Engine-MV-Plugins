@@ -91,11 +91,14 @@ SpiritManager.prototype.performInitialTargeting = function(idx, target, position
 	}	
 }
 
-SpiritManager.prototype.applyEffect = function(idx, caster, targets, cost){
+SpiritManager.prototype.applyEffect = function(idx, caster, targets, cost, additionalCaster){
 	var _this = this;
 	var spiritDef = _this._spiritDefinitions[idx];
 	if(spiritDef){
 		$statCalc.applySPCost(caster, cost);	
+		if(additionalCaster){
+			$statCalc.applySPCost(additionalCaster, cost);
+		}
 		targets.forEach(function(target){			
 			spiritDef.handler(target);			
 		});

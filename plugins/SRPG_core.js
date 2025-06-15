@@ -1676,7 +1676,7 @@ SceneManager.isInSaveScene = function(){
 			$gameSystem.setSubBattlePhase("confirm_adjacent_spirit");		
 		} else {
 			//apply immediately
-			$spiritManager.applyEffect(spiritInfo.idx, caster, initialTargetingResult.targets, spiritInfo.cost);
+			$spiritManager.applyEffect(spiritInfo.idx, caster, initialTargetingResult.targets, spiritInfo.cost, spiritInfo.additionalCaster);
 			
 			this.applyAdditionalSpiritEffects(spiritInfo, target, caster);
 			if(initialTargetingResult.type != "enemy_all" && initialTargetingResult.type != "ally_all"){
