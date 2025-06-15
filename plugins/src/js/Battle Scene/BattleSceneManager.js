@@ -2034,9 +2034,7 @@ BattleSceneManager.prototype.hookBeforeRender = function(){
 		var ratio = _this.getCurrentRatio();
 		ratio*=_this._animRatio;
 		deltaTime*=ratio;
-		if(_this._fastForward){
-			deltaTime*=5;
-		}
+		
 		
 		if(_this._holdTickDuration > 0){
 			_this._holdTickDuration-=deltaTime;
@@ -2696,6 +2694,10 @@ BattleSceneManager.prototype.getCurrentRatio = function(){
 	if(isSpeedUp){
 		ratio = 2;
 	}	
+
+	if(this._fastForward){
+		ratio*=5;
+	}
 		
 	return ratio;
 }
@@ -2884,9 +2886,7 @@ BattleSceneManager.prototype.startScene = function(){
 		var ratio = _this.getCurrentRatio();
 		ratio*=_this._animRatio;
 		deltaTime*=ratio;
-		if(_this._fastForward){
-			deltaTime*=5;
-		}
+	
 		
 		var ticksSinceLastUpdate =  _this._currentAnimationTick - _this._lastAnimationTick;
 		_this._ticksSinceLastUpdate = ticksSinceLastUpdate;			

@@ -34,6 +34,7 @@ Window_SpiritSelection.prototype.resetSelection = function(){
 	this._currentPlusSpirits = {};
 	this._currentBatchedSpirits = {};
 	this._currentSlot = 0;
+	this._twinSpiritSelection = false;
 }
 
 Window_SpiritSelection.prototype.incrementSelection = function(){	
@@ -200,8 +201,21 @@ Window_SpiritSelection.prototype.update = function() {
 			var selectedIdx = this.getCurrentSelection();
 		
 			var enabledState = Math.min(_this.getSpiritEnabledState(null, 0, true), _this.getSpiritEnabledState(null, 1, true));
-			
-			if(spiritList[selectedIdx] && spiritList[selectedIdx].level <= currentLevel && (this.getSpiritEnabledState(selectedIdx) > 0 || (_this._twinSpiritSelection && enabledState))){
+
+			var spiritIsAlreadyBatched = false;
+			if(_this._twinSpiritSelection){
+				let actor;
+				if(_this._currentSlot == 0){
+					actor = $gameTemp.currentMenuUnit.actor;
+				} else {
+					actor = $gameTemp.currentMenuUnit.actor.subTwin;
+				}
+				const twinSpiritInfo = $statCalc.getTwinSpirit(actor);
+				spiritIsAlreadyBatched = this.getCurrentBatchedSpirits(_this._currentSlot)[twinSpiritInfo.idx] != null;
+			} else {
+				spiritIsAlreadyBatched = this.getCurrentBatchedSpirits(_this._currentSlot)[spiritList[selectedIdx].idx] != null;
+			}
+			if(spiritList[selectedIdx] && (spiritList[selectedIdx].level <= currentLevel ||_this._twinSpiritSelection) && ((!_this._twinSpiritSelection && this.getSpiritEnabledState(selectedIdx) > 0) || (_this._twinSpiritSelection && enabledState > 0) || spiritIsAlreadyBatched)){
 				var spirits = [];				
 				var type = $spiritManager.getSpiritDef(spiritList[selectedIdx].idx).targetType;
 				
@@ -307,10 +321,10 @@ Window_SpiritSelection.prototype.update = function() {
 							delete this.getCurrentBatchInfo()[selectedIdx];
 							delete this.getCurrentBatchedSpirits(0)[twinSpiritInfo.idx];
 							delete this.getCurrentBatchedSpirits(1)[twinSpiritInfo.idx];
-						} else if(this.getSpiritEnabledState(null, _this._currentSlot, true) > 0){
+						} else if(this.getSpiritEnabledState(null, 0, true) > 0 && this.getSpiritEnabledState(null, 1, true) > 0){
 							this.getCurrentBatchInfo()[selectedIdx] = true;
-							this.getCurrentBatchedSpirits(0)[twinSpiritInfo.idx] = {actor: actor, spiritInfo: twinSpiritInfo};
-							this.getCurrentBatchedSpirits(1)[twinSpiritInfo.idx] = {actor: actor, spiritInfo: twinSpiritInfo};
+							this.getCurrentBatchedSpirits(0)[twinSpiritInfo.idx] = {actor: $gameTemp.currentMenuUnit.actor, target: $gameTemp.currentMenuUnit.actor, spiritInfo: twinSpiritInfo};
+							this.getCurrentBatchedSpirits(1)[twinSpiritInfo.idx] = {actor: $gameTemp.currentMenuUnit.actor.subTwin, target: $gameTemp.currentMenuUnit.actor.subTwin, spiritInfo: twinSpiritInfo};
 						}				
 						if(!Object.keys(this.getCurrentBatchInfo()).length){
 							delete this.getCurrentBatchInfo();
