@@ -199,9 +199,8 @@ Window_SpiritSelection.prototype.update = function() {
 			var currentLevel = $statCalc.getCurrentLevel(actor);
 			var spiritList = $statCalc.getSpiritList(actor);
 			var selectedIdx = this.getCurrentSelection();
-		
-			var enabledState = Math.min(_this.getSpiritEnabledState(null, 0, true), _this.getSpiritEnabledState(null, 1, true));
 
+			
 			var spiritIsAlreadyBatched = false;
 			if(_this._twinSpiritSelection){
 				let actor;
@@ -215,6 +214,9 @@ Window_SpiritSelection.prototype.update = function() {
 			} else {
 				spiritIsAlreadyBatched = this.getCurrentBatchedSpirits(_this._currentSlot)[spiritList[selectedIdx].idx] != null;
 			}
+		
+			var enabledState = Math.min(_this.getSpiritEnabledState(null, 0, true, _this._currentSlot), _this.getSpiritEnabledState(null, 1, true, _this._currentSlot));
+
 			if(spiritList[selectedIdx] && (spiritList[selectedIdx].level <= currentLevel ||_this._twinSpiritSelection) && ((!_this._twinSpiritSelection && this.getSpiritEnabledState(selectedIdx) > 0) || (_this._twinSpiritSelection && enabledState > 0) || spiritIsAlreadyBatched)){
 				var spirits = [];				
 				var type = $spiritManager.getSpiritDef(spiritList[selectedIdx].idx).targetType;
@@ -321,7 +323,7 @@ Window_SpiritSelection.prototype.update = function() {
 							delete this.getCurrentBatchInfo()[selectedIdx];
 							delete this.getCurrentBatchedSpirits(0)[twinSpiritInfo.idx];
 							delete this.getCurrentBatchedSpirits(1)[twinSpiritInfo.idx];
-						} else if(this.getSpiritEnabledState(null, 0, true) > 0 && this.getSpiritEnabledState(null, 1, true) > 0){
+						} else if(this.getSpiritEnabledState(null, 0, true, _this._currentSlot) > 0 && this.getSpiritEnabledState(null, 1, true, _this._currentSlot) > 0){
 							this.getCurrentBatchInfo()[selectedIdx] = true;
 							this.getCurrentBatchedSpirits(0)[twinSpiritInfo.idx] = {actor: $gameTemp.currentMenuUnit.actor, target: $gameTemp.currentMenuUnit.actor, spiritInfo: twinSpiritInfo};
 							this.getCurrentBatchedSpirits(1)[twinSpiritInfo.idx] = {actor: $gameTemp.currentMenuUnit.actor.subTwin, target: $gameTemp.currentMenuUnit.actor.subTwin, spiritInfo: twinSpiritInfo};
@@ -386,7 +388,7 @@ Window_SpiritSelection.prototype.update = function() {
 	}		
 };
 
-Window_SpiritSelection.prototype.getSpiritEnabledState = function(listIdx, slot, isTwin){
+Window_SpiritSelection.prototype.getSpiritEnabledState = function(listIdx, slot, isTwin, currentSlot){
 	var result = 1;
 	var caster = this.getAvailableActors(slot)[this.getCurrentActor(slot)];
 	if(!caster){
@@ -410,7 +412,13 @@ Window_SpiritSelection.prototype.getSpiritEnabledState = function(listIdx, slot,
 			caster = $gameTemp.currentMenuUnit.actor;
 		}
 		listIdx = 0;
-		var twinSpirit = $statCalc.getTwinSpirit(caster);
+		let spiritProvider;
+		if(currentSlot == 0){//the actor from the current slot is the one providing the spirit info to check the cost off
+			spiritProvider = $gameTemp.currentMenuUnit.actor;
+		} else {
+			spiritProvider = $gameTemp.currentMenuUnit.actor.subTwin;
+		}
+		var twinSpirit = $statCalc.getTwinSpirit(spiritProvider);
 		if(twinSpirit){
 			list = [twinSpirit];
 		} else {
@@ -759,7 +767,7 @@ Window_SpiritSelection.prototype.redraw = function() {
 				} else {
 					otherSlot = 1;
 				}
-				var enabledState = Math.min(_this.getSpiritEnabledState(null, slot, true), _this.getSpiritEnabledState(null, otherSlot, true));
+				var enabledState = Math.min(_this.getSpiritEnabledState(null, slot, true, slot), _this.getSpiritEnabledState(null, otherSlot, true, slot));
 				if(enabledState == -1){
 					displayClass = "disabled";
 				} else if(enabledState == -2){
