@@ -133,21 +133,22 @@ StatCalc.prototype.getReferenceEventId = function(actor){
 StatCalc.prototype.canStandOnTile = function(actor, position){
 	if(this.isActorSRWInitialized(actor)){
 		const currentTerrain = $gameMap.regionId(position.x, position.y) % 8;
-		if(!actor.SRWStats.stageTemp.validTerrainCache){
-			actor.SRWStats.stageTemp.validTerrainCache = {};
-		}
-		if(actor.SRWStats.stageTemp.validTerrainCache[currentTerrain] == null){
-			actor.SRWStats.stageTemp.validTerrainCache[currentTerrain] = this.canStandOnTileResolve(actor, position);
-		}
-		return actor.SRWStats.stageTemp.validTerrainCache[currentTerrain];
+		//if(!actor.SRWStats.stageTemp.validTerrainCache){
+		//	actor.SRWStats.stageTemp.validTerrainCache = {};
+		//}
+		//if(actor.SRWStats.stageTemp.validTerrainCache[currentTerrain] == null){
+		//	actor.SRWStats.stageTemp.validTerrainCache[currentTerrain] = this.canStandOnTileResolve(actor, position);
+		//}
+		//return actor.SRWStats.stageTemp.validTerrainCache[currentTerrain];
+		return this.canStandOnTileResolve(actor, position);
 	}
 	return false;
 }
 
-StatCalc.prototype.canStandOnTileResolve = function(actor, position){
+StatCalc.prototype.canStandOnTileResolve = function(actor, position, noCheckTwin){
 	if(this.isActorSRWInitialized(actor)){
 		const currentTerrain = $gameMap.regionId(position.x, position.y) % 8;
-		if(this.canBeOnTerrain(actor, currentTerrain)){ //base terrain OK
+		if(this.canBeOnTerrain(actor, currentTerrain, noCheckTwin)){ //base terrain OK
 			return true;
 		}
 		if(this.getValidSuperStatesLookup(actor, position)[this.getSuperState(actor)]){ //current super state OK
@@ -158,7 +159,7 @@ StatCalc.prototype.canStandOnTileResolve = function(actor, position){
 		
 		let transitions = this.getValidSuperStates(actor, position);
 		for(let transition of transitions){
-			if((transition.startState == currentTerrain || transition.startState == -1) && this.canBeOnTerrain(actor, transition.endState)){
+			if((transition.startState == currentTerrain || transition.startState == -1) && this.canBeOnTerrain(actor, transition.endState, noCheckTwin)){
 				hasTransitionToValidSuperState = true;
 			}
 		}
@@ -2416,18 +2417,20 @@ StatCalc.prototype.swap = function(actor, force){
 			var twin = actor.subTwin;
 			
 			if(this.canSwap(actor, twin) || force){		
+				let targetSuperState = this.getSuperState(actor);
 				actor.subTwin = null;
 				actor.subTwinId = null;
 				actor.isSubTwin = true;
 				//actor.mainTwin = twin;
 				
 				twin.subTwin = actor;
-				twin.subTwinId = actor.actorId();
+				twin.subTwinId = actor.actorId(); 
 				twin.isSubTwin = false;	
 				//twin.mainTwin = null;	
 				
 				this.applyDeployActions(twin.SRWStats.pilot.id, twin.SRWStats.mech.id);			
 				
+				this.setSuperState(twin, targetSuperState);
 				twin.event = actor.event;
 				actor.event = null;
 				$gameSystem.setEventToUnit(twin.event.eventId(), 'actor', twin.actorId());
@@ -2512,7 +2515,7 @@ StatCalc.prototype.separate = function(actor){
 				if(twin.positionBeforeTwin && this.isFreeSpace(twin.positionBeforeTwin)){
 					space = twin.positionBeforeTwin;
 				} else {
-					space = this.getAdjacentFreeSpace({x: actor.event.posX(), y: actor.event.posY()});
+					space = this.getAdjacentFreeStandableSpace(twin, {x: actor.event.posX(), y: actor.event.posY()});
 				}		
 					
 				event.appear();
@@ -2527,9 +2530,14 @@ StatCalc.prototype.separate = function(actor){
 			this.invalidateAbilityCache();
 			this.reloadSRWStats(actor, true);
 			this.reloadSRWStats(twin, true);
+			this.invalidateAbilityCache();	
+
+			this.updateSuperState(actor);
+			this.updateSuperState(twin);
+			
 				
 				//
-			this.invalidateAbilityCache();		
+				
 		}	
 	}
 }
@@ -2571,11 +2579,7 @@ StatCalc.prototype.twin = function(actor, otherActor){
 			otherActor.event.isUnused = true;
 			otherActor.event = null;	
 			let actorSuperState = this.getSuperState(actor);
-			let otherActorSuperState = this.getSuperState(otherActor);
-			if(!this.canBeInSuperState(actor, otherActorSuperState) || !this.canBeInSuperState(otherActor, actorSuperState)){
-				this.setSuperState(actor, -1, true);
-				this.setSuperState(otherActor, -1, true);
-			}
+			this.setSuperState(otherActor, actorSuperState, true);
 
 			//this invalidation and reload ensures that the spawned unit has its stats calculated with abilities taken into account
 			this.invalidateAbilityCache();
@@ -2630,7 +2634,27 @@ StatCalc.prototype.canSwap = function(actor){
 }
 
 StatCalc.prototype.canDisband = function(actor){
-	return this.isMainTwin(actor) && (!this.isDisabled(actor) && !this.isDisabled(actor.subTwin))
+	const referenceEvent = this.getReferenceEvent(actor);
+	const position = {x: referenceEvent.posX(), y: referenceEvent.posY()};
+
+	let hasValidDisbandPosition = this.canStandOnTileResolve(actor, {x: position.x , y: position.y}, true);
+
+	const subTwin = actor.subTwin;
+	let twinHasValidDisbandPosition = false;
+	if(this.canStandOnTileResolve(subTwin, {x: position.x + 1, y: position.y}, true)){
+		twinHasValidDisbandPosition = true;
+	}
+	if(this.canStandOnTileResolve(subTwin, {x: position.x - 1, y: position.y}, true)){
+		twinHasValidDisbandPosition = true;
+	}
+	if(this.canStandOnTileResolve(subTwin, {x: position.x, y: position.y + 1}, true)){
+		twinHasValidDisbandPosition = true;
+	}
+	if(this.canStandOnTileResolve(subTwin, {x: position.x, y: position.y - 1}, true)){
+		twinHasValidDisbandPosition = true;
+	}
+	
+	return this.isMainTwin(actor) && (!this.isDisabled(actor) && !this.isDisabled(actor.subTwin)) && hasValidDisbandPosition && twinHasValidDisbandPosition;
 }
 
 StatCalc.prototype.canTwin = function(actor, otherActor){
@@ -2737,8 +2761,8 @@ StatCalc.prototype.transform = function(actor, idx, force, forcedId, noRestore){
 			var transformIntoId = actor.SRWStats.mech.transformsInto[idx];
 			if(forcedId){
 				transformIntoId = forcedId;
-			}
-			
+			}			
+						
 			if(transformIntoId != null){			
 				var targetMechData = this.getMechDataById(transformIntoId, true);
 			
@@ -2749,6 +2773,11 @@ StatCalc.prototype.transform = function(actor, idx, force, forcedId, noRestore){
 				
 				
 				var actionsResult = this.applyDeployActions(actor.SRWStats.pilot.id, actor.SRWStats.mech.id);
+
+				//store the sub twin and unassign it from the current actor so that if the pilot changes the previous pilot does not retain an old reference
+				//must be done after deploy actions as those reassign the sub twin otherwise
+				var subTwin = actor.subTwin;
+				this.resetTwinState(actor);
 				
 				//undeployed pilost must be checked to properly transform with a subpilot to main pilot transition
 				var targetActor = this.getCurrentPilot(transformIntoId, true);
@@ -2758,7 +2787,7 @@ StatCalc.prototype.transform = function(actor, idx, force, forcedId, noRestore){
 					actor.event = null;
 					$gameSystem.setEventToUnit(targetActor.event.eventId(), 'actor', targetActor.actorId());
 					actor = targetActor;
-				}			
+				}		
 				
 				actor.SRWStats.mech.unitsOnBoard = unitsOnBoard;
 							
@@ -2788,6 +2817,11 @@ StatCalc.prototype.transform = function(actor, idx, force, forcedId, noRestore){
 						_this.reloadSRWStats(actor);										
 					}			
 				});					
+				if(subTwin){
+					this.resetTwinState(subTwin);
+					subTwin.isSubTwin = true;
+					actor.subTwin = subTwin;					
+				}				
 				this.invalidateAbilityCache(actor);
 				this.updateSuperState(actor);
 			}			
@@ -4658,25 +4692,31 @@ StatCalc.prototype.getCurrentMoveRange = function(actor){
 	}		
 }
 
-StatCalc.prototype.canBeOnTerrain = function(actor, terrain){
+StatCalc.prototype.canBeOnTerrain = function(actor, terrain, noCheckTwin){
 	if(this.isActorSRWInitialized(actor) && actor.SRWStats.mech.enabledTerrainTypes){
 		let terrainDef = $terrainTypeManager.getTerrainDefinition(terrain);
-		var validTwin = true;
-		if(actor.subTwin && !(actor.subTwin.SRWStats.mech.enabledTerrainTypes[terrain] * 1 || this.applyStatModsToValue(actor.subTwin, 0, [terrainDef.abilityName]))){
-			validTwin = false;
-		}
-		if(actor.isSubTwin){
+		//var validTwin = true;
+		//if(actor.subTwin && !(actor.subTwin.SRWStats.mech.enabledTerrainTypes[terrain] * 1 || this.applyStatModsToValue(actor.subTwin, 0, [terrainDef.abilityName]))){
+		//	validTwin = false;
+	//	}
+		/*if(actor.isSubTwin){
 			var mainTwin = this.getMainTwin(actor);
 			if(mainTwin && this.isActorSRWInitialized(mainTwin) && !(mainTwin.SRWStats.mech.enabledTerrainTypes[terrain] * 1 || this.applyStatModsToValue(mainTwin, 0, [terrainDef.abilityName]))){
 				validTwin = false;
 			}
+			return validTwin;
+		}	*/	
+		const selfValid = Math.max(actor.SRWStats.mech.enabledTerrainTypes[terrain] * 1, this.applyStatModsToValue(actor, 0, [terrainDef.abilityName]) * 1);	
+		if(noCheckTwin || selfValid){
+			return selfValid;
 		}
-		if(validTwin){
-			return Math.max(actor.SRWStats.mech.enabledTerrainTypes[terrain] * 1, this.applyStatModsToValue(actor, 0, [terrainDef.abilityName]) * 1);
-		} else {
-			return false;
-		}
-	
+		if(actor.subTwin){
+			return actor.subTwin.SRWStats.mech.enabledTerrainTypes[terrain] * 1 || this.applyStatModsToValue(actor.subTwin, 0, [terrainDef.abilityName]);
+		} else if(actor.isSubTwin){
+			const mainTwin = this.getMainTwin(actor);
+			return mainTwin && this.isActorSRWInitialized(mainTwin) && ((mainTwin.SRWStats.mech.enabledTerrainTypes && mainTwin.SRWStats.mech.enabledTerrainTypes[terrain] * 1) || this.applyStatModsToValue(mainTwin, 0, [terrainDef.abilityName]));
+		} 
+		return false;
 	} else {
 		return false;
 	}
@@ -5563,7 +5603,7 @@ StatCalc.prototype.getAllInRange = function(initiator, includeMoveRange, postMov
 		if(_this.canUseWeapon(initiator, weapon, postMoveOnly)){			
 			_this.iterateAllActors(null, function(target, event){	
 				if(!$gameSystem.isFriendly(target, factionId) || includeFriendlies){
-					if(_this.isValidWeaponTarget(initiator, target, weapon, includeMoveRange) && !event._erased){
+					if(!event.isErased() && _this.isValidWeaponTarget(initiator, target, weapon, includeMoveRange)){
 						result.push(event);
 					}	
 				}						
@@ -5588,7 +5628,7 @@ StatCalc.prototype.getAllInRangeOfWeapon = function(initiator, weapon, includeMo
 			}
 			
 			if(isValidFactionTarget){
-				if(_this.isValidWeaponTarget(initiator, target, weapon, includeMoveRange) && !event._erased){
+				if(!event.isErased() && _this.isValidWeaponTarget(initiator, target, weapon, includeMoveRange)){
 					result.push(event);
 				}	
 			}						
