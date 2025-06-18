@@ -1986,12 +1986,21 @@ StatCalc.prototype.getMechData = function(mech, forActor, items, previousWeapons
 		if(mechProperties.mechAllowedPilots){
 			result.allowedPilots = parsePilotList(mechProperties.mechAllowedPilots);
 		}
+
+		if(mechProperties.mechSubPilots){
+			result.subPilots = JSON.parse(mechProperties.mechSubPilots);
+		} else {
+			result.subPilots = [];
+		}
+
 		result.hasVariableSubPilots = false;
 		result.allowedSubPilots = {};
 		for(var i = 0; i < 10; i++){
-			if(mechProperties["mechAllowedSubPilots"+(i+1)]){
-				result.hasVariableSubPilots = true;
+			if(mechProperties["mechAllowedSubPilots"+(i+1)]){				
 				result.allowedSubPilots[i] = parsePilotList(mechProperties["mechAllowedSubPilots"+(i+1)]);
+				if(result.allowedSubPilots[i]?.length && i < result.subPilots.length){
+					result.hasVariableSubPilots = true;
+				}
 			}
 		}
 		
@@ -2082,11 +2091,7 @@ StatCalc.prototype.getMechData = function(mech, forActor, items, previousWeapons
 			result.combinesInto = JSON.parse(mechProperties.mechCombinesTo);
 		}
 		result.combinedActor = mechProperties.mechCombinedActor;	
-		if(mechProperties.mechSubPilots){
-			result.subPilots = JSON.parse(mechProperties.mechSubPilots);
-		} else {
-			result.subPilots = [];
-		}
+		
 		
 		function compatParse(value){
 			//this method avoids immediately using a try to see if the input is valid json because the debugger needs to run with pause on caught execeptions on
@@ -4020,8 +4025,17 @@ StatCalc.prototype.isWeaponUnlocked = function(actor, weapon){
 
 StatCalc.prototype.getCurrentWeapons = function(actor, noEquips){
 	if(this.isActorSRWInitialized(actor)){
+		let referenceMech;
+		if(actor.isSubPilot){
+			referenceMech = actor.mainPilot.SRWStats.mech;
+		} else {
+			referenceMech = actor.SRWStats.mech;
+		}
+		if(referenceMech.id == -1){
+			return [];
+		}
 		var tmp = [];
-		var allWeapons = actor.SRWStats.mech.weapons;	
+		var allWeapons = referenceMech.weapons;	
 		for(var i = 0; i < allWeapons.length; i++){
 			if(this.isWeaponUnlocked(actor, allWeapons[i])){
 				tmp.push(allWeapons[i]);
@@ -4029,10 +4043,10 @@ StatCalc.prototype.getCurrentWeapons = function(actor, noEquips){
 		}
 		
 		if(!noEquips){
-			const equipables = this.getActorMechEquipables(actor.SRWStats.mech.id);
+			const equipables = this.getActorMechEquipables(referenceMech.id);
 			for(let weapon of equipables){
 				if(weapon){
-					if(this.getWeaponValidHolders(weapon.weaponId)[actor.SRWStats.mech.id]){				
+					if(this.getWeaponValidHolders(weapon.weaponId)[referenceMech.id]){				
 						var weaponDefinition = $dataWeapons[weapon.weaponId];
 						var weaponProperties = weaponDefinition.meta;
 						
@@ -4334,11 +4348,38 @@ StatCalc.prototype.getCurrentPilot = function(mechId, includeUndeployed, include
 }
 
 StatCalc.prototype.getCurrentDeploySlot = function(actorId){
+	const _this = this;
 	var result = -1;
 	var deployList = $gameSystem.getDeployList();
+	function checkSubPilots(mainPilotId){
+		let result = false;
+		const subPilots = _this.getSubPilots($gameActors.actor(mainPilotId));
+			if(subPilots?.length){
+				for(let subPilotId of subPilots){
+					if(subPilotId == actorId){
+						result = true;
+					}
+				}	
+			}
+		return result;	
+	}
 	for(var i = 0; i < deployList.length; i++){		
-		if(deployList[i] && (deployList[i].main == actorId || deployList[i].sub == actorId)){
-			result = i;
+		if(deployList[i]){
+			if(deployList[i].main == actorId){
+				result = i;
+			}
+			if(deployList[i].sub == actorId){
+				result = i;
+			}
+			const mainSubResult = checkSubPilots(deployList[i].main);
+			if(mainSubResult){
+				result = i;
+			}
+
+			const subSubResult = checkSubPilots(deployList[i].sub);
+			if(subSubResult){
+				result = i;
+			}
 		}
 	}
 	return result;

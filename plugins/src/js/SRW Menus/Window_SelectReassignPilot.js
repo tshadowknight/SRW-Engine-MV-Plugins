@@ -277,6 +277,9 @@ Window_SelectReassignPilot.prototype.update = function() {
 					$statCalc.initSRWStats(this.getCurrentSelection().actor);
 				} else {
 					$statCalc.unbindLinkedDeploySlots(this.getCurrentSelection().actor.actorId(), mechId, target.type, $gameTemp.reassignTargetMech.slot);
+					targetPilot._classId = $gameTemp.reassignTargetMech.id;
+					$statCalc.initSRWStats(targetPilot);	
+					$gameSystem.overwritePilotFallbackInfo(targetPilot);
 				}			
 				
 				$gameSystem.updateAvailableUnits(false, true);
