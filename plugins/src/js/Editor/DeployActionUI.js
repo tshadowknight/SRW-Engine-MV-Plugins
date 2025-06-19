@@ -173,6 +173,7 @@ DeployActionUI.prototype.show = async function(){
 							content+="Slot";
 							content+="</div>";					
 							content+="<input class='target_sub_slot' data-blockid='"+pilotId+"' data-mechid='"+mechId+"' data-targetidx='"+targetIdx+"' value='"+(targetEntry.target.slot || "")+"'></input>";
+							content+="<div class='hint'>Starts at 0</div>";
 							content+="</div>";
 						}	
 					

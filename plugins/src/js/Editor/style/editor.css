@@ -1686,4 +1686,11 @@
 .quote_selector .entry .display_name {
 	font-weight: bold;
 }
+
+#srw_editor .hint {
+	display: inline;
+	margin-left: 5px;
+	font-size: 12px;
+	color: #222222;
+}
 /*============*/
