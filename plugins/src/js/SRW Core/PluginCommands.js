@@ -58,6 +58,9 @@
 						throw "Invalid mech "+args[1]+" for assignUnit command.";
 					}
 					const previousPilot = $statCalc.getCurrentPilot(args[1], true, false, false, true);
+					if(actor == previousPilot){
+						return;
+					}
 					actor._classId = args[1] * 1;
 					actor.isSubPilot = !!(args[2] * 1);
 					//actor._intermissionClassId = args[1] * 1; 

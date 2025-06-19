@@ -936,7 +936,7 @@ SceneManager.isInSaveScene = function(){
 	}
 	
 	Scene_Map.prototype.commandGameEnd = function() {
-		//this.closePauseMenu();
+		this.closePauseMenu();
 		$gameTemp.buttonHintManager.hide();
 		this._mapButtonsWindow.hide();
 		this._mapButtonsWindow.close();

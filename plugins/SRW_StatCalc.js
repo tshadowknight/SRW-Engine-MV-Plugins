@@ -96,7 +96,7 @@ StatCalc.prototype.getReferenceEvent = function(actor, depth){
 	if(depth == null){
 		depth = 0;
 	} else if(depth > 10){
-		console.log("Recursion while getting reference event!");
+		//console.log("Recursion while getting reference event!");
 		return null;
 	}
 	if(actor.isSubPilot && actor.mainPilot){		
@@ -4751,7 +4751,7 @@ StatCalc.prototype.canBeOnTerrain = function(actor, terrain, noCheckTwin){
 		if(noCheckTwin || selfValid){
 			return selfValid;
 		}
-		if(actor.subTwin){
+		if(actor.subTwin && this.isActorSRWInitialized(actor.subTwin) && actor.subTwin.SRWStats.mech.enabledTerrainTypes){
 			return actor.subTwin.SRWStats.mech.enabledTerrainTypes[terrain] * 1 || this.applyStatModsToValue(actor.subTwin, 0, [terrainDef.abilityName]);
 		} else if(actor.isSubTwin){
 			const mainTwin = this.getMainTwin(actor);

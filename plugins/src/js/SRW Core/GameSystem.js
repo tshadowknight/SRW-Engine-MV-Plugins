@@ -962,6 +962,12 @@
 			$statCalc.applyRelativeTransforms();
 			
 			event.isShip = $statCalc.isShip(actor_unit);
+
+			if(actor_unit.subTwin){
+				actor_unit.subTwin.SRPGActionTimesSet($statCalc.applyStatModsToValue(actor_unit.subTwin, 1, ["extra_action"]));
+				actor_unit.subTwin.setSrpgTurnEnd(false);	
+				actor_unit.subTwin.setBattleMode("");
+			}
 		}
 		
 		Game_System.prototype.deployItemBox = function(event, items) {
