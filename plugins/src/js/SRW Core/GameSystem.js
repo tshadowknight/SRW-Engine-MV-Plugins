@@ -967,6 +967,15 @@
 				actor_unit.subTwin.setSrpgTurnEnd(false);	
 				actor_unit.subTwin.setBattleMode("");
 			}
+			const subPilots = $statCalc.getSubPilots(actor_unit);
+			for(let subPilotId of subPilots){
+				const subPilot = $gameActors.actor(subPilotId);
+				if(subPilot){
+					subPilot.SRPGActionTimesSet($statCalc.applyStatModsToValue(subPilot, 1, ["extra_action"]));
+					subPilot.setSrpgTurnEnd(false);	
+					subPilot.setBattleMode("");
+				}
+			}
 		}
 		
 		Game_System.prototype.deployItemBox = function(event, items) {

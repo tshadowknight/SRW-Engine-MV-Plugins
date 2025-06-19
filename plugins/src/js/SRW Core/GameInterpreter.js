@@ -1161,7 +1161,8 @@
 			}			
 		}
 
-		//clears the twin state for all pilots referenced on the deploy list to avoid crashes due to lingering twin state(depending on unit init order they can create self reference loops)
+		//clears the twin state for all pilots referenced on the deploy list to avoid crashes due to lingering twin state
+		// (depending on unit init order they can create self reference loops)
 		Game_Interpreter.prototype.cleanDeployListTwinState = function(unlockedOnly){
 			for(let entry of $gameSystem.getDeployList()){
 				if(entry.main != null){
