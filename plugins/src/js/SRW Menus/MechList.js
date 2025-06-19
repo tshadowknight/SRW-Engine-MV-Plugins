@@ -71,18 +71,12 @@ MechList.prototype.defineContent = function(){
 		}	
 	}
 	function mechIcon(pilot, mech){
-		if(pilot.isSubPilot){
-			mech = pilot.mainPilot.SRWStats.mech;
-		}
 		if(!mech.classData){
 			return "";
 		}
 		return "<div class='list_mech_icon' data-mech='"+mech.classData.id+"'></div>";
 	}
 	function mechName(pilot, mech){
-		if(pilot.isSubPilot){
-			mech = pilot.mainPilot.SRWStats.mech;
-		}
 		if(!mech.classData){
 			return "";
 		}

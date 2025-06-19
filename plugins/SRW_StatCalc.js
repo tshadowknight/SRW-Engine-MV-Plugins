@@ -1873,6 +1873,14 @@ StatCalc.prototype.initSRWStats = function(actor, level, itemIds, preserveVolati
 	this.updateTerrainInfo(actor);
 }
 
+StatCalc.prototype.cleanTwinState = function(actor){
+	if(actor){
+		actor.isSubTwin = false;
+		actor.subTwinId = false;			
+		actor.subTwin = null;	
+	}			
+}
+
 StatCalc.prototype.resetTwinState = function(actor){
 	actor.isSubTwin = false;
 	actor.subTwinId = null;
@@ -8967,3 +8975,4 @@ StatCalc.prototype.getPopUpAnims = function(actor){
 	});
 	return result;
 }
+

@@ -1161,6 +1161,18 @@
 			}			
 		}
 
+		//clears the twin state for all pilots referenced on the deploy list to avoid crashes due to lingering twin state(depending on unit init order they can create self reference loops)
+		Game_Interpreter.prototype.cleanDeployListTwinState = function(unlockedOnly){
+			for(let entry of $gameSystem.getDeployList()){
+				if(entry.main != null){
+					$statCalc.cleanTwinState($gameActors.actor(entry.main));		
+				}
+				if(entry.sub != null){
+					$statCalc.cleanTwinState($gameActors.actor(entry.sub));		
+				}
+			}
+		}
+
 		Game_Interpreter.prototype.manualDeploy = function(unlockedOnly){
 			this.setWaitMode("manual_deploy");
 			$gameTemp.deployContextState = "start_srpg";
@@ -1172,6 +1184,7 @@
 			$gameSystem.setSubBattlePhase("deploy_selection_window");
 			$gameTemp.pushMenu = "in_stage_deploy";
 			$gameTemp.originalDeployInfo = JSON.parse(JSON.stringify($gameSystem.getDeployList()));
+			this.cleanDeployListTwinState();
 		}
 		
 		Game_Interpreter.prototype.manualDeployOnActorTurn = function(unlockedOnly){
@@ -1185,6 +1198,7 @@
 			$gameSystem.setSubBattlePhase("deploy_selection_window");
 			$gameTemp.pushMenu = "in_stage_deploy";
 			$gameTemp.originalDeployInfo = JSON.parse(JSON.stringify($gameSystem.getDeployList()));
+			this.cleanDeployListTwinState();
 		}
 
 		Game_Interpreter.prototype.manualShipDeploy = function(){
