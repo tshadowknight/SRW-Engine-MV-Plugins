@@ -940,7 +940,7 @@
 			}
 		
 			
-			if(subId != null){
+			if(subId != null && subId != actor_unit.actorId()){
 				actor_unit.subTwinId = subId;
 			}
 			
