@@ -185,7 +185,7 @@ SRWEditor.prototype.init = function(){
 		},
 		teleport: {
 			hasTarget: true,
-			params: ["position"],
+			params: ["forceAutoFlipX", "position"],
 			desc: "Immediately move an object."
 		},
 		rotate_to: {
@@ -780,6 +780,7 @@ SRWEditor.prototype.init = function(){
 		startRotation: "A rotation defined by an x, y and z component. The rotations are described with radian values.",
 		aroundPivot: "If 1 the rotation will be done around the pivot helper instead of the element origin. Only avaialable for unit sprites. If set Z index will always be mirrored for enemy side animations.",
 		fixMirrored: "If 1 the y rotation will not be inverted if the target is a mirrored effekseer effect",
+		forceAutoFlipX: "If 1 the target will have the direction flip x direction applied even if it is a mirrored effekseer effect",
 		startSize: "The initial size of the target object.",
 		endSize: "The final size of the target object.",
 		x: "If 1 the object will be flipped along its x-axis.",
@@ -1099,6 +1100,9 @@ SRWEditor.prototype.init = function(){
 		
 		},
 		fixMirrored: function(value){
+		
+		},
+		forceAutoFlipX: function(value){
 		
 		},
 		startSize: function(value){

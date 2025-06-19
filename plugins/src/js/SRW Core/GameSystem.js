@@ -903,6 +903,17 @@
 			
 			
 			actor_unit.isSubPilot = false;
+
+			if(actor_unit.isSubTwin){
+				actor_unit.isSubTwin = false;
+				const mainTwin = $statCalc.getMainTwin(actor_unit);
+				if(mainTwin){
+					mainTwin.subTwin = null;
+					mainTwin.subTwinId = null;
+				}
+				console.log("Warning: A pilot was force deployed that was also assigned as a sub twin.");
+			}
+			
 			
 			$statCalc.initSRWStats(actor_unit);
 			

@@ -3700,7 +3700,7 @@ BattleSceneManager.prototype.executeAnimation = function(animation, startTick){
 		},
 		set_opacity_texture: function(target, params){
 			var targetObj = getTargetObject(target);
-			if(targetObj?.material?.opacityTexture){
+			if(targetObj?.material){
 				targetObj.material.opacityTexture = _this.getCachedTexture("img/SRWBattleScene/opacityTextures/"+params.path+".png");
 			}
 		},
@@ -3806,7 +3806,7 @@ BattleSceneManager.prototype.executeAnimation = function(animation, startTick){
 				targetObj.wasMoved = true;
 				var targetPosition = params.position || new BABYLON.Vector3(0,0,0);				
 				
-				if(targetObj.isMirrored){
+				if(targetObj.isMirrored && !params.forceAutoFlipX){
 					_this.registerMatrixUpdate("translate_effek", targetObj, new BABYLON.Vector3(targetPosition.x, targetPosition.y, targetPosition.z));
 				} else {
 					_this.registerMatrixUpdate("translate", targetObj, new BABYLON.Vector3(targetPosition.x, targetPosition.y, targetPosition.z));
