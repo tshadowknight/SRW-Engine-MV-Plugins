@@ -2787,6 +2787,8 @@ StatCalc.prototype.transform = function(actor, idx, force, forcedId, noRestore){
 				
 				var actionsResult = this.applyDeployActions(actor.SRWStats.pilot.id, actor.SRWStats.mech.id);
 
+				
+
 				//store the sub twin and unassign it from the current actor so that if the pilot changes the previous pilot does not retain an old reference
 				//must be done after deploy actions as those reassign the sub twin otherwise
 				var subTwin = actor.subTwin;
@@ -2799,7 +2801,9 @@ StatCalc.prototype.transform = function(actor, idx, force, forcedId, noRestore){
 					targetActor.event = actor.event;
 					actor.event = null;
 					$gameSystem.setEventToUnit(targetActor.event.eventId(), 'actor', targetActor.actorId());
+					const subPilots = this.getSubPilots(actor);
 					actor = targetActor;
+					actor.SRWStats.mech.subPilots = subPilots;//(hack) force the live copy of the new actor's mech data to have an up to date sub pilot list
 				}		
 				
 				actor.SRWStats.mech.unitsOnBoard = unitsOnBoard;
