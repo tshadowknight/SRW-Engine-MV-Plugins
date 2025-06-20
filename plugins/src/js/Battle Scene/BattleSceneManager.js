@@ -8399,7 +8399,7 @@ BattleSceneManager.prototype.processActionQueue = function() {
 						battleText = _this._battleTextManager.getText(entityType, nextAction.ref, "support_attack", nextAction.isActor ? "actor" : "enemy", _this.getBattleTextId(nextAction.attacked), null, null, _this.getBattleTextId(nextAction.mainAttacker));
 					}					
 					if(!battleText || battleText.text == "..."){
-						if(nextAction.type == "initiator"){
+						if(nextAction.type == "initiator" || nextAction.type == "twin attack"){
 							textType = "battle_intro";
 						}
 						if(nextAction.type == "defender"){
