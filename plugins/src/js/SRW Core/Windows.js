@@ -452,7 +452,7 @@
 					}
 					
 					function postMoveMenu(){
-						if(hasTarget || hasMapWeapon){
+						if((hasTarget || hasMapWeapon) && $statCalc.canAttackOnCurrentTerrain(_this._actor)){
 							_this.addCommand(APPSTRINGS.MAPMENU.cmd_attack, 'attack');
 						}
 						if($gameSystem.getPersuadeOption(_this._actor)){

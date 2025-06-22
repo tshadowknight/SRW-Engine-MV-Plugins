@@ -425,7 +425,7 @@ StatCalc.prototype.getCurrentTerrainMods = function(actor){
 StatCalc.prototype.getCurrentMoveCost = function(actor){
 	if(this.isActorSRWInitialized(actor)){
 		var event = this.getReferenceEvent(actor);
-		var moveCost = $terrainTypeManager.getTerrainDefinition(this.getCurrentAliasedTerrainIdx(actor)).moveCost;
+		var moveCost = $terrainTypeManager.getTerrainDefinition(this.getCurrentTerrainIdx(actor)).moveCost;
 		return moveCost * event.lastMoveCount; 
 	} else {
 		return 0;
@@ -6626,6 +6626,16 @@ StatCalc.prototype.applyHPRegen = function(type, factionId){
 			}
 		}		
 	});
+}
+
+StatCalc.prototype.setEN = function(actor, amount){		
+	if(this.isActorSRWInitialized(actor)){			
+		var mechStats = this.getCalculatedMechStats(actor);
+		mechStats.currentEN=amount;
+		if(mechStats.currentEN > mechStats.maxEN){
+			mechStats.currentEN = mechStats.maxEN;
+		}
+	} 	
 }
 
 StatCalc.prototype.setAllWill = function(type, amount){

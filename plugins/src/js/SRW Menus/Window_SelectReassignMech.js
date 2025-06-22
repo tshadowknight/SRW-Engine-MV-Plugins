@@ -63,6 +63,15 @@ Window_SelectReassignMech.prototype.rowEnabled = function(actor){
 		}
 	});
 	
+	Object.keys(deployInfo.assignedSub).forEach(function(slot){
+		if(deployInfo.lockedSlots[slot]){
+			var actor = $gameActors.actor(deployInfo.assignedSub[slot]);
+			if(actor.SRWStats){
+				lockedMechs[actor.SRWStats.mech.id] = true;
+			}			
+		}
+	});
+
 	return !lockedMechs[actor.SRWStats.mech.id];
 }
 

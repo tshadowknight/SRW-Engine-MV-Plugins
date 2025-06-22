@@ -2148,6 +2148,9 @@
 					entry.sub = null;
 				}
 				if(entry.main || entry.sub){
+					if(entry.sub && !entry.main){
+						entry.main = entry.sub;
+					}
 					$gameSystem.deployList.push(entry);							
 					usedUnits[entry.main] = true;
 					usedUnits[entry.sub] = true;

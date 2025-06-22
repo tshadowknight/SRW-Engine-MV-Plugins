@@ -727,6 +727,8 @@
 				addFunds: true,
 				setEventHP: true,
 				setEventHPPercent: true,
+				setEventEN: true,
+				setEventENPercent: true,
 				addSubPilot: true,
 				removeSubPilot: true,
 				setPortraitOverlay: true,

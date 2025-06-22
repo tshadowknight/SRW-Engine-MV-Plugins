@@ -1282,6 +1282,17 @@
 					var mechStats = $statCalc.getCalculatedMechStats(actor);
 					$statCalc.setHP(actor, Math.floor(mechStats.maxHP * args[1] / 100));		
 				}
+
+				if (command === 'setEventEN') {
+					var actor = $gameSystem.EventToUnit(args[0])[1];				
+					$statCalc.setEN(actor, (args[1] || 1) * 1);	
+				}
+
+				if (command === 'setEventENPercent') {
+					var actor = $gameSystem.EventToUnit(args[0])[1];				
+					var mechStats = $statCalc.getCalculatedMechStats(actor);
+					$statCalc.setEN(actor, Math.floor(mechStats.maxEN * args[1] / 100));		
+				}
 				
 				
 				if (command === 'addSubPilot') {					
