@@ -419,6 +419,18 @@
 					$statCalc.initSRWStats(actor);		
 				}
 			});
+
+			//sanity sub twin assignments, reset sub twin state if an actor does not have a main twin
+			//hacky fix for issues where some unts would end up in an instable subtwin state after event slot reassignments
+			this._availableUnits.forEach(function(actor){
+				if(actor.isSubTwin){
+					if(!$statCalc.getMainTwin(actor)){
+						actor.isSubTwin = false;
+						actor.subTwin = null;
+						actor.subTwinId = null;
+					}
+				}
+			});
 			
 			var tmp = Object.keys($SRWSaveManager.getUnlockedUnits());			
 			for(var i = 0; i < tmp.length; i++){
