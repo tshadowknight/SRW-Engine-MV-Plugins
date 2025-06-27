@@ -5415,6 +5415,53 @@ BattleSceneManager.prototype.executeAnimation = function(animation, startTick){
 					}					
 				});	
 				_this._bgAnimations = tmp;
+
+				let playDefaultSfx = false;
+				if(params.playDefaultSfx != null){
+					playDefaultSfx = params.playDefaultSfx;
+				} else {
+					if(ENGINE_SETTINGS.BATTLE_SCENE.DEFAULT_SFX_POSES){
+						if(ENGINE_SETTINGS.BATTLE_SCENE.DEFAULT_SFX_POSES.indexOf(params.name) != -1){
+							playDefaultSfx = true;
+						}
+					}
+				}
+				
+				if(targetObj.isVisible && ENGINE_SETTINGS.BATTLE_SCENE.DEFAULT_MOVE_SFX && playDefaultSfx){		
+					let refObj = targetObj;
+					if(refObj.parent_handle){
+						refObj = refObj.parent_handle;
+					}			
+					if(_this._camera.isInFrustum(refObj)){
+						let targetActor;
+						if(target == "active_main" || target == "active_support_attacker" || target == "active_twin"){
+							targetActor = action.ref;				
+						} else if(target == "active_target" || target == "active_support_defender" || target == "active_target_twin"){
+							targetActor = targetAction.ref; 				
+						}
+
+						const actorMoveSoundInfo = $statCalc.getMoveSoundInfo(targetActor);
+						let pitch = ENGINE_SETTINGS.BATTLE_SCENE.DEFAULT_MOVE_PITCH || 100;
+						if(actorMoveSoundInfo){
+							pitch = actorMoveSoundInfo.pitch;
+						}
+						if(ENGINE_SETTINGS.BATTLE_SCENE.DEFAULT_MOVE_PITCH_VARIANCE && ENGINE_SETTINGS.BATTLE_SCENE.DEFAULT_MOVE_PITCH_VARIANCE[params.name]){
+							pitch+=ENGINE_SETTINGS.BATTLE_SCENE.DEFAULT_MOVE_PITCH_VARIANCE[params.name];
+						}
+						let sfx = ENGINE_SETTINGS.BATTLE_SCENE.DEFAULT_MOVE_SFX;
+						if(actorMoveSoundInfo && actorMoveSoundInfo.seAssignments && actorMoveSoundInfo.seAssignments[params.name]){
+							sfx = actorMoveSoundInfo.seAssignments[params.name];
+						} else if(ENGINE_SETTINGS.BATTLE_SCENE.DEFAULT_POSE_SFX && ENGINE_SETTINGS.BATTLE_SCENE.DEFAULT_POSE_SFX[params.name]){
+							sfx = ENGINE_SETTINGS.BATTLE_SCENE.DEFAULT_POSE_SFX[params.name];
+						}
+						var se = {};
+						se.name = sfx;
+						se.pan = 0;
+						se.pitch = pitch;
+						se.volume = 75;
+						AudioManager.playSe(se);
+					}					
+				}
 				
 				if(ENGINE_SETTINGS.SINGLE_BATTLE_SPRITE_MODE){
 					params.name = "main";
@@ -5770,21 +5817,21 @@ BattleSceneManager.prototype.executeAnimation = function(animation, startTick){
 							if(action.side == "actor"){
 								if(_this.applyAnimationDirection(targetPostion).x > targetObj.parent_handle.position.x){								
 									additions[startTick + 1] = [									
-										{type: "set_sprite_frame", target: target, params:{name: "out"}},
+										{type: "set_sprite_frame", target: target, params:{name: "out", playDefaultSfx: true}},
 									];
 								} else if(_this.applyAnimationDirection(targetPostion).x < targetObj.parent_handle.position.x){
 									additions[startTick + 1] = [									
-										{type: "set_sprite_frame", target: target, params:{name: "in"}},
+										{type: "set_sprite_frame", target: target, params:{name: "in", playDefaultSfx: true}},
 									];
 								}							
 							} else {
 								if(_this.applyAnimationDirection(targetPostion).x > targetObj.parent_handle.position.x){								
 									additions[startTick + 1] = [									
-										{type: "set_sprite_frame", target: target, params:{name: "in"}},
+										{type: "set_sprite_frame", target: target, params:{name: "in", playDefaultSfx: true}},
 									];
 								} else if(_this.applyAnimationDirection(targetPostion).x < targetObj.parent_handle.position.x){
 									additions[startTick + 1] = [									
-										{type: "set_sprite_frame", target: target, params:{name: "out"}},
+										{type: "set_sprite_frame", target: target, params:{name: "out", playDefaultSfx: true}},
 									];
 								}
 							}
@@ -5829,7 +5876,7 @@ BattleSceneManager.prototype.executeAnimation = function(animation, startTick){
 				}
 				
 				if(!action.isHit){
-					additions[startTick + params.duration].push({type: "set_sprite_frame", target: target, params:{name: "main"}});	
+					additions[startTick + params.duration].push({type: "set_sprite_frame", target: target, params:{name: "main", playDefaultSfx: true}});	
 				}
 				
 				if(action.isHit && !action.isDestroyed){
@@ -5839,7 +5886,7 @@ BattleSceneManager.prototype.executeAnimation = function(animation, startTick){
 						];
 					} else {
 						additions[startTick + params.duration + 50] = [
-							{type: "set_sprite_frame", target: target, params:{name: "main"}},
+							{type: "set_sprite_frame", target: target, params:{name: "main", playDefaultSfx: true}},
 						];
 					}				
 				}	
@@ -6509,10 +6556,10 @@ BattleSceneManager.prototype.playAttackAnimation = function(cacheRef, attackDef)
 	if(!_this._animationList[0]){
 		_this._animationList[0] = [];
 	}
-	_this._animationList[0].unshift({type: "set_sprite_frame", target: "active_target", params: {name: "main"}});
-	_this._animationList[0].unshift({type: "set_sprite_frame", target: "active_target_twin", params: {name: "main"}});
-	_this._animationList[0].unshift({type: "set_sprite_frame", target: "active_support_defender", params: {name: "main"}});
-	_this._animationList[0].unshift({type: "set_sprite_frame", target: "active_main", params: {name: "main"}});
+	_this._animationList[0].unshift({type: "set_sprite_frame", target: "active_target", params: {name: "main", playDefaultSfx: false}});
+	_this._animationList[0].unshift({type: "set_sprite_frame", target: "active_target_twin", params: {name: "main", playDefaultSfx: false}});
+	_this._animationList[0].unshift({type: "set_sprite_frame", target: "active_support_defender", params: {name: "main", playDefaultSfx: false}});
+	_this._animationList[0].unshift({type: "set_sprite_frame", target: "active_main", params: {name: "main", playDefaultSfx: false}});
 	
 	return this.startAnimation();
 }

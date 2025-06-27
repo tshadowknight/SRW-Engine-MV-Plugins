@@ -602,12 +602,12 @@ SRWEditor.prototype.init = function(){
 		},
 		set_sprite_frame: {
 			hasTarget: true,
-			params: ["name", "snap", "loop", "playAll", "speed", "from", "to", "isPassive"],
+			params: ["name", "snap", "loop", "playAll", "speed", "from", "to", "isPassive", "playDefaultSfx"],
 			desc: "Set the source frame of a sprite(in, out, dodge, hurt, main)."
 		},
 		set_model_animation: {
 			hasTarget: true,
-			params: ["name", "snap", "loop", "playAll", "speed", "from", "to", "isPassive"],
+			params: ["name", "snap", "loop", "playAll", "speed", "from", "to", "isPassive", "playDefaultSfx"],
 			desc: "Set the animation by name of a model specified by target."
 		},
 		hide_attachment: {
@@ -808,6 +808,7 @@ SRWEditor.prototype.init = function(){
 		snap: "If set to 1 no blending will be done into the new sprite frame(if applicable)",
 		playAll: "If set to 1 every animation available in the model will be played at once",
 		isPassive: "If set to 1 the animation will play alongside other model animations",
+		playDefaultSfx: "If set to 1 the default move sound will played for the unit",
 		from: "The frame to start playing from",
 		to: "The frame to play until",
 		attachId: "The name/id of the attachment",
@@ -1217,6 +1218,9 @@ SRWEditor.prototype.init = function(){
 			
 		},
 		isPassive: function(value){
+			
+		},
+		playDefaultSfx: function(value){
 			
 		},
 		from: function(value){

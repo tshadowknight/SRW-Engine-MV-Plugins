@@ -2285,9 +2285,22 @@ StatCalc.prototype.getMechData = function(mech, forActor, items, previousWeapons
 		}
 		
 		result.destroyAnimInfo = destroyAnimInfo;
-		
-		
-		
+
+		if(mechProperties.mechMoveSoundAssignments){
+			const parts = String(mechProperties.mechMoveSoundAssignments || "").split(",");
+			let assignments = {};
+			for(let part of parts){
+				const innerParts = part.split(":");
+				const spriteFrame = String(innerParts[0]).trim();
+				const seName = String(innerParts[1]).trim();
+				assignments[spriteFrame] = seName;
+			}
+			result.moveSoundAssignments = assignments;
+		}
+
+		if(mechProperties.mechMoveSoundPitch){
+			result.moveSoundPitch = mechProperties.mechMoveSoundPitch;
+		}		
 		
 		var mechData = {
 			SRWStats: {
@@ -2328,6 +2341,18 @@ StatCalc.prototype.getMechData = function(mech, forActor, items, previousWeapons
 				result.tags[String(tag).trim()] = true;
 			});
 		}
+	}
+	return result;
+}
+
+StatCalc.prototype.getMoveSoundInfo = function(actor){
+	let result = {
+		seAssignments: {},
+		pitch: 100
+	};
+	if(this.isActorSRWInitialized(actor)){
+		result.seAssignments = actor.SRWStats.mech.moveSoundAssignments || {};
+		result.pitch = (actor.SRWStats.mech.moveSoundPitch || 100) * 1;
 	}
 	return result;
 }

@@ -145,7 +145,15 @@ var ENGINE_SETTINGS = {
 		SHOW_FADE_BELOW_TEXTBOX: false,
 		DEFAULT_BARRIER_COLOR: "#7c00e6",
 		FADE_BARRIER_DURING_NEXT_PHASE: true,//if true the barrier will only be shown briefly during the next phase command
-		NOISE_PIXEL_SIZE: 1
+		NOISE_PIXEL_SIZE: 1,
+		//uncomment this block to enable default move sfx. Note, move_medium_0 and move_small_0 must be replaced with an existing sound effect
+		/*
+		DEFAULT_MOVE_SFX: "move_medium_0", //the default sound used
+		DEFAULT_POSE_SFX: {in: "move_small_0", out: "move_small_0"}, //overrides for the sound used by sprite frame
+		DEFAULT_MOVE_PITCH: 100, //the pitch used for the sound
+		DEFAULT_MOVE_PITCH_VARIANCE: {main: 0, in: -10, out: -10, dodge: 10, block: -15},//adjustements to the pitch by sprite frame
+		DEFAULT_SFX_POSES: ["main", "in", "out", "dodge", "block"],//which sprite frames get a default sfx even if useDefaultSfx is not set to 1 in the set_sprite_frame command
+		*/
 	},
 	MASTERY_REWARDS: {
 		PP: {AMOUNT: 5, SCOPE: "deployed"}, //scope is deployed, unlocked, or all

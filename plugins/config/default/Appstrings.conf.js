@@ -1078,7 +1078,9 @@ EDITORSTRINGS.MECH = {
 	label_animation: "Animation",
 	label_deploy_actions: "Deploy Actions",
 	
-	
+	label_move_sounds: "Move Sounds",
+	label_move_sounds_pitch: "Pitch",
+	label_move_sounds_assignments: "Assignments",
 }
 
 EDITORSTRINGS.PILOT = {

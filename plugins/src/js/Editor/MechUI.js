@@ -1934,6 +1934,24 @@ MechUI.prototype.initPropertyHandlers = function(){
 				content+="</div>";
 				
 				content+="</div>";
+
+				content+="<div title='' class='table sub_section'>";
+				content+="<div class='row'>";	
+				content+="<div class='cell'>";
+				content+=EDITORSTRINGS.MECH.label_move_sounds;
+				content+="</div>";
+				content+="</div>";
+
+
+				content+="<div title='' class='row'>";
+				content+=_this.createValueInput("mechMoveSoundPitch", EDITORSTRINGS.MECH.label_move_sounds_pitch, "", "");
+				content+="</div>";
+
+				content+="<div title='(pose:se,pose2:se,...)' class='row' id='move_sound_post_assignment'>";
+				content+=_this.createValueInput("mechMoveSoundAssignments", EDITORSTRINGS.MECH.label_move_sounds_assignments, "", "");
+				content+="</div>";
+
+				content+="</div>";				
 				content+="</div>";
 				
 				return content;
@@ -1950,7 +1968,8 @@ MechUI.prototype.initPropertyHandlers = function(){
 					"mechDestroyAnimFrames",
 					"mechDestroyAnimSheetWidth",
 					"mechDestroyAnimSpeed",
-					"mechDestroyAnimAppearFrame",						
+					"mechDestroyAnimAppearFrame",		
+					"mechMoveSoundPitch"				
 					
 				];
 				hookedProperties.forEach(function(prop){
@@ -1969,7 +1988,8 @@ MechUI.prototype.initPropertyHandlers = function(){
 					"mechSpawnAnimName",	
 					"mechSpawnAnimSoundEffect",
 					"mechDestroyAnimName",	
-					"mechDestroyAnimSoundEffect"
+					"mechDestroyAnimSoundEffect",
+					"mechMoveSoundAssignments"
 				];
 			
 				hookedProperties.forEach(function(prop){
