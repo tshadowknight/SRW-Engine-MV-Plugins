@@ -214,7 +214,10 @@ StatCalc.prototype.getBestSuperState = function(possibleStates, forEnemy){
 		let currentSupersedingPriority = terrainDef.supersedingPriority;		
 		let currentEnemyPreference = terrainDef.enemyPreference;
 		result.id = possibleStates[0];
-		result.isSuperseding = currentSupersedingPriority > 0 || currentEnemyPreference;
+		result.isSuperseding = currentSupersedingPriority > 0;
+		if(forEnemy && currentEnemyPreference){
+			result.isSuperseding = true;
+		}
 		for(let i = 1; i < possibleStates.length; i++){
 			terrainDef = $terrainTypeManager.getTerrainDefinition(possibleStates[i]);
 			let newPriotity = terrainDef.priority;
