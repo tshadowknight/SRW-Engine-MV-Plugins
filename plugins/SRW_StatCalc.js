@@ -203,7 +203,7 @@ StatCalc.prototype.getValidTerrainStates = function(actor, position){
 	return result;
 }
 
-StatCalc.prototype.getBestSuperState = function(possibleStates){
+StatCalc.prototype.getBestSuperState = function(possibleStates, forEnemy){
 	let result = {
 		isSuperseding: false,
 		id: -1
@@ -212,12 +212,14 @@ StatCalc.prototype.getBestSuperState = function(possibleStates){
 		let terrainDef = $terrainTypeManager.getTerrainDefinition(possibleStates[0]);
 		let currentPriority = terrainDef.priority;
 		let currentSupersedingPriority = terrainDef.supersedingPriority;		
+		let currentEnemyPreference = terrainDef.enemyPreference;
 		result.id = possibleStates[0];
-		result.isSuperseding = currentSupersedingPriority > 0;
+		result.isSuperseding = currentSupersedingPriority > 0 || currentEnemyPreference;
 		for(let i = 1; i < possibleStates.length; i++){
 			terrainDef = $terrainTypeManager.getTerrainDefinition(possibleStates[i]);
 			let newPriotity = terrainDef.priority;
 			let newSupersedingPriority = terrainDef.supersedingPriority;
+			let newEnemyPreference = terrainDef.enemyPreference;
 			if(newSupersedingPriority > currentSupersedingPriority){
 				result.id = possibleStates[i];
 				result.isSuperseding = true;
@@ -229,6 +231,11 @@ StatCalc.prototype.getBestSuperState = function(possibleStates){
 					currentPriority = newPriotity;
 				}
 			}			
+			if(forEnemy && currentEnemyPreference < newEnemyPreference){
+				result.id = possibleStates[i];
+				currentEnemyPreference = newEnemyPreference;
+				result.isSuperseding = true;
+			}
 		}		
 	}
 	return result;
@@ -240,7 +247,7 @@ StatCalc.prototype.updateSuperState = function(actor, noSE, forceUpgrade){
 		if(event){			
 			const position = {x: event.posX(), y: event.posY()};			
 			let validStates = this.getValidTerrainStates(actor, position);
-			let bestStateInfo = this.getBestSuperState(Object.keys(validStates));
+			let bestStateInfo = this.getBestSuperState(Object.keys(validStates), actor.isEnemy());
 			if(bestStateInfo.isSuperseding || !validStates[this.getCurrentTerrainIdx(actor)] || forceUpgrade){//preserve the current super state if it still valid				
 				this.setSuperState(actor, bestStateInfo.id, noSE);
 			}		
