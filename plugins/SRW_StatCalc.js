@@ -3238,7 +3238,7 @@ StatCalc.prototype.canCombine = function(actor, forced){
 				var current = stack.pop();
 				if(current.event && !visited[current.event.eventId()] && ($statCalc.getCurrentWill(current) >= requiredWill || forced)){
 					var currentMechId = current.SRWStats.mech.id;
-					if(!current.event.isErased() && requiredLookup[currentMechId] && (!$gameSystem.isCombineLocked(currentMechId) || forced)){
+					if(!current.event.isErased() && requiredLookup[currentMechId] && !current.isSubTwin && !_this.isMainTwin(current) && (!$gameSystem.isCombineLocked(currentMechId) || forced)){
 						current.mechBeforeTransform = currentMechId;
 						candidates.push(current.actorId());
 					}
@@ -7003,7 +7003,7 @@ StatCalc.prototype.getRemainingAmmoRatio = function(actor){
 StatCalc.prototype.hasHealTargets = function(actor, percent){
 	var referenceEvent = this.getReferenceEvent(actor);
 	var candidates = this.getAdjacentActors(null, {x: referenceEvent.posX(), y: referenceEvent.posY()});
-	if(this.applyStatModsToValue(actor, 0, ["all_range_resupply"])){	
+	if(this.applyStatModsToValue(actor, 0, ["all_range_repair"])){	
 		candidates = this.getAllActors();
 	}
 	var factionId = $gameSystem.getFactionId(actor);
@@ -7021,6 +7021,9 @@ StatCalc.prototype.hasHealTargets = function(actor, percent){
 StatCalc.prototype.hasResupplyTargets = function(actor, percent){
 	var referenceEvent = this.getReferenceEvent(actor);
 	var candidates = this.getAdjacentActors(null, {x: referenceEvent.posX(), y: referenceEvent.posY()});
+	if(this.applyStatModsToValue(actor, 0, ["all_range_resupply"])){	
+		candidates = this.getAllActors();
+	}
 	var factionId = $gameSystem.getFactionId(actor);
 	var result = false;
 	var ctr = 0;

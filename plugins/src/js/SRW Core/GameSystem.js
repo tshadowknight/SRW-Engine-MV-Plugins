@@ -925,16 +925,7 @@
 			_this.setEventToUnit(event.eventId(), 'actor', actor_unit.actorId());
 			
 			$statCalc.applyDeployActions(actor_unit.SRWStats.pilot.id, actor_unit.SRWStats.mech.id);
-			//account for deploys of units with deploy actions that change their main pilot assignment
-			var targetActor = $statCalc.getCurrentPilot(actor_unit.SRWStats.mech.id, true);
-			if(targetActor && targetActor.actorId() != actor_unit.actorId() && actor_unit.event){
-				targetActor.event = actor_unit.event;
-				actor_unit.event = null;
-				$gameSystem.setEventToUnit(targetActor.event.eventId(), 'actor', targetActor.actorId());
-				const subPilots = $statCalc.getSubPilots(actor_unit);
-				actor_unit = targetActor;
-				actor_unit.SRWStats.mech.subPilots = subPilots;//(hack) force the live copy of the new actor's mech data to have an up to date sub pilot list
-			}	
+			
 			
 			if($statCalc.isShip(actor_unit)){
 				var oldValue = $gameVariables.value(_existShipVarId);
