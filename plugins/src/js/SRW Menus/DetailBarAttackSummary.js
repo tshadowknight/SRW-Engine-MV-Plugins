@@ -54,7 +54,10 @@ DetailBarAttackSummary.prototype.redraw = function(){
 	}
 	var attackData = this.getCurrentSelection() || {totalAmmo: -1, ENCost: -1, willRequired: -1, effects: [], MPCost: -1, isEmpty: true};
 	var mechData = $gameTemp.currentMenuUnit.mech;
-	var actor = $statCalc.getCurrentPilot($gameTemp.currentMenuUnit.mech.id, false, true);
+	var actor = $gameTemp.currentMenuUnit.actor;
+	if(!actor){
+		 actor = $statCalc.getCurrentPilot($gameTemp.currentMenuUnit.mech.id, false, true);
+	}
 	if(!actor){
 		actor = this.createReferenceData($gameTemp.currentMenuUnit.mech);
 	}

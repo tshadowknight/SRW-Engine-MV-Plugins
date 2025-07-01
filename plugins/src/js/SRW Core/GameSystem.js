@@ -926,6 +926,7 @@
 			
 			$statCalc.applyDeployActions(actor_unit.SRWStats.pilot.id, actor_unit.SRWStats.mech.id);
 			
+			
 			if($statCalc.isShip(actor_unit)){
 				var oldValue = $gameVariables.value(_existShipVarId);
 				$gameVariables.setValue(_existShipVarId, oldValue + 1);
