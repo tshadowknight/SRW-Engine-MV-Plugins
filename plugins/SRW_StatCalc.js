@@ -1974,7 +1974,7 @@ StatCalc.prototype.getMechData = function(mech, forActor, items, previousWeapons
 		result.statsLabel = mechProperties.mechStatsLabel || "";
 		result.isShip = mechProperties.mechIsShip * 1;
 		result.enabledTerrainTypes = {
-			1: mechProperties.mechAirEnabled * 1,
+			1: (mechProperties.mechAirEnabled || 0) * 1,
 			2: (mechProperties.mechLandEnabled || 0) * 1,
 			3: (mechProperties.mechWaterEnabled || 0) * 1,
 			4: (mechProperties.mechSpaceEnabled || 0) * 1,
