@@ -42,7 +42,6 @@
     position: absolute;
     background-color: var(--section-bg-color);
     color: #FFFFFF;
-    display: flex;
 }
 
 #equip_item .weapon_upgrade_container {
