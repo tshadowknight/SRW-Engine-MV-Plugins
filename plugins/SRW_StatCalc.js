@@ -1774,7 +1774,7 @@ StatCalc.prototype.initSRWStats = function(actor, level, itemIds, preserveVolati
 					customStats = actor.SRWStats.mech.stats.custom;
 				}			
 			}
-			actor.SRWStats.mech = this.getMechData(mech, isForActor, items, previousWeapons);
+			actor.SRWStats.mech = this.getMechData(mech, isForActor, items, previousWeapons, actor);
 			actor.SRWStats.dropBoxItems = boxDropIds || [];
 			const upgradeLevel = $gameSystem.getEnemyUpgradeLevel();
 			if(!isForActor && upgradeLevel){
@@ -1917,7 +1917,7 @@ StatCalc.prototype.getMechDataById = function(id, forActor){
 	return this.getMechData(mech, forActor);
 }	
 
-StatCalc.prototype.getMechData = function(mech, forActor, items, previousWeapons){	
+StatCalc.prototype.getMechData = function(mech, forActor, items, previousWeapons, refActor){	
 	var result = {
 		id: -1,
 		isShip: false,
@@ -2342,7 +2342,15 @@ StatCalc.prototype.getMechData = function(mech, forActor, items, previousWeapons
 			};
 		}
 		
-		result.weapons = this.getMechWeapons(mechData, mechProperties, previousWeapons);
+		if(refActor){
+			//invalidate abi cache to apply mech abilities before resolving weapons
+			//resolive weapons with access to the ref actor
+			this.invalidateAbilityCache(refActor);
+			result.weapons = this.getMechWeapons(refActor, mechProperties, previousWeapons);
+		} else {
+			result.weapons = this.getMechWeapons(mechData, mechProperties, previousWeapons);
+		}
+		
 		
 		result.tags = {};
 		if(mechProperties.mechTags){
