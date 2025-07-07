@@ -58,6 +58,10 @@
 						throw "Invalid mech "+args[1]+" for assignUnit command.";
 					}
 					
+					if((args[3] * 1) && !(args[2] * 1)){
+						unbindMechPilots(args[1] * 1);
+					}
+
 					actor._classId = args[1] * 1;
 					actor.isSubPilot = !!(args[2] * 1);
 					//actor._intermissionClassId = args[1] * 1; 
@@ -69,6 +73,26 @@
 							$gameSystem.overwritePilotFallbackInfo(actor);
 						}
 					}					
+				}
+
+				function unbindMechPilots(mechId){
+					if(mechId > 0){
+						const targetMech = $statCalc.getMechData(mechId, true);
+						targetMech.subPilots = [];
+						$statCalc.storeMechData(targetMech);
+						$gameSystem.overwriteMechFallbackInfo(args[0] * 1, targetMech.subPilots);
+						for(const actor of $gameActors._data){
+							if(actor._classId == mechId){
+								actor._classId = 0;
+								$gameSystem.overwritePilotFallbackInfo(actor);
+							}
+						}
+					}
+				}
+				
+				if (command === 'unbindMechPilots') {
+					const mechId = args[0] * 1;
+					unbindMechPilots(mechId);								
 				}
 				
 				if (command === 'UnlockUnit') {

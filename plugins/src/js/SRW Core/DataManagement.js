@@ -565,6 +565,7 @@
 				UnlockUnit: true,
 				unlockUnit: true,
 				assignUnit: true,
+				unbindMechPilots: true,
 				lockUnit: true,
 				SetLevel: true,
 				setLevel: true,
