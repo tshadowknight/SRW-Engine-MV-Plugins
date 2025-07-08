@@ -82,7 +82,7 @@
 						$statCalc.storeMechData(targetMech);
 						$gameSystem.overwriteMechFallbackInfo(args[0] * 1, targetMech.subPilots);
 						for(const actor of $gameActors._data){
-							if(actor._classId == mechId){
+							if(actor && actor._classId == mechId){
 								actor._classId = 0;
 								$gameSystem.overwritePilotFallbackInfo(actor);
 							}
