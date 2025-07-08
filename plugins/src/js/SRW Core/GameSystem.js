@@ -528,7 +528,11 @@
 			$gameSystem.textLog = [];			
 			$gameSystem._specialTheme = -1;
 			$gameSystem.highlightedTiles = [];
+
 			$gameSystem.regionHighlights = {};
+			$gameSystem.regionHighlightsRefreshed = true;
+			$gameMap.clearRegionTiles();
+
 			$gameSystem.enemyUpgradeLevel = 0;
 			$gameSystem.persuadeOptions = {};
 			$gameTemp.currentSwapSource = -1;
