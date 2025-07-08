@@ -525,13 +525,12 @@
 			$gameSystem.incrementSaveTurn();//increment for turn 1
 			$gameVariables.setValue(_turnVarID, 1); 
 			$gameSystem.resetSearchedItemList();
-			$gameSystem.textLog = [];			
+			$gameSystem.textLog = [];
 			$gameSystem._specialTheme = -1;
 			$gameSystem.highlightedTiles = [];
 
 			$gameSystem.regionHighlights = {};
-			$gameSystem.regionHighlightsRefreshed = true;
-			$gameMap.clearRegionTiles();
+			
 
 			$gameSystem.enemyUpgradeLevel = 0;
 			$gameSystem.persuadeOptions = {};
@@ -578,6 +577,7 @@
 			}
 			
 			if($gameMap){
+				$gameSystem.regionHighlightsRefreshed = true;
 				$gameMap.clearRegionTiles();
 				$gameMap._SRWTileProperties = null;
 				$gameMap.initSRWTileProperties();
