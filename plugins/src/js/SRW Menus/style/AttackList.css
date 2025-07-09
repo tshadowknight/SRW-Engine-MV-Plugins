@@ -33,17 +33,17 @@
 	display: flex;
     align-items: center;
     justify-content: center;
-	border: 0.1vw solid #FFFFFF;
-	border-radius: 999px;
-	height: 10%;
-	width: 10%;
-	position: absolute;
-	right: -0.3%;
-	top: -12%;
-	background-color: rgba(0,67,99,0.5);
-	color: #FFFFFF;
-	--fontsize: 1.6px;
-	text-align: center;
+    border: 0.1vw solid #FFFFFF;
+    border-radius: 999px;
+    height: 13%;
+    width: 10%;
+    position: absolute;
+    right: -1.3%;
+    top: -6%;
+    background-color: rgba(0,67,99,1);
+    color: #FFFFFF;
+    --fontsize: 1.8px;
+    text-align: center;
 }
 
 #attack_list_control_page #prev_page{
