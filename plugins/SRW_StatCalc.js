@@ -5088,7 +5088,12 @@ StatCalc.prototype.getCombinationWeaponParticipants = function(actor, weapon){
 		
 		function validateParticipant(actor){
 			var hasARequiredWeapon = false;
-					
+			
+			const referenceEvent = _this.getReferenceEvent(actor);
+			if(!referenceEvent || referenceEvent.isErased()){
+				return false;
+			}
+			
 			var weapons = _this.getCurrentWeapons(actor);
 			var ctr = 0;			
 			while(!hasARequiredWeapon && ctr < weapons.length){					
