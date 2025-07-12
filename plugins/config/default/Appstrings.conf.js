@@ -425,7 +425,7 @@ APPSTRINGS.OPTIONS = {
 	label_display: "Display",
 	label_fullscreen: "Fullscreen",
 	label_grid: "Grid",
-	label_will: "Show Will",
+	label_will: "Show Info on Map",
 	label_default_support: "Default Support Defend",
 	label_default_support_on: "Always",
 	label_default_support_off: "Never",
@@ -628,7 +628,7 @@ APPSTRINGS.BUTTON_HINTS = {
 	//Map
 	move_cursor: {text: "Move Cursor", action: "up"},
 	speed_up_cursor: {text: "Faster Cursor", action: "shift"}, 	
-	toggle_detail_icons: {text: "Toggle Will Display", action: "menu"}, 	
+	toggle_detail_icons: {text: "Toggle Status Display", action: "menu"}, 	
 	pause_menu: {text: "Map Menu", action: "ok"}, 
 	show_enemy: {text: "Show Move", action: "ok"}, 
 	navigate_units: {text: "Next/Prev. Unit", action: "d:shoulder_buttons"},

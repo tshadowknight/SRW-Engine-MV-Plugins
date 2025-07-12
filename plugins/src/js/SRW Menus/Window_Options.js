@@ -94,11 +94,41 @@ Window_Options.prototype.initialize = function() {
 	
 	this._optionInfo.push({
 		name: APPSTRINGS.OPTIONS.label_will,
-		display: function(){			
-			return ConfigManager["willIndicator"] ? "ON" : "OFF";
+		display: function(){		
+			if(ConfigManager["willIndicator"] == 0){
+				return "None";
+			}	
+			if(ConfigManager["willIndicator"] == 1){
+				return "Will";
+			}	
+			if(ConfigManager["willIndicator"] == 2){
+				return "HP";
+			}
 		},
-		update: function(){
-			ConfigManager["willIndicator"] = !ConfigManager["willIndicator"];
+		update: function(direction){
+			if(direction == "up"){
+				ConfigManager["willIndicator"]++;
+				if(ENGINE_SETTINGS.ENABLE_HEALTH_BARS_ON_MAP) {
+					if(ConfigManager["willIndicator"] > 2){
+						ConfigManager["willIndicator"] = 0;
+					}
+				} else {
+					if(ConfigManager["willIndicator"] > 1){
+						ConfigManager["willIndicator"] = 0;
+					}
+				}	
+			} else {
+				ConfigManager["willIndicator"]--;	
+				if(ENGINE_SETTINGS.ENABLE_HEALTH_BARS_ON_MAP) {
+					if(ConfigManager["willIndicator"] < 0){
+						ConfigManager["willIndicator"] = 2;
+					}
+				} else {
+					if(ConfigManager["willIndicator"] < 0){
+						ConfigManager["willIndicator"] = 1;
+					}
+				}	
+			}		
 		}
 	});
 	

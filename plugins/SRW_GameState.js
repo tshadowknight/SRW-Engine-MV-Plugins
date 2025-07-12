@@ -1793,8 +1793,17 @@ GameState_normal.prototype.update = function(scene){
 		}
 		
 		if(Input.isTriggered('menu') && !hasActiveZones){
-			ConfigManager["willIndicator"] = !ConfigManager["willIndicator"];
-			ConfigManager.save();
+			ConfigManager["willIndicator"]++;
+			if(ENGINE_SETTINGS.ENABLE_HEALTH_BARS_ON_MAP) {
+				if(ConfigManager["willIndicator"] > 2){
+					ConfigManager["willIndicator"] = 0;
+				}
+			} else {
+				if(ConfigManager["willIndicator"] > 1){
+					ConfigManager["willIndicator"] = 0;
+				}
+			}			
+			ConfigManager.save();			
 		}
 
 		$SRWGameState.updateStateButtonPrompts([["pause_menu"], ["move_cursor", "speed_up_cursor"], ["navigate_units", "navigate_enemies"], [menuAction]], "GameState_normal_empty"+menuAction);

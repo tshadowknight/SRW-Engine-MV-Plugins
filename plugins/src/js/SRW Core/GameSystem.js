@@ -3175,4 +3175,21 @@
 				this._additionalPurchasableAbilities.push(id);
 			}			
 		}
+
+		Game_System.prototype.incrementIndicatorSetting = function() {
+			if(this.indicatorSetting == null){
+				this.indicatorSetting = 0;
+			}
+			this.indicatorSetting++;
+			if(this.indicatorSetting > 2){
+				this.indicatorSetting = 0;
+			}
+		}
+
+		Game_System.prototype.getIndicatorSetting = function() {
+			if(this.indicatorSetting == null){
+				this.indicatorSetting = 0;
+			}
+			return this.indicatorSetting;
+		}
 	}

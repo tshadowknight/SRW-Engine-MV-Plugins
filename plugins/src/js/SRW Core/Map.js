@@ -444,6 +444,7 @@
 				this.createAttackIndicator(event._eventId, event);
 				this.createAttributeIndicator(event._eventId, event);
 				this.createWillIndicator(event._eventId, event);
+				this.createHealthBar(event._eventId, event);
 				
 				this.createTwinIndicator(event._eventId, event);
 				this.createExplosionSprite(event._eventId, event);
@@ -547,6 +548,7 @@
 			this._appearSprites = {};
 			this._disappearSprites = {};
 			this._willIndicators = {};
+			this._HPIndicators = {};
 			this._attributeIndicators = {};
 			this._defendIndicators = {};
 			this._attackIndicators = {};
@@ -651,6 +653,15 @@
 				character._willIndicator = true;
 			};
 		};	
+
+		Spriteset_Map.prototype.createHealthBar = function(id,character) {
+			if (!character) return;
+			if (!this._HPIndicators[id]) {
+				this._HPIndicators[id] = new Sprite_HealthBar(character);
+				this.addCharacterToBaseSprite(this._HPIndicators[id]);
+				character._hpIndicator = true;
+			};
+		};			
 		
 		Spriteset_Map.prototype.createAttributeIndicator = function(id,character) {
 			if (!character) return;

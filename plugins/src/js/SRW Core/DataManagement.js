@@ -1793,7 +1793,7 @@
 			ConfigManager.padSet = "xbox";
 			ConfigManager.disableGrid = false;
 			ConfigManager.mapHints = true;
-			ConfigManager.willIndicator = true;
+			ConfigManager.willIndicator = 0;
 			
 			ConfigManager.defaultSupport = true;
 			ConfigManager.skipUnitMove = false;
@@ -1902,7 +1902,7 @@
 					this.mapHints = this.readFlag(config, 'mapHints');
 				}
 				if(config['willIndicator'] != null){
-					this.willIndicator = this.readFlag(config, 'willIndicator');
+					this.willIndicator = config.willIndicator || 0;
 				}
 				if(config['defaultSupport'] != null){
 					this.defaultSupport = this.readFlag(config, 'defaultSupport');
