@@ -5432,7 +5432,7 @@ BattleSceneManager.prototype.executeAnimation = function(animation, startTick){
 					if(refObj.parent_handle){
 						refObj = refObj.parent_handle;
 					}			
-					if(_this._camera.isInFrustum(refObj)){
+					if(_this._camera.isInFrustum(refObj) && refObj.isVisible){
 						let targetActor;
 						if(target == "active_main" || target == "active_support_attacker" || target == "active_twin"){
 							targetActor = action.ref;				
