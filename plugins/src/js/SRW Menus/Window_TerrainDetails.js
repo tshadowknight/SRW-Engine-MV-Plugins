@@ -50,7 +50,7 @@ Window_TerrainDetails.prototype.redraw = function() {
 		
 		content+="<div class='defense_boost terrain_boost_section scaled_text'>";
 		content+="<div class='label'>";
-		content+="Defense Boost:";
+		content+=APPSTRINGS.TERRAIN_DETAILS.label_def+":";
 		content+="</div>";
 		content+="<div class='value'>";
 		content+=$gameTemp.terrainDetails.defense+"%";
@@ -59,7 +59,7 @@ Window_TerrainDetails.prototype.redraw = function() {
 		
 		content+="<div class='evasion_boost terrain_boost_section scaled_text'>";
 		content+="<div class='label'>";
-		content+="Evasion Boost:";
+		content+=APPSTRINGS.TERRAIN_DETAILS.label_evasion+":";
 		content+="</div>";
 		content+="<div class='value'>";
 		content+=$gameTemp.terrainDetails.evasion+"%";
@@ -68,7 +68,7 @@ Window_TerrainDetails.prototype.redraw = function() {
 		
 		content+="<div class='hp_regen terrain_boost_section scaled_text'>";
 		content+="<div class='label'>";
-		content+="HP Regen:";
+		content+=APPSTRINGS.TERRAIN_DETAILS.label_hp_regen+":";
 		content+="</div>";
 		content+="<div class='value'>";
 		content+=$gameTemp.terrainDetails.hp_regen+"%";
@@ -77,7 +77,7 @@ Window_TerrainDetails.prototype.redraw = function() {
 		
 		content+="<div class='en_regen terrain_boost_section scaled_text'>";
 		content+="<div class='label'>";
-		content+="EN Regen:";
+		content+=APPSTRINGS.TERRAIN_DETAILS.label_en_regen+":";
 		content+="</div>";
 		content+="<div class='value'>";
 		content+=$gameTemp.terrainDetails.en_regen+"%";

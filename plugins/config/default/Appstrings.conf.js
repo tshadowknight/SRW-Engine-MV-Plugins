@@ -526,6 +526,13 @@ APPSTRINGS.ZONE_STATUS = {
 	label_enemy: "Enemy"
 }
 
+APPSTRINGS.TERRAIN_DETAILS = {
+	label_def: "Defense Boost",
+	label_evasion: "Evasion Boost",
+	label_hp_regen: "HP Regen",
+	label_en_regen: "EN Regen"
+}
+
 APPSTRINGS.BUTTON_HINTS = {
 	test: {text: "This is a test action", action: 'menu'},
 	test2: {text: "This is a test action2", action: 'ok'},
