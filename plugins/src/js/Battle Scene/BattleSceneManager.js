@@ -4268,6 +4268,10 @@ BattleSceneManager.prototype.executeAnimation = function(animation, startTick){
 				_this._animationList[insertStartTick + 26] = params.cleanUpCommands;						
 			}		
 
+			let playDefaultSfx = true;
+			if(params.playDefaultSfx != null){
+				playDefaultSfx = params.playDefaultSfx * 1;
+			}
 			
 			//support defend animation
 			if(_this._currentAnimatedAction.attacked && _this._currentAnimatedAction.attacked.type == "support defend"){
@@ -4325,7 +4329,7 @@ BattleSceneManager.prototype.executeAnimation = function(animation, startTick){
 						var additions = [];
 						additions[insertStartTick + 50] = [{type: "show_barrier", target: "active_target", params: {}}];	
 						//if(_this._currentAnimatedAction.attacked.action.type == "defend"){
-						additions[insertStartTick + 50].push({type: "set_sprite_frame", target: "active_target", params: {name: "block"}});
+						additions[insertStartTick + 50].push({type: "set_sprite_frame", target: "active_target", params: {name: "block", playDefaultSfx}});
 						//}
 						_this.mergeAnimList(additions);	
 					//}								
@@ -5429,10 +5433,8 @@ BattleSceneManager.prototype.executeAnimation = function(animation, startTick){
 				
 				if(targetObj.isVisible && ENGINE_SETTINGS.BATTLE_SCENE.DEFAULT_MOVE_SFX && playDefaultSfx){		
 					let refObj = targetObj;
-					if(refObj.parent_handle){
-						refObj = refObj.parent_handle;
-					}			
-					if(_this._camera.isInFrustum(refObj) && refObj.isVisible){
+					
+					if(_this._camera.isInFrustum(refObj) && refObj.isEnabled()){
 						let targetActor;
 						if(target == "active_main" || target == "active_support_attacker" || target == "active_twin"){
 							targetActor = action.ref;				

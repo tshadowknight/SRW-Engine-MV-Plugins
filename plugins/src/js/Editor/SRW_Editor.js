@@ -321,7 +321,7 @@ SRWEditor.prototype.init = function(){
 		},	
 		next_phase: {
 			hasTarget: false,
-			params: ["cleanUpCommands", "commands"],
+			params: ["playDefaultSfx", "cleanUpCommands", "commands"],
 			desc: "Fade the screen to black and set the scene up for the second phase of the attack. This command automatically brings the support defender if available and sets up the default background to match the target."
 		},
 		dodge_pattern: {
