@@ -918,6 +918,7 @@
 			var oldValue = $gameVariables.value(_existActorVarID);
 			
 			actor_unit.isSubPilot = false;			
+			actor_unit.isSubTwin = false;	
 			
 			$statCalc.initSRWStats(actor_unit);
 			
