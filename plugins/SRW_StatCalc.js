@@ -5679,6 +5679,18 @@ StatCalc.prototype.isValidWeaponTarget = function(actor, target, weapon, include
 	
 	let actorRefEvent = _this.getReferenceEvent(actor);
 	let targetRefEvent = _this.getReferenceEvent(target);
+	//this check masks a crash caused by an invalid event to unit mapping state of which the cause is currently not found
+	//the faulty state causes a unit for which getReferenceEvent returns null to be iterated over, which points to a detached sub pilot or sub twin
+	if(!actorRefEvent || !targetRefEvent){
+		console.log("Warning: Attempted to check for a valid target but the target or initiator does not have a reference event!");
+		if(actor.isActor()){
+			console.log("initiator: " + actor.actorId());
+		}
+		if(target.isActor()){
+			console.log("target: " + target.actorId());
+		}
+		return false;
+	}
 	var isInRange = $battleCalc.isTargetInRange({x: actorRefEvent.posX(), y: actorRefEvent.posY()}, {x: targetRefEvent.posX(), y: targetRefEvent.posY()}, range, minRange);
 	var isValidTarget = false;
 
