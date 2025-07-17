@@ -919,6 +919,8 @@
 			
 			actor_unit.isSubPilot = false;			
 			actor_unit.isSubTwin = false;	
+			actor_unit.subTwin = null;
+			actor_unit.subTwinId = null;
 			
 			$statCalc.initSRWStats(actor_unit);
 			
@@ -1098,6 +1100,16 @@
 			$gameSystem.clearSrpgAllActors();
 			$gameMap.events().forEach(function(event) {			
 				if (event.isType() === 'actor' && (!event.isScriptedDeploy || !preserveScripted)) {
+					var battlerArray = $gameSystem.EventToUnit(event.eventId());
+					if (battlerArray && (battlerArray[0] === 'actor')) {
+						const actor_unit = battlerArray[1];
+						if(actor_unit){
+							actor_unit.isSubPilot = false;			
+							actor_unit.isSubTwin = false;	
+							actor_unit.subTwin = null;
+							actor_unit.subTwinId = null;
+						}
+					}
 					$gameSystem.clearEventToUnit(event.eventId());
 					event.isDeployed = false;
 					event.erase();
