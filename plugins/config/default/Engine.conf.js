@@ -454,7 +454,7 @@ var ENGINE_SETTINGS = {
 		//return [{type: "final_damage", modType: "mult", value: 2}];
 	},
 	DIFFICULTY_MODS: {
-		enabled: 3,//0: off, 1: selectable, 2: enable automatic scaling with SR points, 3: enable both
+		enabled: 0,//0: off, 1: selectable, 2: enable automatic scaling with SR points, 3: enable both
 		displayInMenus: true,
 		autoLevelFunc: function(){
 			const padding = 10; //the amount to pad the ref count to, to avoid putting the player on hard mode after doing one stage
