@@ -1521,13 +1521,19 @@
 				this._processedDeath = true;
 				if(this._character.isDoingSubTwinDeath){
 					$statCalc.swapEvent(this._character, true);
+					const mainTwin = $statCalc.getMainTwin(battlerArray[1]);	
 					//_this._currentDeath.event.appear();
 					//this._character.refreshImage();
-					$statCalc.getMainTwin(battlerArray[1]).subTwin = null;
+					mainTwin.subTwin = null;
+					$statCalc.updateSuperState(mainTwin);
+					this._character.transitioningFloat = true;
 				} else if(this._character.isDoingMainTwinDeath){	
 					if(!this._character.isDoingMultiKill){
-						$statCalc.swapEvent(this._character, true);
-						$statCalc.getMainTwin(battlerArray[1]).subTwin = null;
+						$statCalc.swapEvent(this._character, true);					
+						const mainTwin = $statCalc.getMainTwin(battlerArray[1]);	
+						mainTwin.subTwin = null;
+						$statCalc.updateSuperState(mainTwin);
+						this._character.transitioningFloat = true;
 					} else {
 						if(battlerArray[1].SRWStats.dropBoxItems && battlerArray[1].SRWStats.dropBoxItems.length){
 							$gameSystem.deployItemBox(this._character, battlerArray[1].SRWStats.dropBoxItems);

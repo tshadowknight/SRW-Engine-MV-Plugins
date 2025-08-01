@@ -2297,6 +2297,13 @@ SceneManager.isInSaveScene = function(){
 				} else {
 					//battleEffect.ref.event._erased = true;
 					$gameTemp.deathQueue.push({actor: battleEffect.ref, event: $statCalc.getReferenceEvent(battleEffect.ref), destroyer: battleEffect.destroyer, isMultiKill: multiKilledMainTwins[cacheRef]});
+					if(battleEffect.ref.subTwin){
+						const referenceEvent = $statCalc.getReferenceEvent(battleEffect.ref);
+						const pos = {x: referenceEvent.posX(), y: referenceEvent.posY()};
+						if(!$statCalc.canStandOnTileResolve(battleEffect.ref.subTwin, pos, true)){
+							$gameTemp.deathQueue.push({actor: battleEffect.ref.subTwin, event: $statCalc.getReferenceEvent(battleEffect.ref), destroyer: battleEffect.destroyer, isMultiKill: false});
+						}
+					}
 					if($statCalc.isShip(battleEffect.ref)){
 						var boardedUnits = $statCalc.getBoardedUnits(battleEffect.ref)
 						for(var i = 0; i < boardedUnits.length; i++){

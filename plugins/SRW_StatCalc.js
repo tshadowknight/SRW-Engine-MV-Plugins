@@ -5054,6 +5054,9 @@ StatCalc.prototype.setSuperState = function(actor, newVal, noSE, seName){
 	if(this.isActorSRWInitialized(actor)){
 		if(this.canBeOnTerrain(actor, newVal) || newVal == -1){
 			actor.SRWStats.mech.enabledTerrainSuperState = newVal || -1;//force false values to -1
+			if(actor.subTwin && this.isActorSRWInitialized(actor.subTwin)){
+				actor.subTwin.SRWStats.mech.enabledTerrainSuperState = newVal || -1;//force false values to -1
+			}
 			if(!noSE){
 				if(seName){
 					var se = {};
