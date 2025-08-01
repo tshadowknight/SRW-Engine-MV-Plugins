@@ -2304,6 +2304,14 @@ SceneManager.isInSaveScene = function(){
 							$gameTemp.deathQueue.push({actor: battleEffect.ref.subTwin, event: $statCalc.getReferenceEvent(battleEffect.ref), destroyer: battleEffect.destroyer, isMultiKill: false});
 						}
 					}
+					const mainTwin = $statCalc.getMainTwin(battleEffect.ref);
+					if(mainTwin){
+						const referenceEvent = $statCalc.getReferenceEvent(battleEffect.ref);
+						const pos = {x: referenceEvent.posX(), y: referenceEvent.posY()};
+						if(!$statCalc.canStandOnTileResolve(mainTwin, pos, true)){
+							$gameTemp.deathQueue.push({actor: mainTwin, event: $statCalc.getReferenceEvent(battleEffect.ref), destroyer: battleEffect.destroyer, isMultiKill: false});
+						}
+					}
 					if($statCalc.isShip(battleEffect.ref)){
 						var boardedUnits = $statCalc.getBoardedUnits(battleEffect.ref)
 						for(var i = 0; i < boardedUnits.length; i++){
