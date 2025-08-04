@@ -8451,7 +8451,7 @@ BattleSceneManager.prototype.processActionQueue = function() {
 						if(nextAction.type == "initiator" || nextAction.type == "twin attack"){
 							textType = "battle_intro";
 						}
-						if(nextAction.type == "defender"){
+						if(nextAction.type == "defender" || nextAction.type == "twin defend"){
 							textType = "retaliate";
 						}
 						

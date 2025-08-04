@@ -774,6 +774,8 @@
 					enemy_unit.isSubTwin = true;			
 					mainEnemy.subTwin = enemy_unit;
 					mainEnemy.subTwinId = enemy_unit.enemyId();
+
+					$statCalc.updateSuperState(mainEnemy, true);
 				}
 			}
 			$statCalc.invalidateAbilityCache();

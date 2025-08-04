@@ -296,6 +296,9 @@ SRWBattleTextManager.prototype.getTextCandidate = function(definitions, target, 
 				
 				var tmp = [];
 				for(let option of options){
+					if(!Array.isArray(option)){
+						option = [option]; //hack to not die when handling text definition in old format
+					}
 					if(option[0].variable == null || $gameVariables.value(option[0].variable) == option[0].variableValue){
 						tmp.push(option);
 					}
