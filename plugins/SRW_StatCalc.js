@@ -7812,6 +7812,12 @@ StatCalc.prototype.createActiveAbilityLookup = function(){
 		if(!actor.SRWStats || (actor.SRWStats.stageTemp && actor.SRWStats.stageTemp.isBoarded)){
 			return;
 		}
+
+		const referenceEvent = _this.getReferenceEvent(actor);
+		if(!referenceEvent){
+			console.log("Attempted to resolve abilities for an actor without a reference event!");
+			return;
+		}
 		if(!_this._currentActorBeingProcessed[key]){
 			_this._currentActorBeingProcessed[key] = {
 			
