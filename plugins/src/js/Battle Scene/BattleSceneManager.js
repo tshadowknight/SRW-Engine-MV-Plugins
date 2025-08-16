@@ -4158,7 +4158,9 @@ BattleSceneManager.prototype.executeAnimation = function(animation, startTick){
 			];
 			if(_this._instantiatedUnits){
 				for(let unit of _this._instantiatedUnits){
-					targets.push(unit);
+					if(unit.sprite?.shadowSprite){
+						targets.push(unit.sprite.shadowSprite);
+					}					
 				}
 			}
 			for(let target of targets){

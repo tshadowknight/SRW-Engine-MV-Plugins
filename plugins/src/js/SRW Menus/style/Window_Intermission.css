@@ -77,23 +77,50 @@
 
 #intermission_menu_deploy_count {
 	position: absolute;
-	left: 0;
-	bottom: 20%;
-	display: inline-flex;
-	justify-content: center;
-	border-right: 0.1vw solid #FFFFFF;
-	border-top: 0.1vw solid #FFFFFF;
-	--fontsize: 2px;
-	height: 5%;
+    /* left: 6%; */
+    bottom: 20%;
+    margin-left: 0%;
+    display: inline-flex;
+    border-right: 0.1vw solid #FFFFFF;
+    border-top: 0.1vw solid #FFFFFF;
+    --fontsize: 2px;
+    height: 5%;
     align-items: center;
     width: 30%;
-	border-top-right-radius: 100px;
-	color: var(--text-color-highlight);
+    border-top-right-radius: 100px;
+    color: var(--text-color-highlight);
+}
+
+.next_stage_info_text {
+	margin-left: 13%;
+	display: flex;
+	white-space: nowrap;
+}
+
+#intermission_menu_terrain_warning {
+	position: absolute;
+    /* left: 6%; */
+    bottom: 16.5%;
+    margin-left: 0%;
+    display: inline-flex;
+    --fontsize: 2px;
+    height: 5%;
+    align-items: center;
+    width: 30%;
+    color: var(--text-color-highlight);
 }
 
 .deploy_amount {
 	color: #FFFFFF;
 	display: inline-block;
+	margin-left: 3%;
+}
+
+.terrain_hazard_indicator {
+	width: 7%;
+	margin-left: 2%;
+	filter: invert(14%) sepia(91%) saturate(7187%) hue-rotate(11deg) brightness(99%) contrast(103%);
+	margin-top: 1%;
 }
 
 #intermission_menu_divider {

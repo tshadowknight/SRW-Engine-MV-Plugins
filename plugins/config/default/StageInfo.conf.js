@@ -10,5 +10,11 @@ $SRWConfig.stageInfo = {
 	23: {
 		name: "Scripting Demo",
 		displayId: 3
+	},
+	5: {
+		name: "Next map test",
+		displayId: 1,
+		terrainWarning: "SEA",
+		showWarningIndicator: true
 	}
 }

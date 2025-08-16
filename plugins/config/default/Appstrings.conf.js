@@ -179,6 +179,7 @@ APPSTRINGS.INTERMISSION = {
 	confirm_title: "Return to the title screen?",
 	stage_label: "Stage",
 	next_map_units: "Units for next map",
+	next_map_terrain: "Upcoming terrain",
 	cleared_label: "Cleared",
 	turns_label: "Turns",
 	options: "Options",

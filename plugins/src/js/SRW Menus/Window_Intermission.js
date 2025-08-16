@@ -284,9 +284,19 @@ Window_Intermission.prototype.createComponents = function() {
 	this._deployCount.id = this.createId("deploy_count");
 	this._deployCount.classList.add("scaled_text");
 	this._deployCountText = document.createElement("div");
+	this._deployCountText.classList.add("next_stage_info_text");
 	
 	this._deployCount.appendChild(this._deployCountText);
 	windowNode.appendChild(this._deployCount);
+
+	this._terrainWarning = document.createElement("div");
+	this._terrainWarning.id = this.createId("terrain_warning");
+	this._terrainWarning.classList.add("scaled_text");
+	this._terrainWarningText = document.createElement("div");
+	this._terrainWarningText.classList.add("next_stage_info_text");
+	
+	this._terrainWarning.appendChild(this._terrainWarningText);
+	windowNode.appendChild(this._terrainWarning);
 	
 	this._divider = document.createElement("div");
 	this._divider.id = this.createId("divider");
@@ -413,6 +423,7 @@ Window_Intermission.prototype.lineHeight = function() {
 Window_Intermission.prototype.update = function() {
 	const _this = this;
 	Window_Base.prototype.update.call(this);
+	_this.updateGlow();
 	if(this.isOpen() && !this._handlingInput){
 		
 		if(_this._state == "confirm_title"){
@@ -545,8 +556,20 @@ Window_Intermission.prototype.redraw = function() {
 	
 	var toolTipText = this._tooltips[this._currentKey] || "";		
 	this._tooltipText.innerHTML = toolTipText;
-	
+
 	this._deployCountText.innerHTML = APPSTRINGS.INTERMISSION.next_map_units+": <div class='deploy_amount'>"+$gameSystem.getDeployInfo().count+"</div>";
+
+	var nextStageInfo = $SRWStageInfoManager.getStageInfo($gameVariables.value(_nextMapVariable));	
+	if(nextStageInfo?.terrainWarning){
+		this._terrainWarning.style.display = "inline-flex";
+		this._terrainWarningText.innerHTML = APPSTRINGS.INTERMISSION.next_map_terrain+": <div class='deploy_amount'>"+nextStageInfo.terrainWarning+"</div>";
+		if(nextStageInfo.showWarningIndicator){
+			this._terrainWarningText.innerHTML+="<img src='svg/hazard-sign.svg' class='terrain_hazard_indicator glowing_elem'/>";
+		}
+	} else {
+		this._terrainWarning.style.display = "none";
+	}
+	
 	this._srPointsValue.innerHTML = $SRWSaveManager.getSRCount();		
 	if(ENGINE_SETTINGS.ENABLE_FAV_POINTS){
 		this._favPointsValue.innerHTML = $gameSystem.getCurrentFavPoints();		

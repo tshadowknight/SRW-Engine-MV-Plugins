@@ -7815,7 +7815,7 @@ StatCalc.prototype.createActiveAbilityLookup = function(){
 
 		const referenceEvent = _this.getReferenceEvent(actor);
 		if(!referenceEvent){
-			console.log("Attempted to resolve abilities for an actor without a reference event!");
+			//console.log("Attempted to resolve abilities for an actor without a reference event!");
 			return;
 		}
 		if(!_this._currentActorBeingProcessed[key]){
