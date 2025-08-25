@@ -121,7 +121,7 @@ BattleCalc.prototype.performCritCalculation = function(attackerInfo, defenderInf
 	var result = 0;
 	var attackerAction = attackerInfo.action;
 	var activeSpirits = $statCalc.getActiveSpirits(attackerInfo.actor);
-	if(!isSupportAttacker && (activeSpirits.valor || activeSpirits.soul)){
+	if(!isSupportAttacker && (activeSpirits.valor || activeSpirits.soul) && !$statCalc.applyStatModsToValue(attackerInfo.actor, 0, ["boost_crits"])){
 		return -1;
 	}
 	if(attackerAction.type == "attack"){
@@ -464,10 +464,14 @@ BattleCalc.prototype.performDamageCalculation = function(attackerInfo, defenderI
 		if(!isSupportAttacker){
 			if(activeAttackerSpirits.soul){				
 				finalDamage*=SRW_CONSTANTS.SOUL;
-				noCrit = true;
+				if(!$statCalc.applyStatModsToValue(attackerInfo.actor, 0, ["boost_crits"])){
+					noCrit = true;
+				}				
 			} else if(activeAttackerSpirits.valor){				
 				finalDamage*=SRW_CONSTANTS.VALOR;
-				noCrit = true;
+				if(!$statCalc.applyStatModsToValue(attackerInfo.actor, 0, ["boost_crits"])){
+					noCrit = true;
+				}	
 			}
 		}		
 		
