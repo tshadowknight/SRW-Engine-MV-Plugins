@@ -43,7 +43,7 @@ Window_SpiritSelectionBeforeBattle.prototype.getSpiritEnabledState = function(li
 		var caster = this.getAvailableActors(slot)[this.getCurrentActor(slot)];
 		var regularSpirits = $statCalc.getSpiritList(caster);		
 		var spiritInfo = $spiritManager.getSpiritDef(regularSpirits[listIdx].idx);
-		if(spiritInfo.targetType != "self"){
+		if(spiritInfo?.targetType != "self"){
 			result = -1;
 		}
 	}
