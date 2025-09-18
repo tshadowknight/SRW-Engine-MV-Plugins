@@ -82,7 +82,7 @@ var ENGINE_SETTINGS = {
 		terrain: 1,   //if 1 the unit will prefer to move onto tile that grant terrain bonuses
 		formation: 1, //if 1 the unit will prefer to move adjacent to allies that provide support attack/defend
 		reposition: 0, //if 1 the unit will move closer to hit enemies with stronger attacks even if they already can hit a target with a longer range attack
-		preferTarget: 0,//if 1 the unit will prefer to move closer to its target unit or region even if they have other targets to attack. Target units take priority over target regions.  
+		preferTarget: 0,//if 2 the unit will prefer to move closer to its target unit or region even if they have other targets to attack. If 1 the unit will shoot its prefered target if in range but still attack other targets if not. Target units take priority over target regions.  
 	},
 	AI_USES_ITEMS: true,
 	WEAP_TERRAIN_VALUES: {//weapon damage is multiplied with this value depending on its terrain rating and the current terrain of the target

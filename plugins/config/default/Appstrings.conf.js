@@ -977,6 +977,7 @@ EDITORSTRINGS.MECH = {
 	label_move_penalty: "With Movement Penalty",
 	label_terrain_rank: "Rank",
 	label_can_upgrade: "Can Upgrade",
+	label_no_twin: "Can Twin",
 	
 	label_exp_yield: "Exp. Yield",
 	label_pp_yield: "PP Yield",

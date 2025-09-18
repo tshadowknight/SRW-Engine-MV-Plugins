@@ -2024,6 +2024,31 @@ MechUI.prototype.initPropertyHandlers = function(){
 				});
 			}
 		},
+		no_twin: {
+			createControls(entry){
+				var content = "";
+				content+="<div class='row'>";
+				content+="<div class='cell'>";
+				content+=EDITORSTRINGS.MECH.label_no_twin;
+				content+="</div>";
+				content+="<div class='cell'>";
+				content+="<input id='no_twin' type=checkbox "+(_this.getMetaValue("mechNoTwin")*1 ? "" : "checked")+"></input>";
+				content+="</div>";
+				content+="</div>";
+				return content;
+			},
+			hook(entry){
+				entry = _this.getCurrentEntry();
+				containerNode.querySelector("#no_twin").addEventListener("change", function(){
+					_this.setMetaValue("mechNoTwin", this.checked ? 0 : 1);
+					_this.show();
+					_this._mainUIHandler.setModified();
+				});
+			}
+		},
+
+
+		
 	};	
 	
 	var terrains = [
@@ -2139,6 +2164,10 @@ MechUI.prototype.show = async function(){
 	
 	content+="<div class='row'>";
 	content+=_this._propertyHandlers.attribute2.createControls();
+	content+="</div>";
+
+	content+="<div class='row'>";
+	content+=_this._propertyHandlers.no_twin.createControls();
 	content+="</div>";
 	
 	content+="</div>";
