@@ -5241,6 +5241,22 @@ StatCalc.prototype.isComboAttackValidForSupport = function(actor, weapon){
 	return !isInnerComboParticipant;
 }
 
+StatCalc.prototype.getStatusMenuWeaponRestrictions = function(actor, weapon){
+	var canUse = true;
+	var detail = {};
+	if(this.isActorSRWInitialized(actor)){
+		let disabledInfo = this.isWeaponDisabled(actor, weapon);
+		if(disabledInfo.disabled){
+			canUse = false;
+			detail.freeForm = disabledInfo.reason;
+		}
+	}
+	return {
+		canUse: canUse,
+		detail: detail
+	};
+}
+
 StatCalc.prototype.canUseWeaponDetail = function(actor, weapon, postMoveEnabledOnly, rangeTarget, allRequired){
 	var canUse = true;
 	var detail = {};

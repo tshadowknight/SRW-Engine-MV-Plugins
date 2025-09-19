@@ -162,6 +162,7 @@ Window_DetailPages.prototype.createComponents = function() {
 	this._attackList.enableSelection();
 	this._attackList.createComponents();	
 	this._attackList.registerObserver("redraw", function(){_this.requestRedraw();});
+	this._attackList.setAttackValidator(_this);
 	
 	this._weaponDetailContainer = document.createElement("div");
 	this._weaponDetailContainer.classList.add("list_detail");	
@@ -170,7 +171,8 @@ Window_DetailPages.prototype.createComponents = function() {
 	
 	this._attackSummary = new DetailBarAttackSummary(this._weaponDetailContainer, this._attackList);
 	this._attackSummary.createComponents();		
-	
+	this._attackSummary.setAttackValidator(_this);
+
 	this._mapAttackPreview = document.createElement("div");
 	this._mapAttackPreview.id = this.createId("map_preview");
 	this._mapAttackPreview.classList.add("map_preview");	
@@ -258,6 +260,12 @@ Window_DetailPages.prototype.createComponents = function() {
 	this._descriptionOverlay = new DescriptionOverlay(this._descriptionContainer);
 	this._descriptionOverlay.createComponents();
 }	
+
+Window_DetailPages.prototype.validateAttack = function(attack) {
+	var actor = this.getCurrentSelection().actor;
+	
+	return $statCalc.getStatusMenuWeaponRestrictions(actor, attack, false, null, false);	
+}
 
 Window_DetailPages.prototype.update = function() {
 	var _this = this;
