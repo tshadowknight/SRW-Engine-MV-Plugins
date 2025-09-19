@@ -326,4 +326,6 @@ $SRWConfig.weaponEffects = function(){
 			return true;
 		}
 	);
+	
+	
 }

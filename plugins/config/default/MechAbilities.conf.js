@@ -939,6 +939,26 @@ $SRWConfig.mechAbilties = function(){
 	
 	/*Insert new ability here*/
 	
-
+	this.addDefinition(
+		59, 
+		"Weapon Disable", 
+		"Disable Weapon Sample.", 
+		false,
+		false,
+		function(actor, level){
+			//value is the weapon id, the target mech must have the weapon(s) assigned for this to work
+			//example: need attuned (id 5) level 4
+			const attunedLevel = $statCalc.getPilotAbilityLevel(actor, 5);
+			if(attunedLevel >= 4){
+				return [];
+			}
+			return [
+				{type: "disable_weapon", modType: "addFlat", value: 19, disabled_reason: "Needs Attuned Level 4!"},
+			];
+		},
+		function(actor, level){
+			return true;
+		}
+	);
 	
 };

@@ -2251,4 +2251,20 @@ $SRWConfig.pilotAbilties = function(){
 		[0],
 		1,
 	);
+	
+	this.addDefinition(
+		110, 
+		"Boost Crits", 
+		"The pilot can score a Critical Hit while Valor or Soul are active.", 
+		false,
+		true,
+		function(actor, level){
+			return [{type: "boost_crits", modType: "addFlat", value: 1}];
+		},
+		function(actor, level){
+			return true;
+		},
+		[0],
+		1,
+	);
 }

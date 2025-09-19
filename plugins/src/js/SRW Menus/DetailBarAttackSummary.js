@@ -234,7 +234,9 @@ DetailBarAttackSummary.prototype.redraw = function(){
 		if(!validationResult.canUse){
 			var detail = validationResult.detail;
 			
-			if(detail.noComboSupport){
+			if(detail.freeForm){
+				detailContent+=detail.freeForm;
+			} else if(detail.noComboSupport){
 				detailContent+=APPSTRINGS.ATTACKLIST.label_no_combo_support;
 			} else if(detail.noParticipants){
 				detailContent+=APPSTRINGS.ATTACKLIST.label_no_participants;

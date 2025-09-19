@@ -4076,7 +4076,20 @@ StatCalc.prototype.isWeaponUnlocked = function(actor, weapon){
 	}
 }
 
-
+StatCalc.prototype.isWeaponDisabled = function(actor, weapon){
+	if(this.isActorSRWInitialized(actor)){
+		var abilityLockedInfo = $statCalc.getModDefinitions(actor, ["disable_weapon"]);
+		var abilityLockedLookup = {};
+		abilityLockedInfo.forEach(function(entry){
+			abilityLockedLookup[entry.value] = entry.disabled_reason;
+		});
+		if(abilityLockedLookup[weapon.id]){
+			return {disabled: true, reason: abilityLockedLookup[weapon.id]};
+		} 
+	} 
+	return {disabled: false, reason: ""};
+	
+}
 
 StatCalc.prototype.getCurrentWeapons = function(actor, noEquips){
 	if(this.isActorSRWInitialized(actor)){
@@ -5232,6 +5245,12 @@ StatCalc.prototype.canUseWeaponDetail = function(actor, weapon, postMoveEnabledO
 	var canUse = true;
 	var detail = {};
 	if(this.isActorSRWInitialized(actor)){
+
+		let disabledInfo = this.isWeaponDisabled(actor, weapon);
+		if(disabledInfo.disabled){
+			canUse = false;
+			detail.freeForm = disabledInfo.reason;
+		}
 		
 		if(weapon.isCounterOnly){
 			var counterWepOK = true;
@@ -5376,6 +5395,11 @@ StatCalc.prototype.canUseWeaponDetail = function(actor, weapon, postMoveEnabledO
 
 StatCalc.prototype.canUseWeapon = function(actor, weapon, postMoveEnabledOnly, defender){
 	if(this.isActorSRWInitialized(actor)){		
+
+		let disabledInfo = this.isWeaponDisabled(actor, weapon);
+		if(disabledInfo.disabled){
+			return false;
+		}
 		
 		if(weapon.isCounterOnly){
 			var counterWepOK = true;
@@ -7613,6 +7637,8 @@ StatCalc.prototype.getActiveStatMods = function(actor, actorKey, excludedSkills)
 					}							
 				}
 			}	
+
+
 			
 			var relationshipBonuses = this.getActiveRelationshipBonuses(actor);
 			if(relationshipBonuses){
