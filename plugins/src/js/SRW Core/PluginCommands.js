@@ -943,8 +943,11 @@
 				}				
 				
 				if (command === 'setEventWill') {	
-					var actor = $gameSystem.EventToUnit(args[0])[1];
-					$statCalc.setWill(actor, args[1] * 1);
+					const actorInfo =  $gameSystem.EventToUnit(args[0]);
+					if(actorInfo){
+						var actor = actorInfo[1];
+						$statCalc.setWill(actor, args[1] * 1);
+					}					
 				}
 				
 				if (command === 'setActorWill') {	
