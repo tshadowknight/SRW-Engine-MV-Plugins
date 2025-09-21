@@ -633,7 +633,7 @@ Window_UpgradePilot.prototype.currentCost = function() {
 				}
 				cost+=$statCalc.getPilotTerrainIncreaseCost(levels);
 			} else {
-				cost+=currentDelta*10;
+				cost+=currentDelta*(SRW_CONSTANTS.PILOT_STAT_INCREASE_COST || 10);
 			}
 		}
 	});
@@ -848,7 +848,7 @@ Window_UpgradePilot.prototype.redraw = function() {
 				content+=$statCalc.getPilotTerrainIncreaseCost(levels);
 			} else {
 				if(!ENGINE_SETTINGS.MERGE_ATTACK_UPGRADES || idx != 1){
-					content+=_this._currentUpgradeDeltas[stat] * 10;
+					content+=_this._currentUpgradeDeltas[stat] * (SRW_CONSTANTS.PILOT_STAT_INCREASE_COST || 10);
 				}				
 			}			
 			content+="</div>";

@@ -11,4 +11,5 @@ SRW_CONSTANTS = {
 	CRIT_OFFSET: 20,//decreases overall crit rates by x %
 	TWIN_MISMATCH: 0.65,//multiplies with final damage
 	PERSIST: {type: "fixed", value: 10}, //{type: "fixed", value: 10}: damage is set to this value, : damage is multiplied by this value
+	PILOT_STAT_INCREASE_COST: 10
 };
