@@ -7305,12 +7305,18 @@ StatCalc.prototype.getRealWeaponRange = function(actor, weapon){
 		var result = weapon.range;
 		if(result == 1){
 			result = this.applyStatModsToValue(actor, result, ["rangeOne"]);
-			return 1;
+			return result;
 		}
 		if(actor.SRWStats.pilot.activeSpirits.snipe){
 			result+=2;
 		}
 		result = this.applyStatModsToValue(actor, result, ["range"]);
+		if(weapon.type == "M"){
+			result = this.applyStatModsToValue(actor, result, ["range_melee"]);
+		}
+		if(weapon.type == "R"){
+			result = this.applyStatModsToValue(actor, result, ["range_ranged"]);
+		}
 		var rangeDown = this.isRangeDown(actor);
 		if(rangeDown){
 			result-=rangeDown;
