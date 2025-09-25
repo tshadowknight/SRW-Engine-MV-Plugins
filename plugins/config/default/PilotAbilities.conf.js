@@ -2253,13 +2253,13 @@ $SRWConfig.pilotAbilties = function(){
 	);
 	
 	this.addDefinition(
-		110, 
-		"Boost Crits", 
-		"The pilot can score a Critical Hit while Valor or Soul are active.", 
+		111, 
+		"Range Ranged Up", 
+		"The range of ranged weapons is increased", 
 		false,
 		true,
 		function(actor, level){
-			return [{type: "boost_crits", modType: "addFlat", value: 1}];
+			return [{type: "range_ranged", modType: "addFlat", value: 3}];
 		},
 		function(actor, level){
 			return true;
