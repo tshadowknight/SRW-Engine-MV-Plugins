@@ -659,7 +659,7 @@ StatCalc.prototype.parseWeaponDef = function(actor, isLocked, weaponDefinition, 
 	return {
 		id: parseInt(weaponDefinition.id),
 		name: weaponDefinition.name,
-		type: weaponProperties.weaponType,
+		type: weaponProperties.weaponType || "R",
 		attribute1: weaponProperties.weaponAttribute1,
 		attribute2: weaponProperties.weaponAttribute2,
 		postMoveEnabled: parseInt(weaponProperties.weaponPostMoveEnabled),
