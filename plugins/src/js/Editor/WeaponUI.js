@@ -144,6 +144,7 @@ WeaponUI.prototype.initPropertyHandlers = function(){
 		category: handleDefaultProp("weaponCategory", EDITORSTRINGS.WEAPON.label_category),
 		attr1: handleDefaultProp("weaponAttribute1", EDITORSTRINGS.WEAPON.label_primary_attr),
 		attr2: handleDefaultProp("weaponAttribute2", EDITORSTRINGS.WEAPON.label_secondary_attr),
+		tags: handleDefaultProp("weaponTags", EDITORSTRINGS.WEAPON.label_tags),
 		invalid_tags: handleDefaultProp("weaponInvalidTags", EDITORSTRINGS.WEAPON.label_invalid_target_tags),
 		upgrade_type: {
 			createControls(){
@@ -1085,6 +1086,9 @@ WeaponUI.prototype.show = async function(){
 	content+="</div>";
 	content+="<div class='row '>";
 	content+=_this._propertyHandlers.attr2.createControls();
+	content+="</div>";
+	content+="<div class='row '>";
+	content+=_this._propertyHandlers.tags.createControls();
 	content+="</div>";
 	
 	

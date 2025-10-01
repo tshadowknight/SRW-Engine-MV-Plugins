@@ -883,6 +883,7 @@ EDITORSTRINGS.WEAPON = {
 	label_category: "Category",
 	label_primary_attr: "Primary Attribute",
 	label_secondary_attr: "Secondary Attribute",	
+	label_tags: "Tags",
 	label_upgrade_type: "Upgrade Type",
 	label_always_counter: "Always Counter",
 	label_only_counter: "Only as Counter",

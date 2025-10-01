@@ -39,6 +39,7 @@ AllyPilotUI.prototype.initPropertyHandlers = function(){
 				var divs = containerNode.querySelectorAll(".portrait_preview");
 				divs.forEach(function(div){
 					div.addEventListener("click", async function(e){
+						
 						var elem = this;
 						let result = await FaceManager.showFaceSelector(e, entry.faceName, entry.faceIndex, this);
 						if(result.status == "updated"){

@@ -656,6 +656,14 @@ StatCalc.prototype.parseWeaponDef = function(actor, isLocked, weaponDefinition, 
 			invalidTargetTags[String(tag).trim()] = true;
 		});				
 	}
+
+	let tags = {};
+	if(weaponProperties.weaponTags){					
+		var parts = weaponProperties.weaponTags.split(",");
+		parts.forEach(function(tag){
+			tags[String(tag).trim()] = true;
+		});				
+	}
 	return {
 		id: parseInt(weaponDefinition.id),
 		name: weaponDefinition.name,
@@ -707,6 +715,7 @@ StatCalc.prototype.parseWeaponDef = function(actor, isLocked, weaponDefinition, 
 		enemiesInteraction: weaponProperties.weaponEnemyInteraction || "damage_and_status",
 		alliesInteraction: weaponProperties.weaponAllyInteraction || "damage_and_status",
 		invalidTargetTags: invalidTargetTags,
+		tags: tags,
 		costType: parseInt(weaponProperties.weaponCostType)|| 0,
 		weight: parseInt(weaponProperties.weaponWeight)|| 0,	
 		textAlias: parseInt(weaponProperties.weaponTextAlias || -1)
