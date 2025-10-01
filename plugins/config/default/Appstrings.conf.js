@@ -1037,6 +1037,8 @@ EDITORSTRINGS.MECH = {
 	label_allowed: "Allowed",
 	
 	label_basic_battle: "Basic Battle",
+	label_y_offset_bb: "Basic Battle Y Offset",
+	label_x_offset_bb: "Basic Battle X Offset",
 	label_overworld: "Overworld",
 	label_battle_scene: "Battle Scene",
 	label_folder: "Folder",

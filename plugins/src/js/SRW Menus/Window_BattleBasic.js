@@ -470,11 +470,15 @@ Window_BattleBasic.prototype.readBattleCache = function() {
 				if(battleEffect.ref.isSubTwin){
 					_this._participantInfo.actor_twin.participating = true;
 					_this._participantInfo.actor_twin.img = $statCalc.getBasicBattleImage(battleEffect.ref);
+					_this._participantInfo.actor_twin.yOffset = $statCalc.getBasicBattleYOffset(battleEffect.ref);
+					_this._participantInfo.actor_twin.xOffset = $statCalc.getBasicBattleXOffset(battleEffect.ref);
 					_this._participantInfo.actor_twin.ref = battleEffect.ref;
 					_this._participantTypeLookup[cacheRef] = "actor_twin";
 				} else {
 					_this._participantInfo.actor.participating = true;
 					_this._participantInfo.actor.img = $statCalc.getBasicBattleImage(battleEffect.ref);
+					_this._participantInfo.actor.yOffset = $statCalc.getBasicBattleYOffset(battleEffect.ref);
+					_this._participantInfo.actor.xOffset = $statCalc.getBasicBattleXOffset(battleEffect.ref);
 					_this._participantInfo.actor.ref = battleEffect.ref;
 					_this._participantTypeLookup[cacheRef] = "actor";
 				}				
@@ -483,11 +487,15 @@ Window_BattleBasic.prototype.readBattleCache = function() {
 				if(battleEffect.ref.isSubTwin){
 					_this._participantInfo.actor_supporter_twin.participating = true;
 					_this._participantInfo.actor_supporter_twin.img = $statCalc.getBasicBattleImage(battleEffect.ref);
+					_this._participantInfo.actor_supporter_twin.yOffset = $statCalc.getBasicBattleYOffset(battleEffect.ref);
+					_this._participantInfo.actor_supporter_twin.xOffset = $statCalc.getBasicBattleXOffset(battleEffect.ref);
 					_this._participantInfo.actor_supporter_twin.ref = battleEffect.ref;
 					_this._participantTypeLookup[cacheRef] = "actor_supporter_twin";
 				} else {
 					_this._participantInfo.actor_supporter.participating = true;
 					_this._participantInfo.actor_supporter.img = $statCalc.getBasicBattleImage(battleEffect.ref);
+					_this._participantInfo.actor_supporter.yOffset = $statCalc.getBasicBattleYOffset(battleEffect.ref);
+					_this._participantInfo.actor_supporter.xOffset = $statCalc.getBasicBattleXOffset(battleEffect.ref);
 					_this._participantInfo.actor_supporter.ref = battleEffect.ref;
 					_this._participantTypeLookup[cacheRef] = "actor_supporter";
 				}
@@ -497,11 +505,15 @@ Window_BattleBasic.prototype.readBattleCache = function() {
 				if(battleEffect.ref.isSubTwin){
 					_this._participantInfo.enemy_twin.participating = true;
 					_this._participantInfo.enemy_twin.img = $statCalc.getBasicBattleImage(battleEffect.ref);
+					_this._participantInfo.enemy_twin.yOffset = $statCalc.getBasicBattleYOffset(battleEffect.ref);
+					_this._participantInfo.enemy_twin.xOffset = $statCalc.getBasicBattleXOffset(battleEffect.ref);
 					_this._participantInfo.enemy_twin.ref = battleEffect.ref;
 					_this._participantTypeLookup[cacheRef] = "enemy_twin";
 				} else {
 					_this._participantInfo.enemy.participating = true;
 					_this._participantInfo.enemy.img = $statCalc.getBasicBattleImage(battleEffect.ref);
+					_this._participantInfo.enemy.yOffset = $statCalc.getBasicBattleYOffset(battleEffect.ref);
+					_this._participantInfo.enemy.xOffset = $statCalc.getBasicBattleXOffset(battleEffect.ref);
 					_this._participantInfo.enemy.ref = battleEffect.ref;
 					_this._participantTypeLookup[cacheRef] = "enemy";
 				}
@@ -510,11 +522,15 @@ Window_BattleBasic.prototype.readBattleCache = function() {
 				if(battleEffect.ref.isSubTwin){
 					_this._participantInfo.enemy_supporter_twin.participating = true;
 					_this._participantInfo.enemy_supporter_twin.img = $statCalc.getBasicBattleImage(battleEffect.ref);
+					_this._participantInfo.enemy_supporter_twin.yOffset = $statCalc.getBasicBattleYOffset(battleEffect.ref);
+					_this._participantInfo.enemy_supporter_twin.xOffset = $statCalc.getBasicBattleXOffset(battleEffect.ref);
 					_this._participantInfo.enemy_supporter_twin.ref = battleEffect.ref;
 					_this._participantTypeLookup[cacheRef] = "enemy_supporter_twin";
 				} else {
 					_this._participantInfo.enemy_supporter.participating = true;
 					_this._participantInfo.enemy_supporter.img = $statCalc.getBasicBattleImage(battleEffect.ref);
+					_this._participantInfo.enemy_supporter.yOffset = $statCalc.getBasicBattleYOffset(battleEffect.ref);
+					_this._participantInfo.enemy_supporter.xOffset = $statCalc.getBasicBattleXOffset(battleEffect.ref);
 					_this._participantInfo.enemy_supporter.ref = battleEffect.ref;
 					_this._participantTypeLookup[cacheRef] = "enemy_supporter";
 				}
@@ -1472,6 +1488,14 @@ Window_BattleBasic.prototype.redraw = async function() {
 		if(participant.participating && _this._participantComponents[type]){
 			var containerInfo = _this._participantComponents[type];
 			containerInfo.image.setAttribute("data-img", _this.makeImageURL(participant.img));
+			containerInfo.image.style.marginTop = 0;
+			if(participant.yOffset){
+				containerInfo.image.style.marginTop = participant.yOffset + "%";
+			}
+			containerInfo.image.style.marginLeft = 0;
+			if(participant.xOffset){
+				containerInfo.image.style.marginLeft = participant.xOffset + "%";
+			}
 		}
 	});
 	

@@ -3632,6 +3632,8 @@ StatCalc.prototype.getBattleSceneInfo = function(actor){
 		var mechProperties = $dataClasses[actor.SRWStats.mech.id].meta;
 		result.basicBattleSpriteName = mechProperties.mechBasicBattleSprite;
 		result.battleSceneSpriteName = mechProperties.mechBattleSceneSprite;
+		result.basicBattleYOffset = parseFloat(mechProperties.mechBasicBattleYOffset) || 0;
+		result.basicBattleXOffset = parseFloat(mechProperties.mechBasicBattleXOffset) || 0;
 		if(mechProperties.mechMenuSprite){
 			result.menuSpritePath = "menu/"+mechProperties.mechMenuSprite+".png";
 		} else {
@@ -3763,6 +3765,25 @@ StatCalc.prototype.getBasicBattleImage = function(actor){
 		return "";
 	}
 }
+
+StatCalc.prototype.getBasicBattleYOffset = function(actor){
+	if(this.isActorSRWInitialized(actor)){
+		return this.getBattleSceneInfo(actor).basicBattleYOffset;	
+	} else {
+		return "";
+	}
+}
+
+StatCalc.prototype.getBasicBattleXOffset = function(actor){
+	if(this.isActorSRWInitialized(actor)){
+		return this.getBattleSceneInfo(actor).basicBattleXOffset;	
+	} else {
+		return "";
+	}
+}
+
+
+
 
 StatCalc.prototype.getBattleIdleImage = function(actor){
 	if(this.isActorSRWInitialized(actor)){

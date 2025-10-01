@@ -1546,6 +1546,16 @@ MechUI.prototype.initPropertyHandlers = function(){
 				content+="</div>";
 				
 				content+="</div>";
+
+				
+
+				content+="<div title='' class='row'>";
+				content+=_this.createValueInput("mechBasicBattleYOffset", EDITORSTRINGS.MECH.label_y_offset_bb, "", "%");
+				content+="</div>";
+
+				content+="<div title='' class='row'>";
+				content+=_this.createValueInput("mechBasicBattleXOffset", EDITORSTRINGS.MECH.label_x_offset_bb, "", "%");
+				content+="</div>";
 				content+="</div>";
 				
 				content+="<div title='' class='table sub_section'>";
@@ -1770,7 +1780,9 @@ MechUI.prototype.initPropertyHandlers = function(){
 					_this._mainUIHandler.setModified();
 				});
 				
-				let hookedProperties = [					
+				let hookedProperties = [		
+					"mechBasicBattleYOffset",	
+					"mechBasicBattleXOffset",		
 					"mechBattleYOffset",
 					"mechBattleXOffset",
 					"mechBattleCenterYOffset",
