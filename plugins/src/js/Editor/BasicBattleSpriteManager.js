@@ -16,7 +16,7 @@ BasicBattleSpriteManager.showSelector = function(e, current, elem){
 		var availableFiles = [];
 		const FILESYSTEM = require("fs"); 
 		FILESYSTEM.readdirSync(dir).forEach(function(file) {	
-			file = file.replace(/\.png$/, "");
+			file = file.replace(/\.png$/i, "");
 			availableFiles.push(file);		
 		});	
 		

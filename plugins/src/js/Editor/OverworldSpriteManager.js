@@ -50,7 +50,7 @@ OverworldSpriteManager.showOverworldSelector = function(e, faceName, faceIndex, 
 		var availableFaceFiles = [];
 		const FILESYSTEM = require("fs"); 
 		FILESYSTEM.readdirSync(dir).forEach(function(file) {	
-			file = file.replace(/\.png$/, "");
+			file = file.replace(/\.png$/i, "");
 			availableFaceFiles.push(file);		
 		});	
 		

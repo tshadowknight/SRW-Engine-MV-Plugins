@@ -55,7 +55,7 @@ FaceManager.showFaceSelector = function(e, faceName, faceIndex, elem){
 		
 		FILESYSTEM.readdirSync(dir).forEach(function(file) {	
 			console.log("!!Reading " + file);
-			file = file.replace(/\.png$/, "");
+			file = file.replace(/\.png$/i, "");
 			availableFaceFiles.push(file);		
 		});	
 		
