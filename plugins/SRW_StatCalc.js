@@ -1692,6 +1692,8 @@ StatCalc.prototype.initSRWStats = function(actor, level, itemIds, preserveVolati
 	if(actor.SRWStats.pilot.textAlias == null){
 		actor.SRWStats.pilot.textAlias = -1;
 	}
+
+	actor.SRWStats.pilot.noMirrorPortrait = parseInt(actorProperties.pilotNoMirrorPortrait || 0);
 	
 	actor.SRWStats.pilot.attribute1 = actorProperties.pilotAttribute1;
 	actor.SRWStats.pilot.attribute2 = actorProperties.pilotAttribute2;

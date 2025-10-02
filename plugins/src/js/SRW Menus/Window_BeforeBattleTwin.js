@@ -1314,10 +1314,10 @@ Window_BeforebattleTwin.prototype.createParticipantBlock = function(ref, action,
 		content+="<div class='main_content'>";
 	
 		if(allyOrEnemy == "ally"){
-			content+="<div data-type='"+(ref.isActor() ? "actor" : "enemy")+"' data-pilot='"+ref.SRWStats.pilot.id+"' class='pilot_icon display_icon'>";
+			content+="<div data-type='"+(ref.isActor() ? "actor" : "enemy")+"' data-pilot='"+ref.SRWStats.pilot.id+"' class='pilot_icon display_icon '>";
 			content+="</div>";
 		} else {
-			content+="<div data-type='"+(ref.isActor() ? "actor" : "enemy")+"' data-pilot='"+ref.SRWStats.pilot.id+"' class='enemy_icon display_icon'>";
+			content+="<div data-type='"+(ref.isActor() ? "actor" : "enemy")+"' data-pilot='"+ref.SRWStats.pilot.id+"' class='enemy_icon display_icon "+(ref.SRWStats.pilot.noMirrorPortrait ? "no_mirror" : "")+"'>";
 			content+="</div>";		
 		}				
 		

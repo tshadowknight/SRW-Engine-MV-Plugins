@@ -1108,6 +1108,7 @@ EDITORSTRINGS.PILOT = {
 	
 	label_name: "Name",
 	label_use_mech_name: "Use Mech Name",
+	label_no_mirror: "Don't Mirror",
 	label_stats_label: "Stats Label",
 	
 

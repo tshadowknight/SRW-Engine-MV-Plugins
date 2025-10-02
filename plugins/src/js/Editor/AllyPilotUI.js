@@ -24,7 +24,21 @@ AllyPilotUI.prototype.initPropertyHandlers = function(){
 	_this._propertyHandlers = {
 		face: {
 			createControls(entry){
-				return "<div class='portrait_preview unit_img_preview'></div>";
+				let content="";
+				content+="<div>";
+				content+="<div class='portrait_preview unit_img_preview'></div>";
+
+				/*content+="<div class='row'>";
+				content+="<div class='cell'>";
+				content+=EDITORSTRINGS.PILOT.label_no_mirror;
+				content+="</div>";
+				content+="<div class='cell'>";
+				content+="<input id='no_mirror' type=checkbox "+(_this.getMetaValue("pilotNoMirrorPortrait")*1 ? "checked" : "")+"></input>";			
+				
+				content+="</div>";
+				content+="</div>";*/
+				content+="</div>";
+				return content;
 			},
 			hook(entry){
 				entry = _this.getCurrentEntry();
@@ -50,6 +64,12 @@ AllyPilotUI.prototype.initPropertyHandlers = function(){
 						}
 					});			
 				});
+
+				/*containerNode.querySelector("#no_mirror").addEventListener("change", function(){
+					_this.setMetaValue("pilotNoMirrorPortrait", this.checked ? 1 : 0);
+					_this.show();
+					_this._mainUIHandler.setModified();
+				});*/
 			}			
 		},
 		name: {
