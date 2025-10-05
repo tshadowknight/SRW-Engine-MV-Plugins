@@ -532,7 +532,7 @@ GameState_actor_map_target.prototype.update = function(scene){
 			}
 			//console.log(targetDirection);
 			
-			if(targetDirection == $gameTemp.mapTargetDirection){
+			if(targetDirection == $gameTemp.mapTargetDirection || mapAttackDef.lockRotation){
 				processOK = true;
 			} else {
 				 $gameTemp.mapTargetDirection = targetDirection;

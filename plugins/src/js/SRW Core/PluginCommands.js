@@ -1330,7 +1330,7 @@
 				
 				if (command === 'removeSubPilot') {					
 					var targetMech = $statCalc.getMechData($dataClasses[args[0] * 1], true);
-					targetMech.subPilots[args[1] * 1] = null;
+					targetMech.subPilots[args[1] * 1] = 0;
 					$statCalc.storeMechData(targetMech);
 					$gameSystem.overwriteMechFallbackInfo(args[0] * 1, targetMech.subPilots);
 					let actor = $gameActors.actor(args[2] * 1)
