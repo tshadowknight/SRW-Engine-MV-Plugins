@@ -220,6 +220,23 @@ AttackList.prototype.redrawUpgrades = function() {
 	}
 }
 
+AttackList.prototype.hookPageControls = function(softRefresh) {
+	const _this = this;	
+	const windowNode = this.getWindowNode();
+	windowNode.querySelector("#prev_page.attackList").addEventListener("click", function(){
+		_this.decrementPage();
+		_this.requestRedraw();
+		_this.notifyObserver("redraw");
+	});
+	
+	windowNode.querySelector("#next_page.attackList").addEventListener("click", function(){
+		_this.incrementPage();
+		_this.requestRedraw();
+		_this.notifyObserver("redraw");
+	});
+}
+
+
 AttackList.prototype.redraw = function(softRefresh) {
 	var _this = this;	
 	var refData;
@@ -247,14 +264,14 @@ AttackList.prototype.redraw = function(softRefresh) {
 		}
 		
 		var content = "";
-		content+="<img id='prev_page' src=svg/chevron_right.svg>";
+		content+="<img id='prev_page' class='attackList' src=svg/chevron_right.svg>";
 		content+=(this._currentPage + 1)+"/"+maxPage;
-		content+="<img id='next_page' src=svg/chevron_right.svg>";
+		content+="<img id='next_page' class='attackList' src=svg/chevron_right.svg>";
 		this._pageDiv.innerHTML = content;
+		
+		_this.hookPageControls();
 		return;
 	}
-	
-	
 	
 	
 	var listContent = "";
@@ -321,9 +338,9 @@ AttackList.prototype.redraw = function(softRefresh) {
 	
 	
 	var content = "";
-	content+="<img id='prev_page' src=svg/chevron_right.svg>";
+	content+="<img id='prev_page' class='attackList' src=svg/chevron_right.svg>";
 	content+=(this._currentPage + 1)+"/"+maxPage;
-	content+="<img id='next_page' src=svg/chevron_right.svg>";
+	content+="<img id='next_page' class='attackList' src=svg/chevron_right.svg>";
 	this._pageDiv.innerHTML = content;
 	
 	this.loadImages();
@@ -347,12 +364,6 @@ AttackList.prototype.redraw = function(softRefresh) {
 		});		
 	});	
 	
-	windowNode.querySelector("#prev_page").addEventListener("click", function(){
-		_this.notifyTouchObserver("left");
-	});
-	
-	windowNode.querySelector("#next_page").addEventListener("click", function(){
-		_this.notifyTouchObserver("right");
-	});
+	this.hookPageControls();
 
 }

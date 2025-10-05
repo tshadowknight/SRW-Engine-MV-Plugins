@@ -44,6 +44,7 @@
     color: #FFFFFF;
     --fontsize: 1.8px;
     text-align: center;
+	z-index: 1;
 }
 
 #attack_list_control_page #prev_page{

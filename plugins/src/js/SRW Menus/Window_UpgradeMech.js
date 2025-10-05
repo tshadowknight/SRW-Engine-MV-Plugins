@@ -131,6 +131,7 @@ Window_UpgradeMech.prototype.decrementUpgradeLevel = function(){
 }
 
 Window_UpgradeMech.prototype.createComponents = function() {
+	const _this = this;
 	Window_CSS.prototype.createComponents.call(this);
 	
 	var windowNode = this.getWindowNode();
@@ -165,6 +166,7 @@ Window_UpgradeMech.prototype.createComponents = function() {
 	this._attackListDisplay.classList.add("attack_list_container");	
 	this._attackList = new AttackList(this._attackListDisplay, this, true);
 	this._attackList.createComponents();
+	this._attackList.registerObserver("redraw", function(){_this.requestRedraw();});
 	windowNode.appendChild(this._attackListDisplay);
 	
 	this._genericFUBDisplay = document.createElement("div");	
