@@ -350,7 +350,7 @@
 					};
 			
 					var hasTarget = $statCalc.getAllInRange(this._actor, false, $gameTemp.isPostMove, true).length > 0;
-					var hasMapWeapon = $statCalc.hasMapWeaponWithTargets(battler);
+					var hasMapWeapon = $statCalc.hasMapWeaponWithTargets(battler, $gameTemp.isPostMove);
 					
 					function boardingMenu(){
 						_this.addCommand(APPSTRINGS.MAPMENU.board, 'board');

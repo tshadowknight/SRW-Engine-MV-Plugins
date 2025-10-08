@@ -5543,13 +5543,13 @@ StatCalc.prototype.hasMapWeapon = function(actor){
 	}
 }
 
-StatCalc.prototype.hasMapWeaponWithTargets = function(actor){
+StatCalc.prototype.hasMapWeaponWithTargets = function(actor, postMoveOnly){
 	if(this.isActorSRWInitialized(actor)){
 		//hack to avoid needing to move the map attack handling functions to another module
 		const sceneManager = SceneManager._scene;
 		let hasMapWeapon = false;
 		if(sceneManager && sceneManager.getBestMapAttackTargets){
-			var mapWeapons = $statCalc.getActiveMapWeapons(actor, false);	
+			var mapWeapons = $statCalc.getActiveMapWeapons(actor, postMoveOnly);	
 			if(mapWeapons.length){
 				mapWeapons.forEach(function(mapWeapon){
 					if(sceneManager.actorMapWeaponHasTargets(actor, mapWeapon)){
