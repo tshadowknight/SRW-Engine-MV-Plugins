@@ -654,6 +654,7 @@ GameState_actor_map_target_confirm.prototype.update = function(scene){
 	$SRWGameState.updateStateButtonPrompts([["choose_position"], ["confirm_attack"]], "actor_map_target_confirm");
 	
 	var currentPosition = {x: $gamePlayer.posX(), y: $gamePlayer.posY()};		
+	
 
 	var summaryUnit = $statCalc.activeUnitAtPosition(currentPosition);
 	if(summaryUnit && $gameTemp.summariesTimeout <= 0){
@@ -665,7 +666,6 @@ GameState_actor_map_target_confirm.prototype.update = function(scene){
 	} else {
 		scene._summaryWindow.hide();
 	}	
-	
 	
 	var attack = $gameTemp.actorAction.attack;
 	var mapAttackDef = $mapAttackManager.getDefinition(attack.mapId);
@@ -1517,7 +1517,9 @@ GameState_map_attack_animation.prototype.update = function(scene){
 	$gameSystem.highlightsRefreshed = true;	
 	
 	if(!$gameTemp.mapAttackAnimationStarted){
-		$songManager.playBattleSong($gameTemp.currentBattleActor);
+		if($gameTemp.currentMapAttacker){
+			$songManager.playBattleSong($gameTemp.currentMapAttacker);
+		}		
 		$gameTemp.clearMoveTable();
 		var attack;
 		if($gameTemp.isEnemyAttack){
@@ -1664,6 +1666,7 @@ GameState_normal.prototype.update = function(scene){
 	$gameTemp.isHitAndAway = false;		
 	$gameTemp.currentMapTargets	= [];
 	$gameTemp.unitHitInfo = {};
+	$gameTemp.currentMapAttacker = null;
 	
 	if(!scene._mapButtonsWindow.visible && !$gameTemp.onMapSaving){
 		scene._mapButtonsWindow.open();

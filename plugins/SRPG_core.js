@@ -3478,6 +3478,7 @@ SceneManager.isInSaveScene = function(){
 			Input.clear();
 			$gameTemp.touchMapAttackState = "direction";
 			$gameTemp.mapTargetDirection = "up";
+			$gameTemp.currentMapAttacker = battler;
 			$gameSystem.setSubBattlePhase('actor_map_target');
 		} else {
 			var range = $statCalc.getRealWeaponRange(battler, weapon);
@@ -3794,6 +3795,7 @@ SceneManager.isInSaveScene = function(){
 			}
 				
 			$statCalc.setCurrentAttack(enemy, bestMapAttack.attack);
+			$gameTemp.currentMapAttacker = enemy;
 			_this.enemyMapAttackStart();
 			return true;
 		} else {
