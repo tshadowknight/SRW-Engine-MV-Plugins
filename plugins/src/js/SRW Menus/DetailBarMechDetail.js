@@ -27,6 +27,17 @@ DetailBarMechDetail.prototype.redraw = function(){
 	
 	var calculatedStats = mechData.stats.calculated;
 	detailContent+="<div class='left_items'>";
+	detailContent+="<div class='mech_name_container'>";
+	 
+	detailContent+="<div class='mech_name_value scaled_text fitted_text'>";
+	if(mechData.classData?.name){
+		detailContent+=mechData.classData.name; 
+	} else {
+		detailContent+="---"; 
+	}
+	
+	detailContent+="</div>";
+	detailContent+="</div>";
 	detailContent+="<div class='icon_hp_EN'>";
 	detailContent+="<div id='detail_list_icon'></div>";//icon 
 	detailContent+="<div class='mech_hp_en_container scaled_text'>";

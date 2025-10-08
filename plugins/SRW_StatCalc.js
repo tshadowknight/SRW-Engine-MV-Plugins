@@ -2831,17 +2831,15 @@ StatCalc.prototype.transform = function(actor, idx, force, forcedId, noRestore){
 			}			
 						
 			if(transformIntoId != null){			
-				var targetMechData = this.getMechDataById(transformIntoId, true);
-			
+				var targetMechData = this.getMechDataById(transformIntoId, true);			
 				actor.isSubPilot = false;
-				actor.SRWStats.mech = this.getMechDataById(transformIntoId, true);
-				
-				this.calculateSRWMechStats(actor.SRWStats.mech, false, actor);
-				
-				
-				var actionsResult = this.applyDeployActions(actor.SRWStats.pilot.id, actor.SRWStats.mech.id);
+								
+				var actionsResult = this.applyDeployActions(actor.SRWStats.pilot.id, transformIntoId);
 
-				
+				if(!actionsResult){
+					actor.SRWStats.mech = this.getMechDataById(transformIntoId, true);				
+					this.calculateSRWMechStats(actor.SRWStats.mech, false, actor);
+				}
 
 				//store the sub twin and unassign it from the current actor so that if the pilot changes the previous pilot does not retain an old reference
 				//must be done after deploy actions as those reassign the sub twin otherwise
@@ -8827,13 +8825,13 @@ StatCalc.prototype.unbindLinkedDeploySlots = function(actorId, mechId, type, slo
 }
 
 //if overwriteFallbackInfo is set the stored state for all affected units will be update to the state after the deploy actions are applied
-StatCalc.prototype.applyDeployActions = function(actorId, mechId, overwriteFallbackInfo, force){
+StatCalc.prototype.applyDeployActions = function(mainActorId, mechId, overwriteFallbackInfo, force){
 	var _this = this;
 	if(this._unitUpdatesExternalLocked){
 		return;
 	}
 	this.lockAbilityCache();
-	var deployActions = this.getDeployActions(actorId, mechId);
+	var deployActions = this.getDeployActions(mainActorId, mechId);
 	var affectedActors = [];
 	
 	var result = false;
@@ -8874,13 +8872,13 @@ StatCalc.prototype.applyDeployActions = function(actorId, mechId, overwriteFallb
 							
 							//ensure the live copy of the unit is also updated
 							var currentPilot = $statCalc.getCurrentPilot(previousMech.id);
-							if(currentPilot){
+							if(currentPilot && currentPilot.actorId() != mainActorId){
 								$statCalc.reloadSRWStats(currentPilot, false, true);
 							}
 						}	
 					});
 					
-					var actor = $gameActors.actor(actorId);					
+					var actor = $gameActors.actor(mainActorId);					
 					$gameSystem.registerPilotFallbackInfo(actor);	
 					
 					
@@ -8914,7 +8912,7 @@ StatCalc.prototype.applyDeployActions = function(actorId, mechId, overwriteFallb
 								
 								//ensure the live copy of the unit is also updated
 								var currentPilot = $statCalc.getCurrentPilot(targetMechId);
-								if(currentPilot){
+								if(currentPilot && currentPilot.actorId() != mainActorId){
 									$statCalc.reloadSRWStats(currentPilot, false, true);
 								}
 								
@@ -8931,12 +8929,12 @@ StatCalc.prototype.applyDeployActions = function(actorId, mechId, overwriteFallb
 			}
 		});	
 					
-		this.reloadSRWStats($gameActors.actor(actorId), false, true);
+		this.reloadSRWStats($gameActors.actor(mainActorId), false, true);
 	} else {
 		if(overwriteFallbackInfo){
-			$gameSystem.overwritePilotFallbackInfo($gameActors.actor(actorId));	
+			$gameSystem.overwritePilotFallbackInfo($gameActors.actor(mainActorId));	
 		} else {
-			$gameSystem.registerPilotFallbackInfo($gameActors.actor(actorId));	
+			$gameSystem.registerPilotFallbackInfo($gameActors.actor(mainActorId));	
 		}
 	}
 	this.unlockAbilityCache();

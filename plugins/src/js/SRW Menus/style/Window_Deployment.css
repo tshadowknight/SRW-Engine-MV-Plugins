@@ -271,10 +271,35 @@
 	display: inline-block;
 }
 
+.left_items .mech_name_container {
+	display: none;
+}
+
+.deployment .left_items .mech_stats_container {
+
+}
+
+.deployment .left_items .mech_name_container {
+	display: block;
+    width: 18%;
+    position: absolute;
+    top: 7%;
+    left: 1%;
+    white-space: nowrap;
+    color: #FFF;
+    overflow: hidden;
+}
+
+.deployment .left_items .mech_name_container .mech_name_value{
+	width: 100%;
+	border-bottom: 0.1vw solid var(--underline-color);
+}
+
 .deployment .left_items .icon_hp_EN {
 	display: flex;
 	width: 100%;
 	height: 35%;
+ 	margin-left: 49%;	
 }
 
 .deployment .right_items {
