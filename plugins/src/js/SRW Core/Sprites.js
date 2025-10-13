@@ -2246,13 +2246,13 @@ Sprite_HealthBar.prototype.update = function() {
 				var currentHp = mechStats.currentHP;
 				var maxHp = mechStats.maxHP;
 
-				if(this._previousHp == -1){
-					this._previousHp = currentHp;
-				}
+				//if(this._previousHp == -1){
+				//	this._previousHp = currentHp;
+				//}
 
-				if(this._previousMaxHp == -1){
-					this._previousMaxHp = maxHp;
-				}
+				//if(this._previousMaxHp == -1){
+				//	this._previousMaxHp = maxHp;
+				//}
 				
 				
 				// Check if we need to redraw the health bar

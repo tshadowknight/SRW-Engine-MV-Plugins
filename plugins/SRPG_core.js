@@ -2276,23 +2276,32 @@ SceneManager.isInSaveScene = function(){
 
 	Scene_Map.prototype.updateUnitHPFromBattleCache = function() {
 		Object.keys($gameTemp.battleEffectCache).forEach(function(cacheRef){
-		var battleEffect = $gameTemp.battleEffectCache[cacheRef];
-		
-		if(battleEffect.ref){
-			if(battleEffect.HPRestored){
-				$statCalc.recoverHP(battleEffect.ref, battleEffect.HPRestored);
-			}					
-		}	
-		
-		if(battleEffect.hasActed && battleEffect.attacked){
-			var oldHP = $statCalc.getCalculatedMechStats(battleEffect.attacked.ref).currentHP;
-			battleEffect.attacked.ref.setHp(oldHP - battleEffect.damageInflicted);
-		}
-		if(battleEffect.hasActed && battleEffect.attacked_all_sub){
-			var oldHP = $statCalc.getCalculatedMechStats(battleEffect.attacked_all_sub.ref).currentHP;
-			battleEffect.attacked_all_sub.ref.setHp(oldHP - battleEffect.damageInflicted_all_sub);
-		}
-	});
+			var battleEffect = $gameTemp.battleEffectCache[cacheRef];
+			if(battleEffect.ref){
+				if(battleEffect.HPRestored){
+					$statCalc.recoverHP(battleEffect.ref, battleEffect.HPRestored);
+				}					
+			}	
+
+			//regular and map attacks use different properties to manage damage inflicted
+			if($gameTemp.battleOccurred){												
+				if(battleEffect.hasActed && battleEffect.attacked){
+					var oldHP = $statCalc.getCalculatedMechStats(battleEffect.attacked.ref).currentHP;
+					battleEffect.attacked.ref.setHp(oldHP - battleEffect.damageInflicted);
+				}
+				if(battleEffect.hasActed && battleEffect.attacked_all_sub){
+					var oldHP = $statCalc.getCalculatedMechStats(battleEffect.attacked_all_sub.ref).currentHP;
+					battleEffect.attacked_all_sub.ref.setHp(oldHP - battleEffect.damageInflicted_all_sub);
+				}
+			}		
+
+			if($gameTemp.mapAttackOccurred){
+				if(battleEffect.damageTaken){
+					var oldHP = $statCalc.getCalculatedMechStats(battleEffect.ref).currentHP;
+					battleEffect.ref.setHp(oldHP - battleEffect.damageTaken);
+				}
+			}
+		});
 	}
 	
     //戦闘終了後の戦闘不能判定
