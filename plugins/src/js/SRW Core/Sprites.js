@@ -2223,7 +2223,7 @@ Sprite_HealthBar.prototype.initialize = function(character) {
 	this._barHeight = 4;
 	this._borderWidth = 1;
 	this.createBitmap();
-	this._hpFillRate = 500;
+	this._hpFillRate = 1;
 };
 
 Sprite_HealthBar.prototype.createBitmap = function() {
@@ -2251,7 +2251,7 @@ Sprite_HealthBar.prototype.update = function() {
 				}
 
 				if(this._previousMaxHp == -1){
-					this._prev_previousMaxHpiousHp = maxHp;
+					this._previousMaxHp = maxHp;
 				}
 				
 				
@@ -2259,8 +2259,8 @@ Sprite_HealthBar.prototype.update = function() {
 				if(this._previousHp !== currentHp || this._previousMaxHp !== maxHp) {
 					const direction = Math.sign(currentHp - this._previousHp);
 
-					this._previousHp += direction * this._hpFillRate;
-					if(Math.abs(this._previousHp - currentHp) < this._hpFillRate){
+					this._previousHp += maxHp * this._hpFillRate * direction;
+					if(Math.abs(this._previousHp - currentHp) <  maxHp * this._hpFillRate){
 						this._previousHp = currentHp;	
 					}
 					this._previousMaxHp = maxHp;

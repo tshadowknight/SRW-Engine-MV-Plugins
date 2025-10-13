@@ -2273,10 +2273,33 @@ SceneManager.isInSaveScene = function(){
 		} 	
 		return result;
 	};
+
+	Scene_Map.prototype.updateUnitHPFromBattleCache = function() {
+		Object.keys($gameTemp.battleEffectCache).forEach(function(cacheRef){
+		var battleEffect = $gameTemp.battleEffectCache[cacheRef];
+		
+		if(battleEffect.ref){
+			if(battleEffect.HPRestored){
+				$statCalc.recoverHP(battleEffect.ref, battleEffect.HPRestored);
+			}					
+		}	
+		
+		if(battleEffect.hasActed && battleEffect.attacked){
+			var oldHP = $statCalc.getCalculatedMechStats(battleEffect.attacked.ref).currentHP;
+			battleEffect.attacked.ref.setHp(oldHP - battleEffect.damageInflicted);
+		}
+		if(battleEffect.hasActed && battleEffect.attacked_all_sub){
+			var oldHP = $statCalc.getCalculatedMechStats(battleEffect.attacked_all_sub.ref).currentHP;
+			battleEffect.attacked_all_sub.ref.setHp(oldHP - battleEffect.damageInflicted_all_sub);
+		}
+	});
+	}
 	
     //戦闘終了後の戦闘不能判定
     Scene_Map.prototype.srpgBattlerDeadAfterBattle = function() {
 		var _this = this;
+		_this.updateUnitHPFromBattleCache();
+
 		$gameTemp.currentMapTargets = [];
 		$gameTemp.deathQueue = [];
 		$gameTemp.destroyTransformQueue = [];
@@ -2498,10 +2521,10 @@ SceneManager.isInSaveScene = function(){
 					battleEffect.attacked.ref.setSquadMode("normal");
 				}
 				applyCostsToActor(battleEffect.ref, battleEffect.action.attack, battleEffect);
-				if(battleEffect.damageTaken){
+				/*if(battleEffect.damageTaken){
 					var oldHP = $statCalc.getCalculatedMechStats(battleEffect.ref).currentHP;
 					battleEffect.ref.setHp(oldHP - battleEffect.damageTaken);
-				}
+				}*/
 				
 				var defenderPersonalityInfo = $statCalc.getPersonalityInfo(battleEffect.ref);
 				var attackerPersonalityInfo = $statCalc.getPersonalityInfo(battleEffect.attackedBy);
@@ -2574,11 +2597,11 @@ SceneManager.isInSaveScene = function(){
 			Object.keys($gameTemp.battleEffectCache).forEach(function(cacheRef){
 				var battleEffect = $gameTemp.battleEffectCache[cacheRef];
 				
-				if(battleEffect.ref){
+				/*if(battleEffect.ref){
 					if(battleEffect.HPRestored){
 						$statCalc.recoverHP(battleEffect.ref, battleEffect.HPRestored);
 					}					
-				}
+				}*/
 				
 				if(battleEffect.ref && !battleEffect.ref.isActor()){
 					battleEffect.ref.setSquadMode("normal");
@@ -2587,14 +2610,14 @@ SceneManager.isInSaveScene = function(){
 					battleEffect.attacked.ref.setSquadMode("normal");
 				}
 				applyCostsToActor(battleEffect.ref, battleEffect.action.attack, battleEffect);
-				if(battleEffect.hasActed && battleEffect.attacked){
+				/*if(battleEffect.hasActed && battleEffect.attacked){
 					var oldHP = $statCalc.getCalculatedMechStats(battleEffect.attacked.ref).currentHP;
 					battleEffect.attacked.ref.setHp(oldHP - battleEffect.damageInflicted);
 				}
 				if(battleEffect.hasActed && battleEffect.attacked_all_sub){
 					var oldHP = $statCalc.getCalculatedMechStats(battleEffect.attacked_all_sub.ref).currentHP;
 					battleEffect.attacked_all_sub.ref.setHp(oldHP - battleEffect.damageInflicted_all_sub);
-				}
+				}*/
 				
 				var personalityInfo = $statCalc.getPersonalityInfo(battleEffect.ref);
 				
