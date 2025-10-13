@@ -2889,8 +2889,9 @@ BattleSceneManager.prototype.startScene = function(){
 	
 		
 		var ticksSinceLastUpdate =  _this._currentAnimationTick - _this._lastAnimationTick;
-		_this._ticksSinceLastUpdate = ticksSinceLastUpdate;			
-		if(_this._runningAnimation && !_this._animsPaused){
+		_this._ticksSinceLastUpdate = ticksSinceLastUpdate;
+		
+		if(_this._runningAnimation && !_this._animsPaused && !_this.isExecutingAnimationCommand){
 			
 			if(ticksSinceLastUpdate >= 1 && !_this._isLoading){	
 				//_this._animTimeAccumulator = 0;
@@ -2918,9 +2919,9 @@ BattleSceneManager.prototype.startScene = function(){
 				while(command){
 					_this.executeAnimation(command.def, command.tick);
 					command = null;
-					if(!_this._isLoading){
+					//if(!_this._isLoading){
 						command = _this._animQueue.shift();
-					}
+					//}
 				}
 				
 					
@@ -3665,12 +3666,7 @@ BattleSceneManager.prototype.stopShakeAnimations = function(target){
 
 BattleSceneManager.prototype.executeAnimation = function(animation, startTick){
 	var _this = this;
-	//debug
-	/*_this._scene.meshes.forEach((mesh) => {
-		mesh.onBeforeDraw = () => {
-			!_this._drawCounts[mesh.name] ? _this._drawCounts[mesh.name] = 1 : _this._drawCounts[mesh.name]++;                
-		}
-	});*/
+	_this.isExecutingAnimationCommand = true;
 	
 	if(animation.target && this._activeAliases[animation.target]){
 		animation.target = this._activeAliases[animation.target];
@@ -6265,7 +6261,7 @@ BattleSceneManager.prototype.executeAnimation = function(animation, startTick){
 						tmp[i + startTick + 1] = additions[i];
 					}			
 				}
-				_this.mergeAnimList(tmp);	
+				_this.mergeAnimList(tmp);
 			}				
 		},
 		merge_complete_animation: function(target, params){
@@ -6291,6 +6287,7 @@ BattleSceneManager.prototype.executeAnimation = function(animation, startTick){
 	if(animationHandlers[animation.type] && _this._currentAnimatedAction){
 		animationHandlers[animation.type](animation.target, animation.params || {});
 	}
+	_this.isExecutingAnimationCommand = false;
 }
 
 BattleSceneManager.prototype.getTargetAction = function(target){

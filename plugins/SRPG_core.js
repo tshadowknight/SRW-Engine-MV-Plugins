@@ -4527,7 +4527,7 @@ SceneManager.isInSaveScene = function(){
 				canReach = true;
 			}
 			pathScores.push({
-				path: path,
+				path: path || [],
 				pathLength: path.length,
 				distanceOK: distanceOK,
 				dist: dist,
@@ -4551,13 +4551,29 @@ SceneManager.isInSaveScene = function(){
 				return 1;
 			} else if(a.travelDistToTarget != b.travelDistToTarget){
 				return a.travelDistToTarget - b.travelDistToTarget;
-			} else if(b.pathLength == a.pathLength){
+			} else if(b.pathLength == a.pathLength && a.path[0] && b.path[0]){
+				/*
+				//take tile closest in X or Y to unit moving(causes preference for straight lines)
 				return [
 					{retVal: -1, refVal: a.srcDeltaX},
 					{retVal: -1, refVal: a.srcDeltaY},
 					{retVal: 1, refVal: b.srcDeltaX},
 					{retVal: 1, refVal: b.srcDeltaY}
-				].sort((a, b) => b.refVal - a.refVal)[0].retVal;
+				].sort((a, b) => b.refVal - a.refVal)[0].retVal;*/
+				//return 0;//randomly pick tile of equal distance
+
+
+				
+				var deltaXA = Math.abs(targetCoords.x - a.path[0].x);
+				var deltaYA = Math.abs(targetCoords.y - a.path[0].y);
+				var distA = Math.hypot(deltaXA, deltaYA);
+
+				var deltaXB = Math.abs(targetCoords.x - b.path[0].x);
+				var deltaYB = Math.abs(targetCoords.y - b.path[0].y);
+				var distB = Math.hypot(deltaXB, deltaYB);
+
+				return distA - distB;
+
 			} else {
 				return b.pathLength - a.pathLength;
 			}				

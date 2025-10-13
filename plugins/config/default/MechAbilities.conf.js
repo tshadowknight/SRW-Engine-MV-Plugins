@@ -961,4 +961,32 @@ $SRWConfig.mechAbilties = function(){
 		}
 	);
 	
+	this.addDefinition(
+    60, 
+    "Ranged Rank Up Example", 
+    "All allies in 3 Range gain S rank to all terrain ranks. <br><br><i></i>", 
+    false,
+    true,
+    function(actor, level){
+        
+        return [//level 1
+                {type: "land_terrain_rating", modType: "addFlat", value: 4, range: 1},{type: "air_terrain_rating", modType: "addFlat", value: 4, range: 1},{type: "water_terrain_rating", modType: "addFlat", value: 4, range: 1},{type: "space_terrain_rating", modType: "addFlat", value: 4, range: 1},    
+                {type: "land_terrain_rating", modType: "addFlat", value: 4, range: 2},{type: "air_terrain_rating", modType: "addFlat", value: 4, range: 2},{type: "water_terrain_rating", modType: "addFlat", value: 4, range: 2},{type: "space_terrain_rating", modType: "addFlat", value: 4, range: 2},    
+                {type: "land_terrain_rating", modType: "addFlat", value: 4, range: 3},{type: "air_terrain_rating", modType: "addFlat", value: 4, range: 3},{type: "water_terrain_rating", modType: "addFlat", value: 4, range: 3},{type: "space_terrain_rating", modType: "addFlat", value: 4, range: 3},                        
+                {type: "visible_range", modType: "addFlat", range: 1, color: "#57FFDE"},
+                {type: "visible_range", modType: "addFlat", range: 2, color: "#57FFDE"},
+                {type: "visible_range", modType: "addFlat", range: 3, color: "#57FFDE"},                    
+        ];
+        
+
+    },
+    function(actor, level){
+        return true;
+    },
+    null,
+    function(actor, level){//function that determines the range of the ability depending on level
+        return {min: 1, max: 3, targets: "own", targetsBothTwins: true} 
+    },
+);
+	
 };
