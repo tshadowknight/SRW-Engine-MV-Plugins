@@ -4258,12 +4258,14 @@ BattleSceneManager.prototype.executeAnimation = function(animation, startTick){
 		},	
 		next_phase: function(target, params){
 			let insertStartTick = _this._currentAnimationTick;
+
+			const additions = [];
 			
-			_this._animationList[insertStartTick + 1] = [{type: "fade_swipe", target: "", params: {time: 18}}];	
+			additions[insertStartTick + 1] = [{type: "fade_swipe", target: "", params: {time: 18}}];	
 			
-			_this._animationList[insertStartTick + 25] = [{type: "create_target_environment"}, {type: "updateBgMode", target: "active_target"}];
+			additions[insertStartTick + 25] = [{type: "create_target_environment"}, {type: "updateBgMode", target: "active_target"}];
 			if(params.cleanUpCommands){				
-				_this._animationList[insertStartTick + 26] = params.cleanUpCommands;						
+				additions[insertStartTick + 26] = params.cleanUpCommands;						
 			}		
 
 			let playDefaultSfx = true;
@@ -4274,8 +4276,9 @@ BattleSceneManager.prototype.executeAnimation = function(animation, startTick){
 			//support defend animation
 			if(_this._currentAnimatedAction.attacked && _this._currentAnimatedAction.attacked.type == "support defend"){
 				_this.delayAnimationList(insertStartTick + 27, 170);
-				_this._animationList[insertStartTick + 27] =  [{type: "store_active_main_visibility", target: ""}];
-				_this._animationList[insertStartTick + 30] = [
+				
+				additions[insertStartTick + 27] =  [{type: "store_active_main_visibility", target: ""}];
+				additions[insertStartTick + 30] = [
 					{type: "teleport", target: "Camera", params: {position: _this._defaultPositions.camera_main_idle}},
 					{type: "teleport", target: "active_target", params: {position: _this._defaultPositions.enemy_main_idle}},
 					{type: "rotate_to", target: "Camera", params: {rotation: _this._defaultRotations.camera_main_idle}},
@@ -4284,30 +4287,30 @@ BattleSceneManager.prototype.executeAnimation = function(animation, startTick){
 					{type: "hide_sprite", target: "active_main", params: {}},					
 				];	
 				
-				_this._animationList[insertStartTick + 50] = [
+				additions[insertStartTick + 50] = [
 					{type: "set_sprite_frame", target: "active_target", params: {name: "out"}},
 					{type: "translate", target: "active_target", params: {startPosition: _this._defaultPositions.enemy_main_idle, position: new BABYLON.Vector3(-10, 0, 1), duration: 30, easingFunction: new BABYLON.SineEase(), easingMode: BABYLON.EasingFunction.EASINGMODE_EASEIN}},
 				];
 				
-				_this._animationList[insertStartTick + 80] = [
+				additions[insertStartTick + 80] = [
 					{type: "show_sprite", target: "active_support_defender", params: {}},
 					{type: "set_sprite_frame", target: "active_support_defender", params: {name: "in"}},
 					{type: "translate", target: "active_support_defender", params: {startPosition: new BABYLON.Vector3(-10, 0, 1), position: _this._defaultPositions.enemy_main_idle, duration: 30, easingFunction: new BABYLON.SineEase(), easingMode: BABYLON.EasingFunction.EASINGMODE_EASEIN}},
 					{type: "show_support_defender_text"},					
 				];
 				
-				_this._animationList[insertStartTick + 110] = [
+				additions[insertStartTick + 110] = [
 					{type: "set_sprite_frame", target: "active_support_defender", params: {name: "block", spriterOnly: true}},
 					{type: "set_sprite_frame", target: "active_support_defender", params: {name: "block", defaultOnly: true}},
 					{type: "set_sprite_frame", target: "active_target", params: {name: "block"}},
 					{type: "show_barrier", target: "active_support_defender", params: {}}
 				];
 				
-				_this._animationList[insertStartTick + 150] = [
+				additions[insertStartTick + 150] = [
 					{type: "fade_swipe", target: "", params: {time: 54}},
 				];
 				
-				_this._animationList[insertStartTick + 160] = [
+				additions[insertStartTick + 160] = [
 					//{type: "show_sprite", target: "active_main", params: {}},	
 					{type: "enable_support_defender"},
 					{type: "hide_sprite", target: "active_target", params: {}},		
@@ -4315,24 +4318,25 @@ BattleSceneManager.prototype.executeAnimation = function(animation, startTick){
 				];				
 				
 				if(params.commands){
-					_this._animationList[insertStartTick + 161] = params.commands;						
+					additions[insertStartTick + 161] = params.commands;						
 				}
-				_this._animationList[insertStartTick + 162] = [{type: "updateBgMode", target: "active_target"}];
+				additions[insertStartTick + 162] = [{type: "updateBgMode", target: "active_target"}];
 			} else {
 				if(params.commands){
-					_this._animationList[insertStartTick + 27] = params.commands;	
-					_this._animationList[insertStartTick + 28] = [{type: "updateBgMode", target: "active_target"}];
+					additions[insertStartTick + 27] = params.commands;	
+					additions[insertStartTick + 28] = [{type: "updateBgMode", target: "active_target"}];
 					
 					//if(_this._currentAnimatedAction.hits){
-						var additions = [];
+
 						additions[insertStartTick + 50] = [{type: "show_barrier", target: "active_target", params: {}}];	
 						//if(_this._currentAnimatedAction.attacked.action.type == "defend"){
 						additions[insertStartTick + 50].push({type: "set_sprite_frame", target: "active_target", params: {name: "block", playDefaultSfx}});
 						//}
-						_this.mergeAnimList(additions);	
+						
 					//}								
 				}
 			}
+			_this.mergeAnimList(additions);	
 		},
 		dodge_pattern: function(target, params){
 			let insertStartTick = _this._currentAnimationTick;
