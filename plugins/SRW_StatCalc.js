@@ -8866,22 +8866,22 @@ StatCalc.prototype.applyDeployActions = function(mainActorId, mechId, overwriteF
 					previousMechs.forEach(function(previousMechId){		
 						var previousMech = $statCalc.getMechData($dataClasses[previousMechId], true);
 						if(previousMech && previousMech.id != -1){
-							previousMech.subPilots[previousMech.subPilots.indexOf(actorId * 1)] = 0;					
-							$statCalc.storeMechData(previousMech);
-							
-							
-							//ensure the live copy of the unit is also updated
-							var currentPilot = $statCalc.getCurrentPilot(previousMech.id);
-							if(currentPilot && currentPilot.actorId() != mainActorId){
-								$statCalc.reloadSRWStats(currentPilot, false, true);
-							}
+							const subPilotIdx = previousMech.subPilots.indexOf(actorId * 1);
+							if(subPilotIdx != -1){
+								previousMech.subPilots[subPilotIdx] = 0;					
+								$statCalc.storeMechData(previousMech);								
+								
+								//ensure the live copy of the unit is also updated
+								var currentPilot = $statCalc.getCurrentPilot(previousMech.id);
+								if(currentPilot && currentPilot.actorId() != mainActorId){
+									$statCalc.reloadSRWStats(currentPilot, false, true);
+								}
+							}							
 						}	
 					});
 					
-					var actor = $gameActors.actor(mainActorId);					
-					$gameSystem.registerPilotFallbackInfo(actor);	
-					
-					
+					var actor = $gameActors.actor(actorId);					
+					$gameSystem.registerPilotFallbackInfo(actor);						
 					actor._classId = 0;
 					$statCalc.reloadSRWStats(actor, false, true);	
 				});		
