@@ -2880,8 +2880,8 @@ BattleSceneManager.prototype.runAnimations = function(deltaTime){
 			if(animation.easingFunction){
 				t = animation.easingFunction.ease(t);
 			}			
-			var startVector = new BABYLON.Vector3(animation.from, 0, 0);
-			var endVector = new BABYLON.Vector3(animation.to, 0, 0);
+			var startVector = new BABYLON.Vector3(animation.from * 1, 0, 0);
+			var endVector = new BABYLON.Vector3(animation.to * 1, 0, 0);
 			targetObj.fov =  BABYLON.Vector3.Lerp(startVector, endVector, t).x;						
 		} else {
 			targetObj.fov = animation.to;
