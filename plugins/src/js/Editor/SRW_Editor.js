@@ -193,6 +193,11 @@ SRWEditor.prototype.init = function(){
 			params: ["aroundPivot", "fixMirrored", "rotation"],
 			desc: "Immediately set to rotation of an object."
 		},
+		animateFOV: {
+			hasTarget: false,
+			params: ["from", "to", "duration", "easingFunction", "easingMode"],
+			desc: "Animate the camera FOV between two values"
+		},
 		translate: {
 			hasTarget: true,
 			params: ["relative", "startPosition", "position", "duration", "easingFunction", "easingMode", "hide", "catmullRom"],
@@ -625,6 +630,16 @@ SRWEditor.prototype.init = function(){
 			params: [],
 			desc: "Hide a sprite."
 		},
+		start_model_texture_anim: {
+			hasTarget: false,
+			params: ["texAnimKey"],
+			desc: "Set the model texture animation with the matching key to running."
+		},
+		stop_model_texture_anim: {
+			hasTarget: false,
+			params: ["texAnimKey"],
+			desc: "Set the model texture animation with the matching key to stopped."
+		},
 		show_sprite: {
 			hasTarget: true,
 			params: [],
@@ -812,6 +827,7 @@ SRWEditor.prototype.init = function(){
 		from: "The frame to start playing from",
 		to: "The frame to play until",
 		attachId: "The name/id of the attachment",
+		texAnimKey: "The id of the model texture animation to target. Note that texture anim keys are global and should be unique among all models used in a project.",
 		holdFrame: "If 1 the sprite will hold the final frame of the animation, ignored if animation looping is enabled.",
 		scrollSpeed: "Sets the horizontal scroll speed of the background, use negative values to change the scroll direction",
 		uScale: "Sets the horizontal scale of the UV(default 1)",
@@ -1209,6 +1225,9 @@ SRWEditor.prototype.init = function(){
 		
 		},
 		attachId: function(value){
+		
+		},
+		texAnimKey: function(value){
 		
 		},
 		snap: function(value){

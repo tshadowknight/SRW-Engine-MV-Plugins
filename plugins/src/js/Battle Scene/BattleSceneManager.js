@@ -75,6 +75,7 @@ export default function BattleSceneManager(){
 	this._activeAliases = {};
 
 	this._matrixAnimations = {};
+	this._FOVAnimation = null;
 	this._matrixUpdates = {};
 	this._translateAnimationCtr = 0;
 	this._matrixUpdateCtr = 0;
@@ -88,6 +89,7 @@ export default function BattleSceneManager(){
 	this._shakeAnimationCtr = 0;
 	this._bgAnimations = {};
 	this._animatedModelTextureInfo = [];
+	this._currentTextureUpdateId = 0;
 	this._bgAnimationCounter = 0;
 	this._fadeAnimations = {};
 	this._fadeAnimationCtr = 0;
@@ -1614,7 +1616,9 @@ BattleSceneManager.prototype.prepareModel = function(root, name, position, flipX
 					delay: parts[4],
 					accumulator: 0,
 					currentFrame: 0,
-					endFrame: parts[2] * parts[3]
+					endFrame: parts[2] * parts[3],
+					key: parts[5],
+					running: true
 				},
 				nodes: []
 			};
@@ -2403,6 +2407,7 @@ BattleSceneManager.prototype.hookBeforeRender = function(){
 			}
 		});	
 		
+		_this._currentTextureUpdateId++;
 		for(let entry of _this._animatedModelTextureInfo){
 			const animation = entry.animInfo;
 			for(let node of entry.nodes){
@@ -2417,9 +2422,12 @@ BattleSceneManager.prototype.hookBeforeRender = function(){
 					} else {
 						texture = node.texture;
 					}
-					if(texture){			
+					if(texture && texture.lastUpdateId != _this._currentTextureUpdateId){			
+						texture.lastUpdateId = _this._currentTextureUpdateId;
 						var deltaFrames = 0;
-						animation.accumulator+=deltaTime;
+						if(animation.running){
+							animation.accumulator+=deltaTime;
+						}							
 						while(animation.accumulator - animation.delay >= 0){
 							animation.accumulator-=animation.delay;
 							deltaFrames++;
@@ -2432,12 +2440,12 @@ BattleSceneManager.prototype.hookBeforeRender = function(){
 									
 						if(animation.currentFrame >= animation.endFrame){							
 							//console.log("loop to " +  (animation.loop - 1));
-							animation.currentFrame = 0;
+							animation.currentFrame = animation.currentFrame - animation.endFrame;
 							animation.startTick = _this._currentAnimationTick;													
 						}			
 
 						
-						
+						//console.log("Showing animation frame " + animation.currentFrame);
 						
 						
 						const uSize = 1 / (texture._texture.width / animation.frameSize);	
@@ -2452,7 +2460,7 @@ BattleSceneManager.prototype.hookBeforeRender = function(){
 								v: texture.vOffset
 							};
 						}		
-					
+						
 						texture.uOffset = (texture.defaultOffsets.u * uSize) + (col * uSize);								
 						texture.vOffset = (texture.defaultOffsets.v * vSize) + (row * vSize);					
 											
@@ -2857,6 +2865,30 @@ BattleSceneManager.prototype.runAnimations = function(deltaTime){
 			}
 		}
 	});	
+
+	if(_this._FOVAnimation){
+		var animation = _this._FOVAnimation;
+		var targetObj = _this._camera;
+		var currentTick = _this._currentAnimationTick - animation.startTick;
+		var duration = animation.duration * _this.getTickDuration();
+		if(animation.accumulator == null){
+			animation.accumulator = 0;
+		}
+		animation.accumulator+=deltaTime;
+		var t = animation.accumulator / duration;	
+		if(t <= 1){
+			if(animation.easingFunction){
+				t = animation.easingFunction.ease(t);
+			}			
+			var startVector = new BABYLON.Vector3(animation.from, 0, 0);
+			var endVector = new BABYLON.Vector3(animation.to, 0, 0);
+			targetObj.fov =  BABYLON.Vector3.Lerp(startVector, endVector, t).x;						
+		} else {
+			targetObj.fov = animation.to;
+			_this._FOVAnimation = null;
+		}
+		
+	}
 }
 BattleSceneManager.prototype.startScene = function(){
 	var _this = this;
@@ -3260,6 +3292,19 @@ BattleSceneManager.prototype.stopScene = function(){
 	AudioManager.stopSe();
 	AudioManager.clearPreloads();
 	//this._engine.dispose();		
+}
+
+BattleSceneManager.prototype.registerFOVAnimation = function(from, to, startTick, duration, easingFunction, easingMode){
+	if(easingFunction && easingMode){
+		easingFunction.setEasingMode(easingMode);
+	}
+	this._FOVAnimation = {
+		from: from, 
+		to: to,
+		startTick: startTick,
+		duration: duration,
+		easingFunction: easingFunction,
+	};
 }
 
 BattleSceneManager.prototype.registerMatrixAnimation = function(type, targetObj, startPosition, endPosition, startTick, duration, easingFunction, easingMode, hide, catmullRom){
@@ -3859,6 +3904,9 @@ BattleSceneManager.prototype.executeAnimation = function(animation, startTick){
 			}
 			
 		},
+		animateFOV: function(target, params){
+			_this.registerFOVAnimation(params.from, params.to, startTick, params.duration, params.easingFunction, params.easingMode);
+		},
 		translate: function(target, params){
 			var targetObj = getTargetObject(target);
 			//_this.stopShakeAnimations(target);
@@ -4257,7 +4305,7 @@ BattleSceneManager.prototype.executeAnimation = function(animation, startTick){
 			_this.setBgMode($statCalc.isBattleShadowHiddenOnCurrentTerrain(action.ref) ? "sky" : "land");			
 		},	
 		next_phase: function(target, params){
-			let insertStartTick = _this._currentAnimationTick;
+			let insertStartTick = _this._currentAnimationTick; //must use the current animation tick and not the start tick so the insertion at tick + 1 can't be skipped on the next frame
 
 			const additions = [];
 			
@@ -5648,6 +5696,20 @@ BattleSceneManager.prototype.executeAnimation = function(animation, startTick){
 					stack.push(child);		
 				}
 			}
+		},
+		start_model_texture_anim: function(target, params){
+			for(let entry of _this._animatedModelTextureInfo){
+				if(entry.animInfo.key == params.texAnimKey){
+					entry.animInfo.running = true;
+				}
+			}			
+		},
+		stop_model_texture_anim: function(target, params){
+			for(let entry of _this._animatedModelTextureInfo){
+				if(entry.animInfo.key == params.texAnimKey){
+					entry.animInfo.running = false;
+				}
+			}			
 		},
 		hide_sprite: function(target, params){
 			var targetObj = getTargetObject(target);
@@ -7100,6 +7162,7 @@ BattleSceneManager.prototype.resetScene = function() {
 	
 	_this._animationList = [];
 	_this._matrixAnimations = {};
+	_this._FOVAnimation = null;
 	_this._activeAliases = {};
 	_this._sizeAnimations = {};
 	_this._shakeAnimations = {};
