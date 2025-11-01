@@ -285,18 +285,19 @@ BattleCalc.prototype.performHitCalculation = function(attackerInfo, defenderInfo
 		if(finalHit < 0){
 			finalHit = 0;
 		}
+
+		if($statCalc.getActiveSpirits(attackerInfo.actor).strike){
+			if(finalHit < 1){
+				finalHit+=1;
+			}			
+		}
 		
 		if(!$statCalc.applyStatModsToValue(attackerInfo.actor, 0, ["hit_cap_break"])){
 			if(finalHit > 1){
 				finalHit = 1;
 			}
-		}
+		}	
 		
-		if($statCalc.getActiveSpirits(attackerInfo.actor).strike){
-			if(finalHit < 1){
-				return 1;
-			}			
-		}
 		
 		result = finalHit;
 	}
