@@ -2267,4 +2267,71 @@ $SRWConfig.pilotAbilties = function(){
 		[0],
 		1,
 	);
+	
+	this.addDefinition(
+		112, 
+		"If other unit fielded example", 
+		"An example of an ability that only provides an effect when another unit is on the field.", 
+		false,
+		true,
+		function(actor, level){
+			const checkedActorId = 10;
+			let effects = [];
+			if($statCalc.getReferenceEvent($gameActors.actor(checkedActorId)) && !$statCalc.getReferenceEvent($gameActors.actor(checkedActorId)).isErased()){
+				effects.push({type: "range_ranged", modType: "addFlat", value: 3});
+			}
+			return effects;
+		},
+		function(actor, level){
+			return true;
+		},
+		[0],
+		1,
+	);
+	
+	
+	this.addDefinition(
+		113,
+		"Soul Harvest",
+		"Gains +10 to all stats for each Cocoon on the map. Example of an ability that provides effects based on the number of other specific units on the map.",
+		false,
+		true,
+		function(actor, level){
+			const effects = [];
+			const targetMechId = 238; 
+			let counter = 0;
+
+			for (let event of $gameMap.events()) {
+				const actorInfo = $gameSystem.EventToUnit(event.eventId());
+				if (!actorInfo) continue;
+				
+				const otherActor = actorInfo[1];
+				if (!otherActor) continue;
+
+				if ($statCalc.isActorSRWInitialized(otherActor) && otherActor.SRWStats.mech.id === targetMechId) {
+					counter++;
+				}
+			}
+
+			if (counter > 0) {
+				const boost = 1 * counter;
+				effects.push(
+					{type: "stat_melee", modType: "addFlat", value: 10 * boost},
+					{type: "stat_ranged", modType: "addFlat", value: 10 * boost},
+					{type: "stat_evade", modType: "addFlat", value: 10 * boost},
+					{type: "stat_defense", modType: "addFlat", value: 10 * boost},
+					{type: "stat_hit", modType: "addFlat", value: 10 * boost},
+					{type: "stat_skill", modType: "addFlat", value: 10 * boost},
+				);
+			}
+
+			return effects;
+		},
+		function(actor, level){
+			return true;
+		},
+		[0],
+		4
+	);
+
 }

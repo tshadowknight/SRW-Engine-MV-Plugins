@@ -1666,6 +1666,7 @@ GameState_normal.prototype.update = function(scene){
 	$gameTemp.isHitAndAway = false;		
 	$gameTemp.currentMapTargets	= [];
 	$gameTemp.unitHitInfo = {};
+	$gameTemp.unitDamageInfo = {};
 	$gameTemp.currentMapAttacker = null;
 	
 	if(!scene._mapButtonsWindow.visible && !$gameTemp.onMapSaving){
@@ -2042,6 +2043,7 @@ GameState_enemy_command.prototype.update = function(scene){
 		$gameTemp.AIWaitTimer--;
 		if($gameTemp.AIWaitTimer < 0){		
 			$gameTemp.unitHitInfo = {};
+			$gameTemp.unitDamageInfo = {};
 			scene.srpgInvokeAICommand();		
 		}			
 	}	

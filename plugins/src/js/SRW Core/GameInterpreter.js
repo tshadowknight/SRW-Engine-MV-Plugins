@@ -1397,6 +1397,51 @@
 			return result;
 		}
 
+
+		Game_Interpreter.prototype.getLastMaxActorDamage = function(eventId, weaponId, includeSupport) {
+			let result = 0;
+			if($gameTemp.unitDamageInfo && $gameTemp.unitDamageInfo.actor){
+				for(let pilotId in $gameTemp.unitDamageInfo.actor){
+					if($gameTemp.unitDamageInfo.actor[pilotId] > result){
+						result = $gameTemp.unitDamageInfo.actor[pilotId];
+					}
+				}
+			}
+			return result;
+		}
+
+		Game_Interpreter.prototype.getLastTotalActorDamage = function(eventId, weaponId, includeSupport) {
+			let result = 0;
+			if($gameTemp.unitDamageInfo && $gameTemp.unitDamageInfo.actor){
+				for(let pilotId in $gameTemp.unitDamageInfo.actor){			
+					result+= $gameTemp.unitDamageInfo.actor[pilotId];					
+				}
+			}
+			return result;
+		}
+
+		Game_Interpreter.prototype.getLastMaxEnemyDamage = function(eventId, weaponId, includeSupport) {
+			let result = 0;
+			if($gameTemp.unitDamageInfo && $gameTemp.unitDamageInfo.enemy){
+				for(let pilotId in $gameTemp.unitDamageInfo.enemy){
+					if($gameTemp.unitDamageInfo.enemy[pilotId] > result){
+						result = $gameTemp.unitDamageInfo.enemy[pilotId];
+					}
+				}
+			}
+			return result;
+		}
+
+		Game_Interpreter.prototype.getLastTotalEnemyDamage = function(eventId, weaponId, includeSupport) {
+			let result = 0;
+			if($gameTemp.unitDamageInfo && $gameTemp.unitDamageInfo.enemy){
+				for(let pilotId in $gameTemp.unitDamageInfo.enemy){			
+					result+= $gameTemp.unitDamageInfo.enemy[pilotId];					
+				}
+			}
+			return result;
+		}		
+
 		Game_Interpreter.prototype.isActorInBattle = function(actorId, checkSubPilots) {
 			var result = false;
 			

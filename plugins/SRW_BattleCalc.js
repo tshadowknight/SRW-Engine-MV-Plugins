@@ -1615,6 +1615,15 @@ BattleCalc.prototype.generateBattleResult = function(isPrediction){
 			
 		}
 	};
+
+	$gameTemp.unitDamageInfo = {
+		actor: {
+			
+		},
+		enemy: {
+			
+		},
+	};
 	
 	Object.keys($gameTemp.battleEffectCache).forEach(function(cacheRef){
 		var battleEffect = $gameTemp.battleEffectCache[cacheRef];
@@ -1639,7 +1648,20 @@ BattleCalc.prototype.generateBattleResult = function(isPrediction){
 					$gameTemp.unitHitInfo.event[targetId] = {};
 				}
 				$gameTemp.unitHitInfo.event[targetId][attackId] = {isSupport: battleEffect.type == "support attack"};
-			}			
+			}		
+			if(battleEffect.ref.isActor()){
+				if(!$gameTemp.unitDamageInfo.actor[battleEffect.ref.actorId()]){
+					$gameTemp.unitDamageInfo.actor[battleEffect.ref.actorId()] = {};
+				}
+				$gameTemp.unitDamageInfo.actor[battleEffect.ref.actorId()] = (battleEffect.damageInflicted || 0) + (battleEffect.damageInflicted_all_sub || 0);
+			}	
+			if(battleEffect.ref.isEnemy()){
+				if(!$gameTemp.unitDamageInfo.enemy[battleEffect.ref.enemyId()]){
+					$gameTemp.unitDamageInfo.enemy[battleEffect.ref.enemyId()] = {};
+				}
+				$gameTemp.unitDamageInfo.enemy[battleEffect.ref.enemyId()] = (battleEffect.damageInflicted || 0) + (battleEffect.damageInflicted_all_sub || 0);
+			}	
+			
 		}
 	});	
 }
