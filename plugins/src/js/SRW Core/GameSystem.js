@@ -2048,6 +2048,7 @@
 		
 		Game_System.prototype.invalidateDeployList = function() {
 			$gameSystem.deployList = null;
+			$gameSystem.shipDeployList = null;
 		}
 		
 		Game_System.prototype.getDeployList = function() {
