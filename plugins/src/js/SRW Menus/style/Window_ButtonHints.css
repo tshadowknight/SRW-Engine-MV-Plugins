@@ -27,15 +27,34 @@
 	justify-content: flex-end;
 }
 
+#button_hints #button_hints_center.text_log {
+	bottom: 29.2%;
+	height: 4%;
+	background: linear-gradient(to right, rgba(0,0,0,0) 45%,rgba(0,0,0,0.2) 53%,rgba(0,0,0,0.2) 100%);
+}
+
+#button_hints #button_hints_center.text_log .hint{
+	/*--fontsize: 1px;	*/
+}
+
 #button_hints .hint_container .hint_block {
 	margin-left: 2%;
 	margin-right: 2%;	
+}
+
+#button_hints #button_hints_center.text_log .hint_block{
+	margin-left: 1%;
+	margin-right: 1%;	
 }
 
 #button_hints .hint_container .hint {
 	display: flex;	
 	--fontsize: 1.2px;
 	align-items: center;
+}
+
+#button_hints .hint_container .hint.combo {
+
 }
 
 #button_hints .action_icon_container {
@@ -49,6 +68,22 @@
 	display: flex;
 	align-items: center;
 	margin-left: 0.7vw;
+	overflow: hidden;
+	opacity: 0.8;
+}
+
+#button_hints .hint_container .hint.combo .action_icon{
+	margin-left: 0.2vw;
+}
+
+#button_hints .hint_container .hint.combo .action_icon:first-child{
+	margin-left: 0.7vw;
+}
+
+#button_hints .combo_input {
+	display: flex;
+	align-items: center;
+	margin-left: 0.2vw;
 	overflow: hidden;
 	opacity: 0.8;
 }

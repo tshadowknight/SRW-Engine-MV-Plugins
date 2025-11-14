@@ -666,6 +666,12 @@ APPSTRINGS.BUTTON_HINTS = {
 	scroll_list: {text: "Scroll List", action: "d:up_down"},
 	show_zone_info: {text: "Show Zone Details", action: "menu"},
 	show_status: {text: "Show Status", action: "menu"},
+
+	//Text
+	confim_text: {text: "Continue", action: "ok"}, 
+	text_log: {text: "Text Log", action: "menu"}, 
+	fast_forward: {text: "Fast Forward", actions: ["ok", "pagedown"]}, 
+	skip_forward:  {text: "Skip", actions: ["ok", "pageup", "pagedown"]}, 
 };
 
 

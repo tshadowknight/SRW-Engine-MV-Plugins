@@ -84,6 +84,71 @@
 			}									
 		};
 
+		Window_Message.prototype.initialize = function() {
+			var width = this.windowWidth();
+			var height = this.windowHeight();
+			var x = (Graphics.boxWidth - width) / 2;
+			Window_Base.prototype.initialize.call(this, x, 0, width, height);
+			this.openness = 0;
+			this.initMembers();
+			this.createSubWindows();
+			this.updatePlacement();
+		};
+
+		Window_Message.prototype.startMessage = function() {
+			this._textState = {};
+			this._textState.index = 0;
+			this._textState.text = this.convertEscapeCharacters($gameMessage.allText());
+			this.newPage(this._textState);
+			this.updatePlacement();
+			this.updateBackground();
+			this.open();			
+		};
+
+		Window_Message.prototype.show = function() {
+			this.visible = true;			
+			if(this._positionType == 2){
+				$gameTemp.buttonHintManager.setHelpButtons([["text_log"], ["fast_forward"], ["skip_forward"]]);
+				$gameTemp.buttonHintManager.show("text_log", true);
+			}								
+		}
+
+		Window_Message.prototype.hide = function() {
+			this.visible = false;
+			this._requestHintWindowClose = true;
+		}
+
+
+		Window_Message.prototype.open = function() {
+			if (!this.isOpen()) {
+				this._opening = true;
+			}
+			this._closing = false;
+			if(this._positionType == 2){
+				$gameTemp.buttonHintManager.setHelpButtons([["text_log"], ["fast_forward"], ["skip_forward"]]);
+				if (!this.isOpen()) {					
+					$gameTemp.buttonHintManager.show("text_log");
+				} else {
+					$gameTemp.buttonHintManager.show("text_log", true);
+				}
+			}
+		};
+
+		Window_Message.prototype.close = function() {
+			if (!this.isClosed()) {
+				this._closing = true;
+			}
+			this._opening = false;
+			//queue a hint window close for the next update so that it can be cancelled
+			this._requestHintWindowClose = true;
+			
+		};
+		Window_Message.prototype.updatePlacement = function() {
+			this._positionType = $gameMessage.positionType();
+			this.y = this._positionType * (Graphics.boxHeight - this.height) / 2;			
+			this._goldWindow.y = this.y > 0 ? 0 : Graphics.boxHeight - this._goldWindow.height;
+		};
+
 		
 		Window_Message.prototype.isInstantText = function() {
 			return Input.isPressed('ok') && Input.isPressed('pagedown');
@@ -192,7 +257,12 @@
 		
 		Window_Message.prototype.update = function() {
 			this.checkToNotClose();
-			Window_Base.prototype.update.call(this);
+			//if a hint window closure was requested and the closing wasn't cancelled
+			if(this._requestHintWindowClose && this._closing){
+				$gameTemp.buttonHintManager.hide();
+			}
+			this._requestHintWindowClose = false;
+			Window_Base.prototype.update.call(this);			
 			while (!this.isOpening() && !this.isClosing()) {
 				this._remoteOverlayCounter+=0.2;
 				if($gameMessage.faceName()){

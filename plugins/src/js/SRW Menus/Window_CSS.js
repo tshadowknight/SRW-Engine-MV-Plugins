@@ -763,30 +763,48 @@ Window_CSS.prototype.createAttributeBlock = function(attack) {
 	return content;
 }
 
-
 Window_CSS.prototype.populatHintContainer = function(elem, list) {
 	let content = "";
 	let iconInfo = [];
 	let iconCtr = 0;
+
+
+
 	for(let entry of list){
 		content+="<div class='hint_block'>";
 		for(let row of entry){
 			let hintDef = APPSTRINGS.BUTTON_HINTS[row];
 			if(hintDef){
-				content+="<div class='hint'>";
+				let actions = [];
+				if(hintDef.action){
+					actions.push(hintDef.action);
+				} else if(hintDef.actions){
+					actions = hintDef.actions;
+				}
+
+				content+="<div class='hint "+(actions.length > 1 ? "combo" : "")+"'>";
 				content+="<div class='hint_text scaled_text'>";
 				content+=hintDef.text;
 				content+="</div>"
-				content+="<div class='action_icon_container'>";
-				let icons = $gameSystem.getActionGlyphs(hintDef.action);
-				for(let icon of icons){
-					if(icon){
-						content+="<div class='action_icon' data-icon='"+iconCtr+"'>";
-						content+="</div>"
-						iconInfo[iconCtr] = icon;						
-					}
-					iconCtr++;
-				}				
+				content+="<div class='action_icon_container'>";				
+				
+				let glyphContainers = [];
+				for(let action of actions){
+					let icons = $gameSystem.getActionGlyphs(action);
+					let content = "";
+					for(let icon of icons){
+						if(icon){							
+							content+="<div class='action_icon' data-icon='"+iconCtr+"'>";
+							content+="</div>";
+							
+							iconInfo[iconCtr] = icon;						
+						}
+						iconCtr++;
+					}	
+					glyphContainers.push(content);
+				}
+				content+=glyphContainers.join("<div class='combo_input scaled_text'>+</div>");
+							
 				content+="</div>"
 				content+="</div>"
 			}
@@ -798,7 +816,7 @@ Window_CSS.prototype.populatHintContainer = function(elem, list) {
 }
 
 
-Window_CSS.prototype.constructButtonIcon = function(iconCtr, iconDef) {	
+Window_CSS.prototype.constructButtonIcon = function(iconCtr, iconDef, shrinkMultiRowIcons) {	
 	const _this = this;
 	const parentElem = this._centerContainer.querySelector(".action_icon[data-icon='"+iconCtr+"']");
 	
@@ -814,7 +832,26 @@ Window_CSS.prototype.constructButtonIcon = function(iconCtr, iconDef) {
 	
 	let width = 0;
 	let height = 0;
-	
+
+	let shrinkFactor = 1;
+	if(shrinkMultiRowIcons){
+		let hasMultiRow = false;
+		for(let i = 0; i < 4; i++){
+			let suffix = "";
+			if(i > 0){//compat with original format
+				suffix = i;
+			}
+			let tiles = iconDef["tiles"+suffix];
+			if(tiles && tiles.length > 1){
+				hasMultiRow = true;
+			}
+		}
+
+		if(hasMultiRow){
+			shrinkFactor = 0.76;
+		}
+	}
+		
 	for(let i = 0; i < 4; i++){
 		let suffix = "";
 		if(i > 0){//compat with original format
@@ -837,7 +874,7 @@ Window_CSS.prototype.constructButtonIcon = function(iconCtr, iconDef) {
 				}
 			}
 			
-			const mutiplier = initialMultiplier * Graphics.getScale();
+			const mutiplier = initialMultiplier * Graphics.getScale() * shrinkFactor;
 			const size = tileSize * mutiplier;
 			
 			offsetX = offsetX * size;
@@ -894,4 +931,8 @@ Window_CSS.prototype.createHPBarContent = function(calculatedStats) {
 
 	content+="<div class='hp_bar'><div style='width: "+hpPercent+"%; background-color: "+fillColor+";' class='hp_bar_fill'></div></div>";
 	return content;
+}
+
+Window_CSS.prototype.easeInOutSine = function(t) {
+	return Math.sin((t * Math.PI) / 2);
 }

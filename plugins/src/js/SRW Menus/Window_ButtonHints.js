@@ -5,6 +5,8 @@ export default function Window_ButtonHints() {
 	this.initialize.apply(this, arguments);	
 }
 
+//TODO: separate out text_log button hint functionality into deriving class 
+
 Window_ButtonHints.prototype = Object.create(Window_CSS.prototype);
 Window_ButtonHints.prototype.constructor = Window_ButtonHints;
 
@@ -17,6 +19,12 @@ Window_ButtonHints.prototype.initialize = function() {
 	});	
 	this._requestCtr = 0;
 	this._hints = [];
+	this._topBarContexts = ["text_log"];
+	this._usedContexts = {};
+}
+
+Window_ButtonHints.prototype.isTopBar = function(){
+	return this._topBarContexts.indexOf(this._currentDisplayKey) != -1;
 }
 
 Window_ButtonHints.prototype.setHelpButtons = function(hints){
@@ -53,8 +61,11 @@ Window_ButtonHints.prototype.clearDisplayKey = function() {
 	this._currentDisplayKey = null
 }
 
-Window_ButtonHints.prototype.show = function(displayKey) {
-	if(!displayKey || this._currentDisplayKey != displayKey){
+Window_ButtonHints.prototype.show = function(displayKey, immediate) {
+	if(displayKey){
+		this._usedContexts[displayKey] = true;
+	}
+	if(!displayKey || this._currentDisplayKey != displayKey){		
 		this._currentDisplayKey = displayKey;	
 		this.resetSelection();
 		this._handlingInput = false;
@@ -65,26 +76,64 @@ Window_ButtonHints.prototype.show = function(displayKey) {
 		this.triggerCustomBgCreate();
 		
 		Graphics._updateCanvas();
+
+		this._animateShow = false;
+		this._centerContainer.style.opacity = null;
+		this._centerContainer.style.left = null;
+		this._requestClose = false;
+
+		if(this.isTopBar() && !immediate){
+			this.animateShow();
+		}
 	}
 };
 
+Window_ButtonHints.prototype.animateShow = function() {
+	this._centerContainer.style.opacity = 0;
+	this._animateShow = true;
+	this._animateShowCtr = 0;
+}
 
 Window_ButtonHints.prototype.hide = function() {
 	this.clearDisplayKey();
-    this.visible = false;
+	this.visible = false;
 	this._visibility = "none";
 	this.refresh();
+	this._requestClose = false;	
 };
 
 Window_ButtonHints.prototype.update = function() {
 	var _this = this;
 	Window_Base.prototype.update.call(this);
+	const animOffset = 0.2;
+	const animFrames = 6;
+	if(this._animateShow){
+		this._animateShowCtr++;
+		const progress = this.easeInOutSine(this._animateShowCtr / animFrames);
+
+		this._centerContainer.style.opacity = progress;
+		this._centerContainer.style.left = animOffset - (animOffset * (progress)) + "%";
+		
+		if(this._centerContainer.style.opacity >= 1){
+			this._centerContainer.style.opacity = 1;
+			this._centerContainer.style.left = null;
+			this._animateShow = false;
+		}
+	} 
+	
 	//hacky workaround for issue where the hints don't show up for the deployment in stage window, since that is a window that is shown while the event interpreter is active
 	//exception for when $gameTemp.doingModeSelection is true, so the hints can be displayed in the mode selection window which is shown while the interpreter is running
-	if(!$gameTemp.doingModeSelection && $gameSystem.isSubBattlePhase() != "deploy_selection_window" && $gameMap && $gameMap._interpreter && $gameMap._interpreter.isRunning()){
-		this.hide();
-	}
 	
+	//exception for when the message window is open
+	//might be a better idea to spin off the message window button hints into its own window class instead
+	let messageWindowIsOpen = false;
+	let messageWindowRef = SceneManager?._scene?._messageWindow;
+	if(messageWindowRef?.isOpen() || messageWindowRef?.isOpening()){
+		messageWindowIsOpen = true;
+	}
+	if(!this._animateHide && !$gameTemp.doingModeSelection && $gameSystem.isSubBattlePhase() != "deploy_selection_window" && (($gameMap && $gameMap._interpreter && $gameMap._interpreter.isRunning()) && !messageWindowIsOpen)){
+		this.hide();
+	}	
 	
 	if(this.isOpen() && !this._handlingInput){			
 		this.refresh();
@@ -99,13 +148,17 @@ Window_ButtonHints.prototype.refresh = function() {
 	this.getWindowNode().style.display = this._visibility;
 }
 
-
-
 Window_ButtonHints.prototype.redraw = async function() {	
 	var _this = this;
 	
 	this._requestCtr++;
 	let currentCtr = this._requestCtr;
+
+	for(let context in this._usedContexts){
+		this._centerContainer.classList.remove(context);	
+	}
+
+	this._centerContainer.classList.add(this._currentDisplayKey);
 	
 	
 	if(!_this._iconsBitmap){
@@ -117,27 +170,14 @@ Window_ButtonHints.prototype.redraw = async function() {
 	}
 	
 	const iconInfo = this.populatHintContainer(this._centerContainer, this._hints);
+
 	for(let i = 0; i < iconInfo.length; i++){
 		let iconDef = iconInfo[i];
 		if(iconDef){
-			this.constructButtonIcon(i, iconDef);
+			this.constructButtonIcon(i, iconDef, this.isTopBar());
 		}
 	}
 	
-	/*const hintBlocks = this._centerContainer.querySelectorAll(".hint_block");
-	for(const hintBlock of hintBlocks){
-		const hints = hintBlock.querySelectorAll(".hint_text");
-		let maxWidth = 0;
-		for(let hint of hints){
-			const width = hint.getBoundingClientRect().width;
-			if(width > maxWidth){
-				maxWidth = width;
-			}
-		}
-		for(let hint of hints){
-			hint.style.width = maxWidth + "px";
-		}
-	}*/
 	Graphics._updateCanvas();
 	$CSSUIManager.doUpdateScaledText("button_hints");
 }

@@ -17,7 +17,7 @@ $SRWConfig.abilityCommands = function(){
 		1, //the id of the command
 		"Summon Illusion", //the display name of the command
 		"Summon a ghostly copy of an enemy to fight on your side.", //the display description of the command
-		{type: "MP", cost: 70}, //the cost for use
+		4,//{type: "MP", cost: 70}, //the cost for use
 		function(actor){ //the function that applies the effect of the command to the user
 			var event = $gameMap.requestDynamicEvent();			
 			var space = $statCalc.getAdjacentFreeStandableSpace(actor, {x: actor.event.posX(), y: actor.event.posY()});			
@@ -44,6 +44,8 @@ $SRWConfig.abilityCommands = function(){
 				$statCalc.setCustomMechStats(actor_unit, {maxHP: 10000, armor: 500, mobility: 130});				
 			}
 			
+			$statCalc.setIsAI(actor_unit, true);
+
 			event.appear();
 			event.refreshImage();
 		}, function(actor){ //the function that checks if the command can be used

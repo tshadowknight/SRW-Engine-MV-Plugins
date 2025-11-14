@@ -881,7 +881,7 @@ Window_UpgradePilot.prototype.redraw = function() {
 		let abilityList = ENGINE_SETTINGS.FAV_POINT_ABILITIES[pilotData.actorId()] || ENGINE_SETTINGS.FAV_POINT_ABILITIES[-1];
 		let pointCount = $statCalc.getFavPoints(pilotData);
 		
-		favPointControlsContent+="<div class='upgrade_control_row header'>";
+		favPointControlsContent+="<div class='upgrade_control_row header fav_point_control'>";
 		favPointControlsContent+="<div class='upgrade_control_block scaled_text'>";
 		//favPointControlsContent+=APPSTRINGS.PILOTUPGRADES.label_ability;
 		favPointControlsContent+="</div>";
@@ -897,7 +897,7 @@ Window_UpgradePilot.prototype.redraw = function() {
 			let def = abilityList[i];
 			var displayInfo = $pilotAbilityManager.getAbilityDisplayInfo(def.id);
 			let isEnabled = this.canFavAbilityBeBought(i) || this.isFavAbilityUnlocked(i) || _this._currentFavSkillsPending[i];
-			favPointControlsContent+="<div data-idx='"+i+"' class='upgrade_control_row "+(_this._currentFavSkillSelection == i ? "selected" : "")+" "+(isEnabled ? "enabled" : "disabled")+"'>";
+			favPointControlsContent+="<div data-idx='"+i+"' class='upgrade_control_row fav_point_control "+(_this._currentFavSkillSelection == i ? "selected" : "")+" "+(isEnabled ? "enabled" : "disabled")+"'>";
 			favPointControlsContent+="<div class='upgrade_control_block scaled_text status_block'>";
 			//favPointControlsContent+=APPSTRINGS.PILOTUPGRADES.label_ability;
 			favPointControlsContent+="<img class='arrow_indic' src='svg/arrow-right-s-fill.svg'>";
@@ -1082,10 +1082,37 @@ Window_UpgradePilot.prototype.redraw = function() {
 			}					
 		});
 	});
+
+	var entries = windowNode.querySelectorAll(".fav_point_control");
+	entries.forEach(function(entry){
+		entry.addEventListener("click", function(){
+			if(_this._currentUIState == "fav_point_selection"){
+				var idx = this.getAttribute("data-idx"); 
+				if(idx != null){
+					idx*=1;					
+					_this._currentFavSkillSelection = idx;
+					if(_this._currentFavSkillsPending[idx]){
+						_this._touchLeft = true;
+					} else {
+						_this._touchRight = true;	
+					}						
+					_this.requestRedraw();					
+				}						
+			}					
+		});
+	});
+
+
+	
 	
 	windowNode.querySelector("#btn_apply").addEventListener("click", function(){
 		_this._touchOK = true;
 	});
+
+	windowNode.querySelector("#btn_apply_points").addEventListener("click", function(){
+		_this._touchOK = true;
+	});
+
 	var cost = this.currentCost();					
 	var pilotData = this.getCurrentSelection();
 	if(cost > 0 && (cost <= $statCalc.getCurrentPP(pilotData) || $gameSystem.optionInfinitePP)){
