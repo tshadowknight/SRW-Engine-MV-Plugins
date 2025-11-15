@@ -2733,7 +2733,7 @@ GameState_rearrange_deploys.prototype.update = function(scene){
 		$gameSystem.setBattlePhase($gameTemp.deployContextState);
 		$gameSystem.setSubBattlePhase($gameTemp.deployContextSubState);
 		
-		var deployInfo = $gameSystem.getDeployInfo();
+		/*var deployInfo = $gameSystem.getDeployInfo();
 		deployInfo.count = 0;
 		deployInfo.assigned = {};
 		deployInfo.assignedSub = {};
@@ -2742,7 +2742,7 @@ GameState_rearrange_deploys.prototype.update = function(scene){
 		deployInfo.lockedShipSlots = {};
 		deployInfo.doNotDeploySlots = {};
 		deployInfo.minDeployCount = 1;
-		$gameSystem.setDeployInfo(deployInfo);
+		$gameSystem.setDeployInfo(deployInfo);*/
 		
 		$gameMap._interpreter.setWaitMode("enemy_appear");
 		$gameTemp.enemyAppearQueueIsProcessing = true;
