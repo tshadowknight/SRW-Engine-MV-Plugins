@@ -7533,7 +7533,7 @@ StatCalc.prototype.isStatModActiveOnAnyActor = function(modType, excludedSkills)
 	return result;
 }
 
-StatCalc.prototype.getActiveStatMods = function(actor, actorKey, excludedSkills){
+StatCalc.prototype.getActiveStatMods = function(actor, actorKey, excludedSkills, force){
 	var _this = this;
 	if(!excludedSkills){
 		excludedSkills = {};
@@ -7546,21 +7546,22 @@ StatCalc.prototype.getActiveStatMods = function(actor, actorKey, excludedSkills)
 		list: []
 	};
 	
+	//this structure disallows the same ability to be processed twice for the same actor in one round of processing
+	//functions as infinite recursion prevention for ability calling ability checks
 	if(!_this._currentActorBeingProcessed[actorKey]){
 		_this._currentActorBeingProcessed[actorKey] = {
 		
 		};
-	}
-	
-	
+	}	
 	
 	function accumulateFromAbilityList(abilityList, abilityManager){
 		if(abilityList && abilityManager){			
 			let ctr = 0;
 			abilityList.forEach(function(abilityDef){
 				if(abilityDef){
-					const sourceId = abilityManager.getIdPrefix()+"_"+abilityDef.idx + "_" + ctr;
-					if(!_this._currentActorBeingProcessed[actorKey][sourceId]){						
+					const skillPrefixId = abilityManager.getIdPrefix()+"_"+abilityDef.idx;
+					const sourceId = skillPrefixId + "_" + ctr;
+					if((!_this._currentActorBeingProcessed[actorKey][sourceId] || force) && !excludedSkills[skillPrefixId]){						
 						_this._currentActorBeingProcessed[actorKey][sourceId] = true;
 						
 						if((typeof abilityDef.requiredLevel == "undefined" || abilityDef.requiredLevel == 0 || _this.getCurrentLevel(actor) >= abilityDef.requiredLevel) && abilityManager.isActive(actor, abilityDef.idx, abilityDef.level)){
@@ -7631,6 +7632,17 @@ StatCalc.prototype.getActiveStatMods = function(actor, actorKey, excludedSkills)
 		}		
 
 		if(!actor.isSubPilot && actor.SRWStats.mech){			
+
+			var FUBAbility = actor.SRWStats.mech.fullUpgradeAbility;	
+			if(typeof FUBAbility != "undefined" && FUBAbility != -1 && FUBAbility.idx != -1){
+				accumulateFromAbilityList([FUBAbility], $mechAbilityManager);	
+			}
+			
+			var genericFullUpgradeAbility = actor.SRWStats.mech.genericFullUpgradeAbility;	
+			if(typeof genericFullUpgradeAbility != "undefined" && genericFullUpgradeAbility != -1 && genericFullUpgradeAbility.idx != -1){
+				accumulateFromAbilityList([genericFullUpgradeAbility], $mechAbilityManager);	
+			}		
+
 			var abilities = actor.SRWStats.mech.abilities;	
 			
 			if(abilities){
@@ -7666,15 +7678,7 @@ StatCalc.prototype.getActiveStatMods = function(actor, actorKey, excludedSkills)
 				}	
 			}
 			
-			var FUBAbility = actor.SRWStats.mech.fullUpgradeAbility;	
-			if(typeof FUBAbility != "undefined" && FUBAbility != -1 && FUBAbility.idx != -1){
-				accumulateFromAbilityList([FUBAbility], $mechAbilityManager);	
-			}
 			
-			var genericFullUpgradeAbility = actor.SRWStats.mech.genericFullUpgradeAbility;	
-			if(typeof genericFullUpgradeAbility != "undefined" && genericFullUpgradeAbility != -1 && genericFullUpgradeAbility.idx != -1){
-				accumulateFromAbilityList([genericFullUpgradeAbility], $mechAbilityManager);	
-			}		
 			
 			var items = actor.SRWStats.mech.items;		
 			accumulateFromAbilityList(items, $itemEffectManager);		
@@ -7781,6 +7785,21 @@ StatCalc.prototype.getActiveStatMods = function(actor, actorKey, excludedSkills)
 		}
 	}
 	return result;
+}
+
+//note: if called from inside an effect handler, excluded skills must be set to avoid infinte loops
+StatCalc.prototype.getActiveEffectValue = function(actor, effectId, excludedSkills){
+	const globalResult = this.applyStatModsToValue(actor, 0, [effectId], excludedSkills);
+	if(globalResult){
+		return !!globalResult; //the effect is set by another unit's ability
+	}
+	const ownAbilityEffects = this.getActiveStatMods(actor, actor.SRWStats.pilot.id+"_"+"own", excludedSkills, true);
+	for(const entry of ownAbilityEffects.list){
+		if(entry.type == effectId && entry.value > 0){
+			return true;
+		}
+	}
+	return false;
 }
 
 StatCalc.prototype.externalLockUnitUpdates = function(){
