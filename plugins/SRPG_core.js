@@ -390,7 +390,7 @@ var _defaultPlayerSpeed = parameters['defaultPlayerSpeed'] || 4;
 	ImageManager.getTranslationInfo = function(filename){	
 		if(filename){
 			if($gameSystem.faceAliases && $gameSystem.faceAliases[filename]){
-			filename = $gameSystem.faceAliases[filename];
+				filename = $gameSystem.faceAliases[filename];
 			}
 			if(ENGINE_SETTINGS.variableUnitPortraits && !$gameSystem.disableVariablePortraits){
 				var keyParts = filename.split("_");

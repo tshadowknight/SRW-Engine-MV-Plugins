@@ -5821,16 +5821,12 @@ BattleSceneManager.prototype.executeAnimation = function(animation, startTick){
 			}
 			
 			//this should be done through UV scrolling, but changing the UV on the same frame as the camera position causes flickering?
-			_this._bgs.forEach(function(bg){	
-				if(!bg.inactive){ 
-					bg.position.x+=targetOffset % bg.sizeInfo.width;	
-				}
+			_this._bgs.forEach(function(bg){			
+				bg.position.x+=targetOffset % bg.sizeInfo.width;					
 				
 			});
 			_this._bgInstances.forEach(function(bg){	
-				if(!bg.inactive){
-					bg.position.x+=targetOffset % bg.sizeInfo.width;	
-				}
+				bg.position.x+=targetOffset % bg.sizeInfo.width;					
 			});
 			
 			
@@ -7298,6 +7294,7 @@ BattleSceneManager.prototype.createEnvironment = function(ref){
 							_this._bgLayerInfo[bgId] = bg.path;
 							await _this.preloadTexture("img/SRWBattlebacks/"+bg.path+".png", "Environment Creation Fixed BG");
 						} else {
+							
 							_this.createScrollingBg("bg"+ctr, bgId, bg.path, {width: bg.width, height: bg.height}, bg.yoffset, bg.zoffset, maxZOffset - bg.zoffset, bg.xoffset);
 						}	
 					}	
@@ -7330,8 +7327,9 @@ BattleSceneManager.prototype.createScrollingBg = function(id, bgId, path, size, 
 	for(var i = 0; i < amount; i++){
 		var bg;
 		const position = new BABYLON.Vector3(startX + (i * size.width), yOffset, zOffset);
+		
 		if(i == 0){
-			bg = this.createBg(id + "_" + i, path, position, size, 1, null, true, false, true);
+			bg = this.createBg(bgId + "_" + id + "_" + i, path, position, size, 1, null, true, false, true);
 			bg.parent = _this._bgsParent;
 			bg.isInstanceRef = true;
 			instanceRef = bg;
@@ -7343,7 +7341,7 @@ BattleSceneManager.prototype.createScrollingBg = function(id, bgId, path, size, 
 			bg.scrollOffset = scrollOffset;
 			_this._bgs.push(bg);
 		} else {
-			bg = instanceRef.createInstance(id + "_" + i);
+			bg = instanceRef.createInstance(bgId + "_" +id + "_" + i);
 			bg.parent = _this._bgsParent;
 			bg.isInstanceRef = false;
 			bg.position = position;
