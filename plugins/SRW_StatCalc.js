@@ -7238,7 +7238,7 @@ StatCalc.prototype.clearTempEffects = function(actor){
 StatCalc.prototype.clearTempEffectsOnAll = function(type){		
 	var _this = this;
 	_this.iterateAllActors(type, function(actor){			
-		_this.clearTempEffects(actor, effect);						
+		_this.clearTempEffects(actor);						
 	});
 }
 
