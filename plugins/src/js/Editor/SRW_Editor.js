@@ -153,6 +153,11 @@ SRWEditor.prototype.init = function(){
 	};
 	
 	_this._commandDisplayInfo = {
+		tick_conditional: {
+			hasTarget: false,
+			params: ["expression"],
+			desc: "If added to a tick the expression must evaluate to true or the entire tick will be ignored."
+		},
 		set_blend_color: {
 			hasTarget: true,
 			params: ["r", "g", "b"],
@@ -749,6 +754,7 @@ SRWEditor.prototype.init = function(){
 	
 	
 	_this._paramTooltips = {
+		expression: "A javascript expression to evaluate. actor is an available variable referencing the actor performing the current attack. All globals are accessible.",
 		r: "The red component of a color 0-255",
 		g: "The green component of a color 0-255",
 		b: "The blue component of a color 0-255",
@@ -955,6 +961,9 @@ SRWEditor.prototype.init = function(){
 		},		
 		
 		immediate: function(value){
+			
+		}, 
+		expression: function(value){
 			
 		}, 
 		armatureName: function(value){

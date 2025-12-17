@@ -18,6 +18,7 @@ export default function BattleSceneManager(){
 	this._initialized = false;
 	this._isLoading = 0;
 	this._animQueue = [];
+	this._tmpAnimQueue = [];
 	this._instanceId = 0;
 	this._frameAccumulator = 0;
 	this._bgWidth = 50;	
@@ -916,7 +917,7 @@ BattleSceneManager.prototype.runShaderEffect = function(id, effect, postEffect){
 		
 	}*/
 	
-	console.log(_this._shaderManagement[id].currentTime);
+	//console.log(_this._shaderManagement[id].currentTime);
 			
 	effect.setVector2('iResolution', new BABYLON.Vector2(postEffect.width, postEffect.height));
 	//effect.setBool('iPlaying', true);
@@ -2938,12 +2939,28 @@ BattleSceneManager.prototype.startScene = function(){
 					if(_this._animationList[i]){
 						let current = _this._animationList[i];
 						_this._animationList[i] = null;
+						let tickConditionalOK = true;
+						_this._tempAnimQueue = [];
 						for(var j = 0; j < current.length; j++){
 							//_this.executeAnimation(_this._animationList[i][j], i);
-							_this._animQueue.push({
-								def: current[j],
-								tick: i
-							});
+							if(current[j].type == "tick_conditional" && tickConditionalOK){// if multiple blocks are included, all must be true
+								let actor = _this._currentAnimatedAction.ref;
+								try {
+									tickConditionalOK = eval(current[j].params.expression);
+								} catch(e){
+									console.log(e.message);
+								}
+							} else {
+								_this._tempAnimQueue.push({
+									def: current[j],
+									tick: i
+								});
+							}							
+						}
+						if(tickConditionalOK){
+							for(let entry of _this._tempAnimQueue){
+								_this._animQueue.push(entry)
+							}
 						}
 					}
 				}
@@ -3736,6 +3753,9 @@ BattleSceneManager.prototype.executeAnimation = function(animation, startTick){
 	}
 		
 	var animationHandlers = {
+		tick_conditional: function(){
+			
+		},
 		register_alias: function(target, params){
 			_this._activeAliases[params.id] = target;
 		},
