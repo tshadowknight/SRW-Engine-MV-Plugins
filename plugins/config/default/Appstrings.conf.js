@@ -425,6 +425,7 @@ APPSTRINGS.OPTIONS = {
 	label_sound_options: "Sound Options",
 	label_display: "Display",
 	label_fullscreen: "Fullscreen",
+	label_save_vram: "Effects Quality",
 	label_grid: "Grid",
 	label_will: "Show Info on Map",
 	label_default_support: "Default Support Defend",

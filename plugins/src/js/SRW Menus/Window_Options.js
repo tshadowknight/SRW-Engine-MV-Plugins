@@ -48,7 +48,18 @@ Window_Options.prototype.initialize = function() {
 			
 		}
 	});
-	
+/*
+	this._optionInfo.push({
+		name: APPSTRINGS.OPTIONS.label_save_vram,
+		display: function(){
+			return ConfigManager["SaveVRAM"] ? "LOW" : "HIGH";
+		},
+		update: function(){
+			var newState = !ConfigManager["SaveVRAM"];
+			ConfigManager["SaveVRAM"] = newState;			
+		}
+	});	
+	*/
 	const buttonImgs = {"xbox": "XBox", "ds": "Playstation", "nin": "Nintendo"};
 	
 	this._optionInfo.push({

@@ -671,6 +671,7 @@ var effekseer = function () {
     xhr.send(null);
   };
 
+  
   var _loadResource = async function _loadResource(path, onload, onerror) {
 
     splitted_path = path.split('?');
@@ -683,7 +684,23 @@ var effekseer = function () {
     var ext = extindex >= 0 ? ext_path.slice(extindex) : "";
     if (ext == ".png" || ext == ".jpg") {
       var bitmap = await ImageManager.loadBitmapPromise("", path);
+	  
       var converted_image = _convertPowerOfTwoImage(bitmap.canvas);
+	  if(ConfigManager["SaveVRAM"]){
+		if(converted_image.width > 512 || converted_image.height > 512){
+		  var canvas = document.createElement('canvas');
+		  var ctx = canvas.getContext('2d');
+		  
+		  // Calculate new dimensions while maintaining aspect ratio
+		  var scale = Math.min(512 / converted_image.width, 512 / converted_image.height);
+		  canvas.width = Math.floor(converted_image.width * scale);
+		  canvas.height = Math.floor(converted_image.height * scale);
+		  
+		  // Draw downsampled image
+		  ctx.drawImage(converted_image, 0, 0, canvas.width, canvas.height);
+		  converted_image = canvas;
+		}
+	  }
       onload(converted_image);
     } else if (ext == ".tga") {
       if (!(typeof onerror === "undefined")) onerror('not supported', path);

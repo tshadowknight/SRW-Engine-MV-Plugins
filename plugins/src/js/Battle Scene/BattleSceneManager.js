@@ -5501,38 +5501,40 @@ BattleSceneManager.prototype.executeAnimation = function(animation, startTick){
 					}
 				}
 				
-				if(targetObj.isVisible && ENGINE_SETTINGS.BATTLE_SCENE.DEFAULT_MOVE_SFX && playDefaultSfx){		
-					let refObj = targetObj;
-					
-					if(_this._camera.isInFrustum(refObj) && refObj.isEnabled()){
-						let targetActor;
-						if(target == "active_main" || target == "active_support_attacker" || target == "active_twin"){
-							targetActor = action.ref;				
-						} else if(target == "active_target" || target == "active_support_defender" || target == "active_target_twin"){
-							targetActor = targetAction.ref; 				
-						}
+				if(targetObj.lastAnimation != params.name){					
+					if(targetObj.isVisible && ENGINE_SETTINGS.BATTLE_SCENE.DEFAULT_MOVE_SFX && playDefaultSfx){		
+						let refObj = targetObj;
+						
+						if(_this._camera.isInFrustum(refObj) && refObj.isEnabled()){
+							let targetActor;
+							if(target == "active_main" || target == "active_support_attacker" || target == "active_twin"){
+								targetActor = action.ref;				
+							} else if(target == "active_target" || target == "active_support_defender" || target == "active_target_twin"){
+								targetActor = targetAction.ref; 				
+							}
 
-						const actorMoveSoundInfo = $statCalc.getMoveSoundInfo(targetActor);
-						let pitch = ENGINE_SETTINGS.BATTLE_SCENE.DEFAULT_MOVE_PITCH || 100;
-						if(actorMoveSoundInfo){
-							pitch = actorMoveSoundInfo.pitch;
-						}
-						if(ENGINE_SETTINGS.BATTLE_SCENE.DEFAULT_MOVE_PITCH_VARIANCE && ENGINE_SETTINGS.BATTLE_SCENE.DEFAULT_MOVE_PITCH_VARIANCE[params.name]){
-							pitch+=ENGINE_SETTINGS.BATTLE_SCENE.DEFAULT_MOVE_PITCH_VARIANCE[params.name];
-						}
-						let sfx = ENGINE_SETTINGS.BATTLE_SCENE.DEFAULT_MOVE_SFX;
-						if(actorMoveSoundInfo && actorMoveSoundInfo.seAssignments && actorMoveSoundInfo.seAssignments[params.name]){
-							sfx = actorMoveSoundInfo.seAssignments[params.name];
-						} else if(ENGINE_SETTINGS.BATTLE_SCENE.DEFAULT_POSE_SFX && ENGINE_SETTINGS.BATTLE_SCENE.DEFAULT_POSE_SFX[params.name]){
-							sfx = ENGINE_SETTINGS.BATTLE_SCENE.DEFAULT_POSE_SFX[params.name];
-						}
-						var se = {};
-						se.name = sfx;
-						se.pan = 0;
-						se.pitch = pitch;
-						se.volume = 75;
-						AudioManager.playSe(se);
-					}					
+							const actorMoveSoundInfo = $statCalc.getMoveSoundInfo(targetActor);
+							let pitch = ENGINE_SETTINGS.BATTLE_SCENE.DEFAULT_MOVE_PITCH || 100;
+							if(actorMoveSoundInfo){
+								pitch = actorMoveSoundInfo.pitch;
+							}
+							if(ENGINE_SETTINGS.BATTLE_SCENE.DEFAULT_MOVE_PITCH_VARIANCE && ENGINE_SETTINGS.BATTLE_SCENE.DEFAULT_MOVE_PITCH_VARIANCE[params.name]){
+								pitch+=ENGINE_SETTINGS.BATTLE_SCENE.DEFAULT_MOVE_PITCH_VARIANCE[params.name];
+							}
+							let sfx = ENGINE_SETTINGS.BATTLE_SCENE.DEFAULT_MOVE_SFX;
+							if(actorMoveSoundInfo && actorMoveSoundInfo.seAssignments && actorMoveSoundInfo.seAssignments[params.name]){
+								sfx = actorMoveSoundInfo.seAssignments[params.name];
+							} else if(ENGINE_SETTINGS.BATTLE_SCENE.DEFAULT_POSE_SFX && ENGINE_SETTINGS.BATTLE_SCENE.DEFAULT_POSE_SFX[params.name]){
+								sfx = ENGINE_SETTINGS.BATTLE_SCENE.DEFAULT_POSE_SFX[params.name];
+							}
+							var se = {};
+							se.name = sfx;
+							se.pan = 0;
+							se.pitch = pitch;
+							se.volume = 75;
+							AudioManager.playSe(se);
+						}					
+					}
 				}
 				
 				if(ENGINE_SETTINGS.SINGLE_BATTLE_SPRITE_MODE){
