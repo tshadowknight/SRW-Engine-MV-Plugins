@@ -4352,23 +4352,25 @@ BattleSceneManager.prototype.executeAnimation = function(animation, startTick){
 					{type: "rotate_to", target: "Camera", params: {rotation: _this._defaultRotations.camera_main_idle}},
 				
 					{type: "show_sprite", target: "active_target", params: {}},		
-					{type: "hide_sprite", target: "active_main", params: {}},					
+					{type: "hide_sprite", target: "active_main", params: {}},		
+					
+					{type: "set_sprite_frame", target: "active_support_defender", params: {name: "in", snap: 1, speed: 10}},
 				];	
 				
 				additions[insertStartTick + 50] = [
 					{type: "set_sprite_frame", target: "active_target", params: {name: "out"}},
-					{type: "translate", target: "active_target", params: {startPosition: _this._defaultPositions.enemy_main_idle, position: new BABYLON.Vector3(-10, 0, 1), duration: 30, easingFunction: new BABYLON.SineEase(), easingMode: BABYLON.EasingFunction.EASINGMODE_EASEIN}},
+					{type: "translate", target: "active_target", params: {startPosition: _this._defaultPositions.enemy_main_idle, position: new BABYLON.Vector3(-11, 0, 1), duration: 30, easingFunction: new BABYLON.SineEase(), easingMode: BABYLON.EasingFunction.EASINGMODE_EASEIN}},
 				];
 				
 				additions[insertStartTick + 80] = [
 					{type: "show_sprite", target: "active_support_defender", params: {}},
-					{type: "set_sprite_frame", target: "active_support_defender", params: {name: "in"}},
-					{type: "translate", target: "active_support_defender", params: {startPosition: new BABYLON.Vector3(-10, 0, 1), position: _this._defaultPositions.enemy_main_idle, duration: 30, easingFunction: new BABYLON.SineEase(), easingMode: BABYLON.EasingFunction.EASINGMODE_EASEIN}},
+					
+					{type: "translate", target: "active_support_defender", params: {startPosition: new BABYLON.Vector3(-11, 0, 1), position: _this._defaultPositions.enemy_main_idle, duration: 30, easingFunction: new BABYLON.SineEase(), easingMode: BABYLON.EasingFunction.EASINGMODE_EASEIN}},
 					{type: "show_support_defender_text"},					
 				];
 				
 				additions[insertStartTick + 110] = [
-					{type: "set_sprite_frame", target: "active_support_defender", params: {name: "block", spriterOnly: true}},
+					//{type: "set_sprite_frame", target: "active_support_defender", params: {name: "block", spriterOnly: true}},
 					{type: "set_sprite_frame", target: "active_support_defender", params: {name: "block", defaultOnly: true}},
 					{type: "set_sprite_frame", target: "active_target", params: {name: "block"}},
 					{type: "show_barrier", target: "active_support_defender", params: {}}
