@@ -2,7 +2,7 @@ var ENGINE_SETTINGS = {
 	GAMEID: "SRWMV",
 	CUSTOM_TITLE_SCREEN: "",
 	PHOTOSENSITIVITY_DISCLAIMER: {
-		show: true,
+		show: false,
 		header: "PHOTOSENSITIVITY WARNING",
 		lines: [
 			"This game contains bright flashing lights and/or images that may ",
