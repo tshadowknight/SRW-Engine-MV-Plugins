@@ -1,6 +1,15 @@
 var ENGINE_SETTINGS = {
 	GAMEID: "SRWMV",
 	CUSTOM_TITLE_SCREEN: "",
+	PHOTOSENSITIVITY_DISCLAIMER: {
+		show: true,
+		header: "PHOTOSENSITIVITY WARNING",
+		lines: [
+			"This game contains bright flashing lights and/or images that may ",
+			"cause discomfort, seizures, and/or convulsions in people",
+			"with photosensitive epilepsy. Player discretion is advised.",
+		]
+	},
 	PLACE_PARALLAX_ABOVE_MAP: true,
 	ENABLE_HEALTH_BARS_ON_MAP: true,
 	FONT_SCALE: 1,//used to scale the text in CSS menus.

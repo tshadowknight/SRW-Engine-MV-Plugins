@@ -5257,7 +5257,9 @@ SceneManager.isInSaveScene = function(){
 		} else {
 			this.checkPlayerLocation();
 			DataManager.setupNewGame();
-			if(ENGINE_SETTINGS.DISCLAIMER_TEXT){
+			if(ENGINE_SETTINGS.PHOTOSENSITIVITY_DISCLAIMER?.show){
+				SceneManager.goto(Scene_Photosensitivity_Warning);
+			} else if(ENGINE_SETTINGS.DISCLAIMER_TEXT){
 				SceneManager.goto(Scene_Disclaimer);
 			} else {
 				SceneManager.goto(Scene_Title);
@@ -5295,7 +5297,7 @@ Scene_Disclaimer.prototype.start = function() {
 
 Scene_Disclaimer.prototype.update = function() {
 	Scene_Base.prototype.update.call(this);
-	if (!this._leavingScene && (Input.isTriggered('ok') || Input.isTriggered('cancel') || TouchInput.isTriggered() || TouchInput.isCancelled())) {
+	if (!this._leavingScene && (Input.isTriggered('ok') || Input.isTriggered('cancel') || Input.isTriggered('menu') || TouchInput.isTriggered() || TouchInput.isCancelled())) {
 		this.startFadeOut(this.slowFadeSpeed(), false);
 		this._leavingScene = true;
 		
@@ -5323,6 +5325,80 @@ Scene_Disclaimer.prototype.createForeground = function() {
 	for(line of lines){		
 		this._disclaimerSprite.bitmap.drawText(line, x, y + 28 * ctr++, maxWidth, ENGINE_SETTINGS.LINE_HEIGHT || 28, "left");
 	}	
+};
+
+
+function Scene_Photosensitivity_Warning() {
+	this.initialize.apply(this, arguments);
+}
+
+Scene_Photosensitivity_Warning.prototype = Object.create(Scene_Base.prototype);
+Scene_Photosensitivity_Warning.prototype.constructor = Scene_Photosensitivity_Warning;
+
+Scene_Photosensitivity_Warning.prototype.initialize = function() {
+	Scene_Base.prototype.initialize.call(this);
+};
+
+Scene_Photosensitivity_Warning.prototype.create = function() {
+	Scene_Base.prototype.create.call(this);
+	this.createForeground();
+};
+
+Scene_Photosensitivity_Warning.prototype.start = function() {
+	Scene_Base.prototype.start.call(this);
+	SceneManager.clearStack();
+
+	//this.startFadeIn(this.fadeSpeed(), false);
+};
+
+Scene_Photosensitivity_Warning.prototype.update = function() {
+	Scene_Base.prototype.update.call(this);
+	if (!this._leavingScene && (Input.isTriggered('ok') || Input.isTriggered('cancel') || Input.isTriggered('menu') || TouchInput.isTriggered() || TouchInput.isCancelled())) {
+		this.startFadeOut(this.slowFadeSpeed(), false);
+		this._leavingScene = true;
+		
+	}
+	if(this._leavingScene && !this.isBusy()){
+		if(ENGINE_SETTINGS.DISCLAIMER_TEXT){
+			SceneManager.goto(Scene_Disclaimer);		
+		} else {
+			SceneManager.goto(Scene_Title);		
+		}		
+	}
+};
+
+Scene_Photosensitivity_Warning.prototype.terminate = function() {
+	Scene_Base.prototype.terminate.call(this);
+	SceneManager.snapForBackground();
+};
+
+Scene_Photosensitivity_Warning.prototype.createForeground = function() {
+	this._disclaimerSprite = new Sprite(new Bitmap(Graphics.width, Graphics.height));
+	this.addChild(this._disclaimerSprite);
+
+	var x = 20;
+	var maxWidth = Graphics.width - x * 2;	
+	
+	var y = 20;
+	var text = ENGINE_SETTINGS.PHOTOSENSITIVITY_DISCLAIMER.header;
+	var ctr = 0;
+	var baseY = 190;
+	this._disclaimerSprite.bitmap.fontSize = (ENGINE_SETTINGS.FONT_SIZE || 24) * 1.8;		
+	this._disclaimerSprite.bitmap.textColor = "red";
+	this._disclaimerSprite.bitmap.drawText(text, 0, baseY, maxWidth, ENGINE_SETTINGS.LINE_HEIGHT || 28, "center");
+	
+	this._disclaimerSprite.bitmap.fontSize = (ENGINE_SETTINGS.FONT_SIZE || 24) * 0.8;		
+	this._disclaimerSprite.bitmap.textColor = "white";
+
+	var x = 160;
+	var lineHeight = 26;
+	baseY+= 70;
+	var maxWidth = Graphics.width - x * 2;	
+
+	const lines = ENGINE_SETTINGS.PHOTOSENSITIVITY_DISCLAIMER.lines;
+	for(let i = 0; i < lines.length; i++){
+		this._disclaimerSprite.bitmap.drawText(lines[i], x, baseY + lineHeight * i, maxWidth, ENGINE_SETTINGS.LINE_HEIGHT || 28, "left");	
+	}
 };
 
 SceneManager.onKeyDown = function(event) {
