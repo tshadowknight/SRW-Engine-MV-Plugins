@@ -421,8 +421,8 @@ APPSTRINGS.ATTR_CHART = {
 
 APPSTRINGS.OPTIONS = {
 	title: "Options",
-	label_game_options: "Game Options",
-	label_sound_options: "Sound Options",
+	label_game_options: "General",
+	label_sound_options: "Sound",
 	label_display: "Display",
 	label_fullscreen: "Fullscreen",
 	label_save_vram: "Effects Quality",
@@ -439,7 +439,7 @@ APPSTRINGS.OPTIONS = {
 	label_bgm_vol: "BGM Volume",
 	label_sfx_vol: "SFX Volume",
 	label_battle_speed: "Action Speed",
-	label_tweaks: "Game Tweaks",
+	label_tweaks: "Modes",
 	label_button_set: "Button Display",
 	label_show_map_buttons: "Map Button Hints",
 	label_intermission_only: "Edit in Intermission"
@@ -453,7 +453,7 @@ APPSTRINGS.MODE_SELECTION = {
 }
 
 APPSTRINGS.GAME_MODES = {
-	title: "Game Tweaks",
+	title: "Modes",
 	label_on: "On",
 	label_off: "Off",
 	label_infinite_funds: "Infinite Funds",

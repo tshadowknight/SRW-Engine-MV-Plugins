@@ -1,5 +1,5 @@
 #options .list_container {
-	height: 70.5%;
+	height: 62%;
     border: 0.1vw solid #FFFFFF;
     border-radius: 1vw;
     display: block;
@@ -8,6 +8,11 @@
 	background-color: var(--section-bg-color);
 	overflow: hidden;
 	padding: 1%;
+	top: 23%;
+}
+
+#options .list_container.inactive {
+	opacity: 0.5;
 }
 
 #options .entry {
@@ -19,6 +24,7 @@
     margin-left: auto;
     margin-right: auto;
 	color: #FFFFFF;
+	
 }
 
 #options .entry.selected {
@@ -43,4 +49,40 @@
 	margin-left: 5%;
 	margin-right: 5%;
 	text-align: center;
+}
+
+/* Tab buttons */
+#options .tab_button {
+	position: absolute;
+	color: #AAAAAA;
+	border: 0.1vw solid #AAAAAA;
+	display: flex;
+	align-items: center;
+	justify-content: center;
+	top: 15%;
+	padding: 0.4%;
+	border-radius: 999px;
+	width: 15%;
+	cursor: pointer;
+}
+
+#options .tab_button.selected {
+	color: #FFFFFF;
+	border: 0.1vw solid #FFFFFF;
+}
+
+#options .general_options_button {
+	left: 11.5%;
+}
+
+#options .sound_options_button {
+	left: 28.5%;
+}
+
+#options .graphics_options_button {
+	left: 45.5%;
+}
+
+#options .tweaks_button {
+	left: 62.5%;
 }
