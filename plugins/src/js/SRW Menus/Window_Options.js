@@ -625,8 +625,7 @@ Window_Options.prototype.update = function() {
 		}
 
 		if(Input.isTriggered('cancel') || TouchInput.isCancelled()){
-			SoundManager.playCancel();
-			this.requestRedraw();
+			SoundManager.playCancel();			
 			if(this._currentUIState == "tab_selection"){
 				ConfigManager.save();
 				$gameTemp.popMenu = true;
@@ -635,9 +634,10 @@ Window_Options.prototype.update = function() {
 					this._callbacks["closed"]();
 				}
 			} else if(this._currentUIState == "options_editing"){
+				this.requestRedraw();
 				this._currentUIState = "tab_selection";
-			}
-			this.refresh();
+				this.refresh();
+			}			
 			return;
 		}				
 		this.resetTouchState();
