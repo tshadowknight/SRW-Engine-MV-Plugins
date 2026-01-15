@@ -5154,8 +5154,12 @@ SceneManager.isInSaveScene = function(){
 		
 		$SRWSaveManager.lockMapSRPoint($gameMap.mapId());	
 		$gameMap._interpreter.clear();//make sure no events run after the game over before loading into the intermission
-		$gamePlayer.reserveTransfer(2, 0, 0);//send player to intermission after losing
-		SceneManager.goto(Scene_Map);
+		if(ENGINE_SETTINGS.SEND_TO_TITLE_ON_GAME_OVER){
+			SceneManager.goto(Scene_Title);
+		} else {
+			$gamePlayer.reserveTransfer(2, 0, 0);//send player to intermission after losing
+			SceneManager.goto(Scene_Map);
+		}		
 	};
 	
 	Scene_Map.prototype.callMenu = function() {

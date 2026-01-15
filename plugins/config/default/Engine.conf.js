@@ -10,6 +10,7 @@ var ENGINE_SETTINGS = {
 			"with photosensitive epilepsy. Player discretion is advised.",
 		]
 	},
+	SEND_TO_TITLE_ON_GAME_OVER: false,
 	PLACE_PARALLAX_ABOVE_MAP: true,
 	ENABLE_HEALTH_BARS_ON_MAP: true,
 	FONT_SCALE: 1,//used to scale the text in CSS menus.
