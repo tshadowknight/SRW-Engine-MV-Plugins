@@ -114,11 +114,13 @@ function GameStateManager(){
 GameStateManager.prototype.updateStateButtonPrompts = function(items, displayKey){
 	let hasBlockingMenu = ($gameTemp.menuStack && $gameTemp.menuStack.length > 0);
 	if($gameTemp && $gameTemp.buttonHintManager){		
-		if($gameSystem && ConfigManager["mapHints"]){
-			if(!hasBlockingMenu){
+		if($gameSystem && !hasBlockingMenu){
+			if(ConfigManager["mapHints"]){		
 				$gameTemp.buttonHintManager.setHelpButtons(items);
-				$gameTemp.buttonHintManager.show(displayKey);
-			}			
+				$gameTemp.buttonHintManager.show(displayKey);				
+			} else {
+				$gameTemp.buttonHintManager.hide();
+			}
 		}		
 	}	
 }
