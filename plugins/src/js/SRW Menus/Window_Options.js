@@ -673,23 +673,31 @@ Window_Options.prototype.redraw = function() {
 	$gameTemp.buttonHintManager.show();
 
 	var content = "";
-	var ctr = 0;
-	this._optionInfo.forEach(function(option){
-		if(_this._titleInfo[ctr]){
-			content+="<div class='entry title scaled_text fitted_text'>";
-			content+=_this._titleInfo[ctr];			
+	if(currentTabKey == "tweaks" && !$gameSystem?._isIntermission){
+		content+="<div class='entry title scaled_text fitted_text'>";
+		content+=APPSTRINGS.OPTIONS.label_intermission_only;
+		content+="</div>";
+	} else {
+		var ctr = 0;
+		this._optionInfo.forEach(function(option){
+			if(_this._titleInfo[ctr]){
+				content+="<div class='entry title scaled_text fitted_text'>";
+				content+=_this._titleInfo[ctr];			
+				content+="</div>";
+			}
+			content+="<div data-idx='"+ctr+"' class='entry "+(ctr == _this._currentSelection ? "selected" : "")+"'>";
+			content+="<div class='label scaled_text fitted_text'>";
+			content+=option.name;
 			content+="</div>";
-		}
-		content+="<div data-idx='"+ctr+"' class='entry "+(ctr == _this._currentSelection ? "selected" : "")+"'>";
-		content+="<div class='label scaled_text fitted_text'>";
-		content+=option.name;
-		content+="</div>";
-		content+="<div class='value scaled_text fitted_text'>";
-		content+=option.display();
-		content+="</div>";
-		content+="</div>";
-		ctr++;
-	});
+			content+="<div class='value scaled_text fitted_text'>";
+			content+=option.display();
+			content+="</div>";
+			content+="</div>";
+			ctr++;
+		});
+	}
+	
+	
 	this._listContainer.innerHTML = content;
 	
 	var windowNode = this.getWindowNode();
