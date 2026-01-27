@@ -454,11 +454,15 @@
 				if(ENGINE_SETTINGS.SAVE_UPDATE_FUNCTION){
 					ENGINE_SETTINGS.SAVE_UPDATE_FUNCTION();
 				}
-				$statCalc.invalidateAbilityCache();
-				$statCalc.invalidateZoneCache();
-				$statCalc.softRefreshUnits();
-
-				$SRWGameState.requestNewState("normal");
+				if($gameSystem.isIntermission()){
+					$gameSystem.startIntermission();
+				} else {
+					$statCalc.invalidateAbilityCache();
+					$statCalc.invalidateZoneCache();
+					$statCalc.softRefreshUnits();
+					
+					$SRWGameState.requestNewState("normal");
+				}
 				
 				SceneManager._scene.fadeOutAll()
 				SceneManager.goto(Scene_Map);

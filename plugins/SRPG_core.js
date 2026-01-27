@@ -2027,6 +2027,11 @@ SceneManager.isInSaveScene = function(){
 		this.processMenuStack();
 		
 		if($gameSystem.isIntermission()){
+			if($gameTemp.continueLoaded){
+				$gameTemp.continueLoaded = false;
+				$gameSystem.onAfterLoad();
+			}
+
 			$SRWGameState.requestNewState("intermission");
 			if(!this._intermissionWindowOpen){
 				$gameSystem.clearData();//make sure stage temp data is cleared when moving between stages
@@ -4347,6 +4352,15 @@ SceneManager.isInSaveScene = function(){
 		$gameTemp.onMapSaving = false;
 		SceneManager.pop();
 	};
+
+	Scene_Save.prototype.onSaveSuccess = function() {
+		SoundManager.playSave();
+		StorageManager.cleanBackup(this.savefileId());
+		if(ENGINE_SETTINGS.DEBUG_SAVING){
+			DataManager.saveContinueSlot();	
+		}
+		this.popScene();
+	};	
 	
 	function coordUtils(startX, startY, chunkRadius){
 		this.startX = startX;
