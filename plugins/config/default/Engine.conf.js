@@ -10,6 +10,7 @@ var ENGINE_SETTINGS = {
 			"with photosensitive epilepsy. Player discretion is advised.",
 		]
 	},
+	DISABLE_SHIFT_QUICK_MOVE: false,
 	SEND_TO_TITLE_ON_GAME_OVER: false,
 	PLACE_PARALLAX_ABOVE_MAP: true,
 	ENABLE_HEALTH_BARS_ON_MAP: true,

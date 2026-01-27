@@ -1105,6 +1105,9 @@ StatCalc.prototype.setDisabled = function(actor){
 }
 
 StatCalc.prototype.isDisabled = function(actor){
+	if(!actor){
+		return false;
+	}
 	return this.hasTurnStatus(actor, "disabledTurn") || actor._battleMode == "disabled";
 }
 
@@ -2946,9 +2949,9 @@ StatCalc.prototype.getSwapOptions = function(actor){
 				if(entry == actor.actorId()){
 					isValid = false;
 				}
-				if($gameParty._actors.indexOf(entry * 1) == -1){
+				/*if($gameParty._actors.indexOf(entry * 1) == -1){
 					isValid = false;
-				}
+				}*/
 				let targetEvent = this.getReferenceEvent($gameActors.actor(entry));
 				if(targetEvent && sourceEvent != targetEvent){
 					isValid = false;

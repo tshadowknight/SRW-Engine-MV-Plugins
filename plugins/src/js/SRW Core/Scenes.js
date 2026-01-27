@@ -29,13 +29,16 @@
 		};
 
 		Scene_Title.prototype.checkGL = function () { 
-			try {
-				var canvas = document.createElement('canvas'); 
-				return !!window.WebGLRenderingContext &&
-				(canvas.getContext('webgl') || canvas.getContext('experimental-webgl'));
-			} catch(e) {
-				return false;
+			if(this._GLOK == null){	
+				try {
+					var canvas = document.createElement('canvas'); 
+					this._GLOK = !!(window.WebGLRenderingContext &&
+					(canvas.getContext('webgl') || canvas.getContext('experimental-webgl')));
+				} catch(e) {
+					this._GLOK = false;
+				}
 			}
+			return this._GLOK;
 		}
 
 		Scene_Title.prototype.create = function() {

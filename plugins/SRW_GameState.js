@@ -287,7 +287,7 @@ GameState_actor_move.prototype = Object.create(GameState.prototype);
 GameState_actor_move.prototype.constructor = GameState_actor_move;
 
 GameState_actor_move.prototype.canCursorMove = function(){
-	return !ENGINE_SETTINGS.ENABLE_QUICK_MOVE || (!Input.isPressed('pagedown') && !Input.isPressed('shift')) || !$gameTemp.moveEdgeInfo;
+	return !ENGINE_SETTINGS.ENABLE_QUICK_MOVE || (!Input.isPressed('pagedown') && (ENGINE_SETTINGS.DISABLE_SHIFT_QUICK_MOVE || !Input.isPressed('shift'))) || !$gameTemp.moveEdgeInfo;
 }
 
 GameState_actor_move.prototype.update = function(){
@@ -320,7 +320,7 @@ GameState_actor_move.prototype.update = function(){
 	}
 	
 	$gameSystem.showMoveEdge = false;
-	if(ENGINE_SETTINGS.ENABLE_QUICK_MOVE && (Input.isPressed('pagedown') || Input.isPressed('shift'))){
+	if(ENGINE_SETTINGS.ENABLE_QUICK_MOVE && (Input.isPressed('pagedown') || (!ENGINE_SETTINGS.DISABLE_SHIFT_QUICK_MOVE && Input.isPressed('shift')))){
 		$gameSystem.showMoveEdge = true;
 		if($gameTemp.moveEdgeInfo){
 			var lookup = $gameTemp.moveEdgeInfo.graph;
