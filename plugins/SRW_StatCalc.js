@@ -7793,19 +7793,22 @@ StatCalc.prototype.getActiveStatMods = function(actor, actorKey, excludedSkills,
 //note: if called from inside an effect handler, excluded skills must be set to avoid infinte loops
 StatCalc.prototype.getActiveEffectValue = function(actor, effectId, excludedSkills){
 	//excludedSkills = structuredClone(excludedSkills);
-	const globalResult = this.applyStatModsToValue(actor, 0, [effectId], excludedSkills);
-	if(globalResult){
-		return !!globalResult; //the effect is set by another unit's ability
-	}
 	if(!this._resolvingActiveEffect){
 		this._resolvingActiveEffect = true;	
+		const globalResult = this.applyStatModsToValue(actor, 0, [effectId], excludedSkills);
+		if(globalResult){
+			this._resolvingActiveEffect = false;
+			return !!globalResult; //the effect is set by another unit's ability
+		}
+	
 		const ownAbilityEffects = this.getActiveStatMods(actor, actor.SRWStats.pilot.id+"_"+"own", excludedSkills, true);
+		this._resolvingActiveEffect = false;
 		for(const entry of ownAbilityEffects.list){
 			if(entry.type == effectId && entry.value > 0){
 				return true;
 			}
 		}
-		this._resolvingActiveEffect = false;
+		
 	}
 	return false;
 }

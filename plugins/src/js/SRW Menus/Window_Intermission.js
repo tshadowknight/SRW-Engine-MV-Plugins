@@ -592,6 +592,9 @@ Window_Intermission.prototype.redraw = function() {
 	if(!this._aceFacePicsLoaded && $gameSystem._availableUnits){
 		var ace = $statCalc.getTopAce();
 		if(ace){
+			if(ace.isSubPilot && ace.mainPilot && $statCalc.getKills(ace) <= $statCalc.getKills(ace.mainPilot)){		
+				ace = ace.mainPilot;				
+			}
 			this._aceFacePicsLoaded = true;
 			this.loadActorFace(ace.SRWStats.pilot.id, this._acePicContainer);
 			this._aceValue.innerHTML = $statCalc.getKills(ace);
