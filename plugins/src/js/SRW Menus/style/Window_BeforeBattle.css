@@ -992,6 +992,11 @@
 	position: relative;
 }
 
+.participant_block_small .attribute_effectiveness_block {
+	--widthpixels: 18;
+	--heightpixels: 18;
+}
+
 .attribute_effectiveness_block .effectiveness_indicator {
 	position: absolute;
 	/*transform: rotate(45deg);

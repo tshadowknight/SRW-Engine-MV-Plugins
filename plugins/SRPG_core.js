@@ -1913,7 +1913,7 @@ SceneManager.isInSaveScene = function(){
 			return;
 		}	
 		//Soft Reset
-		if(!$gameSystem.isIntermission() && (!$gameTemp.menuStack || $gameTemp.menuStack.length == 0) && Input.isPressed("ok") && Input.isPressed("cancel") && Input.isPressed("pageup") && Input.isPressed("pagedown")){			
+		if(!$gameSystem.isIntermission() && !$gameMessage.isBusy() && (!$gameTemp.menuStack || $gameTemp.menuStack.length == 0) && Input.isPressed("ok") && Input.isPressed("cancel") && Input.isPressed("pageup") && Input.isPressed("pagedown")){			
 			let continueSlotIsPopulated = false;
 			try {
 				JsonEx.parse(StorageManager.load("continue"));//check if the continue slot exists first by trying to parse it
