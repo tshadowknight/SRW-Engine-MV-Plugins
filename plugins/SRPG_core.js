@@ -2971,6 +2971,10 @@ SceneManager.isInSaveScene = function(){
     };	
 	
 	Scene_Map.prototype.commandSpirit = function() {
+		//hacky fix for crash when using Soft Reset while this can still be called
+		if(!$gameTemp.activeEvent()){
+			return;
+		}
 		var actionBattlerArray = $gameSystem.EventToUnit($gameTemp.activeEvent().eventId());
 		$gameTemp.currentMenuUnit = {
 			actor: actionBattlerArray[1],

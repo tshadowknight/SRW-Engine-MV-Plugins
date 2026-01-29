@@ -1090,6 +1090,17 @@
 					}
 					$gameSystem.faceAliases[args[0]] = args[1];
 				}
+
+				if (command === 'setActorNameOverride') {	
+					if(!$gameSystem.actorNameAliases){
+						$gameSystem.actorNameAliases = {};
+					}
+					if(!args[1]){
+						delete $gameSystem.actorNameAliases;
+					} else {
+						$gameSystem.actorNameAliases[args[0]] = args[1];
+					}					
+				}				
 				
 				if (command === 'setCharacterIndexAlias') {	
 					if(!$gameSystem.characterIdexAliases){

@@ -692,6 +692,7 @@
 				unlockTransformation: true,
 				unlockAllTransformations: true,
 				setFaceAlias: true,
+				setActorNameOverride: true,
 				setCharacterIndexAlias: true,
 				setPilotAbilityUpgrade: true,
 				setMechAbilityUpgrade: true,

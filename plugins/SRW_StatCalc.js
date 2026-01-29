@@ -988,6 +988,11 @@ StatCalc.prototype.getMechItemInfo = function(mechProperties){
 
 StatCalc.prototype.getPilotName = function(actor){
 	if(this.isActorSRWInitialized(actor)){
+		if($gameSystem?.actorNameAliases){
+			if($gameSystem.actorNameAliases[actor.actorId()]){
+				return $gameSystem.actorNameAliases[actor.actorId()];
+			}
+		}
 		if(actor.SRWStats.pilot.usesClassName){
 			return actor.SRWStats.mech.classData.name;
 		} 
