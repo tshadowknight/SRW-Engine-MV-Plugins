@@ -4077,7 +4077,7 @@ BattleSceneManager.prototype.executeAnimation = function(animation, startTick){
 			var battleText = _this._battleTextManager.getText(entityType, action.ref, type, _this.getBattleTextTargetType(action), _this.getBattleTextId(_this._currentAnimatedAction));
 			
 			_this._awaitingText = true;
-			_this._TextlayerManager.setTextBox(entityType, entityId, action.ref.SRWStats.pilot.name, battleText).then(function(){
+			_this._TextlayerManager.setTextBox(entityType, entityId, action.ref.name(), battleText).then(function(){
 				_this._awaitingText = false;
 			});
 		},
@@ -4088,7 +4088,7 @@ BattleSceneManager.prototype.executeAnimation = function(animation, startTick){
 			var entityId = action.ref.SRWStats.pilot.id;
 			var battleText = _this._battleTextManager.getText(entityType, action.ref, "evade", _this.getBattleTextTargetType(action), _this.getBattleTextId(_this._currentAnimatedAction));
 			_this._awaitingText = true;
-			_this._TextlayerManager.setTextBox(entityType, entityId, action.ref.SRWStats.pilot.name, battleText).then(function(){
+			_this._TextlayerManager.setTextBox(entityType, entityId, action.ref.name(), battleText).then(function(){
 				_this._awaitingText = false;
 			});
 		},
@@ -4099,7 +4099,7 @@ BattleSceneManager.prototype.executeAnimation = function(animation, startTick){
 			var entityId = action.ref.SRWStats.pilot.id;
 			var battleText = _this._battleTextManager.getText(entityType, action.ref, "destroyed", _this.getBattleTextTargetType(action), _this.getBattleTextId(_this._currentAnimatedAction));
 			_this._awaitingText = true;
-			_this._TextlayerManager.setTextBox(entityType, entityId, action.ref.SRWStats.pilot.name, battleText).then(function(){
+			_this._TextlayerManager.setTextBox(entityType, entityId, action.ref.name(), battleText).then(function(){
 				_this._awaitingText = false;
 			});
 		},
@@ -4126,7 +4126,7 @@ BattleSceneManager.prototype.executeAnimation = function(animation, startTick){
 			
 			var battleText = _this._battleTextManager.getText(entityType, textProvider, "attacks", _this.getBattleTextTargetType(action), _this.getBattleTextId(_this._currentAnimatedAction.attacked), params.id, attackTextProviderId);
 			_this._awaitingText = true;
-			_this._TextlayerManager.setTextBox(entityType, entityId, action.ref.SRWStats.pilot.name, battleText, false, true).then(function(){
+			_this._TextlayerManager.setTextBox(entityType, entityId, action.ref.name(), battleText, false, true).then(function(){
 				_this._awaitingText = false;
 			});
 		},
@@ -4141,7 +4141,7 @@ BattleSceneManager.prototype.executeAnimation = function(animation, startTick){
 			var entityType = action.isActor ? "actor" : "enemy";
 			var entityId = action.ref.SRWStats.pilot.id;
 			var battleText = _this._battleTextManager.getText(entityType, action.ref, "support_defend", entityType, _this.getBattleTextId({ref: _this._currentAnimatedAction.attacked.defended}));
-			_this._TextlayerManager.setTextBox(entityType, entityId, action.ref.SRWStats.pilot.name, battleText);			
+			_this._TextlayerManager.setTextBox(entityType, entityId, action.ref.name(), battleText);			
 			_this._UILayerManager.setNotification(entityType, "Support Defend");
 		},
 		enable_support_defender: function(target, params){
@@ -4416,7 +4416,7 @@ BattleSceneManager.prototype.executeAnimation = function(animation, startTick){
 			var entityId = action.ref.SRWStats.pilot.id;
 			var battleText = _this._battleTextManager.getText(entityType, action.ref, "evade", _this.getBattleTextTargetType(action), _this.getBattleTextId(_this._currentAnimatedAction));
 			
-			_this._TextlayerManager.setTextBox(entityType, entityId, action.ref.SRWStats.pilot.name, battleText);
+			_this._TextlayerManager.setTextBox(entityType, entityId, action.ref.name(), battleText);
 			
 			var hasSpecialEvasion = false;
 			if(action.specialEvasion){
@@ -6089,7 +6089,7 @@ BattleSceneManager.prototype.executeAnimation = function(animation, startTick){
 			var battleText = _this._battleTextManager.getText(entityType, action.ref, "destroyed", _this.getBattleTextTargetType(action), _this.getBattleTextId(_this._currentAnimatedAction));
 			
 			_this._awaitingText = true;
-			_this._TextlayerManager.setTextBox(entityType, entityId, action.ref.SRWStats.pilot.name, battleText, true).then(function(){
+			_this._TextlayerManager.setTextBox(entityType, entityId, action.ref.name(), battleText, true).then(function(){
 				_this._awaitingText = false;
 			});
 			
@@ -8438,7 +8438,7 @@ BattleSceneManager.prototype.processActionQueue = function() {
 				}
 				var battleText = _this._battleTextManager.getText(entityType, nextAction.ref, textType, nextAction.isActor ? "actor" : "enemy", _this.getBattleTextId(nextAction.attackedBy), null, null);
 				
-				_this._TextlayerManager.setTextBox(entityType, entityId, nextAction.ref.SRWStats.pilot.name, battleText);
+				_this._TextlayerManager.setTextBox(entityType, entityId, nextAction.ref.name(), battleText);
 			}
 			setTimeout(function(){
 				_this.systemFadeToBlack(100, 1000).then(function(){					
@@ -8545,7 +8545,7 @@ BattleSceneManager.prototype.processActionQueue = function() {
 						
 						battleText = _this._battleTextManager.getText(entityType, nextAction.ref, textType, _this.getBattleTextTargetType(nextAction), _this.getBattleTextId(nextAction.attacked));
 					}				
-					await _this._TextlayerManager.setTextBox(entityType, entityId, nextAction.ref.SRWStats.pilot.name, battleText);
+					await _this._TextlayerManager.setTextBox(entityType, entityId, nextAction.ref.name(), battleText);
 				}
 				
 				function startAnimation(){					

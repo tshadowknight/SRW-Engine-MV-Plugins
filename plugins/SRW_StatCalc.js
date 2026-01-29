@@ -8054,6 +8054,9 @@ StatCalc.prototype.createActiveAbilityLookup = function(){
 											} else if(actor.actorId){
 												isValid = effect.originId == actor.actorId();
 											}
+											if(effect.eventId != _this.getReferenceEvent(actor).eventId()){
+												isValid = false;
+											}
 											if(isValid){
 												var entityKey = _this.getReferenceEvent(actor).eventId();
 				
