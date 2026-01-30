@@ -68,7 +68,7 @@
 					if(actor.isSubPilot){
 						$gameSystem.overwritePilotFallbackInfo(actor);
 					} else {
-						let actionsResult = $statCalc.applyDeployActions(args[0], args[1], true);
+						let actionsResult = $statCalc.applyDeployActions(args[0], args[1], true, true);
 						if(!actionsResult){
 							$gameSystem.overwritePilotFallbackInfo(actor);
 						}
