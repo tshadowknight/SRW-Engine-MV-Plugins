@@ -303,6 +303,7 @@
 #detail_pages #pilot_summary_name {
 	left: 43%;
     top: 24%;
+	white-space: nowrap;
 }
 
 #pilot_summary_card {

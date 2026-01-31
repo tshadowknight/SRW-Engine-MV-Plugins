@@ -2983,6 +2983,7 @@ BattleSceneManager.prototype.startScene = function(){
 				if(_this._currentAnimationTick > _this._animationList.length){
 					if(_this._supportDefenderActive){
 						_this._supportDefenderActive = false;
+						_this._lastActionWasSupportDefend = true;
 						_this._animationList[_this._currentAnimationTick  + 50] = [
 							{type: "set_sprite_frame", target: "active_support_defender", params: {name: "out"}},
 							{type: "translate", target: "active_support_defender", params: {startPosition: _this._defaultPositions.enemy_main_idle, position: new BABYLON.Vector3(-10, 0, 1), duration: 30, easingFunction: new BABYLON.SineEase(), easingMode: BABYLON.EasingFunction.EASINGMODE_EASEIN}},
@@ -8499,15 +8500,24 @@ BattleSceneManager.prototype.processActionQueue = function() {
 						await showBeforeAnimationTextBox();						
 						startAnimation();
 					} else {
-						_this.doingFadeTransition = true;						
-						await _this.swipeToBlack(direction, "in", 300);
-						_this._UILayerManager.clearPopupNotifications()
-						_this.showEnvironment(nextAction.ref);
-						await continueSetup();	
-						finalizeSetup();
-						await _this.swipeToBlack(direction, "out", 300);
-						await showBeforeAnimationTextBox();						
-						startAnimation();						
+						if(_this._lastActionWasSupportDefend){
+							_this._lastActionWasSupportDefend = false;
+							_this._UILayerManager.clearPopupNotifications()
+							await continueSetup();	
+							finalizeSetup();
+							await showBeforeAnimationTextBox();						
+							startAnimation();
+						} else {
+							_this.doingFadeTransition = true;						 
+							await _this.swipeToBlack(direction, "in", 300);
+							_this._UILayerManager.clearPopupNotifications()
+							_this.showEnvironment(nextAction.ref);
+							await continueSetup();	
+							finalizeSetup();
+							await _this.swipeToBlack(direction, "out", 300);
+							await showBeforeAnimationTextBox();						
+							startAnimation();		
+						}											
 					}					
 				} else {
 					if(_this._lastAction && _this._lastAction.attacked_all_sub){
