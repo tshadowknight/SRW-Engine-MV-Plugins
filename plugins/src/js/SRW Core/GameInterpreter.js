@@ -2523,6 +2523,11 @@
 		Game_Interpreter.prototype.preloadTextScriptAssets = async function(scriptId) {
 			const eventToCheck = {
 				afterAction: true, 
+				actorTurn: true,
+				enemyTurn: true,
+				turnEnd: true,
+				beforeBattle: true,
+				beforeDestruction: true,				
 			};
 			try {
 				for(let event of $gameMap.events()) {
