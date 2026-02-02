@@ -2536,7 +2536,7 @@
 						for(let entry of event.list()){
 							if(entry.code == 355){
 								let matches = entry.parameters[0].match(/this\.runTextScript\s*\(\s*["']([^"']+)["']\s*\)/);
-								if(matches.length == 2){
+								if(matches && matches.length == 2){
 									await this.loadTextScriptAssets(matches[1]);
 								}
 							}
