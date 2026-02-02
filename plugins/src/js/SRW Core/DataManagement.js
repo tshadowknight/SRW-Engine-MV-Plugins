@@ -380,9 +380,11 @@
 					ENGINE_SETTINGS.SAVE_UPDATE_FUNCTION();
 				}
 				
+				
 				if($gameSystem.isIntermission()){
 					$gameSystem.startIntermission();
 				} else {
+					$gameTemp.loadingIntoSaveCtr = 60;
 					$statCalc.invalidateAbilityCache();
 					$statCalc.invalidateZoneCache();
 					$statCalc.softRefreshUnits();
@@ -457,6 +459,7 @@
 				if($gameSystem.isIntermission()){
 					$gameSystem.startIntermission();
 				} else {
+					$gameTemp.loadingIntoSaveCtr = 60;
 					$statCalc.invalidateAbilityCache();
 					$statCalc.invalidateZoneCache();
 					$statCalc.softRefreshUnits();

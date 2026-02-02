@@ -107,6 +107,9 @@ window.Window_OpeningCrawl = Window_OpeningCrawl;
 import Window_TextLog from "./Window_TextLog.js";
 window.Window_TextLog = Window_TextLog;
 
+import Window_LoadOverlay from "./Window_LoadOverlay.js";
+window.Window_LoadOverlay = Window_LoadOverlay;
+
 import Window_ZoneStatus from "./Window_ZoneStatus.js";
 window.Window_ZoneStatus = Window_ZoneStatus;
 

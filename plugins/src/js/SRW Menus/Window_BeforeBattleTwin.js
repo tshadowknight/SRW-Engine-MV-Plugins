@@ -549,7 +549,7 @@ Window_BeforebattleTwin.prototype.update = function() {
 		
 		if(!Input.isTriggered('ok') && !Input.isLongPressed('ok') && !Input.isPressed('ok')){
 			if(!$statCalc.isAI($gameTemp.currentBattleActor) && !$statCalc.isDisabled($gameTemp.currentBattleActor)){			
-				if(Input.isTriggered('pageup') || Input.isRepeated('pageup')){
+				if(Input.isTriggered('pageup')){
 					this.requestRedraw();
 					if(this._currentUIState == "main_selection"){
 						if(_this.counterValid() && $gameTemp.currentBattleActor.isActor() && $gameTemp.isEnemyAttack){
@@ -565,7 +565,7 @@ Window_BeforebattleTwin.prototype.update = function() {
 					}
 					this.refresh();
 					return;
-				} else if (Input.isTriggered('pagedown') || Input.isRepeated('pagedown')) {
+				} else if (Input.isTriggered('pagedown')) {
 					this.requestRedraw();
 					if(this._currentUIState == "main_selection"){
 						if(_this.counterValid() && $gameTemp.currentBattleActor.isActor() && $gameTemp.isEnemyAttack){

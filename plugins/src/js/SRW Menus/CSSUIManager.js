@@ -190,6 +190,7 @@ CSSUIManager.prototype.initAllWindows = function(){
 	this.initWindow("map_buttons");
 	this.initWindow("opening_crawl");
 	this.initWindow("text_log");
+	this.initWindow("load_overlay");
 	this.initWindow("zone_status");
 	this.initWindow("game_modes");
 	this.initWindow("button_hints");

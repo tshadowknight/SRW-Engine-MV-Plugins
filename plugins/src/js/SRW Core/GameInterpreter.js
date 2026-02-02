@@ -299,6 +299,8 @@
 				}
 				
 				return false;
+			} else {
+				$gameVariables.setValue(_masteryConditionText, APPSTRINGS.GENERAL.label_mastery_completed);	
 			}
 			return true;
 		}

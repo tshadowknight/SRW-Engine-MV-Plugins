@@ -807,6 +807,7 @@ SceneManager.isInSaveScene = function(){
 		this.createMapButtonsWindow();
 		this.createOpeningCrawlWindow();
 		this.createTextLogWindow();
+		this.createLoaderOverlayWindow();
 		this.createZoneStatusWindow();
 		this.createButtonHintsWindow();
 		this.createZoneSummaryWindow();
@@ -1500,6 +1501,12 @@ SceneManager.isInSaveScene = function(){
 		this._textLogWindow.hide();
 		this.idToMenu["text_log"] = this._textLogWindow;
     };
+
+	Scene_Map.prototype.createLoaderOverlayWindow = function() {
+		var _this = this;
+		_this._loadOverlayWindow = new Window_LoadOverlay(0, 0, Graphics.boxWidth, Graphics.boxHeight);		
+		this.addWindow(this._loadOverlayWindow);	
+    };
 	
 	Scene_Map.prototype.createBeforeBattleSpiritWindow = function() {
 		var _this = this;
@@ -1908,6 +1915,11 @@ SceneManager.isInSaveScene = function(){
     var _SRPG_SceneMap_update = Scene_Map.prototype.update;
     Scene_Map.prototype.update = function() {
 		var _this = this;
+		if($gameTemp.loadingIntoSaveCtr > 0){
+			$gameTemp.loadingIntoSaveCtr--;
+			Scene_Base.prototype.update.call(this);
+			return;
+		}
 		if($gameTemp.preparingSoftReset){
 			this.updateFade();
 			return;
