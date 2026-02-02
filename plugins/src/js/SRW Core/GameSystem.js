@@ -455,6 +455,8 @@
 			
 			//_this._pilotFallbackInfo = {};
 			//_this._mechFallbackInfo = {};
+
+			
 		}
 		
 		Game_System.prototype.startIntermission = function(){
@@ -464,6 +466,7 @@
 			this.updateAvailableUnits();
 			$gameTemp.summaryUnit = null;
 			$statCalc.invalidateAbilityCache();
+			//$statCalc.createActiveAbilityLookup();
 			$gameTemp.deployMode = "";		
 			this.setAutomaticDifficultyLevel();	
 		}

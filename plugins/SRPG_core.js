@@ -1908,12 +1908,12 @@ SceneManager.isInSaveScene = function(){
     var _SRPG_SceneMap_update = Scene_Map.prototype.update;
     Scene_Map.prototype.update = function() {
 		var _this = this;
-		if($gameTemp.doingSoftRestFade){
+		if($gameTemp.preparingSoftReset){
 			this.updateFade();
 			return;
 		}	
 		//Soft Reset
-		if(!$gameSystem.isIntermission() && !$gameMessage.isBusy() && (!$gameTemp.menuStack || $gameTemp.menuStack.length == 0) && Input.isPressed("ok") && Input.isPressed("cancel") && Input.isPressed("pageup") && Input.isPressed("pagedown")){			
+		if(!$gameSystem.isIntermission()  && !_this._messageWindow.isOpen() && !_this._messageWindow.isClosing() && !$gameMessage.isBusy() && (!$gameTemp.menuStack || $gameTemp.menuStack.length == 0) && Input.isPressed("ok") && Input.isPressed("cancel") && Input.isPressed("pageup") && Input.isPressed("pagedown")){			
 			let continueSlotIsPopulated = false;
 			try {
 				JsonEx.parse(StorageManager.load("continue"));//check if the continue slot exists first by trying to parse it
@@ -1922,6 +1922,7 @@ SceneManager.isInSaveScene = function(){
 				
 			}
 			if(continueSlotIsPopulated){
+				$gameTemp.preparingSoftReset = true;
 				this.fadeOutAll();
 				$gameTemp.buttonHintManager.hide();
 				this._mapButtonsWindow.hide();
@@ -1934,14 +1935,13 @@ SceneManager.isInSaveScene = function(){
 				this._zoneSummaryWindow.close();
 				
 				this._terrainDetailsWindow.hide();
-				this._terrainDetailsWindow.close();
+				this._terrainDetailsWindow.close();				
 				
-				$gameTemp.doingSoftRestFade = true;
 				setTimeout(function(){
-					$gameTemp.doingSoftRestFade = false;
 					Input.clear();
 					$gameSystem.setSubBattlePhase("normal");				
-					DataManager.loadContinueSlot();							
+					DataManager.loadContinueSlot();			
+					$gameTemp.preparingSoftReset = false;				
 				}, 1000);
 				
 				return;

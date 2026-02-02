@@ -578,3 +578,9 @@
 .slot_container .slot_icon.used {
 	background-color: var(--text-color-highlight2);	
 }
+
+.mech_abi_check {
+	filter: var(--white-filter);
+    height: 35%;
+    margin-top: 9%;
+}

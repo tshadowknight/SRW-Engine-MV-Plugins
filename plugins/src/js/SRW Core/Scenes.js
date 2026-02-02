@@ -20,6 +20,7 @@
 		
 		
 		Scene_Map.prototype.onMapLoaded = function() {
+			$gameMap._interpreter.preloadTextScriptAssets();
 			$gameTemp.allocateSRPGMapStructures();
 			DataManager.resetTextScriptCache(); //do not cache script files from previous map(s)
 			if (this._transfer) {

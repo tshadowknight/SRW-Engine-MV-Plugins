@@ -146,10 +146,29 @@ MechList.prototype.defineContent = function(){
 	function hasActiveMechAbilities(mech, list){
 		var ctr = 0;
 		var result = false;
-		while(!result && ctr < list.length){
-			result = $statCalc.applyStatModsToValue(createReferenceData(mech), 0, list[ctr++]);
+		let currentPilot = $statCalc.getCurrentPilot(mech.id);
+		
+		if(!currentPilot){
+			return false;
 		}
-		return result ? true : false;
+		const baseWill = $statCalc.getCurrentWill(currentPilot);
+
+		$statCalc.setWill(currentPilot, 150);
+		$statCalc.invalidateAbilityCache(currentPilot);
+		while(!result && ctr < list.length){
+			result = !!$statCalc.applyStatModsToValue(currentPilot, 0, [list[ctr++]]);
+		}
+		if(!result){
+			//check mod definitions
+			let ctr = 0;
+			while(!result && ctr < list.length){
+				const barrierEffectList = $statCalc.getModDefinitions(currentPilot, [list[ctr++]]) || [];
+				result = barrierEffectList.length > 0;
+			}
+		}
+		$statCalc.setWill(currentPilot, baseWill);
+		$statCalc.invalidateAbilityCache(currentPilot);
+		return result;
 	}
 	function compareMechAbilities(a, b, abilities){
 		var aHasAbility = hasActiveMechAbilities(getUnitData(a).mech, abilities);
@@ -375,9 +394,9 @@ MechList.prototype.defineContent = function(){
 					title: APPSTRINGS.MECHSTATS.repair,
 					contentFunction: function(pilot, mech){
 						if(hasActiveMechAbilities(mech, ["heal"])){
-							return "Y";
+							return "X";
 						} else {
-							return "N";
+							return "";
 						}
 					},
 					compareFunction: function(a, b){
@@ -388,16 +407,16 @@ MechList.prototype.defineContent = function(){
 					title: APPSTRINGS.MECHSTATS.resupply,
 					contentFunction: function(pilot, mech){						
 						if(hasActiveMechAbilities(mech, ["resupply"])){
-							return "Y";
+							return "X";
 						} else {
-							return "N";
+							return "";
 						}
 					},
 					compareFunction: function(a, b){
 						return compareMechAbilities(a, b, ["resupply"]);
 					}
 				},
-				{
+				/*{
 					title: APPSTRINGS.MECHSTATS.shield,
 					contentFunction: function(pilot, mech){					
 						if(hasActiveMechAbilities(mech, ["shield"])){
@@ -409,15 +428,15 @@ MechList.prototype.defineContent = function(){
 					compareFunction: function(a, b){
 						return compareMechAbilities(a, b, ["shield"]);
 					}	
-				},
+				},*/
 				{
 					title: APPSTRINGS.MECHSTATS.barrier,
 					contentFunction: function(pilot, mech){	
 						var referenceData = createReferenceData(mech);
 						if(hasActiveMechAbilities(mech, ["threshold_barrier", "reduction_barrier", "percent_barrier"])){							
-							return "Y";
+							return "X";
 						} else {
-							return "N";
+							return "";
 						}
 					},
 					compareFunction: function(a, b){
@@ -1277,10 +1296,56 @@ MechList.prototype.redraw = function() {
 	windowNode.querySelector("#prev_page").addEventListener("click", function(){
 		_this.notifyTouchObserver("left");
 	});
-	
+
 	windowNode.querySelector("#next_page").addEventListener("click", function(){
 		_this.notifyTouchObserver("right");
 	});
+
+	// Add click functionality for page_block elements (display tab switching)
+	var pageBlocks = windowNode.querySelectorAll(".page_block");
+	pageBlocks.forEach(function(pageBlock, idx){
+		pageBlock.addEventListener("click", function(){
+			if(!this.classList.contains("selected")){
+				// Calculate the actual page index from the visible page number
+				var targetPage = 0;
+				var pageCounter = 0;
+				for(var i = 0; i < _this._maxInfoPage; i++){
+					if(_this.isPageUsed(i)){
+						if(pageCounter == idx){
+							targetPage = i;
+							break;
+						}
+						pageCounter++;
+					}
+				}
+				_this._currentInfoPage = targetPage;
+				_this._currentSortIdx = -1;
+				_this.requestRedraw();
+				_this.notifyObserver("redraw");
+			}
+		});
+	});
+
+	// Add click functionality for list_table_block header elements (sort dimension)
+	var headerBlocks = windowNode.querySelectorAll(".list_table_block.header");
+	headerBlocks.forEach(function(headerBlock, idx){
+		headerBlock.addEventListener("click", function(){
+			var contentDef = _this._pageInfo[_this._currentInfoPage];
+			if(!contentDef.content[idx].noSort){
+				if(_this._currentSortIdx === idx){
+					// Clicking on already selected column - toggle sort order
+					_this.toggleSortOrder();
+				} else {
+					// Clicking on a different column - set it and reset to ascending order
+					_this._currentSortIdx = idx;
+					_this._sortDirection = 1;
+				}
+				_this.requestRedraw();
+				_this.notifyObserver("redraw");
+			}
+		});
+	});
+
 	Graphics._updateCanvas();
 }
 

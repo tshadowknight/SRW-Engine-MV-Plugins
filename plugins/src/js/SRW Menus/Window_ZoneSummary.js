@@ -54,7 +54,7 @@ Window_ZoneSummary.prototype.redraw = function() {
 		const actorInfo = $gameSystem.EventToUnit(entry.ownerEventId);
 		if(actorInfo){		
 			let isFriendly = $gameSystem.isFriendly(actorInfo[1], "player");
-			if(stackCount < 4 || ctr < 4){
+			if(stackCount < 4 || ctr < 3){
 				content+="<div class='entry "+(isFriendly ? "friendly" : "")+"'>";
 				content+="<div class='label scaled_text fitted_text '>";
 				content+=displayInfo.name;
@@ -65,7 +65,7 @@ Window_ZoneSummary.prototype.redraw = function() {
 				content+="</div>";
 				
 				content+="</div>";
-			} else if(ctr == 4){
+			} else if(ctr == 3){
 				content+="<div class='scaled_text fitted_text entry'>";
 				content+="<div class='label'>";
 				content+="...";

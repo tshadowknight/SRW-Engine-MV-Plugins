@@ -8234,6 +8234,11 @@ StatCalc.prototype.createActiveAbilityLookup = function(){
 		_this._invalidatedEventIds = {};
 	} else {
 		//console.log("Rebuilding full ability cache");
+		//since a full refresh is happening, ensure invalidatedEventIds is cleared otherwise inconsistent results can be 
+		//generated if an inner stat mod update causes a refresh of the invalidated event's abilities, 
+		//if the invalidated event is processed after that the abi key tracking will cause an incomplete set of statmods to be generated for that unit
+
+		_this._invalidatedEventIds = {}; 
 		_this.iterateAllActors(null, function(actor, event){			
 			handleEventActors(actor, event);
 		});

@@ -1205,11 +1205,11 @@
 		currentHeight+=lineheight;
 		this.drawText(APPSTRINGS.MAPMENU.label_enemy, x,  currentHeight, width);
 		this.changeTextColor("#AA2222");
-		this.drawText($gameVariables.value(_enemiesDestroyed), x + columnOffset,  currentHeight, width);
+		this.drawText(Math.min($gameVariables.value(_enemiesDestroyed), 99), x + columnOffset,  currentHeight, width);
 		this.changeTextColor("#FFFFFF");
 		this.drawText("/", x + columnOffset + 30, currentHeight, width);
 		this.changeTextColor("#43dbf9");
-		this.drawText($gameVariables.value(_enemiesDestroyed) + $gameVariables.value(_existEnemyVarID), x + columnOffset + 45,  currentHeight, width);
+		this.drawText(Math.min($gameVariables.value(_enemiesDestroyed) + $gameVariables.value(_existEnemyVarID), 99), x + columnOffset + 45,  currentHeight, width);
 		this.changeTextColor("#FFFFFF");
 		
 		currentHeight+=lineheight;

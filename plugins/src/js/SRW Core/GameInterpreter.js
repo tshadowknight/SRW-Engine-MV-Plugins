@@ -2431,86 +2431,117 @@
 		};
 
 		// ターン終了を行う（メニューの「ターン終了」と同じ）
-			Game_Interpreter.prototype.turnEnd = function() {
-				$gameTemp.setTurnEndFlag(true);
-				return true;
-			};
+		Game_Interpreter.prototype.turnEnd = function() {
+			$gameTemp.setTurnEndFlag(true);
+			return true;
+		};
 
-		// プレイヤーの操作を受け付けるかの判定（操作できるサブフェーズか？）
-			Game_Interpreter.prototype.isSubPhaseNormal = function(id) {
-				if ($gameSystem.isBattlePhase() === 'actor_phase' && $gameSystem.isSubBattlePhase() === 'normal') {
-					$gameSwitches.setValue(id, true);
-				} else {
-					$gameSwitches.setValue(id, false);
+	// プレイヤーの操作を受け付けるかの判定（操作できるサブフェーズか？）
+		Game_Interpreter.prototype.isSubPhaseNormal = function(id) {
+			if ($gameSystem.isBattlePhase() === 'actor_phase' && $gameSystem.isSubBattlePhase() === 'normal') {
+				$gameSwitches.setValue(id, true);
+			} else {
+				$gameSwitches.setValue(id, false);
+			}
+			return true;
+		};
+		
+		
+		Game_Interpreter.prototype.runSubEvent = function(id) {
+			$gameMap.events().forEach(function(event) {
+				if (event.event().meta.function == id) {
+					if (event.pageIndex() >= 0){
+						$gameMap._interpreter.setupChild(event.list(), 0);
+					}				
 				}
-				return true;
-			};
-			
-			
-			Game_Interpreter.prototype.runSubEvent = function(id) {
-				$gameMap.events().forEach(function(event) {
-					if (event.event().meta.function == id) {
-						if (event.pageIndex() >= 0){
-							$gameMap._interpreter.setupChild(event.list(), 0);
-						}				
-					}
-				});
-			};
-			
-			Game_Interpreter.prototype.getEventWill = function(eventId) {
-				var actor = $gameSystem.EventToUnit(eventId)[1];
-				var result = 0;
-				if(actor){
-					result = $statCalc.getCurrentWill(actor);
-				}
-				return result;
-			};
-			
-			Game_Interpreter.prototype.getActorWill = function(actorId) {
+			});
+		};
+		
+		Game_Interpreter.prototype.getEventWill = function(eventId) {
+			var actor = $gameSystem.EventToUnit(eventId)[1];
+			var result = 0;
+			if(actor){
+				result = $statCalc.getCurrentWill(actor);
+			}
+			return result;
+		};
+		
+		Game_Interpreter.prototype.getActorWill = function(actorId) {
+			var actor = $gameActors.actor(actorId);
+			var result = 0;
+			if(actor){
+				result = $statCalc.getCurrentWill(actor);
+			}
+			return result;
+		};
+		
+		// Set Movement Route
+		Game_Interpreter.prototype.command205 = function() {
+			$gameMap.refreshIfNeeded();
+			this._character = this.character(this._params[0]);
+			if(/actor\:.*/.exec(this._params[0])){
+				this._character = null;
+				var actorId = this._params[0].replace("actor:", "");
 				var actor = $gameActors.actor(actorId);
-				var result = 0;
 				if(actor){
-					result = $statCalc.getCurrentWill(actor);
+					var event = $statCalc.getReferenceEvent(actor);
+					if(event){
+						this._character = this.character(event.eventId());
+					}
+				}					
+			}
+			if (this._character) {
+				this._character.forceMoveRoute(this._params[1]);
+				if (this._params[1].wait) {
+					this.setWaitMode('route');
 				}
-				return result;
-			};
+			}
+			if(this._params[0] == -1){//cursor
+				$gameTemp.movingCursorByScript = true;
+			}
 			
-			// Set Movement Route
-			Game_Interpreter.prototype.command205 = function() {
-				$gameMap.refreshIfNeeded();
-				this._character = this.character(this._params[0]);
-				if(/actor\:.*/.exec(this._params[0])){
-					this._character = null;
-					var actorId = this._params[0].replace("actor:", "");
-					var actor = $gameActors.actor(actorId);
-					if(actor){
-						var event = $statCalc.getReferenceEvent(actor);
-						if(event){
-							this._character = this.character(event.eventId());
+			
+			return true;
+		};
+		
+		Game_Interpreter.prototype.runTextScript = async function(scriptId) {
+			this.setWaitMode("text_script_loading");
+			this._isLoadingTextScript = true;
+			let eventList = await DataManager.interpretTextScript(scriptId);
+			$gameMap._interpreter.setupChild(eventList, 0);	
+			this._isLoadingTextScript = false;
+		}	
+		
+		Game_Interpreter.prototype.loadTextScriptAssets = async function(scriptId) {
+			this.setWaitMode("text_script_loading");
+			this._isLoadingTextScript = true;
+			let eventList = await DataManager.interpretTextScript(scriptId);
+			Game_Interpreter.requestImages(eventList, 0);	
+			this._isLoadingTextScript = false;
+		}	
+
+		Game_Interpreter.prototype.preloadTextScriptAssets = async function(scriptId) {
+			const eventToCheck = {
+				afterAction: true, 
+			};
+			try {
+				for(let event of $gameMap.events()) {
+					if (eventToCheck[event.isType()]) {
+						//event.list()
+						for(let entry of event.list()){
+							if(entry.code == 355){
+								let matches = entry.parameters[0].match(/this\.runTextScript\s*\(\s*["']([^"']+)["']\s*\)/);
+								if(matches.length == 2){
+									await this.loadTextScriptAssets(matches[1]);
+								}
+							}
 						}
-					}					
-				}
-				if (this._character) {
-					this._character.forceMoveRoute(this._params[1]);
-					if (this._params[1].wait) {
-						this.setWaitMode('route');
 					}
 				}
-				if(this._params[0] == -1){//cursor
-					$gameTemp.movingCursorByScript = true;
-				}
-				
-				
-				return true;
-			};
-			
-			Game_Interpreter.prototype.runTextScript = async function(scriptId) {
-				this.setWaitMode("text_script_loading");
-				this._isLoadingTextScript = true;
-				let eventList = await DataManager.interpretTextScript(scriptId);
-				$gameMap._interpreter.setupChild(eventList, 0);	
-				this._isLoadingTextScript = false;
-			}		
+			} catch(e){
+				console.log("Error while preloading text script assets: " + (e.message || e));
+			}			
+		}
 			
 		Game_Interpreter.prototype.reloadRelativeUnits = function(params) {
 			$statCalc.applyRelativeTransforms();

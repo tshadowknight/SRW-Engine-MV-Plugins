@@ -15,6 +15,13 @@
 			Game_Map_prototype_initialize.call(this);		
 			
 		}
+
+		const Game_Map_SRWMV_prototype_setup = Game_Map.prototype.setup;
+		Game_Map.prototype.setup = function(mapId)
+		{
+			Game_Map_SRWMV_prototype_setup.call(this, mapId);
+			this._interpreter.preloadTextScriptAssets();
+		};
 		
 		Game_Map.prototype.setupEvents = function() {
 			this._events = [];

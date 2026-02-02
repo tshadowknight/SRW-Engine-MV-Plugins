@@ -67,7 +67,7 @@ DetailBarPilot.prototype.redraw = function(){
 		detailContent+="<div class='stat_value'>--</div>";
 		detailContent+="</div>";
 	} else {	
-		detailContent+="<div class='scaled_text actor_name'>"+actor.name()+"</div>";	
+		detailContent+="<div class='scaled_text fitted_text actor_name'>"+actor.name()+"</div>";	
 		detailContent+="<div class='mech_stats_container scaled_text'>";
 		detailContent+="<div class='stat_section stat_section_level' >";
 		detailContent+="<div class='stat_label'>Lv</div>";
