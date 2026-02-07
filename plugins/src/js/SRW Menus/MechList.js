@@ -42,6 +42,11 @@ MechList.prototype.rowEnabled = function(actor){
 	}
 }
 
+MechList.prototype.resetSelection = function(){
+	this._currentPage = 0;	
+	this._currentSelection = 0;
+}
+
 MechList.prototype.setCurrentSelection = function(value){
 	this._currentSelection = value;
 }

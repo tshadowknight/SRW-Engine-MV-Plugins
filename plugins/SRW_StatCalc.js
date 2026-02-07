@@ -9176,7 +9176,7 @@ StatCalc.prototype.getPopUpAnims = function(actor){
 		}	
 		for(let animAbility of mods){
 			if(!actor.SRWStats.stageTemp.popUpAnimsPlayed[animAbility.stackId]){
-				result.push({actor: actor, animId: animAbility.animationId, trackingId: animAbility.stackId});
+				result.push({actor: actor, animId: animAbility.animationId, trackingId: animAbility.stackId, lockedFrameRate: animAbility.lockedFrameRate});
 			}
 		}
 	});

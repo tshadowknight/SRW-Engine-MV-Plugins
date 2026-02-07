@@ -506,7 +506,11 @@
 		};
 		
 		Sprite_Animation.prototype.setupRate = function() {
-			this._rate = 5 - $gameSystem.getBattleSpeed();
+			if(this._animation.lockedFrameRate){
+				this._rate = 5;
+			} else {
+				this._rate = 5 - $gameSystem.getBattleSpeed();
+			}			
 		};
 		
 		Sprite_Animation.prototype.updateMain = function() {

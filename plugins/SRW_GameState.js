@@ -2929,7 +2929,7 @@ GameState_popup_anim.prototype.update = function(scene){
 		let animId = $gameTemp.queuedPopUpAnim.animId;
 		
 		$gameTemp.animCharacter = event;				
-		event.requestAnimation(animId);
+		event.requestAnimation(animId, {lockedFrameRate: $gameTemp.queuedPopUpAnim.lockedFrameRate});
 	} else {
 		$gameTemp.handlingPopUpAnim = false;
 		$gameTemp.animCharacter = null;

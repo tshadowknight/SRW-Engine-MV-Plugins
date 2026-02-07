@@ -171,7 +171,7 @@ Window_MechListDeployed.prototype.update = function() {
 			$gamePlayer.locate(event.posX(), event.posY(), false);		
 			$gameTemp.popMenu = true;
 			$gameTemp.buttonHintManager.hide();
-			this._mechList.setCurrentSelection(0);
+			this._mechList.resetSelection();
 			Input.clear();
 			
 			if($gameTemp.mechListWindowSearchSelectionCallback){
@@ -188,7 +188,7 @@ Window_MechListDeployed.prototype.update = function() {
 			SoundManager.playCancel();		
 			$gameTemp.popMenu = true;
 			$gameTemp.buttonHintManager.hide();
-			this._mechList.setCurrentSelection(0);
+			this._mechList.resetSelection();
 			Input.clear();
 			if(this._callbacks["closed"]){
 				this._callbacks["closed"]();
