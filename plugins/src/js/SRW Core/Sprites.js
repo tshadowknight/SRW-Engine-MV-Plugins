@@ -507,7 +507,7 @@
 		
 		Sprite_Animation.prototype.setupRate = function() {
 			if(this._animation.lockedFrameRate){
-				this._rate = 5;
+				this._rate = 4;
 			} else {
 				this._rate = 5 - $gameSystem.getBattleSpeed();
 			}			
