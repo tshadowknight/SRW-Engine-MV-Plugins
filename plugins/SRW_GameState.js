@@ -2929,6 +2929,14 @@ GameState_popup_anim.prototype.update = function(scene){
 		let animId = $gameTemp.queuedPopUpAnim.animId;
 		
 		$gameTemp.animCharacter = event;				
+		if($gameTemp.queuedPopUpAnim.bgm){
+			var bgm = {};
+			bgm.name = $gameTemp.queuedPopUpAnim.bgm;
+			bgm.pan = 0;
+			bgm.pitch = 100;
+			bgm.volume = 90;
+			AudioManager.playBgm(bgm);
+		}
 		event.requestAnimation(animId, {lockedFrameRate: $gameTemp.queuedPopUpAnim.lockedFrameRate});
 	} else {
 		$gameTemp.handlingPopUpAnim = false;

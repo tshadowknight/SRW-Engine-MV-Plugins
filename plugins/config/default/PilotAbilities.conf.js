@@ -1968,7 +1968,7 @@ $SRWConfig.pilotAbilties = function(){
 		false,
 		function(actor, level){
 			return [
-				{type: "activation_animation", animationId: 51, lockedFrameRate: false},				
+				{type: "activation_animation", animationId: 51, lockedFrameRate: false, bgm: "Battle2"},				
 			];
 		},
 		function(actor, level){
