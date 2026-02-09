@@ -1266,8 +1266,20 @@ StatCalc.prototype.setIsAI = function(actor, state){
 }
 
 StatCalc.prototype.isEssential = function(actor){
+	const _this = this;
 	if(this.isActorSRWInitialized(actor)){
-		return actor.SRWStats.stageTemp.isEssential;
+		let result = false;
+		if(actor.SRWStats.stageTemp.isEssential){
+			result = true;
+		}
+		var subPilots = this.getSubPilots(actor);
+		subPilots.forEach(function(pilotId){
+			var actor = $gameActors.actor(pilotId);
+			if(_this.isActorSRWInitialized(actor) && actor.SRWStats.stageTemp.isEssential){
+				result = true;
+			}		
+		});
+		return result;
 	} else {
 		return false;
 	}
@@ -3035,6 +3047,9 @@ StatCalc.prototype.swapPilot = function(actor, newActorId){
 StatCalc.prototype.syncStageTemp = function(targetActor, sourceActor){
 	targetActor.SRWStats.stageTemp.abilityUsed = sourceActor.SRWStats.stageTemp.abilityUsed;
 	targetActor.SRWStats.stageTemp.inventoryConsumed = sourceActor.SRWStats.stageTemp.inventoryConsumed;
+	if(targetActor.SRWStats.stageTemp.isEssential){
+		targetActor.SRWStats.stageTemp.isEssential = sourceActor.SRWStats.stageTemp.inventoryConsumed;
+	}	
 }
 
 StatCalc.prototype.split = function(actor){
@@ -3168,6 +3183,7 @@ StatCalc.prototype.combine = function(actor, forced){
 			var ENRatioSum = 0;
 			var ENRatioCount = 0;
 			var combinesInto = combineResult.combinesInto;
+			var isEssential = actor.SRWStats.stageTemp.isEssential;
 			let potentialSuperStates = {}; 
 			
 			for(var i = 0; i < combineResult.participants.length; i++){
@@ -3196,6 +3212,10 @@ StatCalc.prototype.combine = function(actor, forced){
 				actor.SRWStats.mech = targetMechData;
 			}
 			targetActor.combineInfo = combineResult;
+
+			if(isEssential){
+				targetActor.SRWStats.stageTemp.isEssential = true;
+			}
 		
 			
 			this.calculateSRWMechStats(targetActor.SRWStats.mech);
