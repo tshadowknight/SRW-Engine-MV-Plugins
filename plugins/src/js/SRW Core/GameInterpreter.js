@@ -815,6 +815,11 @@
 			}			
 		}
 
+		Game_Interpreter.prototype.destroyActor = function(actorId, silent) {
+			const eventId = $statCalc.getReferenceEvent($gameActors.actor(actorId)).eventId();
+			this.destroyEvent(eventId, silent);
+		}
+
 		Game_Interpreter.prototype.eraseEventsOfType = function(type, omitted, toQueue) {
 			var _this = this;
 			omitted = omitted || [];

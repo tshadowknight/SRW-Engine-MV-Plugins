@@ -8966,6 +8966,7 @@ StatCalc.prototype.applyDeployActions = function(mainActorId, mechId, overwriteF
 								targetPilot.isSubPilot = false;//set to false for unit reload
 								$statCalc.reloadSRWStats(targetPilot, false, true);
 								targetPilot.isSubPilot = false;//reaffirm in case the unit reload processed a previous main pilot and set the new main pilot back to sub pilot
+								targetPilot.mainPilot = null;
 							} else {								
 								$gameSystem.registerMechFallbackInfo(targetMechId, JSON.parse(JSON.stringify(targetMech.subPilots)));	
 
