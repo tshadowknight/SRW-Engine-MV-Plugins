@@ -2844,6 +2844,8 @@ StatCalc.prototype.transform = function(actor, idx, force, forcedId, noRestore){
 			var previousHPRatio = calculatedStats.currentHP / calculatedStats.maxHP;
 			var previousENRatio = calculatedStats.currentEN / calculatedStats.maxEN;
 			var unitsOnBoard = actor.SRWStats.mech.unitsOnBoard;
+			const originalMechId = actor.SRWStats.mech.id;
+			var reversalInfo = actor.reversalInfo;
 			var restoreInfo = actor.SRWStats.mech.transformRestores || {HP: false, EN: false};
 			var transformIntoId = actor.SRWStats.mech.transformsInto[idx];
 			if(forcedId){
@@ -2879,6 +2881,13 @@ StatCalc.prototype.transform = function(actor, idx, force, forcedId, noRestore){
 				}		
 				
 				actor.SRWStats.mech.unitsOnBoard = unitsOnBoard;
+				
+				if(!actor.reversalInfo){
+					actor.reversalInfo = {};
+				}
+				if(actor.reversalInfo[originalMechId]){					
+					actor.reversalInfo[transformIntoId] = actor.reversalInfo[originalMechId];
+				}
 							
 				calculatedStats = this.getCalculatedMechStats(actor);
 				if(!restoreInfo.HP || !noRestore){				
@@ -2903,7 +2912,13 @@ StatCalc.prototype.transform = function(actor, idx, force, forcedId, noRestore){
 						actor.isSubPilot = true;
 						actor.subPilotSlot = ctr;
 						actor.mainPilot = mainPilot;						
-						_this.reloadSRWStats(actor);										
+						_this.reloadSRWStats(actor);	
+						if(!actor.reversalInfo){
+							actor.reversalInfo = {};
+						}
+						if(actor.reversalInfo[originalMechId]){					
+							actor.reversalInfo[transformIntoId] = actor.reversalInfo[originalMechId];
+						}						
 					}			
 				});					
 				if(subTwin){
@@ -3124,6 +3139,7 @@ StatCalc.prototype.split = function(actor){
 				var actionsResult = this.applyDeployActions(combineInfo.participants[i], actor.reversalInfo[startFromMechId]);
 				if(!actionsResult){//if no deploy actions are assigned to main split target
 					actor.SRWStats.mech = this.getMechDataById(actor.reversalInfo[startFromMechId], true);
+					actor._classId = actor.reversalInfo[startFromMechId];
 					this.calculateSRWMechStats(actor.SRWStats.mech);					
 				}			
 				actor.isSubPilot = false;
