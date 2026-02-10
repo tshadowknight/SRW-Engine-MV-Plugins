@@ -1477,6 +1477,7 @@
 				if (battlerArray && battlerArray[0] === 'actor' && battlerArray[1].isAlive() && !event.isErased()) {
 					$gameSystem.aliveActorIdList.push(event.eventId());
 					battlerArray[1].SRPGActionTimesSet($statCalc.applyStatModsToValue(battlerArray[1], 1, ["extra_action"]));
+
 					var SPRegen = 0;
 					SPRegen = $statCalc.applyStatModsToValue(battlerArray[1], SPRegen, ["SP_regen"]);
 					if(ENGINE_SETTINGS.VXT_SP){
@@ -1504,6 +1505,8 @@
 						subPilots.forEach(function(pilotId){
 							var subPilot = $gameActors.actor(pilotId);
 							if(subPilot){
+								subPilot.SRPGActionTimesSet($statCalc.applyStatModsToValue(subPilot, 1, ["extra_action"]));
+
 								var SPRegen = 0;
 								SPRegen = $statCalc.applyStatModsToValue(subPilot, SPRegen, ["SP_regen"]);
 								if(ENGINE_SETTINGS.VXT_SP){
@@ -1666,6 +1669,13 @@
 				var battlerArray = $gameSystem.EventToUnit(event.eventId());
 				if (battlerArray && (battlerArray[0] === 'actor' || battlerArray[0] === 'enemy')) {
 					battlerArray[1].onTurnEnd();
+					const subPilots = $statCalc.getSubPilots(battlerArray[1]);
+					for(let subPilotId of subPilots){
+						const actor = $gameActors.actor(subPilotId);
+						if(actor){
+							actor.onTurnEnd();
+						}						
+					}
 				}
 			});
 			$gameMap.events().forEach(function(event) {
