@@ -977,17 +977,19 @@ BattleCalc.prototype.generateBattleResult = function(isPrediction){
 		
 		aCache.side = this._side;
 		if(aCache.action.type != "attack"){
+			this._attacker.actor._cacheReference = storedCacheRef;
 			return;
 		}
 		
 		if(aCache.isDisabled){
+			this._attacker.actor._cacheReference = storedCacheRef;
 			return;
-		}
-		
+		}		
 		
 		aCache.allInfo = this._allInfo;
 		if(aCache.type == "support attack"){
 			if(mainAttackerCache.isDestroyed){
+				this._attacker.actor._cacheReference = storedCacheRef;
 				return; //the support attacker does not get to attack if the main attacker is down
 			}			
 			aCache.mainAttacker = mainAttackerCache;
