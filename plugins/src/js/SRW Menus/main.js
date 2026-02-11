@@ -1,6 +1,9 @@
 import CSSUIManager from "./CSSUIManager.js";
 window.CSSUIManager = CSSUIManager;
 
+import Window_CSS from "./Window_CSS.js";
+window.Window_CSS = Window_CSS;
+
 import Window_Intermission from "./Window_Intermission.js";
 window.Window_Intermission = Window_Intermission;
 
@@ -141,7 +144,6 @@ window.Window_Attribute_Chart = Window_Attribute_Chart;
 import "./style/SRW_Menus.css";
 
 
-import Window_CSS from "./Window_CSS.js";
 
 Graphics.getPreviewWindowWidth = function(){
 	if($gameTemp && $gameTemp.editMode){

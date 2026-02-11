@@ -413,10 +413,28 @@ Window_Options.prototype.getCurrentSelection = function(){
 
 Window_Options.prototype.createComponents = function() {
 	var _this = this;
-	Window_CSS.prototype.createComponents.call(this);
-
 	var windowNode = this.getWindowNode();
 
+	// Check if our components already exist in the DOM
+	// Workaround for issue where a custom title screen(or possible other scene in the future) can also instantiate an option window and interfere with the global Scene_Map Window_Options instance
+	var existingHeader = document.getElementById(this.createId("header"));
+	if(existingHeader && windowNode.contains(existingHeader)){
+		// Components already exist, rebind references to existing DOM nodes
+		this._bgFadeContainer = windowNode.querySelector(".bg_fade_container");
+		this._bgTextureContainer = windowNode.querySelector(".bg_container");
+		// _customMenuBg is user-created with no guaranteed class; it's already in the DOM and not referenced elsewhere
+		this._header = existingHeader;
+		this._headerText = existingHeader.firstChild;
+		this._generalOptionsTabButton = windowNode.querySelector(".general_options_button");
+		this._soundOptionsTabButton = windowNode.querySelector(".sound_options_button");
+		this._graphicsOptionsTabButton = windowNode.querySelector(".graphics_options_button") || null;
+		this._tweaksTabButton = windowNode.querySelector(".tweaks_button") || null;
+		this._optionsList = windowNode.querySelector(".list_container");
+		return;
+	}
+
+	Window_CSS.prototype.createComponents.call(this);
+	windowNode = this.getWindowNode();
 
 	this._header = document.createElement("div");
 	this._header.id = this.createId("header");
@@ -486,9 +504,9 @@ Window_Options.prototype.createComponents = function() {
 		});
 	}
 
-	this._listContainer = document.createElement("div");
-	this._listContainer.classList.add("list_container");
-	windowNode.appendChild(this._listContainer);
+	this._optionsList = document.createElement("div");
+	this._optionsList.classList.add("list_container");
+	windowNode.appendChild(this._optionsList);
 
 }
 
@@ -698,7 +716,7 @@ Window_Options.prototype.redraw = function() {
 	}
 	
 	
-	this._listContainer.innerHTML = content;
+	this._optionsList.innerHTML = content;
 	
 	var windowNode = this.getWindowNode();
 	var entries = windowNode.querySelectorAll(".entry");
@@ -739,9 +757,9 @@ Window_Options.prototype.redraw = function() {
 	}
 
 	// Update list container inactive state
-	this._listContainer.classList.remove("inactive");
+	this._optionsList.classList.remove("inactive");
 	if(this._currentUIState == "tab_selection"){
-		this._listContainer.classList.add("inactive");
+		this._optionsList.classList.add("inactive");
 	}
 
 	this.loadImages();

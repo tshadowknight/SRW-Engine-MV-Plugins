@@ -399,6 +399,18 @@ Window_Intermission.prototype.createComponents = function() {
 	windowNode.appendChild(this._confirmContainer);
 }
 
+Window_Intermission.prototype.resetMenuState = function() {
+	this._menuLevels = [0];
+	this._currentLevel = 0;
+	this._currentSelection = 0;
+	this._currentKey = this._commands[0].key;
+	this._state = "";
+	this.titleConfirmSelection = true;
+	this._handlingInput = false;
+	this._aceFacePicsLoaded = false;
+	this.requestRedraw();
+}
+
 Window_Intermission.prototype.addHandler = function(key, func) {
 	this._handlers[key] = func;
 };

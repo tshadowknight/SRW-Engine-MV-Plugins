@@ -17,7 +17,68 @@
 				}
 			}			
 		};
-		
+
+		//keep a copy of the Scene_Map in memory to reuse, workaround for memory of menu components created in Scene_Map
+		SceneManager._globalMapScene = null;
+		SceneManager.initGlobalMapScene = function(){
+			if(!SceneManager._globalMapScene){
+				SceneManager._globalMapScene = new Scene_Map();
+			}
+		}
+		SceneManager.initialize = function() {
+			this.initGraphics();
+			this.checkFileAccess();
+			this.initAudio();
+			this.initInput();
+			this.initNwjs();
+			this.checkPluginErrors();
+			this.setupErrorHandlers();		
+		};
+
+		SceneManager.changeScene = function() {
+			if (this.isSceneChanging() && !this.isCurrentSceneBusy()) {
+				if (this._scene) {
+					if(this._scene != SceneManager._globalMapScene){
+						this._scene.terminate();
+						this._scene.detachReservation();
+					}					
+					this._previousClass = this._scene.constructor;
+				}
+				this._scene = this._nextScene;
+				if (this._scene) {
+					if(this._scene != SceneManager._globalMapScene){
+						this._scene.attachReservation();
+						this._scene.create();
+					} else if(!SceneManager._globalMapScene.firstInit){
+						SceneManager._globalMapScene.firstInit = true;
+						this._scene.attachReservation();
+						this._scene.create();
+					} else {
+						this._scene.restart();
+					}
+					this._nextScene = null;
+					this._sceneStarted = false;
+					this.onSceneCreate();
+				}
+				if (this._exiting) {
+					this.terminate();
+				}
+			}
+		};
+
+		SceneManager.goto = function(sceneClass) {
+			if (sceneClass) {
+				if(sceneClass == Scene_Map.prototype.constructor){
+					SceneManager.initGlobalMapScene();
+					this._nextScene = SceneManager._globalMapScene;					
+				} else {
+					this._nextScene = new sceneClass();	
+				}				
+			}
+			if (this._scene) {
+				this._scene.stop();
+			}
+		};
 		
 		Scene_Map.prototype.onMapLoaded = function() {
 			$gameMap._interpreter.preloadTextScriptAssets();

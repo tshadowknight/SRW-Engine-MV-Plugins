@@ -683,6 +683,77 @@ SceneManager.isInSaveScene = function(){
 		this.idToMenu = {};
 		$gameTemp.menuStack = [];
     };
+
+	Scene_Map.prototype.create = function() {
+		Scene_Base.prototype.create.call(this);
+		this._transfer = $gamePlayer.isTransferring();
+		var mapId = this._transfer ? $gamePlayer.newMapId() : $gameMap.mapId();
+		DataManager.loadMapData(mapId);
+	};
+
+	Scene_Map.prototype.restart = function() {
+		$gameTemp.buttonHintManager = this._buttonHintsWindow;
+		this.closePauseMenu();
+
+		this._waitCount = 0;
+		this._encounterEffectDuration = 0;
+		this._mapLoaded = false;
+		this._touchCount = 0;
+
+		this._intermissionWindow.close();
+		this._intermissionWindow.resetMenuState();
+		this._intermissionWindow.hide();
+		this._intermissionWindowOpen = false;
+
+		$gameTemp.menuStack = [];
+		
+		this.removeChild(this._fadeSprite);
+		this.removeChild(this._mapNameWindow);
+		this.removeChild(this._windowLayer);
+		this.removeChild(this._spriteset);
+
+
+		this._transfer = $gamePlayer.isTransferring();
+		var mapId = this._transfer ? $gamePlayer.newMapId() : $gameMap.mapId();
+		DataManager.loadMapData(mapId);
+	}
+
+	Scene_Map.prototype.addWindow = function(window) {
+		if(window instanceof Window_CSS){
+			this.addCSSWindow(window);
+		} else {
+			this._windowLayer.addChild(window);	
+		}			
+	};
+
+	Scene_Map.prototype.addCSSWindow = function(window) {
+		this._CSSWindowLayer.addChild(window);		
+	};
+
+	Scene_Map.prototype.createCSSWindowLayer = function() {
+		var width = Graphics.boxWidth;
+		var height = Graphics.boxHeight;
+		var x = (Graphics.width - width) / 2;
+		var y = (Graphics.height - height) / 2;
+		this._CSSWindowLayer = new WindowLayer();
+		this._CSSWindowLayer.move(x, y, width, height);
+		this.addChild(this._CSSWindowLayer);
+	};
+
+	Scene_Map.prototype.createDisplayObjects = function() {
+		//create pixi child objects
+		this.createSpriteset();
+		this.createMapNameWindow();		
+		this.createWindowLayer();			
+		this.createAllWindows();
+
+		//create windows
+		if(!this._windowsInitialized){
+			this._windowsInitialized = true;
+			this.createCSSWindowLayer();
+			this.createAllCSSWindows();
+		} 
+	};
 	
 	Scene_Map.prototype.processMapTouch = function() {
 		if (TouchInput.isTriggered() || this._touchCount > 0) {
@@ -749,19 +820,28 @@ SceneManager.isInSaveScene = function(){
 	Scene_Map.prototype.stop = function() {
 		var _this = this;
 		Scene_Map_prototype_stop.call(this);
-		Object.keys(_this.idToMenu).forEach(function(id){
+		/*Object.keys(_this.idToMenu).forEach(function(id){
 			_this.idToMenu[id].destroy();
-		});
+		});*/
+	}
+
+	var _SRPG_SceneMap_createAllWindows = Scene_Map.prototype.createAllWindows;
+    Scene_Map.prototype.createAllWindows = function() {
+        _SRPG_SceneMap_createAllWindows.call(this);
+
+		this.createSrpgActorCommandWindow();
+		this.createHelpWindow();
+		this.createPauseWindow();
+		this.createConditionsWindow();
+		
+		this.createItemWindow();
+		this.createAbilityWindow();
+		this.createTransformWindow();
+		this.createPilotSwapWindow();
 	}
 
     // マップのウィンドウ作成
-    var _SRPG_SceneMap_createAllWindows = Scene_Map.prototype.createAllWindows;
-    Scene_Map.prototype.createAllWindows = function() {
-        _SRPG_SceneMap_createAllWindows.call(this);
-		
-        this.createSrpgActorCommandWindow();
-        this.createHelpWindow();
-        
+    Scene_Map.prototype.createAllCSSWindows = function() {            
 		this.createAttackWindow();
 		this.createSpiritWindow();
 		this.createBeforeBattleSpiritWindow();
@@ -789,13 +869,8 @@ SceneManager.isInSaveScene = function(){
 		this.createMinimalBattleWindow();
 		this.createSpiritAnimWindow();
 		this.createDetailPagesWindow();
-		this.createBeforeBattleWindow();
-		this.createPauseWindow();
-		this.createConditionsWindow();
-		this.createItemWindow();
-		this.createAbilityWindow();
-		this.createTransformWindow();
-		this.createPilotSwapWindow();
+		this.createBeforeBattleWindow();		
+		
 		this.createDeploymentWindow();
 		this.createEndTurnConfirmWindow();
 		this.createDeploymentInStageWindow();
@@ -941,6 +1016,7 @@ SceneManager.isInSaveScene = function(){
 		$gameTemp.buttonHintManager.hide();
 		this._mapButtonsWindow.hide();
 		this._mapButtonsWindow.close();
+		SceneManager.snapForBackground();
 		SceneManager.push(Scene_GameEnd);
 	};
 	
@@ -1925,7 +2001,7 @@ SceneManager.isInSaveScene = function(){
 			return;
 		}	
 		//Soft Reset
-		if(!$gameSystem.isIntermission()  && !_this._messageWindow.isOpen() && !_this._messageWindow.isClosing() && !$gameMessage.isBusy() && (!$gameTemp.menuStack || $gameTemp.menuStack.length == 0) && Input.isPressed("ok") && Input.isPressed("cancel") && Input.isPressed("pageup") && Input.isPressed("pagedown")){			
+		if(!($gameSystem.isSubBattlePhase() == "deploy_selection_window") &&!$gameSystem.isIntermission()  && !_this._messageWindow.isOpen() && !_this._messageWindow.isClosing() && !$gameMessage.isBusy() && (!$gameTemp.menuStack || $gameTemp.menuStack.length == 0) && Input.isPressed("ok") && Input.isPressed("cancel") && Input.isPressed("pageup") && Input.isPressed("pagedown")){			
 			let continueSlotIsPopulated = false;
 			try {
 				JsonEx.parse(StorageManager.load("continue"));//check if the continue slot exists first by trying to parse it
