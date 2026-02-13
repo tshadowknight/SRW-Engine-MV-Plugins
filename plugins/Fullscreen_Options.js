@@ -114,11 +114,11 @@
 			Graphics._switchFullScreen();
 			ConfigManager.callFullscreen = eval(forceFullscreen);
 		}*/
-		if(ConfigManager.Fullscreen){
+		/*if(ConfigManager.Fullscreen){
 			Graphics._requestFullScreen();
 		} else {
 			Graphics._cancelFullScreen();
-		}
+		}*/
 		ConfigManager.save();
 		_Scene_Title_start_Alias.call(this)
 	};

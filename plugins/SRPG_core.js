@@ -5359,6 +5359,12 @@ SceneManager.isInSaveScene = function(){
 	
 	Scene_Boot.prototype.start = function() {
 		Scene_Base.prototype.start.call(this);
+		this.updateDocumentTitle();
+		if(ConfigManager.Fullscreen){
+			Graphics._requestFullScreen();
+		} else {
+			Graphics._cancelFullScreen();
+		}
 		SoundManager.preloadImportantSounds();
 		if (DataManager.isBattleTest()) {
 			DataManager.setupBattleTest();
@@ -5378,8 +5384,7 @@ SceneManager.isInSaveScene = function(){
 			}
 			
 			Window_TitleCommand.initCommandPosition();
-		}
-		this.updateDocumentTitle();
+		}		
 	};
 		
 })();
