@@ -46,11 +46,11 @@
 }
 
 #sell_item .item_list_row .item_list_block:nth-child(1) {
-	width: 50%;
+	width: 48%;
 }
 
 #sell_item .item_list_row .item_list_block:nth-child(2) {
-	width: 15%;
+	width: 12%;
 }
 
 #sell_item .item_list_row .item_list_block:nth-child(3) {
@@ -58,7 +58,7 @@
 }
 
 #sell_item .item_list_row .item_list_block:nth-child(4) {
-	width: 15%;
+	width: 20%;
 	justify-content: center;
 }
 
