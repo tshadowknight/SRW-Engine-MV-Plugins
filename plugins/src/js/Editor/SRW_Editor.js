@@ -737,7 +737,12 @@ SRWEditor.prototype.init = function(){
 		set_shadow_floor: {
 			hasTarget: false,
 			params: ["floor"],
-		},		
+		},
+		end_scene: {
+			hasTarget: false,
+			params: [],
+			desc: "Immediately ends the current battle scene."
+		},
 		set_text_provider: {
 			hasTarget: false,
 			params: ["id"],

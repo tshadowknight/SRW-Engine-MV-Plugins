@@ -439,6 +439,7 @@ Window_DetailPages.prototype.update = function() {
 		if(Input.isTriggered('ok')){
 			if(this._uiState == "normal" && this._selectedTab == 0 && this._isPilotAbiOverflow){
 				this._uiState = "pilot_abi_detail";
+				this.resetRenderedTabs();
 				this.requestRedraw();
 			}
 		}
@@ -456,6 +457,19 @@ Window_DetailPages.prototype.update = function() {
 					this._uiState = "description";
 				}					
 			}
+
+			if(this._uiState == "pilot_abi_detail"){
+				if(this._selectedTab == 0){
+					this._descriptionOverlay.show(this._pilotInfoTab);
+					this._uiState = "description_abi_detail";
+				} else if(this._selectedTab == 1){
+					this._descriptionOverlay.show(this._detailContainer);
+					this._uiState = "description_abi_detail";
+				} else if(this._selectedTab == 2){
+					this._descriptionOverlay.show(this._weaponInfoContainer);
+					this._uiState = "description_abi_detail";
+				}					
+			}
 		}	
 		
 		if(Input.isTriggered('cancel') || TouchInput.isCancelled()){	
@@ -470,10 +484,17 @@ Window_DetailPages.prototype.update = function() {
 			} else if(this._uiState == "pilot_abi_detail"){
 				this._uiState = "normal";
 				this.requestRedraw();
+				this.resetRenderedTabs();
+				this.requestRedraw();
 			} else if(this._uiState == "description"){
 				this._descriptionOverlay.hide();
-				this._uiState = "normal";
-			} 			
+				this._uiState = "normal";				
+			} else if(this._uiState == "description_abi_detail"){
+				this._descriptionOverlay.hide();
+				this._uiState = "pilot_abi_detail";
+				this.resetRenderedTabs();
+				this.requestRedraw();
+			} 		
 		}				
 		this.resetTouchState();
 		this.validateTab();		
@@ -813,6 +834,12 @@ Window_DetailPages.prototype.drawPilotStats1 = function() {
 	});
 }
 
+
+Window_DetailPages.prototype.isAbiDetailState = function() {
+	return this._uiState == "pilot_abi_detail" || this._uiState == "description_abi_detail";
+}
+
+
 Window_DetailPages.prototype.drawPilotStats2 = function() {
 	const _this = this;
 	if(!_this._renderedTabs["P2"]){
@@ -916,15 +943,19 @@ Window_DetailPages.prototype.drawPilotStats2 = function() {
 	this._isPilotAbiOverflow = isOverflow;
 	const abilityDisplaySlots = 6;
 	
-	function createAbiBlockContent(abilityDef, nameOverride){
+	function createAbiBlockContent(abilityDef, nameOverride, noDescribe){
 		let content = "";
 		var displayName = "---";
 		var displayClass = "";
 		var uniqueString = "";
 		var descriptionData = "";
 		var descriptionClass = "";
+
 		if(typeof abilityDef != "undefined" && abilityDef.requiredLevel <= currentLevel){
 			descriptionClass = "described_element";
+			if(noDescribe){
+				descriptionClass = "";
+			}
 			descriptionData = "data-type='pilot' data-idx='"+abilityDef.idx+"'";
 			var displayInfo = $pilotAbilityManager.getAbilityDisplayInfo(abilityDef.idx);
 			
@@ -968,7 +999,7 @@ Window_DetailPages.prototype.drawPilotStats2 = function() {
 		for(let j = 0; j < columnContentCount; j++){
 			if(ctr < maxPilotAbilities){
 				content+="<div class='entry scaled_text'>";			
-				content+=createAbiBlockContent(abilityDisplayList[ctr]);			
+				content+=createAbiBlockContent(abilityDisplayList[ctr], null);			
 				content+="</div>";
 			}
 			ctr++;
@@ -976,9 +1007,11 @@ Window_DetailPages.prototype.drawPilotStats2 = function() {
 		content+="</div>";
 	}
 	content+="</div>";
-	this._fullPilotAbiList.innerHTML = content;	
-	
-	
+	if(this.isAbiDetailState()){
+		this._fullPilotAbiList.innerHTML = content;	
+	} else {
+		this._fullPilotAbiList.innerHTML = "";	
+	}	
 	
 	for(var i = 0; i < abilityDisplaySlots; i++){
 		const abilityDef = abilityDisplayList[i];
@@ -990,9 +1023,9 @@ Window_DetailPages.prototype.drawPilotStats2 = function() {
 		
 		
 		if(i == (abilityDisplaySlots - 1) && isOverflow){
-			detailContent+=createAbiBlockContent(abilityDef, "...");
+			detailContent+=createAbiBlockContent(abilityDef, "...", true);
 		} else {
-			detailContent+=createAbiBlockContent(abilityDef);
+			detailContent+=createAbiBlockContent(abilityDef, null, this.isAbiDetailState());
 		}	
 				
 		
@@ -1022,6 +1055,9 @@ Window_DetailPages.prototype.drawPilotStats2 = function() {
 		var descriptionClass = "";
 		if(typeof spiritList[i] != "undefined" && spiritList[i].idx !== '' &&  spiritList[i].level <= currentLevel){
 			descriptionClass = "described_element";
+			if(this.isAbiDetailState()){
+				descriptionClass = "";
+			}
 			descriptionData = "data-type='spirit' data-idx='"+spiritList[i].idx+"'";
 			
 			var displayInfo = $spiritManager.getSpiritDisplayInfo(spiritList[i].idx);
@@ -1104,6 +1140,9 @@ Window_DetailPages.prototype.drawPilotStats2 = function() {
 			var descriptionClass = "";
 			if(typeof abilityList[i] != "undefined" && unlocked[i]){
 				descriptionClass = "described_element";
+				if(this.isAbiDetailState()){
+					descriptionClass = "";
+				}
 				descriptionData = "data-type='fav_skill' data-isunlocked="+(unlocked[i] ? 1 : 0)+" data-idx='"+abilityList[i].id+"'";
 				
 				var displayInfo = $pilotAbilityManager.getAbilityDisplayInfo(abilityList[i].id);
@@ -1328,7 +1367,7 @@ Window_DetailPages.prototype.redraw = function() {
 	}
 	this.loadImages();
 	
-	if(this._uiState == "pilot_abi_detail"){
+	if(this.isAbiDetailState()){
 		this._fullPilotAbiContainer.classList.add("active");
 	} else {
 		this._fullPilotAbiContainer.classList.remove("active");

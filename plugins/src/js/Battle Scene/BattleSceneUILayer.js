@@ -15,6 +15,8 @@ export default function BattleSceneUILayer() {
 	
 	this._currentActor;
 	this._currentEnemy;
+
+	this._statBoxesLocked = false;
 }
 
 BattleSceneUILayer.prototype = Object.create(Window_CSS.prototype);
@@ -69,7 +71,18 @@ BattleSceneUILayer.prototype.resetDisplay = function(info){
 	this._enemyTwinStats.style.display = "none";
 }
 
+BattleSceneUILayer.prototype.lockStatboxes = function(info){
+	this._statBoxesLocked = true;
+}
+
+BattleSceneUILayer.prototype.unlockStatboxes = function(info){
+	this._statBoxesLocked = false;
+}
+
 BattleSceneUILayer.prototype.setStatBoxVisible = function(type, inTwinContext){
+	if(this._statBoxesLocked){
+		return;
+	}
 	if(type == "ally"){
 		this._allyStats.style.display = "block";
 		if(inTwinContext){

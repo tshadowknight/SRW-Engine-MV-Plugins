@@ -6367,6 +6367,9 @@ BattleSceneManager.prototype.executeAnimation = function(animation, startTick){
 		}, 
 		set_shadow_floor: function(target, params){
 			_this._shadowFloor = (params.floor || 0 ) * 1;
+		},
+		end_scene: function(target, params){
+			_this.endScene();
 		}
 	};
 	
@@ -6457,11 +6460,19 @@ BattleSceneManager.prototype.startAnimation = function(){
 BattleSceneManager.prototype.playIntroAnimation = function(){
 	this._playingIntro = true;
 	this._animationList = [];
-	
+
+	if($gameTemp.skipNextBattleSceneIntro){
+		$gameTemp.skipNextBattleSceneIntro = false;
+		this._skipIntroText = true;
+		this._camera.position = new BABYLON.Vector3().copyFrom(this._defaultPositions.camera_main_idle);
+		this._playingIntro = false;
+		return Promise.resolve();
+	}
+
 	this._animationList[0] = [
 		{type: "translate", target: "Camera", params: {startPosition: this._defaultPositions.camera_main_intro, position: this._defaultPositions.camera_main_idle, duration: 25, easingFunction: new BABYLON.SineEase(), easingMode: BABYLON.EasingFunction.EASINGMODE_EASEOUT}}
 	];
-	
+
 	this._animationList[60] = []; //padding
 	return this.startAnimation();
 }
@@ -8536,15 +8547,19 @@ BattleSceneManager.prototype.processActionQueue = function() {
 				}
 				
 				async function showBeforeAnimationTextBox(){
+					if(_this._skipIntroText){
+						_this._skipIntroText = false;
+						return;
+					}
 					var textType = "";
-					
+
 					var entityType = nextAction.isActor ? "actor" : "enemy";
 					var entityId = nextAction.ref.SRWStats.pilot.id;
-					
+
 					var battleText;
 					if(nextAction.type == "support attack"){
 						battleText = _this._battleTextManager.getText(entityType, nextAction.ref, "support_attack", nextAction.isActor ? "actor" : "enemy", _this.getBattleTextId(nextAction.attacked), null, null, _this.getBattleTextId(nextAction.mainAttacker));
-					}					
+					}
 					if(!battleText || battleText.text == "..."){
 						if(nextAction.type == "initiator" || nextAction.type == "twin attack"){
 							textType = "battle_intro";
@@ -8552,9 +8567,9 @@ BattleSceneManager.prototype.processActionQueue = function() {
 						if(nextAction.type == "defender" || nextAction.type == "twin defend"){
 							textType = "retaliate";
 						}
-						
+
 						battleText = _this._battleTextManager.getText(entityType, nextAction.ref, textType, _this.getBattleTextTargetType(nextAction), _this.getBattleTextId(nextAction.attacked));
-					}				
+					}
 					await _this._TextlayerManager.setTextBox(entityType, entityId, nextAction.ref.name(), battleText);
 				}
 				
@@ -8726,6 +8741,11 @@ BattleSceneManager.prototype.processActionQueue = function() {
 				
 				async function finalizeSetup(){	
 					_this._UILayerManager.resetDisplay();
+					if($gameTemp.hideBattleSceneStatBoxes){
+						_this._UILayerManager.lockStatboxes();
+					} else {
+						_this._UILayerManager.unlockStatboxes();
+					}
 					if(nextAction.side == "actor"){
 						if(nextAction.attacked_all_sub){
 							_this._UILayerManager.setStatBoxVisible("enemyTwin", true);

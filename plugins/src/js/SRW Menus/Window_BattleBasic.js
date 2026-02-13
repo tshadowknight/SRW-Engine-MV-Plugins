@@ -85,7 +85,7 @@ Window_BattleBasic.prototype.createParticipantComponents = function(componentId,
 	var id = this.createId(componentId);
 	var previous = document.getElementById(id);
 	if(previous){
-		previous.parent.removeChild(previous);
+		previous.parentNode.removeChild(previous);
 	}
 	
 	var container = document.createElement("div"); 
@@ -538,12 +538,31 @@ Window_BattleBasic.prototype.readBattleCache = function() {
 		}				
 	});
 	
-	/*Object.keys(_this._participantComponents).forEach(function(type){
+	Object.keys(_this._participantComponents).forEach(function(type){
 		_this._participantComponents[type].container.className = "participant_container "+_this._participantComponents[type].side;
 		_this._participantComponents[type].destroyed.className = "destroyed_anim";
 		_this._participantComponents[type].container.style.visibility = "visible";
-	});*/
-	_this.createParticipantComponents();
+	});
+}
+
+Window_BattleBasic.prototype.cleanupResources = function() {
+	if(this._RMMVSpriteInfo){
+		this._RMMVSpriteInfo.forEach(function(RMMVBg){
+			RMMVBg.renderer.destroy();
+			RMMVBg.stage.destroy({children: true});
+		});
+		this._RMMVSpriteInfo = [];
+	}
+	// Cancel infinite Web Animations on terrain scroll layers to prevent
+	// detached DOMTokenList/KeyframeEffect leaks when elements are removed
+	var windowNode = this.getWindowNode();
+	var layers = windowNode.querySelectorAll(".layer");
+	layers.forEach(function(layer){
+		var animations = layer.getAnimations();
+		for(var i = 0; i < animations.length; i++){
+			animations[i].cancel();
+		}
+	});
 }
 
 Window_BattleBasic.prototype.show = function() {
@@ -551,13 +570,14 @@ Window_BattleBasic.prototype.show = function() {
 	this._processingAction = false;
 	this._finishing = false;
 	this._processingAnimationCount = 0;
+	this.cleanupResources();
 	var windowNode = this.getWindowNode();
 	windowNode.classList.add("beforeView");
 	windowNode.classList.remove("beginView");
-	windowNode.classList.remove("fadeIn");	
+	windowNode.classList.remove("fadeIn");
 	windowNode.classList.add("fadeIn");
-	
-	
+
+
 	_this.initTimer = 18;
 	_this.createComponents();
 	_this.readBattleCache();
@@ -1251,11 +1271,14 @@ Window_BattleBasic.prototype.update = function() {
 		
 		var tmp = [];
 		_this._RMMVSpriteInfo.forEach(function(RMMVBg){
-			if(!RMMVBg.RMMVSprite.hasEnded()){			
-				RMMVBg.RMMVSprite.update(_this._deltaTime / Math.max(_this.getAnimTimeRatio(), 0.5));				
-				RMMVBg.renderer.render(RMMVBg.stage);	
+			if(!RMMVBg.RMMVSprite.hasEnded()){
+				RMMVBg.RMMVSprite.update(_this._deltaTime / Math.max(_this.getAnimTimeRatio(), 0.5));
+				RMMVBg.renderer.render(RMMVBg.stage);
 				tmp.push(RMMVBg);
-			}			
+			} else {
+				RMMVBg.renderer.destroy();
+				RMMVBg.stage.destroy({children: true});
+			}
 		});
 		_this._RMMVSpriteInfo = tmp;
 		
@@ -1518,14 +1541,16 @@ Window_BattleBasic.prototype.redraw = async function() {
 		}			
 	});	
 	
-	var windowNode = this.getWindowNode();	
-	windowNode.addEventListener("mousedown", function(){
-		_this._touchDoubleSpeed = true;
-	});	
-	
-	windowNode.addEventListener("mouseup", function(){
-		_this._touchDoubleSpeed = false;
-	})
+	var windowNode = this.getWindowNode();
+	if(!windowNode._bbMouseHooked){
+		windowNode._bbMouseHooked = true;
+		windowNode.addEventListener("mousedown", function(){
+			_this._touchDoubleSpeed = true;
+		});
+		windowNode.addEventListener("mouseup", function(){
+			_this._touchDoubleSpeed = false;
+		});
+	}
 	
 	const imgBgs = windowNode.querySelectorAll(".layer");
 	

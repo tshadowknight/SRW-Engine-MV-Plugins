@@ -1965,7 +1965,9 @@ SceneManager.isInSaveScene = function(){
 			}
 			$gameTemp.menuStack = menuStack;
 		}
-		
+		if(!menuStack){
+			menuStack = []; //workaround for crash related to soft reset
+		}
 		if($gameTemp.pushMenu){
 			//console.log("Push Menu "+$gameTemp.pushMenu);
 			if(menuStack.length){
