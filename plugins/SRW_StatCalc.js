@@ -8988,12 +8988,15 @@ StatCalc.prototype.applyDeployActions = function(mainActorId, mechId, overwriteF
 
 								targetMech.subPilots[targetDef.slot] = targetPilot.actorId();							
 								$statCalc.storeMechData(targetMech);
-								targetPilot.isSubPilot = true;//set to false for unit reinit
+
+								targetPilot.isSubPilot = true;
+								$statCalc.reloadSRWStats(targetPilot, false, true);
+								targetPilot.isSubPilot = true;
 								
 								//ensure the live copy of the unit is also updated
 								var currentPilot = $statCalc.getCurrentPilot(targetMechId);
 								if(currentPilot && currentPilot.actorId() != mainActorId){
-									$statCalc.reloadSRWStats(currentPilot, false, true);
+									$statCalc.reloadSRWStats(currentPilot, false, true); 
 								}
 								
 							}	
