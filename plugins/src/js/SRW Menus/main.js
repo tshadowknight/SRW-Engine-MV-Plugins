@@ -1,7 +1,7 @@
 import CSSUIManager from "./CSSUIManager.js";
 window.CSSUIManager = CSSUIManager;
 
-import Window_CSS from "./Window_CSS.js";
+import Window_CSS from "./Window_CSS.js";	
 window.Window_CSS = Window_CSS;
 
 import Window_Intermission from "./Window_Intermission.js";

@@ -563,6 +563,7 @@ GameState_actor_map_target.prototype.update = function(scene){
 			}	
 		}									
 	} else if (Input.isTriggered('cancel') || TouchInput.isCancelled()) {
+		$gameTemp.currentMapTargets = [];
 		if(TouchInput.isTriggered() && $gameTemp.touchMapAttackState == "confirm"){
 			$gameTemp.touchMapAttackState = "direction";
 		} else {	
