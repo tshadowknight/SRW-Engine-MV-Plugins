@@ -563,7 +563,7 @@ GameState_actor_map_target.prototype.update = function(scene){
 			}	
 		}									
 	} else if (Input.isTriggered('cancel') || TouchInput.isCancelled()) {
-		$gameTemp.currentMapTargets = [];
+		$gameTemp.currentMapTargets = [];		
 		if(TouchInput.isTriggered() && $gameTemp.touchMapAttackState == "confirm"){
 			$gameTemp.touchMapAttackState = "direction";
 		} else {	
@@ -2014,6 +2014,7 @@ GameState_end_actor_turn.prototype.update = function(scene){
 	if($gameTemp.eraseActorAfterTurn){
 		$gameTemp.activeEvent().erase();
 		$statCalc.applyRelativeTransforms();
+		$gameSystem.expireAbilityZones(true);
 	}
 	scene.srpgPrepareNextAction();
 }
