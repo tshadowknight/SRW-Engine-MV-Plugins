@@ -693,6 +693,7 @@ SceneManager.isInSaveScene = function(){
 
 	Scene_Map.prototype.restart = function() {
 		$gameTemp.buttonHintManager = this._buttonHintsWindow;
+		$gameTemp.buttonHintManager.hide();
 		this.closePauseMenu();
 
 		this._waitCount = 0;

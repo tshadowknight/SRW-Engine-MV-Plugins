@@ -1534,7 +1534,12 @@ GameState_map_attack_animation.prototype.update = function(scene){
 		
 		var textInfo = mapAttackDef.textInfo;
 		if(textInfo && textInfo.faceName != null && textInfo.faceIdx != null && textInfo.text){
-			$gameMap._interpreter.showMapAttackText(textInfo.faceName, textInfo.faceIdx, textInfo.text);
+			const textParts = textInfo.text.split("\n");
+			if(textParts[0] == $gameTemp.currentMapAttacker?._name){
+				textParts[0] = $statCalc.getPilotName($gameTemp.currentMapAttacker);
+			}
+			const text = textParts.join("\n");
+			$gameMap._interpreter.showMapAttackText(textInfo.faceName, textInfo.faceIdx, text);
 		}	
 		$gameTemp.mapAttackAnimationPlaying = false;			
 		

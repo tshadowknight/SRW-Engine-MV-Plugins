@@ -52,30 +52,40 @@ Window_ButtonHints.prototype.setHelpButtons = function(hints){
 }
 
 Window_ButtonHints.prototype.createComponents = function() {
+	var windowNode = this.getWindowNode();
+
+	var existingCenter = document.getElementById(this.createId("center"));
+	if(existingCenter && windowNode.contains(existingCenter)){
+		this._centerContainer = existingCenter;
+		this._leftContainer = document.getElementById(this.createId("left"));
+		this._rightContainer = document.getElementById(this.createId("right"));
+		return;
+	}
+
 	Window_CSS.prototype.createComponents.call(this);
-	var windowNode = this.getWindowNode();	
-	
+	windowNode = this.getWindowNode();
+
 	this._centerContainer = document.createElement("div");
 	this._centerContainer.id = this.createId("center");
 	this._centerContainer.classList.add("hint_container");
-	this._centerContainer.classList.add("center_container");	
+	this._centerContainer.classList.add("center_container");
 	this._centerContainer.classList.add("scaled_text");
 	windowNode.appendChild(this._centerContainer);
-	
+
 	this._leftContainer = document.createElement("div");
 	this._leftContainer.id = this.createId("left");
 	this._leftContainer.classList.add("hint_container");
-	this._leftContainer.classList.add("left_container");	
+	this._leftContainer.classList.add("left_container");
 	this._leftContainer.classList.add("scaled_text");
 	windowNode.appendChild(this._leftContainer);
-	
+
 	this._rightContainer = document.createElement("div");
 	this._rightContainer.id = this.createId("right");
 	this._rightContainer.classList.add("hint_container");
-	this._rightContainer.classList.add("left_container");	
+	this._rightContainer.classList.add("left_container");
 	this._rightContainer.classList.add("scaled_text");
 	windowNode.appendChild(this._rightContainer);
-}	
+}
 
 Window_ButtonHints.prototype.clearDisplayKey = function() {
 	this._currentDisplayKey = null
