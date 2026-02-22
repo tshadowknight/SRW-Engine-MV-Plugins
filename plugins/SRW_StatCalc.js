@@ -1917,7 +1917,10 @@ StatCalc.prototype.initSRWStats = function(actor, level, itemIds, preserveVolati
 StatCalc.prototype.cleanTwinState = function(actor){
 	if(actor){
 		actor.isSubTwin = false;
-		actor.subTwinId = false;			
+		actor.subTwinId = false;	
+		if(actor.subTwin){
+			actor.subTwin.isSubTwin = false;
+		}		
 		actor.subTwin = null;	
 	}			
 }
@@ -2664,6 +2667,7 @@ StatCalc.prototype.twin = function(actor, otherActor){
 			otherActor.positionBeforeTwin = {x: otherActor.event.posX(), y: otherActor.event.posY()};
 			otherActor.event.erase();
 			otherActor.event.isUnused = true;
+			$gameSystem.clearEventToUnit(otherActor.event.eventId());
 			otherActor.event = null;	
 			let actorSuperState = this.getSuperState(actor);
 			this.setSuperState(otherActor, actorSuperState, true);
