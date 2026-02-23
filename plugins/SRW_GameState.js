@@ -1674,6 +1674,7 @@ GameState_normal.prototype.update = function(scene){
 	$gameTemp.unitHitInfo = {};
 	$gameTemp.unitDamageInfo = {};
 	$gameTemp.currentMapAttacker = null;
+	$gameTemp.hasTwinned = false;
 	
 	if(!scene._mapButtonsWindow.visible && !$gameTemp.onMapSaving){
 		scene._mapButtonsWindow.open();
