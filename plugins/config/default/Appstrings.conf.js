@@ -673,6 +673,10 @@ APPSTRINGS.BUTTON_HINTS = {
 	text_log: {text: "Text Log", action: "menu"}, 
 	fast_forward: {text: "Fast Forward", actions: ["ok", "pagedown"]}, 
 	skip_forward:  {text: "Skip", actions: ["ok", "pageup", "pagedown"]}, 
+
+	//Text Crawl
+	text_crawl_speedup: {text: "Resume/Speed Up", action: "ok"}, 
+	text_crawl_pause: {text: "Pause", action: "cancel"}, 
 };
 
 

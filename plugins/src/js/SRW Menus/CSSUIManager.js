@@ -6,6 +6,8 @@ export default function CSSUIManager(){
 CSSUIManager.textScaleCache = {};
 CSSUIManager.textScaleCacheCtr = 0;
 CSSUIManager.cacheKeyCtr = 0;
+CSSUIManager._measureCanvas = document.createElement('canvas');
+CSSUIManager._measureCtx = CSSUIManager._measureCanvas.getContext('2d');
 
 CSSUIManager.bumpScaleCache = function(dimensions){
 	CSSUIManager.textScaleCacheCtr++;
@@ -127,21 +129,50 @@ CSSUIManager.prototype.doUpdateScaledText = function(windowId, forceAll){
 			
 		});
 		
+		const ctx = CSSUIManager._measureCtx;
+
+		// Phase 1: batch all DOM reads
 		for(const elemId in fittedElemInfo){
-			const textElement = fittedElemInfo[elemId].elem;
-			
-			
-			let needsProcessing = true;
-			let isUnderflow = false;
-			while(!isUnderflow && (textElement.scrollHeight > textElement.clientHeight || textElement.scrollWidth > textElement.clientWidth)){
-				const nextSize = Math.floor(fittedElemInfo[elemId].currentFontSize / 1.2);
-				if(nextSize > fittedElemInfo[elemId].minFontSize){
-					fittedElemInfo[elemId].currentFontSize = nextSize;
+			const info = fittedElemInfo[elemId];
+			const style = window.getComputedStyle(info.elem);
+			info.containerWidth = info.elem.clientWidth;
+			info.text           = info.elem.textContent;
+			info.fontFamily     = style.fontFamily;
+			info.fontWeight     = style.fontWeight;
+			info.fontStyle      = style.fontStyle;
+		}
+
+		// Phase 2: binary search off-DOM via canvas measureText
+		for(const elemId in fittedElemInfo){
+			const info = fittedElemInfo[elemId];
+			if(info.containerWidth <= 0){
+				continue;
+			}
+
+			ctx.font = `${info.fontStyle} ${info.fontWeight} ${info.currentFontSize}px ${info.fontFamily}`;
+			if(ctx.measureText(info.text).width <= info.containerWidth){
+				info.finalFontSize = info.currentFontSize;
+				continue;
+			}
+
+			let lo = info.minFontSize;
+			let hi = info.currentFontSize;
+			while(lo < hi - 1){
+				const mid = Math.floor((lo + hi) / 2);
+				ctx.font = `${info.fontStyle} ${info.fontWeight} ${mid}px ${info.fontFamily}`;
+				if(ctx.measureText(info.text).width > info.containerWidth){
+					hi = mid;
 				} else {
-					isUnderflow = true;
+					lo = mid;
 				}
-				fittedElemInfo[elemId].elem.style.fontSize = fittedElemInfo[elemId].currentFontSize + "px";
-				
+			}
+			info.finalFontSize = lo;
+		}
+
+		// Phase 3: batch all DOM writes
+		for(const elemId in fittedElemInfo){
+			if(fittedElemInfo[elemId].finalFontSize !== undefined){
+				fittedElemInfo[elemId].elem.style.fontSize = fittedElemInfo[elemId].finalFontSize + "px";
 			}
 		}					
 				
