@@ -6,8 +6,6 @@ export default function CSSUIManager(){
 CSSUIManager.textScaleCache = {};
 CSSUIManager.textScaleCacheCtr = 0;
 CSSUIManager.cacheKeyCtr = 0;
-CSSUIManager._measureCanvas = document.createElement('canvas');
-CSSUIManager._measureCtx = CSSUIManager._measureCanvas.getContext('2d');
 
 CSSUIManager.bumpScaleCache = function(dimensions){
 	CSSUIManager.textScaleCacheCtr++;
@@ -31,22 +29,28 @@ CSSUIManager.prototype.doUpdateScaledText = function(windowId, forceAll){
 	CSSUIManager.bumpScaleCache();
 	if(this.customUILayer){
 		
-		var sourceContainer;
+		var sourceContainers;
 		if(windowId){
-			sourceContainer = window.document.getElementById(windowId);
+			var windowNode = window.document.getElementById(windowId);
+			sourceContainers = windowNode ? [windowNode] : [];
+		} else {
+			// only query visible UI windows to avoid processing stale content in hidden windows
+			sourceContainers = Array.from(window.document.querySelectorAll(".UI_window"))
+				.filter(function(w){ return w.style.display !== "none"; });
 		}
-		if(!sourceContainer){
-			sourceContainer = window.document;
-		}
-		
-		
-		
+
 		//this.customUILayer.style.display = "none";
 		var referenceWidth = Graphics._getCurrentWidth();
-		
-		var textElements = sourceContainer.querySelectorAll(".scaled_text");	
-		var scaledWidthElements = sourceContainer.querySelectorAll(".scaled_width");
-		var scaledHeightElements = sourceContainer.querySelectorAll(".scaled_height");
+
+		var textElements = [];
+		var scaledWidthElements = [];
+		var scaledHeightElements = [];
+		for(var si = 0; si < sourceContainers.length; si++){
+			var sc = sourceContainers[si];
+			textElements = textElements.concat(Array.from(sc.querySelectorAll(".scaled_text")));
+			scaledWidthElements = scaledWidthElements.concat(Array.from(sc.querySelectorAll(".scaled_width")));
+			scaledHeightElements = scaledHeightElements.concat(Array.from(sc.querySelectorAll(".scaled_height")));
+		}
 		
 		//measure
 		for(let textElement of textElements){
@@ -112,68 +116,48 @@ CSSUIManager.prototype.doUpdateScaledText = function(windowId, forceAll){
 		
 		//this.customUILayer.style.display = "";
 		
-		var fittedTextElements = sourceContainer.querySelectorAll(".fitted_text");	
-		//document.body.display = "none";
+		var fittedTextElements = [];
+		for(var si = 0; si < sourceContainers.length; si++){
+			fittedTextElements = fittedTextElements.concat(Array.from(sourceContainers[si].querySelectorAll(".fitted_text")));
+		}
+
 		let elemId = 0;
 		let fittedElemInfo = {};
 		fittedTextElements.forEach(function(textElement){
-			
-			const currentFontSize = textElement.style.fontSize.replace("px", "");
+			const currentFontSize = parseFloat(textElement.style.fontSize);
 			fittedElemInfo[elemId] = {
 				elem: textElement,
-				currentFontSize: currentFontSize,
+				currentFontSize: Math.floor(currentFontSize),
 				minFontSize: Math.floor(currentFontSize / 10),
-				isValid: true
 			}
-			elemId++;	
-			
+			elemId++;
 		});
-		
-		const ctx = CSSUIManager._measureCtx;
 
-		// Phase 1: batch all DOM reads
 		for(const elemId in fittedElemInfo){
 			const info = fittedElemInfo[elemId];
-			const style = window.getComputedStyle(info.elem);
-			info.containerWidth = info.elem.clientWidth;
-			info.text           = info.elem.textContent;
-			info.fontFamily     = style.fontFamily;
-			info.fontWeight     = style.fontWeight;
-			info.fontStyle      = style.fontStyle;
-		}
+			const textElement = info.elem;
 
-		// Phase 2: binary search off-DOM via canvas measureText
-		for(const elemId in fittedElemInfo){
-			const info = fittedElemInfo[elemId];
-			if(info.containerWidth <= 0){
-				continue;
-			}
-
-			ctx.font = `${info.fontStyle} ${info.fontWeight} ${info.currentFontSize}px ${info.fontFamily}`;
-			if(ctx.measureText(info.text).width <= info.containerWidth){
-				info.finalFontSize = info.currentFontSize;
+			if(textElement.scrollHeight <= textElement.clientHeight &&
+			   textElement.scrollWidth  <= textElement.clientWidth){
 				continue;
 			}
 
 			let lo = info.minFontSize;
 			let hi = info.currentFontSize;
-			while(lo < hi - 1){
+			let sanity = 10;
+
+			while(sanity-- > 0 && lo < hi - 1){
 				const mid = Math.floor((lo + hi) / 2);
-				ctx.font = `${info.fontStyle} ${info.fontWeight} ${mid}px ${info.fontFamily}`;
-				if(ctx.measureText(info.text).width > info.containerWidth){
+				textElement.style.fontSize = mid + "px";
+				if(textElement.scrollHeight > textElement.clientHeight ||
+				   textElement.scrollWidth  > textElement.clientWidth){
 					hi = mid;
 				} else {
 					lo = mid;
 				}
 			}
-			info.finalFontSize = lo;
-		}
 
-		// Phase 3: batch all DOM writes
-		for(const elemId in fittedElemInfo){
-			if(fittedElemInfo[elemId].finalFontSize !== undefined){
-				fittedElemInfo[elemId].elem.style.fontSize = fittedElemInfo[elemId].finalFontSize + "px";
-			}
+			textElement.style.fontSize = lo + "px";
 		}					
 				
 	}
