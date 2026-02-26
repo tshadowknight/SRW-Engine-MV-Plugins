@@ -58,6 +58,8 @@ BattleSceneTextLayer.prototype.createComponents = function() {
 	Window_CSS.prototype.createComponents.call(this);
 	
 	var windowNode = this.getWindowNode();
+
+	windowNode.classList.add("UI_window");//required for auto scaling/fitting functionality
 	
 	this._textDisplay = document.createElement("div");
 	this._textDisplay.id = this.createId("text_display");
