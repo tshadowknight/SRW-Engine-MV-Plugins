@@ -148,11 +148,11 @@ MechList.prototype.defineContent = function(){
 		}
 		return result * _this._sortDirection;
 	}
-	function hasActiveMechAbilities(mech, list){
+	function hasActiveMechAbilities(mech, list, pilot){
 		var ctr = 0;
 		var result = false;
-		let currentPilot = $statCalc.getCurrentPilot(mech.id);
-		
+		let currentPilot = pilot || $statCalc.getCurrentPilot(mech.id);
+
 		if(!currentPilot){
 			return false;
 		}
@@ -176,8 +176,8 @@ MechList.prototype.defineContent = function(){
 		return result;
 	}
 	function compareMechAbilities(a, b, abilities){
-		var aHasAbility = hasActiveMechAbilities(getUnitData(a).mech, abilities);
-		var bHasAbility = hasActiveMechAbilities(getUnitData(b).mech, abilities);
+		var aHasAbility = hasActiveMechAbilities(getUnitData(a).mech, abilities, a);
+		var bHasAbility = hasActiveMechAbilities(getUnitData(b).mech, abilities, b);
 		var result;
 		if(aHasAbility == bHasAbility){
 			result = 0;
@@ -398,7 +398,7 @@ MechList.prototype.defineContent = function(){
 				{
 					title: APPSTRINGS.MECHSTATS.repair,
 					contentFunction: function(pilot, mech){
-						if(hasActiveMechAbilities(mech, ["heal"])){
+						if(hasActiveMechAbilities(mech, ["heal"], pilot)){
 							return "X";
 						} else {
 							return "";
@@ -410,8 +410,8 @@ MechList.prototype.defineContent = function(){
 				},
 				{
 					title: APPSTRINGS.MECHSTATS.resupply,
-					contentFunction: function(pilot, mech){						
-						if(hasActiveMechAbilities(mech, ["resupply"])){
+					contentFunction: function(pilot, mech){
+						if(hasActiveMechAbilities(mech, ["resupply"], pilot)){
 							return "X";
 						} else {
 							return "";
@@ -423,8 +423,8 @@ MechList.prototype.defineContent = function(){
 				},
 				/*{
 					title: APPSTRINGS.MECHSTATS.shield,
-					contentFunction: function(pilot, mech){					
-						if(hasActiveMechAbilities(mech, ["shield"])){
+					contentFunction: function(pilot, mech){
+						if(hasActiveMechAbilities(mech, ["shield"], pilot)){
 							return "Y";
 						} else {
 							return "N";
@@ -432,13 +432,12 @@ MechList.prototype.defineContent = function(){
 					},
 					compareFunction: function(a, b){
 						return compareMechAbilities(a, b, ["shield"]);
-					}	
+					}
 				},*/
 				{
 					title: APPSTRINGS.MECHSTATS.barrier,
-					contentFunction: function(pilot, mech){	
-						var referenceData = createReferenceData(mech);
-						if(hasActiveMechAbilities(mech, ["threshold_barrier", "reduction_barrier", "percent_barrier"])){							
+					contentFunction: function(pilot, mech){
+						if(hasActiveMechAbilities(mech, ["threshold_barrier", "reduction_barrier", "percent_barrier"], pilot)){
 							return "X";
 						} else {
 							return "";
@@ -446,7 +445,7 @@ MechList.prototype.defineContent = function(){
 					},
 					compareFunction: function(a, b){
 						return compareMechAbilities(a, b, ["threshold_barrier", "reduction_barrier", "percent_barrier"]);
-					}					
+					}
 				}
 			]
 		}, 4: {

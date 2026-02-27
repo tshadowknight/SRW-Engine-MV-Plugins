@@ -28,7 +28,7 @@ BattleSceneUILayer.prototype.initialize = function() {
 	Window_CSS.prototype.initialize.call(this, 0, 0, 0, 0);	
 	
 	window.addEventListener("resize", function () {
-		_this.redraw();
+		_this.redraw(true);
 	});
 }
 
@@ -416,9 +416,29 @@ BattleSceneUILayer.prototype.setStat = function(effect, type) {
 		console.log("Setting stat "+type+" to "+effect.currentAnimEN);
 	}
 	isHidden = !$statCalc.isRevealed(effect.ref);
-	var elems = _this.getStatElements(target, slot, type);	
+	var elems = _this.getStatElements(target, slot, type);
+
+	// Keep stored stat data in sync so redraw(preserveStatText) can restore values
+	if(slot == "twin"){
+		if(target == "actor"){
+			_this._allyTwinStatData[type].max = maxValue;
+			_this._allyTwinStatData[type].current = value;
+		} else {
+			_this._enemyTwinStatData[type].max = maxValue;
+			_this._enemyTwinStatData[type].current = value;
+		}
+	} else {
+		if(target == "actor"){
+			_this._allyStatData[type].max = maxValue;
+			_this._allyStatData[type].current = value;
+		} else {
+			_this._enemyStatData[type].max = maxValue;
+			_this._enemyStatData[type].current = value;
+		}
+	}
+
 	this.updateStatContent(elems, maxValue, value, type, isHidden);
-	this.updateUnitIcons();	
+	this.updateUnitIcons();
 }
 
 BattleSceneUILayer.prototype.updateStatContent = function(elems, maxValue, value, type, isHidden) {
@@ -469,6 +489,9 @@ BattleSceneUILayer.prototype.showEnemyNotification = function(text){
 
 BattleSceneUILayer.prototype.setNotification = function(side, text){
 	var _this = this;
+	if(this._statBoxesLocked){
+		return;
+	}
 	if(side == "actor"){
 		this._allyNotification.innerHTML = text;
 		setTimeout(function(){_this._allyNotification.innerHTML = "";}, 1000);
@@ -655,7 +678,7 @@ BattleSceneUILayer.prototype.updateUnitIcons = function(){
 }
 
 
-BattleSceneUILayer.prototype.redraw = function() {	
+BattleSceneUILayer.prototype.redraw = function(preserveStatText) {	
 	var _this = this;	
 	
 	//_this.updateScaledImage(_this._spiritAnimImage);
@@ -778,6 +801,32 @@ BattleSceneUILayer.prototype.redraw = function() {
 	icons.forEach(function(icon){
 		_this.updateScaledDiv(icon);
 	});
-		
+
+	if(preserveStatText){
+		["HP", "EN"].forEach(function(type){
+			if(_this._currentActor){
+				var isHidden = !$statCalc.isRevealed(_this._currentActor.ref);
+				var elems = _this.getStatElements("actor", "", type);
+				_this.updateStatContent(elems, _this._allyStatData[type].max, _this._allyStatData[type].current, type, isHidden);
+			}
+			if(_this._currentTwinActor){
+				var isHidden = !$statCalc.isRevealed(_this._currentTwinActor.ref);
+				var elems = _this.getStatElements("actor", "twin", type);
+				_this.updateStatContent(elems, _this._allyTwinStatData[type].max, _this._allyTwinStatData[type].current, type, isHidden);
+			}
+			if(_this._currentEnemy){
+				var isHidden = !$statCalc.isRevealed(_this._currentEnemy.ref);
+				var elems = _this.getStatElements("enemy", "", type);
+				_this.updateStatContent(elems, _this._enemyStatData[type].max, _this._enemyStatData[type].current, type, isHidden);
+			}
+			if(_this._currentTwinEnemy){
+				var isHidden = !$statCalc.isRevealed(_this._currentTwinEnemy.ref);
+				var elems = _this.getStatElements("enemy", "twin", type);
+				_this.updateStatContent(elems, _this._enemyTwinStatData[type].max, _this._enemyTwinStatData[type].current, type, isHidden);
+			}
+		});
+		_this.updateUnitIcons();
+	}
+
 	this.updateCanvas();
 }

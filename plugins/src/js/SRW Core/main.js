@@ -1,3 +1,5 @@
+
+
 function importGlobal(exports){
 	Object.keys(exports).forEach(function(className){
 		window[className] = exports[className];

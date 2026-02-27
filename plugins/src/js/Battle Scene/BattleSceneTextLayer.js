@@ -294,7 +294,9 @@ BattleSceneTextLayer.prototype.hideNoise = function() {
 BattleSceneTextLayer.prototype.redraw = function() {	
 	var _this = this;
 	_this.showTextBox();	
-			
+	_this.updateScaledDiv(_this._textDisplay, true, false);		
+	var iconContainer = _this._textDisplay.querySelector("#icon_and_noise_container");
+	_this.updateScaledDiv(iconContainer);		
 	this.updateCanvas();
 }
 

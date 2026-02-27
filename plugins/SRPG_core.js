@@ -49,6 +49,23 @@ TouchInput.update = function() {
 	}
 }
 
+// PIXI v4 bug fix: pixi-tilemap's CanvasTileRenderer does not implement destroy(),
+// but PIXI's destroyPlugins() calls it unconditionally on every registered plugin.
+// This causes renderer.destroy() to throw before it can clean up InteractionManager,
+// which registers itself on the global core.ticker.shared at construction time and
+// must be explicitly destroyed to avoid a ticker reference leak that prevents GC.
+
+PIXI.CanvasRenderer.prototype.destroyPlugins = function() {
+	for (var o in this.plugins) {
+		if (typeof this.plugins[o].destroy === 'function') {
+			this.plugins[o].destroy();
+		}
+		this.plugins[o] = null;
+	}
+	this.plugins = null;
+};
+
+
 //
 
 var windowOffset = 0;

@@ -67,7 +67,7 @@ Window_DeploySelection.prototype.createComponents = function() {
 	this._detailPilotContainer.classList.add("list_detail");
 	windowNode.appendChild(this._detailPilotContainer);	
 	
-	this._mechList = new MechList(this._listContainer, [0, 1, 2, 3], this);
+	this._mechList = new MechList(this._listContainer, [0, 1, 2], this);
 	this._mechList.createComponents();
 	this._mechList.registerTouchObserver("ok", function(){_this._touchOK = true;});
 	this._mechList.registerTouchObserver("left", function(){_this._touchLeft = true;});
@@ -94,12 +94,14 @@ Window_DeploySelection.prototype.update = function() {
 		    this._mechList.decrementSelection();
 		}			
 
-		if(Input.isTriggered('left') || Input.isRepeated('left')){			
+		if(Input.isTriggered('left') || Input.isRepeated('left') || this._touchLeft){
 			this.requestRedraw();
 			this._mechList.decrementPage();
-		} else if (Input.isTriggered('right') || Input.isRepeated('right')) {
+			this.resetTouchState();
+		} else if (Input.isTriggered('right') || Input.isRepeated('right') || this._touchRight) {
 			this.requestRedraw();
 		    this._mechList.incrementPage();
+			this.resetTouchState();
 		}
 		
 		if(Input.isTriggered('left_trigger') || Input.isRepeated('left_trigger')){
@@ -128,17 +130,17 @@ Window_DeploySelection.prototype.update = function() {
 				this._handlingInput = true;
 				this._internalHandlers[this._currentKey].call(this);
 			}*/
-		
+			this.resetTouchState();
 			var canStand = $statCalc.canStandOnTile(this.getCurrentSelection().actor, {x: $gameTemp.activeEvent().posX(), y: $gameTemp.activeEvent().posY()});
 			if(canStand && !this.getCurrentSelection().actor.srpgTurnEnd()){
 				SoundManager.playOk();
-				$gameTemp.popMenu = true;	
+				$gameTemp.popMenu = true;
 				if($gameTemp.deployWindowCallback){
 					$gameTemp.deployWindowCallback(this.getCurrentSelection());
 				}
 			} else {
 				SoundManager.playBuzzer();
-			}			
+			}
 		}
 		if(Input.isTriggered('cancel') || TouchInput.isCancelled()){		
 			SoundManager.playCancel();		

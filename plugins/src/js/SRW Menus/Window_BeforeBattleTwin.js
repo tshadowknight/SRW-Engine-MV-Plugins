@@ -409,7 +409,7 @@ Window_BeforebattleTwin.prototype.createComponents = function() {
 	
 	windowNode.appendChild(this.new_attack_inidicator);	
 	
-	if(!ENGINE_SETTINGS.SHOW_NEW_MOVE_INDICATOR){
+	if(!ENGINE_SETTINGS.SHOW_NEW_MOVE_INDICATOR || ENGINE_SETTINGS.DISABLE_FULL_BATTLE_SCENE){
 		this.new_attack_inidicator.style.display = "none";
 	}
 	
