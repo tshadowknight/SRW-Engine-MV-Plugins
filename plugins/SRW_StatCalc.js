@@ -9219,8 +9219,11 @@ StatCalc.prototype.getPopUpAnims = function(actor){
 			actor.SRWStats.stageTemp.popUpAnimsPlayed = {};
 		}	
 		for(let animAbility of mods){
-			if(!actor.SRWStats.stageTemp.popUpAnimsPlayed[animAbility.stackId]){
-				result.push({actor: actor, animId: animAbility.animationId, trackingId: animAbility.stackId, lockedFrameRate: animAbility.lockedFrameRate, bgm: animAbility.bgm});
+			//workaround fix for issue where battleships temporarily inherit the abilities of a unit being deployed from them
+			if(!actor.isActor() || actor.actorId() == animAbility.originId){			
+				if(!actor.SRWStats.stageTemp.popUpAnimsPlayed[animAbility.stackId]){
+					result.push({actor: actor, animId: animAbility.animationId, trackingId: animAbility.stackId, lockedFrameRate: animAbility.lockedFrameRate, bgm: animAbility.bgm});
+				}
 			}
 		}
 	});
