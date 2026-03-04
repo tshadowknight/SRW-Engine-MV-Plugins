@@ -5,6 +5,7 @@ import EnemyPilotUI from "./EnemyPilotUI.js";
 import MechUI from "./MechUI.js";
 import WeaponUI from "./WeaponUI.js";
 import PatternUI from "./PatternUI.js";
+import LocalizationUI from "./LocalizationUI.js";
 
 export default function SRWEditor(){
 	this._currentEditor = "attack_editor";
@@ -31,6 +32,7 @@ SRWEditor.prototype.initTitles = function(){
 			attack_editor: {title: EDITORSTRINGS.GENERAL.attack_editor_label, func: this.showAttackEditor},
 			environment_editor: {title: EDITORSTRINGS.GENERAL.environment_editor_label, func: this.showEnvironmentEditor},
 			battle_text_editor: {title: EDITORSTRINGS.GENERAL.battle_text_editor_label, func: this.showBattleTextEditor},
+			localization_editor: {title: "Localization", func: this.showLocalizationEditor},
 		}
 	}
 }
@@ -1517,7 +1519,8 @@ SRWEditor.prototype.show = function(){
 		content+="<option value='attack_editor' "+(_this._currentEditor == "attack_editor" ? "selected" : "")+">Attack Animations</option>";
 		content+="<option value='environment_editor' "+(_this._currentEditor == "environment_editor" ? "selected" : "")+">Environments</option>";
 		content+="<option value='battle_text_editor' "+(_this._currentEditor == "battle_text_editor" ? "selected" : "")+">Battle Text</option>";
-		
+		content+="<option value='localization_editor' "+(_this._currentEditor == "localization_editor" ? "selected" : "")+">Localization</option>";
+
 		content+="</select>";
 		content+="</div>";
 		
@@ -3062,6 +3065,17 @@ SRWEditor.prototype.showPatternEditor = function(){
 	var _this = this;
 	var containerNode = _this._contentDiv.querySelector(".content");
 	new PatternUI(containerNode, this).show();
+}
+
+SRWEditor.prototype.showLocalizationEditor = function(){
+	var _this = this;
+	var containerNode = _this._contentDiv.querySelector(".content");
+	if (!_this._localizationUI) {
+		_this._localizationUI = new LocalizationUI(containerNode, _this);
+	} else {
+		_this._localizationUI._container = containerNode;
+	}
+	_this._localizationUI.show();
 }
 
 SRWEditor.prototype.showAttackEditor = function(){

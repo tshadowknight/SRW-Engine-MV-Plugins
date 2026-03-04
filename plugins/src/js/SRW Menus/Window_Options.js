@@ -212,6 +212,32 @@ Window_Options.prototype.initialize = function() {
 		}
 	});
 
+	var _loc = ENGINE_SETTINGS.LOCALIZATION;
+	if (_loc && _loc.LOCALES && _loc.LOCALES.length > 0) {
+		var _localeOptions = [_loc.DEFAULT_LOCALE || ""].concat(_loc.LOCALES.map(function(l) { return l.name; }));
+		var _localeDisplay = {};
+		_localeDisplay[_loc.DEFAULT_LOCALE || ""] = _loc.DEFAULT_LOCALE || "Default";
+		_loc.LOCALES.forEach(function(l) { _localeDisplay[l.name] = l.display || l.name; });
+		this._gameOptions.push({
+			name: APPSTRINGS.OPTIONS.label_language || "Language",
+			display: function() {
+				var current = ConfigManager.locale || (_loc.DEFAULT_LOCALE || "");
+				return _localeDisplay[current] || current;
+			},
+			update: function(direction) {
+				var current = _localeOptions.indexOf(ConfigManager.locale);
+				if (current === -1) current = 0;
+				if (direction === "up") {
+					current = (current + 1) % _localeOptions.length;
+				} else {
+					current = (current - 1 + _localeOptions.length) % _localeOptions.length;
+				}
+				ConfigManager.locale = _localeOptions[current];
+				DataManager.loadLocalization();
+			}
+		});
+	}
+
 	// Graphics Options
 	
 	this._graphicsOptions.push({

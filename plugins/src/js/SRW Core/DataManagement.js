@@ -21,6 +21,7 @@
 				DataManager.loadDatabase();
 				await DataManager.loadSRWConfig();
 				ConfigManager.load();	
+				await DataManager.loadLocalization();
 				if(ENGINE_SETTINGS.PRELOADER){
 					ENGINE_SETTINGS.PRELOADER();
 				}		
@@ -167,6 +168,165 @@
 			});
 		}
 		
+	DataManager.tagTextScriptsForLocalization = function() {
+		if (!Utils.isNwjs() || process.versions["nw-flavor"] !== "sdk") {
+			console.warn("tagTextScriptsForLocalization is only available in the SDK environment.");
+			return;
+		}
+
+		const fs = require('fs');
+		const path = require('path');
+
+		function findMvsFiles(dir) {
+			var files = [];
+			var entries = fs.readdirSync(dir, { withFileTypes: true });
+			for (var i = 0; i < entries.length; i++) {
+				var entry = entries[i];
+				var fullPath = path.join(dir, entry.name);
+				if (entry.isDirectory()) {
+					files = files.concat(findMvsFiles(fullPath));
+				} else if (entry.name.endsWith('.mvs')) {
+					files.push(fullPath);
+				}
+			}
+			return files;
+		}
+
+		var scriptDir = 'text_scripts';
+		if (!fs.existsSync(scriptDir)) {
+			alert('text_scripts directory not found.');
+			return;
+		}
+
+		var files = findMvsFiles(scriptDir);
+
+		// First pass: find the highest existing localization ID so new ones continue from there
+		var maxId = 0;
+		files.forEach(function(file) {
+			var content = fs.readFileSync(file, 'utf8');
+			var lines = content.split('\n');
+			lines.forEach(function(line) {
+				var match = / #([0-9]+)$/.exec(line.trimEnd());
+				if (match) {
+					var id = parseInt(match[1], 10);
+					if (id > maxId) maxId = id;
+				}
+			});
+		});
+		var idCounter = maxId + 1;
+
+		var totalTagged = 0;
+		var filesModified = 0;
+		var locIdRe = / #[0-9]+$/;
+
+		files.forEach(function(file) {
+			var content = fs.readFileSync(file, 'utf8');
+			var lines = content.split('\n');
+			var modified = false;
+
+			// State tracking
+			var inBlockComment = false;
+			var inExplicitScript = false;
+			// Stack entries: "function" | "inline_script" | "move"
+			// Lines inside "inline_script" or "move" are JavaScript/move-commands -- skip.
+			// Lines inside "function" are still MVS -- tag normally.
+			var blockStack = [];
+			// After a speaker line (*Name), following text lines are covered by the speaker's tag.
+			var afterSpeaker = false;
+
+			var newLines = lines.map(function(line) {
+				var trimmed = line.trim();
+
+				// Block comment /* ... */
+				if (trimmed === '/*') { inBlockComment = true; return line; }
+				if (trimmed === '*/') { inBlockComment = false; return line; }
+				if (inBlockComment) return line;
+
+				// Explicit script block [script] ... [/script]
+				if (trimmed === '[script]') { inExplicitScript = true; return line; }
+				if (trimmed === '[/script]') { inExplicitScript = false; return line; }
+				if (inExplicitScript) return line;
+
+				// "}" closes the innermost tracked block
+				if (trimmed === '}') {
+					if (blockStack.length > 0) blockStack.pop();
+					return line;
+				}
+
+				// Standalone "{" -- inline JavaScript script block
+				if (trimmed === '{') {
+					blockStack.push('inline_script');
+					return line;
+				}
+
+				// Move block: move <eventId> [wait] {
+				if (/^move\s/.test(trimmed) && trimmed.endsWith('{')) {
+					blockStack.push('move');
+					return line;
+				}
+
+				// Function definition: function <name> {
+				if (/^function\s.+\{/.test(trimmed)) {
+					blockStack.push('function');
+					return line;
+				}
+
+				// Skip content inside inline script or move blocks
+				var currentBlock = blockStack.length > 0 ? blockStack[blockStack.length - 1] : null;
+				if (currentBlock === 'inline_script' || currentBlock === 'move') {
+					return line;
+				}
+
+				// Empty lines and line comments
+				if (!trimmed || trimmed.startsWith('//')) return line;
+
+				// Speaker / character lines (*Name ...) -- tag the speaker line; following text is covered by this tag
+				if (trimmed.startsWith('*')) {
+					afterSpeaker = true;
+					if (locIdRe.test(line.trimEnd())) return line;
+					var id = '#' + idCounter.toString(10).padStart(8, '0');
+					idCounter++;
+					modified = true;
+					totalTagged++;
+					return line.trimEnd() + ' ' + id;
+				}
+
+				// Preprocessor directives (#include, #define)
+				if (trimmed.startsWith('#')) { afterSpeaker = false; return line; }
+
+				// Function calls  call name(...)
+				if (/^call\s/.test(trimmed)) { afterSpeaker = false; return line; }
+
+				// Choice entries [N]text  -- localizable (always tagged regardless of speaker context)
+				var isChoiceEntry = /^\[\d\]/.test(trimmed);
+
+				// Other command lines [command: ...]  -- not localizable
+				if (trimmed.startsWith('[') && !isChoiceEntry) { afterSpeaker = false; return line; }
+
+				// Already tagged?
+				if (locIdRe.test(line.trimEnd())) return line;
+
+				// Text lines following a speaker line are covered by the speaker's tag -- skip
+				if (afterSpeaker && !isChoiceEntry) return line;
+
+				// Append localization ID
+				var id = '#' + idCounter.toString(10).padStart(8, '0');
+				idCounter++;
+				modified = true;
+				totalTagged++;
+				return line.trimEnd() + ' ' + id;
+			});
+
+			if (modified) {
+				fs.writeFileSync(file, newLines.join('\n'), 'utf8');
+				filesModified++;
+			}
+		});
+
+		console.log('Localization tagging complete. Tagged ' + totalTagged + ' lines across ' + filesModified + ' files.');
+		alert('Localization tagging complete!\nTagged ' + totalTagged + ' text lines across ' + filesModified + ' files.');
+	};
+
 		DataManager.loadSRWConfig = async function() {		
 			var _this = this;
 			//const fs = require('fs');		
@@ -361,6 +521,76 @@
 				}
 			});
 		}		
+
+		DataManager.loadLocalization = async function() {
+			DataManager._localizationData = {};
+			var locSettings = ENGINE_SETTINGS.LOCALIZATION;
+
+			// Deep clone preserving functions and non-JSON values
+			function cloneAppstrings(obj) {
+				return structuredClone(obj);
+			}
+			// Snapshot base APPSTRINGS on first call so locale switches always start clean
+			if (!DataManager._baseAppstrings) {
+				DataManager._baseAppstrings = cloneAppstrings(window.APPSTRINGS || {});
+			} else {
+				window.APPSTRINGS = cloneAppstrings(DataManager._baseAppstrings);
+			}
+
+			if (!locSettings || !locSettings.LOCALES || !locSettings.LOCALES.length) return;
+
+			var localeName = ConfigManager.locale;
+			if (!localeName || localeName === locSettings.DEFAULT_LOCALE) return;
+
+			// Load text substitution JSON
+			await new Promise(function(resolve) {
+				var xhr = new XMLHttpRequest();
+				xhr.open('GET', 'data/localization/' + localeName + '.json');
+				xhr.onload = function() {
+					if (xhr.status < 400) {
+						try {
+							DataManager._localizationData = JSON.parse(xhr.responseText);
+						} catch(e) {
+							console.error('Failed to parse localization file: ' + localeName, e);
+						}
+					} else {
+						console.warn('Localization file not found: data/localization/' + localeName + '.json');
+					}
+					resolve();
+				};
+				xhr.onerror = function() {
+					console.warn('Failed to load localization file: data/localization/' + localeName + '.json');
+					resolve();
+				};
+				xhr.send();
+			});
+
+			// Load locale-specific Appstrings override
+			await new Promise(function(resolve) {
+				var el = document.createElement('script');
+				el.onload = function() {
+					if (window.APPSTRINGS) {
+						function deepMerge(base, override) {
+							Object.keys(override).forEach(function(key) {
+								if (typeof override[key] === 'object' && override[key] !== null &&
+									typeof base[key] === 'object' && base[key] !== null) {
+									deepMerge(base[key], override[key]);
+								} else {
+									base[key] = override[key];
+								}
+							});
+						}
+						var base = cloneAppstrings(DataManager._baseAppstrings);
+						deepMerge(base, window.APPSTRINGS);
+						window.APPSTRINGS = base;
+					}
+					resolve();
+				};
+				el.onerror = function() { resolve(); };
+				el.src = 'data/localization/Appstrings_' + localeName + '.conf.js';
+				document.body.appendChild(el);
+			});
+		};
 
 		DataManager.loadGameWithoutRescue = function(savefileId) {
 			if (this.isThisGameFile(savefileId)) {
@@ -1474,6 +1704,12 @@
 							}]
 						});
 					} else if(lineType.type == "txt_start"){
+						var locId = null;
+						var lastEl = lineType.data[lineType.data.length - 1];
+						if(lastEl && /^#[0-9]+$/.test(lastEl)){
+							locId = lastEl.slice(1);
+							lineType.data = lineType.data.slice(0, -1);
+						}
 						var characterId = String(lineType.data[0]).trim();
 						var expressionId = lineType.data[1];
 						var skipFocus = (lineType.data[2] || 0) * 1;
@@ -1555,13 +1791,26 @@
 								parameters: ["\\>"+name]
 							});
 						}
-						while(i < contentParts.length && getLineType(contentParts[i]).type == "txt"){
-							eventList.push({
-								code: 401,
-								indent: indent,
-								parameters: [processDefineTokens(processArgTokens(args, contentParts[i].trim()))]
+						var localizedLines = locId && DataManager._localizationData && DataManager._localizationData[locId];
+						if(localizedLines){
+							if(typeof localizedLines === 'string') localizedLines = [localizedLines];
+							localizedLines.forEach(function(localizedLine){
+								eventList.push({
+									code: 401,
+									indent: indent,
+									parameters: [localizedLine]
+								});
 							});
-							i++;
+							while(i < contentParts.length && getLineType(contentParts[i]).type == "txt") i++;
+						} else {
+							while(i < contentParts.length && getLineType(contentParts[i]).type == "txt"){
+								eventList.push({
+									code: 401,
+									indent: indent,
+									parameters: [processDefineTokens(processArgTokens(args, contentParts[i].trim()))]
+								});
+								i++;
+							}
 						}
 						if(i < contentParts.length){
 							i--;//Correct for potential overread
@@ -1811,6 +2060,8 @@
 			ConfigManager.battleBGM = true;
 			ConfigManager.afterBattleBGM = true;
 
+			ConfigManager.locale = "";
+
 			Object.defineProperty(ConfigManager, 'bgmVolume', {
 				get: function() {
 					return AudioManager._bgmVolume;
@@ -1889,6 +2140,8 @@
 				
 				config.battleBGM = this.battleBGM;
 				config.afterBattleBGM = this.afterBattleBGM;
+
+				config.locale = this.locale;
 				
 				return config;
 			};
@@ -1928,6 +2181,9 @@
 				if(config['afterBattleBGM'] != null){
 					this.afterBattleBGM = this.readFlag(config, 'afterBattleBGM');
 				}
+
+				var _defaultLocale = (ENGINE_SETTINGS.LOCALIZATION && ENGINE_SETTINGS.LOCALIZATION.DEFAULT_LOCALE) ? ENGINE_SETTINGS.LOCALIZATION.DEFAULT_LOCALE : "";
+				this.locale = (config['locale'] != null) ? config.locale : _defaultLocale;
 			};
 
 			ConfigManager.readFlag = function(config, name) {

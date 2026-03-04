@@ -1,24 +1,4 @@
-function APPSTRINGS(){
-	
-}
-
-
-APPSTRINGS.testAllSections = function(){
-	Object.keys(APPSTRINGS).forEach(function(section){
-		if(typeof APPSTRINGS[section] == "object"){
-			APPSTRINGS.testSection(section);
-		}
-	});
-}
-
-APPSTRINGS.testSection = function(section){
-	if(APPSTRINGS[section]){
-		var ctr = 0;
-		Object.keys(APPSTRINGS[section]).forEach(function(key){
-			APPSTRINGS[section][key] = ctr++;
-		});
-	}
-}
+var APPSTRINGS = {};
 
 APPSTRINGS.GENERAL = {
 	label_kills: "Score",

@@ -64,7 +64,7 @@
 			if(this.optionMapHints == null){
 				this.optionMapHints = true;
 			}
-		};
+			};
 		
 		Game_System.prototype.getOptionMapHints = function() {
 			if(this.optionMapHints == null){
@@ -73,10 +73,18 @@
 			return this.optionMapHints;
 		}
 		
-		Game_System.prototype.setOptionMapHints = function(value) {			
-			this.optionMapHints = value;		
+		Game_System.prototype.setOptionMapHints = function(value) {
+			this.optionMapHints = value;
 		}
-		
+
+		Game_System.prototype.getCurrentLocale = function() {
+			return ConfigManager.locale || "";
+		}
+
+		Game_System.prototype.setCurrentLocale = function(localeName) {
+			ConfigManager.locale = localeName;
+		}
+
 		Game_System.prototype.getControllerIconSets = function() {
 			return ["xbox", "ds", "nin"];
 		}

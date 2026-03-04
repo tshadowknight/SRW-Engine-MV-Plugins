@@ -560,6 +560,15 @@ var ENGINE_SETTINGS = {
 				}
 			}
 		]
+	},
+	LOCALIZATION: {
+		DEFAULT_LOCALE: "eng", //the base locale of the game. No substitution is performed when this locale is active.
+		LOCALES: [
+			/*{
+				name: "en", //locale name, must match a file in data/localization/
+				//per-locale settings can be added here
+			},*/
+		]
 	}
 	/*
 	//map a face file to another face file based on a deployed unit
