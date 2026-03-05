@@ -718,9 +718,9 @@ SceneManager.isInSaveScene = function(){
 		this._mapLoaded = false;
 		this._touchCount = 0;
 
-		this._intermissionWindow.close();
-		this._intermissionWindow.resetMenuState();
+		this._intermissionWindow.close();		
 		this._intermissionWindow.hide();
+		this._intermissionWindow.resetMenuState();
 		this._intermissionWindowOpen = false;
 
 		$gameTemp.menuStack = [];

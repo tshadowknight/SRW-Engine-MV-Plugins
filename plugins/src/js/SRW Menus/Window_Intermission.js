@@ -604,13 +604,19 @@ Window_Intermission.prototype.redraw = function() {
 	if(!this._aceFacePicsLoaded && $gameSystem._availableUnits){
 		var ace = $statCalc.getTopAce();
 		if(ace){
-			if(ace.isSubPilot && ace.mainPilot && $statCalc.getKills(ace) <= $statCalc.getKills(ace.mainPilot)){		
-				ace = ace.mainPilot;				
-			}
-			this._aceFacePicsLoaded = true;
-			this.loadActorFace(ace.SRWStats.pilot.id, this._acePicContainer);
-			this._aceValue.innerHTML = $statCalc.getKills(ace);
-			this._aceName.innerHTML = ace.name();
+			if(ace.SRWStats.pilot.id != -1){
+				if(ace.isSubPilot && ace.mainPilot && $statCalc.getKills(ace) <= $statCalc.getKills(ace.mainPilot)){		
+					ace = ace.mainPilot;				
+				}
+				this._aceFacePicsLoaded = true;
+				this.loadActorFace(ace.SRWStats.pilot.id, this._acePicContainer);
+				this._aceValue.innerHTML = $statCalc.getKills(ace);
+				this._aceName.innerHTML = ace.name();
+			} else {
+				this._acePicContainer.innerHTML = "";
+				this._aceValue.innerHTML = "";
+				this._aceName.innerHTML = "";
+			}			
 		}		
 	}
 	
