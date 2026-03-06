@@ -3350,8 +3350,9 @@ StatCalc.prototype.applyStoredActorData = function(actor, dbAbilities, dbRelatio
 		actor.SRWStats.pilot.PP = storedData.PP;
 		actor.SRWStats.pilot.exp = storedData.exp;
 		actor.SRWStats.pilot.kills = storedData.kills;
-		actor.SRWStats.pilot.stats.upgrades = storedData.pilotUpgrades;	
-		actor.SRWStats.pilot.customSpirits = storedData.customSpirits || {};	
+		actor.SRWStats.pilot.favPoints = storedData.favPoints || 0;
+		actor.SRWStats.pilot.stats.upgrades = storedData.pilotUpgrades;
+		actor.SRWStats.pilot.customSpirits = storedData.customSpirits || {};
 		
 		var storedAbilities = $SRWSaveManager.getActorData(actor.actorId()).abilities || {};
 		var usedSlots = {};
