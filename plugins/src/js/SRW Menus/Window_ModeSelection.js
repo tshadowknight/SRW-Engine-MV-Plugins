@@ -173,10 +173,13 @@ Window_ModeSelection.prototype.update = function() {
 		}	
 		
 		if(Input.isTriggered('cancel') || TouchInput.isCancelled()){		
-			if(this._callbacks["closed"]){
-				this.doFadeOut();
-				setTimeout(() => {$gameTemp.buttonHintManager.hide(); $gameTemp.popMenu = true; this._callbacks["closed"]();}, 1000);				
-			}
+			if(!this._closing){
+				if(this._callbacks["closed"]){
+					this._closing = true;
+					this.doFadeOut();
+					setTimeout(() => {$gameTemp.buttonHintManager.hide(); $gameTemp.popMenu = true; this._closing = false; this._callbacks["closed"]();}, 1000);				
+				}
+			}			
 		}			
 		this.resetTouchState();
 		this.refresh();
@@ -194,7 +197,7 @@ Window_ModeSelection.prototype.redraw = function() {
 	
 	if(!this._options){
 		if(ENGINE_SETTINGS.DIFFICULTY_MODS && ENGINE_SETTINGS.DIFFICULTY_MODS.levels && ENGINE_SETTINGS.DIFFICULTY_MODS.levels.length){
-			this._options = structuredClone(ENGINE_SETTINGS.DIFFICULTY_MODS.levels);
+			this._options = [...ENGINE_SETTINGS.DIFFICULTY_MODS.levels];
 			if(ENGINE_SETTINGS.DIFFICULTY_MODS.enabled & 2){
 				this._options.unshift({
 					name: APPSTRINGS.MODE_SELECTION.label_automatic,

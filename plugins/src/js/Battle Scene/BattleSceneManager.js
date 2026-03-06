@@ -5679,6 +5679,13 @@ BattleSceneManager.prototype.executeAnimation = function(animation, startTick){
 				}						
 			}
 		},
+		stop_model_animations: function(target, params){
+			var targetObj = getTargetObject(target);
+			for(let animKey in targetObj.animationRef){			
+				targetObj.animationRef[animKey].stop();
+				targetObj.animationRef[animKey].speedRatio = 1;											
+			}
+		},
 		show_attachment: function(target, params){
 			const targetObj = getTargetObject(target);		
 			/*targetObj.getChildMeshes().forEach(m => {

@@ -617,6 +617,11 @@ SRWEditor.prototype.init = function(){
 			params: ["name", "snap", "loop", "playAll", "speed", "from", "to", "isPassive", "playDefaultSfx"],
 			desc: "Set the source frame of a sprite(in, out, dodge, hurt, main)."
 		},
+		stop_model_animations: {
+			hasTarget: true,
+			params: [],
+			desc: "Stop all animations currently active on a unit, including passive animations."
+		},
 		set_model_animation: {
 			hasTarget: true,
 			params: ["name", "snap", "loop", "playAll", "speed", "from", "to", "isPassive", "playDefaultSfx"],
