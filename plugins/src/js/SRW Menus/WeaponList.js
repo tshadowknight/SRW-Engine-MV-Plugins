@@ -225,7 +225,7 @@ WeaponList.prototype.redraw = function() {
 				const target = entry;
 				let weaponData = $dataWeapons[current.info.weaponId];
 				const displayInfo = {
-					name: weaponData.name,
+					name: DataManager.getLocalizedName('weapon', current.info.weaponId, weaponData.name),
 					upgrades: current.info.upgrades,
 					pendingUpgrades: _this.pendingUpgrades[current.idx],
 					isActive: _this.pendingUpgrades[current.idx] != null,

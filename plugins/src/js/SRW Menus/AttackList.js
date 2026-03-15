@@ -147,7 +147,7 @@ AttackList.prototype.createUpgradeViewRow = function(refData, attack, idx) {
 	}
 	
 	listContent+="</div>";
-	listContent+="<div class='attack_list_block scaled_text fitted_text'>"+attack.name+"</div>";
+	listContent+="<div class='attack_list_block scaled_text fitted_text'>"+DataManager.getLocalizedName('weapon', attack.id, attack.name)+"</div>";
 	listContent+="<div class='attack_list_block scaled_text'>"+this.createAttributeBlock(attack)+"</div>";
 	var currentPower = $statCalc.getWeaponPower(refData, attack)*1;
 	listContent+="<div class='attack_list_block scaled_text'>"+currentPower+"</div>";
@@ -167,7 +167,7 @@ AttackList.prototype.createSummaryViewRow = function(refData, attack) {
 	}
 	
 	listContent+="</div>";
-	listContent+="<div class='attack_list_block scaled_text fitted_text'>"+attack.name+"</div>";
+	listContent+="<div class='attack_list_block scaled_text fitted_text'>"+DataManager.getLocalizedName('weapon', attack.id, attack.name)+"</div>";
 	listContent+="<div class='attack_list_block scaled_text'>"+this.createAttributeBlock(attack)+"</div>";
 	var currentPower = $statCalc.getWeaponPowerWithMods(refData, attack)*1;
 	

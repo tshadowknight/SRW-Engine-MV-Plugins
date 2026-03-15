@@ -49,6 +49,40 @@ TouchInput.update = function() {
 	}
 }
 
+// Patch addEventListener to auto-add touchstart when click is added
+const _addEventListener = EventTarget.prototype.addEventListener;
+EventTarget.prototype.addEventListener = function(type, handler, options) {
+    _addEventListener.call(this, type, handler, options);
+    if (type === 'click') {
+        _addEventListener.call(this, 'touchstart', function(e) {
+            e.preventDefault();
+            handler.call(this, e);
+        }, options);
+    }
+};
+
+//set up wake lock for mobile devices
+let wakeLock = null;
+
+async function requestWakeLock() {
+    if (!navigator.wakeLock) return;
+    try {
+        wakeLock = await navigator.wakeLock.request('screen');
+    } catch (err) {
+        console.log('Wake lock failed:', err);
+    }
+}
+
+// Request immediately on script load
+requestWakeLock();
+
+// Re-request when page becomes visible again (Wake Lock is auto-released on visibility hidden)
+document.addEventListener('visibilitychange', function() {
+    if (document.visibilityState === 'visible') {
+        requestWakeLock();
+    }
+}, false);
+
 // PIXI v4 bug fix: pixi-tilemap's CanvasTileRenderer does not implement destroy(),
 // but PIXI's destroyPlugins() calls it unconditionally on every registered plugin.
 // This causes renderer.destroy() to throw before it can clean up InteractionManager,
@@ -898,6 +932,7 @@ SceneManager.isInSaveScene = function(){
 		this.createAttrChartWindow();
 		this.createGameModesWindow();
 		this.createMapButtonsWindow();
+		this.createMapCancelButtonWindow();
 		this.createOpeningCrawlWindow();
 		this.createTextLogWindow();
 		this.createLoaderOverlayWindow();
@@ -1870,7 +1905,7 @@ SceneManager.isInSaveScene = function(){
     };
 		
 	Scene_Map.prototype.createUnitSummaryWindow = function() {
-		this._summaryWindow = new Window_UnitSummary(0, 0);				
+		this._summaryWindow = new Window_UnitSummary(0, 0);
 		this._summaryWindow.close();
 		this.addWindow(this._summaryWindow);
 		this._summaryWindow.hide();
@@ -1900,6 +1935,14 @@ SceneManager.isInSaveScene = function(){
 		this._mapButtonsWindow.hide();
 		this.idToMenu["map_buttons"] = this._mapButtonsWindow;
     };	
+
+	Scene_Map.prototype.createMapCancelButtonWindow = function() {
+		this._mapCancelButtonWindow = new Window_MapCancelButton(0, 0);
+		this._mapCancelButtonWindow.open();
+		this.addWindow(this._mapCancelButtonWindow);
+		this._mapCancelButtonWindow.show();
+		this.idToMenu["map_cancel_button"] = this._mapCancelButtonWindow;
+    };
 	
 	Scene_Map.prototype.createLevelUpWindow = function() {
 		this._levelUpWindow = new Window_LevelUp();

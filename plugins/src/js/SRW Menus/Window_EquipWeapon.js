@@ -402,7 +402,7 @@ Window_EquipWeapon.prototype.redraw = function() {
 		var displayData;
 		if(itemInfo){
 			 displayData = {
-				 name: $dataWeapons[itemInfo.weaponId].name,
+				 name: DataManager.getLocalizedName('weapon', itemInfo.weaponId, $dataWeapons[itemInfo.weaponId].name),
 				 upgrades: itemInfo.upgrades
 			 }
 		} else {
@@ -433,7 +433,7 @@ Window_EquipWeapon.prototype.redraw = function() {
 			var displayData;
 			if(transferCandidates[i]){			
 				displayData = {
-					name: "<div data-mechid='"+transferCandidates[i].mechId+"' class='mechIcon'></div>"+$dataClasses[transferCandidates[i].mechId].name
+					name: "<div data-mechid='"+transferCandidates[i].mechId+"' class='mechIcon'></div>"+DataManager.getLocalizedName('mech', transferCandidates[i].mechId, $dataClasses[transferCandidates[i].mechId].name)
 				 };
 			} else {
 				displayData = {
@@ -477,9 +477,9 @@ Window_EquipWeapon.prototype.redraw = function() {
 	
 	var mechNameContent = "";
 	mechNameContent+="<div id='equip_item_upgrade_name_icon'></div>";//icon 
-	mechNameContent+="<div class='upgrade_mech_name_value scaled_text'>"+mechData.classData.name+"</div>";//icon 	
-	this._mechNameDisplay.innerHTML = mechNameContent;	
-	
+	mechNameContent+="<div class='upgrade_mech_name_value scaled_text'>"+DataManager.getLocalizedName('mech', mechData.classData.id, mechData.classData.name)+"</div>";//icon
+	this._mechNameDisplay.innerHTML = mechNameContent;
+
 	var mechIcon = this._container.querySelector("#equip_item_upgrade_name_icon");
 	this.loadMechMiniSprite(this.getCurrentSelection().id, mechIcon);
 	

@@ -85,7 +85,7 @@ MechList.prototype.defineContent = function(){
 		if(!mech.classData){
 			return "";
 		}
-		return mech.classData.name;
+		return DataManager.getLocalizedName('mech', mech.classData.id, mech.classData.name);
 	}
 	function mechTeam(pilot, mech){
 		var result = "";						

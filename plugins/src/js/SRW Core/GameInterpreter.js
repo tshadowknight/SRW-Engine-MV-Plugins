@@ -42,6 +42,7 @@
 				var haltingScriptCommands = [
 					"showStageConditions",
 					"showEnemyPhaseText",
+					"showPlayerPhaseText",
 					"awardSRPoint",
 					"showMapAttackText",
 					"destroyEvent",
@@ -251,6 +252,26 @@
 			}
 			return false;
 		}
+
+		Game_Interpreter.prototype.showPlayerPhaseText = function(){
+			if (!$gameMessage.isBusy()) {
+				$gameMessage.setFaceImage("", "");
+				$gameMessage.setBackground(1);
+				$gameMessage.setPositionType(1);
+				
+				var text = APPSTRINGS.GENERAL.label_player_phase;
+				$gameMessage.add("\\TA[1]");		
+				$gameMessage.add("\\>\\C[9]\\{"+text+"\\}");		
+				$gameMessage.add("\\>\\C[0]Turn \\v[3]");		
+				$gameMessage.add("\\.\\.\\^");		
+				this._index++;
+				
+				$gameSystem.pushTextLog("", "", text);			
+			
+				this.setWaitMode('message');
+			}
+			return false;
+		}		
 
 		Game_Interpreter.prototype.awardSRPoint = function(){	
 			var mapId = $gameMap.mapId();
@@ -1547,10 +1568,10 @@
 				if(!this.isHaltingCommand(command) && Input.isPressed("ok") && Input.isPressed("pagedown") && Input.isPressed("pageup")){
 					if(!this.isTextSkipMode){
 						$gameScreen.startFadeOut(this.fadeSpeed());
+						this._lastBGM = AudioManager._currentBgm;
 					}
 					this.isTextSkipMode = true;		
-					$gameTemp.isSkippingEvents = true;	
-					this._lastBGM = AudioManager._currentBgm;
+					$gameTemp.isSkippingEvents = true;						
 					//AudioManager.fadeOutBgm(2);
 				}
 				

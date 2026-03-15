@@ -284,7 +284,7 @@ Window_SelectReassignMech.prototype.redraw = function() {
 		if(current.mech.allowedPilots.length){
 			slotSelectionContent+="<div data-idx='0' data-type='main' class='entry scaled_text fitted_text "+(_this._currentSlotSelection == 0 ? "selected" : "")+"'>";
 			slotSelectionContent+="<div class='slot_label'>"+APPSTRINGS.REASSIGN.label_main+"</div>";
-			slotSelectionContent+="<div class='slot_value'>"+(current.actor.SRWStats.pilot.name || "")+"</div>";
+			slotSelectionContent+="<div class='slot_value'>"+current.actor.name()+"</div>";
 			slotSelectionContent+="<div data-actor='"+(current.actor.SRWStats.pilot.id)+"' class='slot_icon'></div>";
 			slotSelectionContent+="</div>";	
 		}
@@ -296,7 +296,7 @@ Window_SelectReassignMech.prototype.redraw = function() {
 			var actor = $gameActors.actor(subPilots[i]);
 			var name = "---"
 			if(actor){
-				name = actor.SRWStats.pilot.name || "";
+				name = actor.name();
 			}
 			slotSelectionContent+="<div class='slot_value'>"+(name)+"</div>";
 			slotSelectionContent+="<div data-actor='"+subPilots[i]+"' class='slot_icon'></div>";

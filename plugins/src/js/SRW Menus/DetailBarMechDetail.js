@@ -31,7 +31,7 @@ DetailBarMechDetail.prototype.redraw = function(){
 	 
 	detailContent+="<div class='mech_name_value scaled_text fitted_text'>";
 	if(mechData.classData?.name){
-		detailContent+=mechData.classData.name; 
+		detailContent+=DataManager.getLocalizedName('mech', mechData.classData.id, mechData.classData.name);
 	} else {
 		detailContent+="---"; 
 	}

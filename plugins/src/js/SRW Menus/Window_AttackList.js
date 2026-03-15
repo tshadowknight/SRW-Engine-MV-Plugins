@@ -197,7 +197,7 @@ Window_AttackList.prototype.redraw = function() {
 	
 	var mechNameContent = "";
 	mechNameContent+="<div id='detail_pages_weapons_name_icon'></div>";//icon 
-	mechNameContent+="<div class='upgrade_mech_name_value scaled_text'>"+this.getCurrentSelection().mech.classData.name+"</div>";//icon 	
+	mechNameContent+="<div class='upgrade_mech_name_value scaled_text'>"+DataManager.getLocalizedName('mech', this.getCurrentSelection().mech.classData.id, this.getCurrentSelection().mech.classData.name)+"</div>";//icon	
 	this._mechNameDisplayWeapons.innerHTML = mechNameContent;	
 	
 	var mechIcon = this._container.querySelector("#detail_pages_weapons_name_icon");

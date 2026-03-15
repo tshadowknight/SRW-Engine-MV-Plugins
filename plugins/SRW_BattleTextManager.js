@@ -190,6 +190,19 @@ SRWBattleTextManager.prototype.getText = function(target, ref, type, subType, ta
 			text: "..."
 		};
 	}
+	var battleLocData = DataManager._battleLocalizationData;
+	if(battleLocData) {
+		var lines = Array.isArray(text) ? text : [text];
+		lines.forEach(function(line) {
+			if(line && line.locId) {
+				var id = String(line.locId).replace(/^#/, '');
+				var localized = battleLocData[id];
+				if(localized != null) {
+					line.text = String(localized).replace(/\r?\n/g, '<br>');
+				}
+			}
+		});
+	}
 	return text;
 }
 

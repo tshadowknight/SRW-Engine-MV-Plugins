@@ -20,6 +20,7 @@ APPSTRINGS.GENERAL = {
 	label_box_stolen: "The item box was taken!",
 	label_enemy_phase: "Enemy Phase",
 	label_ally_phase: "Ally Phase",
+	label_player_phase: "Player Phase",
 	label_yes: "YES",
 	label_no: "NO",
 	label_ask_end_turn_single: "unit can still take an action, end your turn?",

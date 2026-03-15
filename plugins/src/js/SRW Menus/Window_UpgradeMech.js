@@ -448,7 +448,7 @@ Window_UpgradeMech.prototype.redraw = function() {
 	
 	var mechNameContent = "";
 	mechNameContent+="<div id='upgrade_name_icon'></div>";//icon 
-	mechNameContent+="<div class='upgrade_mech_name_value scaled_text'>"+this.getCurrentSelection().classData.name+"</div>";//icon 	
+	mechNameContent+="<div class='upgrade_mech_name_value scaled_text'>"+DataManager.getLocalizedName('mech', this.getCurrentSelection().classData.id, this.getCurrentSelection().classData.name)+"</div>";//icon	
 	this._mechNameDisplay.innerHTML = mechNameContent;	
 	
 	var mechIcon = this._container.querySelector("#upgrade_name_icon");

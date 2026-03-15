@@ -160,13 +160,13 @@ BattleSceneTextLayer.prototype.showTextLines = function(lines, callback) {
 					});
 				}
 				if(active){
-					textDisplayContent+= $dataClasses[active.deployedId].name;
+					textDisplayContent+= DataManager.getLocalizedName('mech', active.deployedId, $dataClasses[active.deployedId].name);
 				} else {
-					textDisplayContent+=line.displayName;
+					textDisplayContent+=DataManager.getLocalizedName('actor', null, line.displayName);
 				}
-				
+
 			} else {
-				textDisplayContent+=line.displayName;
+				textDisplayContent+=DataManager.getLocalizedName('actor', null, line.displayName);
 			}			
 		} else {
 			textDisplayContent+=_this._currentName;

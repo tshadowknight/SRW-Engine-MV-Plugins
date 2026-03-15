@@ -66,3 +66,43 @@
     justify-content: center;
 }
 
+.map_button.cancel {
+	border-top-left-radius: 1vw;
+    border-bottom-left-radius: 1vw;
+    border: 0.2vw solid #FFFFFF;
+    height: 6vw;
+    width: 6vw;
+    background-color: var(--section-bg-color-solid);
+    position: relative;
+    cursor: pointer;
+    padding: 1%;
+    pointer-events: auto;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+.map_button.cancel img {
+	width: 5vw;
+	filter: var(--white-filter);
+}
+
+#map_cancel_button {
+	width: auto;
+    height: auto;
+    position: fixed;
+    top: 35%;
+    right: 6vw;
+    pointer-events: none;
+}
+
+#map_cancel_button.menu_bg {
+	background: none;
+}
+
+#map_cancel_button .bg_fade_container {
+	background: none;
+	-webkit-mask-image: none;
+	mask-image: none;
+	pointer-events: none;
+}

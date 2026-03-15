@@ -35,8 +35,8 @@ SpiritManager.prototype.addDefinition = function(idx, name, desc, handler, targe
 }
 
 SpiritManager.prototype.getSpiritDisplayInfo = function(idx){
-	var spiritDef = this._spiritDefinitions[idx];
-	var result = {
+	const spiritDef = this._spiritDefinitions[idx];
+	const result = {
 		name: "",
 		desc: "",
 		target: "",
@@ -49,6 +49,14 @@ SpiritManager.prototype.getSpiritDisplayInfo = function(idx){
 		result.target = this._targetTypeStrings[spiritDef.targetType];
 		result.enabledHandler = spiritDef.enabledHandler;
 		result.animInfo = spiritDef.animInfo;
+	}
+	if (DataManager._abilityLocalizationData) {
+		const section = DataManager._abilityLocalizationData['spirit'];
+		const translation = section && section[idx];
+		if (translation && typeof translation === 'object') {
+			if (translation.name && String(translation.name).trim()) result.name = translation.name;
+			if (translation.desc && String(translation.desc).trim()) result.desc = translation.desc;
+		}
 	}
 	return result;
 }

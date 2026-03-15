@@ -767,6 +767,15 @@
 	width: 61%;
 }
 
+.participant_block_small .support_attack_name {
+	width: 77%;
+	margin-left: 2%;
+}
+
+.participant_block .main_attack_text {
+	max-width: 77%;
+}	
+
 .participant_block_small .percent_indicator {
 	--fontsize: 1.5px;
 	margin-right: 0%;

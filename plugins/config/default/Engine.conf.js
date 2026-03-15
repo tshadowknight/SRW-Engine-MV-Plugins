@@ -22,6 +22,8 @@ var ENGINE_SETTINGS = {
 	MSG_LINE_HEIGHT_SCALE: 1,//scaling factor for the line height of lines in the message window. Use this to adjust if you are not using the default FONT_SIZE
 	DISABLE_TOUCH: false,
 	PRELOAD_AUDIO: true,
+	DEFAULT_VOLUME: 100, //the starting volume for new players(0-100). Affects BGM, BGS, ME and SE.
+
 	DEFAULT_BASIC_ANIM_RATE: 4,
 	BASIC_BATTLE_ANIM_MODE: "normal", //normal = use anims set in editor, none = do not use, attribute = use animation linked to weapon attribute
 	USE_CUSTOM_BASIC_BATTLE_BGS: true, //if true using the scrolling backgrounds from BasicBattleBgs.conf. If false default colors are used, additionally shadows are forced to enabled.

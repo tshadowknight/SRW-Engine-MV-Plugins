@@ -14,6 +14,22 @@
 	function patches(){};
 	
 	patches.apply = function(){
+		// Newer Android WebViews reject undefined as a CanvasTextAlign value.
+		// Default align to 'left' when callers omit the argument.
+		var _Bitmap_drawText = Bitmap.prototype.drawText;
+		Bitmap.prototype.drawText = function(text, x, y, maxWidth, lineHeight, align) {
+			_Bitmap_drawText.call(this, text, x, y, maxWidth, lineHeight, align || 'left');
+		};
+
+		Bitmap.prototype.clearRect = function(x, y, width, height) {
+			this._context.clearRect(x, y, width, height);
+			this._setDirty();
+			if(Utils.isMobileDevice()){
+				this._context.getImageData(x, y, 1, 1);
+			}	
+		};
+
+
 		Window_SavefileList.prototype.drawItem = function(index) {
 			var id = index + 1;
 			var valid = DataManager.isThisGameFile(id);
@@ -262,10 +278,14 @@
 				$gameTemp.buttonHintManager.hide();
 			}
 			this._requestHintWindowClose = false;
-			Window_Base.prototype.update.call(this);			
+			Window_Base.prototype.update.call(this);
 			while (!this.isOpening() && !this.isClosing()) {
 				this._remoteOverlayCounter+=0.2;
-				if($gameMessage.faceName()){
+				// Only animate the face/portrait while the message is actively being displayed
+				// (text state active or paused waiting for input). Skipping during transitional
+				// states prevents drawing to contents right before startMessage() clears it,
+				// which can cause stale GPU texture issues on mobile.
+				if($gameMessage.faceName() && (this._textState !== null || this.pause)){
 					this.updateFaceDisplay();
 				}
 				if($gameTemp.locationHeader){
@@ -1064,7 +1084,7 @@
 		width = width || 312;
 		if (item) {
 			this.resetTextColor();
-			this.drawText(item.name, x + 10, y, width - 20);
+			this.drawText(DataManager.getLocalizedName('mech', item.id, item.name), x + 10, y, width - 20);
 		}
 	};
 	
@@ -1127,7 +1147,7 @@
 		width = width || 312;
 		if (item) {
 			this.resetTextColor();
-			this.drawText(item.name(), x + 10, y, width - 60);
+			this.drawText(DataManager.getLocalizedName('actor', item._actorId, item.name()), x + 10, y, width - 60);
 			let attr1 = $statCalc.getParticipantAttribute(item, "attribute1");
 			if(attr1){
 				let attrInfo = ENGINE_SETTINGS.ATTRIBUTE_DISPLAY_NAMES[attr1] || {};

@@ -66,9 +66,31 @@ AbilityManager.prototype.getDefinitionCount = function(){
 	return this._abilityDefinitions.length;
 }
 
+AbilityManager.prototype.getLocGroupKey = function() {
+	return null;
+};
+
+AbilityManager.prototype._applyAbilityLocalization = function(result, effectiveIdx) {
+	const groupKey = this.getLocGroupKey();
+	if (!groupKey || !DataManager._abilityLocalizationData) return;
+	const section = DataManager._abilityLocalizationData[groupKey];
+	const translation = section && section[effectiveIdx];
+	if (!translation || typeof translation !== 'object') return;
+	if (translation.name && String(translation.name).trim()) result.name = translation.name;
+	if (translation.desc && String(translation.desc).trim()) {
+		if (typeof result.desc === 'function') {
+			const locDesc = translation.desc;
+			result.desc = function() { return {ally: locDesc, enemy: locDesc}; };
+		} else {
+			result.desc = translation.desc;
+		}
+	}
+};
+
 AbilityManager.prototype.getAbilityDisplayInfo = function(idx){
-	var abilityDef = this._abilityDefinitions[this.getUpgradeIdx(idx)];
-	var result = {
+	const effectiveIdx = this.getUpgradeIdx(idx);
+	const abilityDef = this._abilityDefinitions[effectiveIdx];
+	const result = {
 		name: "",
 		desc: "",
 		hasLevel: false,
@@ -87,6 +109,7 @@ AbilityManager.prototype.getAbilityDisplayInfo = function(idx){
 		result.maxLevel = abilityDef.maxLevel;
 		result.isHighlightedHandler = abilityDef.isHighlightedHandler;
 	}
+	this._applyAbilityLocalization(result, effectiveIdx);
 	return result;
 }
 
@@ -143,9 +166,14 @@ PilotAbilityManager.prototype.initDefinitions = function(){
 	$SRWConfig.pilotAbilties.call(this);
 }
 
+PilotAbilityManager.prototype.getLocGroupKey = function() {
+	return 'pilotAbility';
+};
+
 PilotAbilityManager.prototype.getAbilityDisplayInfo = function(idx){
-	var abilityDef = this._abilityDefinitions[this.getUpgradeIdx(idx)];
-	var result = {
+	const effectiveIdx = this.getUpgradeIdx(idx);
+	const abilityDef = this._abilityDefinitions[effectiveIdx];
+	const result = {
 		name: "",
 		desc: "",
 		hasLevel: false,
@@ -168,6 +196,7 @@ PilotAbilityManager.prototype.getAbilityDisplayInfo = function(idx){
 		result.maxLevel = abilityDef.maxLevel;
 		result.isHighlightedHandler = abilityDef.isHighlightedHandler;
 	}
+	this._applyAbilityLocalization(result, effectiveIdx);
 	return result;
 }
 
@@ -186,6 +215,10 @@ MechAbilityManager.prototype.constructor = MechAbilityManager;
 MechAbilityManager.prototype.getIdPrefix = function(idx){
 	return "mech";
 }
+
+MechAbilityManager.prototype.getLocGroupKey = function() {
+	return 'mechAbility';
+};
 
 MechAbilityManager.prototype.addDefinition = function(idx, name, desc, hasLevel, isUnique, statmodHandler, isActiveHandler, isHighlightedHandler, rangeDef, canStack){
 	var _this = this;
@@ -264,9 +297,14 @@ ItemEffectManager.prototype.addDefinition = function(idx, name, desc, hasLevel, 
 	}	
 }
 
+ItemEffectManager.prototype.getLocGroupKey = function() {
+	return 'itemEffect';
+};
+
 ItemEffectManager.prototype.getAbilityDisplayInfo = function(idx){
-	var abilityDef = this._abilityDefinitions[this.getUpgradeIdx(idx)];
-	var result = {
+	const effectiveIdx = this.getUpgradeIdx(idx);
+	const abilityDef = this._abilityDefinitions[effectiveIdx];
+	const result = {
 		name: "",
 		desc: "",
 		hasLevel: false,
@@ -287,6 +325,7 @@ ItemEffectManager.prototype.getAbilityDisplayInfo = function(idx){
 		result.isHighlightedHandler = abilityDef.isHighlightedHandler;
 		result.worth = abilityDef.worth;
 	}
+	this._applyAbilityLocalization(result, effectiveIdx);
 	return result;
 }
 
@@ -405,6 +444,10 @@ WeaponEffectManager.prototype.getIdPrefix = function(idx){
 	return "weapon";
 }
 
+WeaponEffectManager.prototype.getLocGroupKey = function() {
+	return 'weaponEffect';
+};
+
 WeaponEffectManager.prototype.initDefinitions = function(){
 	$SRWConfig.weaponEffects.call(this);
 }
@@ -425,6 +468,9 @@ AbilityCommandManger.prototype.getIdPrefix = function(idx){
 	return "command";
 }
 
+AbilityCommandManger.prototype.getLocGroupKey = function() {
+	return 'abilityCommand';
+};
 
 AbilityCommandManger.prototype.getUseInfo = function(actor, idx){
 	var def = this._abilityDefinitions[this.getUpgradeIdx(idx)];
@@ -460,8 +506,8 @@ AbilityCommandManger.prototype.addDefinition = function(idx, name, desc, useCoun
 }
 
 AbilityCommandManger.prototype.getAbilityDisplayInfo = function(idx){
-	var abilityDef = this._abilityDefinitions[idx];
-	var result = {
+	const abilityDef = this._abilityDefinitions[idx];
+	const result = {
 		name: "",
 		desc: "",
 		useCount: 0,
@@ -473,6 +519,7 @@ AbilityCommandManger.prototype.getAbilityDisplayInfo = function(idx){
 		result.useCount = abilityDef.useCount;
 		result.isActiveHandler = abilityDef.isActiveHandler;
 	}
+	this._applyAbilityLocalization(result, idx);
 	return result;
 }
 
@@ -522,6 +569,10 @@ AbilityZoneManager.prototype.getIdPrefix = function(idx){
 	return "zone";
 }
 
+AbilityZoneManager.prototype.getLocGroupKey = function() {
+	return 'abilityZone';
+};
+
 AbilityZoneManager.prototype.initDefinitions = function(){
 	$SRWConfig.abilityZones.call(this);
 }
@@ -548,8 +599,9 @@ AbilityZoneManager.prototype.getEnemyMod = function(actor, idx, stackCount){
 }
 
 AbilityZoneManager.prototype.getAbilityDisplayInfo = function(idx){
-	var abilityDef = this._abilityDefinitions[this.getUpgradeIdx(idx)];
-	var result = {
+	const effectiveIdx = this.getUpgradeIdx(idx);
+	const abilityDef = this._abilityDefinitions[effectiveIdx];
+	const result = {
 		name: "",
 		desc: function(){return "";},
 		upgradeCount: 1,
@@ -559,5 +611,6 @@ AbilityZoneManager.prototype.getAbilityDisplayInfo = function(idx){
 		result.desc = abilityDef.desc;
 		result.upgradeCount = abilityDef.upgradeCount;
 	}
+	this._applyAbilityLocalization(result, effectiveIdx);
 	return result;
 }

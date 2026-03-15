@@ -348,7 +348,7 @@ Window_UnitSummary.prototype.redraw = async function() {
 			comp.mechImg.setAttribute("data-img", "img/" + menuImagePath);
 
 			// Mech info
-			comp.mechName.textContent = actor.SRWStats.mech.classData.name;
+			comp.mechName.textContent = DataManager.getLocalizedName('mech', actor.SRWStats.mech.classData.id, actor.SRWStats.mech.classData.name);
 
 			// HP/EN values
 			comp.currentHP.textContent = $statCalc.getCurrentHPDisplay(actor);

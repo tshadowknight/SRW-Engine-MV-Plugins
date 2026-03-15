@@ -1870,7 +1870,7 @@
 	};
 
 	Sprite_SrpgGrid.prototype.update = function() {
-		if($gameSystem.enableGrid && !ConfigManager["disableGrid"]){
+		if($gameSystem.enableGrid && !ConfigManager["disableGrid"] && !$gameSystem.isIntermission()){
 			this.opacity = 128;
 		} else {
 			this.opacity = 0;

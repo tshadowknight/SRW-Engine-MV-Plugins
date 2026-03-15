@@ -104,6 +104,9 @@ window.Window_Options = Window_Options;
 import Window_MapButtons from "./Window_MapButtons.js";
 window.Window_MapButtons = Window_MapButtons;
 
+import Window_MapCancelButton from "./Window_MapCancelButton.js";
+window.Window_MapCancelButton = Window_MapCancelButton;
+
 import Window_OpeningCrawl from "./Window_OpeningCrawl.js";
 window.Window_OpeningCrawl = Window_OpeningCrawl;
 

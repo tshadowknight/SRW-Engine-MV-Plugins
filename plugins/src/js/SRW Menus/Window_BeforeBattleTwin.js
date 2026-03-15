@@ -1370,7 +1370,7 @@ Window_BeforebattleTwin.prototype.createParticipantBlock = function(ref, action,
 		content+="<div class='en_bar'><div style='width: "+enPercent+"%;' class='en_bar_fill'></div></div>";
 		content+="</div>";
 		
-		content+="<div class='attack_name scaled_text fitted_text "+(ENGINE_SETTINGS.ENABLE_ATTRIBUTE_SYSTEM ? "with_attributes" : "")+"'>";	
+		content+="<div class='attack_name scaled_text "+(ENGINE_SETTINGS.ENABLE_ATTRIBUTE_SYSTEM ? "with_attributes" : "")+"'>";	
 		var attack = action.attack;
 		if(attack && action.type == "attack"){	
 			if(attack.type == "M"){
@@ -1388,7 +1388,7 @@ Window_BeforebattleTwin.prototype.createParticipantBlock = function(ref, action,
 				}								
 			}
 			
-			content+="<div class=''>"+attack.name+"</div>";
+			content+="<div class='scaled_text fitted_text main_attack_text'>"+DataManager.getLocalizedName('weapon', attack.id, attack.name)+"</div>";
 		} else {
 			content+="<div class=''>------</div>";
 		}
@@ -1432,7 +1432,7 @@ Window_BeforebattleTwin.prototype.createSmallParticipantBlock = function(ref, ac
 	} 
 	
 	if(action.type == "attack"){
-		content+="<div class='attack_name scaled_text fitted_text "+(ENGINE_SETTINGS.ENABLE_ATTRIBUTE_SYSTEM ? "with_attributes" : "")+"'>";	
+		content+="<div class='attack_name scaled_text "+(ENGINE_SETTINGS.ENABLE_ATTRIBUTE_SYSTEM ? "with_attributes" : "")+"'>";	
 		var attack = action.attack;
 		if(attack && action.type == "attack"){	
 			if(attack.type == "M"){
@@ -1451,7 +1451,7 @@ Window_BeforebattleTwin.prototype.createSmallParticipantBlock = function(ref, ac
 				content+=_this.createAttributeEffectivenessBlock(ref, "attribute1", attack, attacked);
 			}
 			
-			content+="<div class=''>"+attack.name+"</div>";
+			content+="<div class='support_attack_name scaled_text fitted_text'>"+DataManager.getLocalizedName('weapon', attack.id, attack.name)+"</div>";
 		} else {
 			content+="<div class=''>------</div>";
 		}

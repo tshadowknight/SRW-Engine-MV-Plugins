@@ -48,6 +48,11 @@ Window_ZoneSummary.prototype.createComponents = function() {
 		this._contentContainer.appendChild(slot.container);
 		this._entrySlots.push(slot);
 	}
+
+	this._bgFadeContainer.addEventListener("click", function(){
+		$gameSystem.setSubBattlePhase('wait');
+		$gameTemp.pushMenu = "zone_status";	
+	});
 }
 
 Window_ZoneSummary.prototype.update = function() {

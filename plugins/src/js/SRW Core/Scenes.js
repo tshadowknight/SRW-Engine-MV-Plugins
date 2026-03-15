@@ -79,6 +79,13 @@
 				this._scene.stop();
 			}
 		};
+
+		SceneManager.getCurrentSceneFade = function(){
+			if(!this._scene || !this._scene._fadeSprite){
+				return 255;
+			}
+			return 255 - (this._scene._fadeSprite.opacity || 0);
+		}
 		
 		Scene_Map.prototype.onMapLoaded = function() {
 			$gameMap._interpreter.preloadTextScriptAssets();

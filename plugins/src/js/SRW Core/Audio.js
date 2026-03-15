@@ -126,6 +126,10 @@
 				});				
 			});					
 		};
+
+		AudioManager.audioFileExt = function() {
+			return '.ogg';
+		};
 		
 		WebAudio.prototype.play = function(loop, offset) {
 			if (this.isReady()) {

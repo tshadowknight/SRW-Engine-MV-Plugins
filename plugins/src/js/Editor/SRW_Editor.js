@@ -6,6 +6,7 @@ import MechUI from "./MechUI.js";
 import WeaponUI from "./WeaponUI.js";
 import PatternUI from "./PatternUI.js";
 import LocalizationUI from "./LocalizationUI.js";
+import ScriptCharactersUI from "./ScriptCharactersUI.js";
 
 export default function SRWEditor(){
 	this._currentEditor = "attack_editor";
@@ -33,6 +34,7 @@ SRWEditor.prototype.initTitles = function(){
 			environment_editor: {title: EDITORSTRINGS.GENERAL.environment_editor_label, func: this.showEnvironmentEditor},
 			battle_text_editor: {title: EDITORSTRINGS.GENERAL.battle_text_editor_label, func: this.showBattleTextEditor},
 			localization_editor: {title: "Localization", func: this.showLocalizationEditor},
+			script_characters_editor: {title: "Script Characters", func: this.showScriptCharactersEditor},
 		}
 	}
 }
@@ -1525,6 +1527,7 @@ SRWEditor.prototype.show = function(){
 		content+="<option value='environment_editor' "+(_this._currentEditor == "environment_editor" ? "selected" : "")+">Environments</option>";
 		content+="<option value='battle_text_editor' "+(_this._currentEditor == "battle_text_editor" ? "selected" : "")+">Battle Text</option>";
 		content+="<option value='localization_editor' "+(_this._currentEditor == "localization_editor" ? "selected" : "")+">Localization</option>";
+		content+="<option value='script_characters_editor' "+(_this._currentEditor == "script_characters_editor" ? "selected" : "")+">Script Characters</option>";
 
 		content+="</select>";
 		content+="</div>";
@@ -2515,14 +2518,19 @@ SRWEditor.prototype.createQuoteContent = function(type, idx, quote, unitBaseInfo
 			};
 		}
 		
-		//hack to pretend that the quote id is stored for an entire quote instead of for each line of the quote		
-		if(quote.quoteId != null && lineCounter == 0){		
+		//hack to pretend that the quote id is stored for an entire quote instead of for each line of the quote
+		if(quote.quoteId != null && lineCounter == 0){
 			content+="<div class='command_label quote_id_label'>"+EDITORSTRINGS.TEXT.label_quote_id+":</div>";
-			content+="<input class='quote_id' value='"+quote.quoteId+"'></input>";	
+			content+="<input class='quote_id' value='"+quote.quoteId+"'></input>";
 
 			content+="<div class='command_label quote_group_label'>"+EDITORSTRINGS.TEXT.label_quote_group+":</div>";
-			content+="<input class='quote_group' value='"+(quote.quoteGroup || "")+"'></input>";				
-		}	
+			content+="<input class='quote_group' value='"+(quote.quoteGroup || "")+"'></input>";
+		}
+
+		if(quote.locId != null && lineCounter == 0){
+			content+="<div class='command_label'>Loc ID:</div>";
+			content+="<div class='quote_loc_id'>"+quote.locId+"</div>";
+		}
 		
 		
 		content+="<div data-lineidx='"+(lineCounter)+"'  data-targetunit='"+(quote.unitId)+"'  class='quote_line'>";
@@ -3070,6 +3078,17 @@ SRWEditor.prototype.showPatternEditor = function(){
 	var _this = this;
 	var containerNode = _this._contentDiv.querySelector(".content");
 	new PatternUI(containerNode, this).show();
+}
+
+SRWEditor.prototype.showScriptCharactersEditor = function(){
+	var _this = this;
+	var containerNode = _this._contentDiv.querySelector(".content");
+	if (!_this._scriptCharactersUI) {
+		_this._scriptCharactersUI = new ScriptCharactersUI(containerNode, _this);
+	} else {
+		_this._scriptCharactersUI._container = containerNode;
+	}
+	_this._scriptCharactersUI.show();
 }
 
 SRWEditor.prototype.showLocalizationEditor = function(){

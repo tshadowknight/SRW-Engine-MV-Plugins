@@ -456,7 +456,7 @@
 		};
 		
 		Game_Actor.prototype.name = function() {
-			return $statCalc.getPilotName(this);
+			return DataManager.getLocalizedName('actor', this.actorId(), $statCalc.getPilotName(this));
 		};
 		
 		

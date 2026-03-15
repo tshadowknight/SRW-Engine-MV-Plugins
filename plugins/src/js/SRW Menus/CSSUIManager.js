@@ -203,6 +203,7 @@ CSSUIManager.prototype.initAllWindows = function(){
 	this.initWindow("search");
 	this.initWindow("options");
 	this.initWindow("map_buttons");
+	this.initWindow("map_cancel_button");
 	this.initWindow("opening_crawl");
 	this.initWindow("text_log");
 	this.initWindow("load_overlay");

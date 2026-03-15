@@ -610,7 +610,7 @@ Window_BeforeBattle.prototype.createParticipantBlock = function(ref, action, isS
 			} else {
 				content+="<img class='attack_list_type scaled_width' src='svg/crosshair.svg'>";
 			}
-			content+="<div class='scaled_text'>"+attack.name+"</div>";
+			content+="<div class='scaled_text'>"+DataManager.getLocalizedName('weapon', attack.id, attack.name)+"</div>";
 		} else {
 			content+="<div class='scaled_text'>------</div>";
 		}

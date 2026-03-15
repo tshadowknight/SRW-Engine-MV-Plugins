@@ -1211,15 +1211,15 @@ Window_DetailPages.prototype.redraw = function() {
 	if(this.getCurrentSelection().mech.id != -1){
 		var mechNameContent = "";
 		mechNameContent+="<div id='detail_pages_upgrade_name_icon'></div>";//icon 
-		mechNameContent+="<div class='upgrade_mech_name_value scaled_text fitted_text'>"+this.getCurrentSelection().mech.classData.name+"</div>";//icon 	
-		this._mechNameDisplay.innerHTML = mechNameContent;	
-		
+		mechNameContent+="<div class='upgrade_mech_name_value scaled_text fitted_text'>"+DataManager.getLocalizedName('mech', this.getCurrentSelection().mech.classData.id, this.getCurrentSelection().mech.classData.name)+"</div>";//icon
+		this._mechNameDisplay.innerHTML = mechNameContent;
+
 		var mechIcon = this._container.querySelector("#detail_pages_upgrade_name_icon");
 		this.loadMechMiniSprite(this.getCurrentSelection().mech.id, mechIcon);
-		
+
 		var mechNameContent = "";
-		mechNameContent+="<div id='detail_pages_weapons_name_icon'></div>";//icon 
-		mechNameContent+="<div class='upgrade_mech_name_value scaled_text fitted_text'>"+this.getCurrentSelection().mech.classData.name+"</div>";//icon 	
+		mechNameContent+="<div id='detail_pages_weapons_name_icon'></div>";//icon
+		mechNameContent+="<div class='upgrade_mech_name_value scaled_text fitted_text'>"+DataManager.getLocalizedName('mech', this.getCurrentSelection().mech.classData.id, this.getCurrentSelection().mech.classData.name)+"</div>";//icon	
 		this._mechNameDisplayWeapons.innerHTML = mechNameContent;	
 		
 		var mechIcon = this._container.querySelector("#detail_pages_weapons_name_icon");

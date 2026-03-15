@@ -2146,6 +2146,7 @@ BattleSceneManager.prototype.hookBeforeRender = function(){
 		
 		
 		Input.update();
+		TouchInput.update();
 		_this.isOKHeld = Input.isPressed("ok") || Input.isLongPressed("ok") || TouchInput.isLongPressed();
 		if(!_this._animsPaused && !$gameTemp.editMode){
 			if((Input.isPressed("cancel") || TouchInput.isCancelled()) && _this._sceneCanEnd && !_this._sceneIsEnding){
@@ -7208,7 +7209,10 @@ BattleSceneManager.prototype.resetScene = function() {
 	_this._bgAnimations = {};	
 	_this._animatedModelTextureInfo = [];
 	_this._bgScrolls = {};	
-	_this._fadeAnimations = {};	
+	_this._fadeAnimations = {};
+	_this._animationBlends = {};
+	_this._lightAnimations = {};
+	_this._effekserDynParamAnimations = {};
 	_this._lastAction = null;
 	
 	_this._bgs.forEach(function(bg){

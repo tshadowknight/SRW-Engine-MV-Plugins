@@ -327,6 +327,99 @@
 		alert('Localization tagging complete!\nTagged ' + totalTagged + ' text lines across ' + filesModified + ' files.');
 	};
 
+	DataManager.tagBattleTextForLocalization = function() {
+		if (!Utils.isNwjs() || process.versions["nw-flavor"] !== "sdk") {
+			console.warn("tagBattleTextForLocalization is only available in the SDK environment.");
+			return;
+		}
+
+		const fs = require('fs');
+		var filePath = 'data/BattleText.json';
+		if (!fs.existsSync(filePath)) {
+			alert('data/BattleText.json not found.');
+			return;
+		}
+
+		var data = JSON.parse(fs.readFileSync(filePath, 'utf8'));
+		var allQuotes = [];
+
+		function collectFromQuoteArrays(subtypeData) {
+			Object.keys(subtypeData).forEach(function(key) {
+				var arr = subtypeData[key];
+				if (Array.isArray(arr)) {
+					arr.forEach(function(q) {
+						if (q && typeof q === 'object') {
+							if(!Array.isArray(q)){
+								allQuotes.push(q);	
+							} else {
+								for(let option of q){
+									allQuotes.push(option);		
+								}
+							}							
+						}
+					});
+				}
+			});
+		}
+
+		function collectFromUnit(unitData) {
+			Object.keys(unitData).forEach(function(hookName) {
+				var hook = unitData[hookName];
+				if (hookName === 'attacks') {
+					Object.keys(hook).forEach(function(attackId) {
+						collectFromQuoteArrays(hook[attackId]);
+					});
+				} else if (hook && typeof hook === 'object') {
+					collectFromQuoteArrays(hook);
+				}
+			});
+		}
+
+		function collectFromUnitGroup(group) {
+			Object.keys(group).forEach(function(unitId) {
+				collectFromUnit(group[unitId]);
+			});
+		}
+
+		function collectFromSection(sectionData) {
+			if (sectionData.actor) collectFromUnitGroup(sectionData.actor);
+			if (sectionData.enemy) collectFromUnitGroup(sectionData.enemy);
+		}
+
+		if (data.default) collectFromSection(data.default);
+		if (data.stage) collectFromSection(data.stage);
+		if (Array.isArray(data.event)) {
+			data.event.forEach(function(ev) {
+				if (ev && ev.data) collectFromSection(ev.data);
+			});
+		}
+
+		var maxId = 0;
+		allQuotes.forEach(function(q) {
+			if (q.locId) {
+				var match = /^#([0-9]+)$/.exec(q.locId);
+				if (match) {
+					var id = parseInt(match[1], 10);
+					if (id > maxId) maxId = id;
+				}
+			}
+		});
+		var idCounter = maxId + 1;
+
+		var tagged = 0;
+		allQuotes.forEach(function(q) {
+			if (!q.locId) {
+				q.locId = '#' + String(idCounter).padStart(8, '0');
+				idCounter++;
+				tagged++;
+			}
+		});
+
+		fs.writeFileSync(filePath, JSON.stringify(data), 'utf8');
+		console.log('Battle text localization tagging complete. Tagged ' + tagged + ' quotes.');
+		alert('Battle text localization tagging complete!\nTagged ' + tagged + ' quotes.');
+	};
+
 		DataManager.loadSRWConfig = async function() {		
 			var _this = this;
 			//const fs = require('fs');		
@@ -524,6 +617,9 @@
 
 		DataManager.loadLocalization = async function() {
 			DataManager._localizationData = {};
+			DataManager._battleLocalizationData = {};
+			DataManager._nameLocalizationInfo = { byId: {}, byName: {} };
+			DataManager._abilityLocalizationData = {};
 			var locSettings = ENGINE_SETTINGS.LOCALIZATION;
 
 			// Deep clone preserving functions and non-JSON values
@@ -565,7 +661,101 @@
 				xhr.send();
 			});
 
-			// Load locale-specific Appstrings override
+			// Load battle text substitution JSON
+			await new Promise(function(resolve) {
+				var xhr = new XMLHttpRequest();
+				xhr.open('GET', 'data/localization/' + localeName + '_battle.json');
+				xhr.onload = function() {
+					if (xhr.status < 400) {
+						try {
+							DataManager._battleLocalizationData = JSON.parse(xhr.responseText);
+						} catch(e) {
+							console.error('Failed to parse battle localization file: ' + localeName, e);
+						}
+					}
+					resolve();
+				};
+				xhr.onerror = function() { resolve(); };
+				xhr.send();
+			});
+
+			// Load resource name substitution JSON
+			await new Promise(function(resolve) {
+				var xhr = new XMLHttpRequest();
+				xhr.open('GET', 'data/localization/' + localeName + '_names.json');
+				xhr.onload = function() {
+					if (xhr.status < 400) {
+						try {
+							const raw = JSON.parse(xhr.responseText);
+							DataManager._nameLocalizationInfo.byId = raw;
+							var typeArrays = {
+								actor:  typeof $dataActors  !== 'undefined' ? $dataActors  : null,
+								enemy:  typeof $dataEnemies !== 'undefined' ? $dataEnemies : null,
+								mech:   typeof $dataClasses !== 'undefined' ? $dataClasses : null,
+								weapon: typeof $dataWeapons !== 'undefined' ? $dataWeapons : null,
+							};
+							const byName = DataManager._nameLocalizationInfo.byName;
+							Object.keys(raw).forEach(function(key) {
+								const m = /^(actor|enemy|mech|weapon)_(\d+)$/.exec(key);
+								if (m) {
+									const type = m[1];
+									const arr = typeArrays[type];
+									const id = parseInt(m[2]);
+									if (arr && arr[id] && arr[id].name) {
+										if (!byName[type]) byName[type] = {};
+										byName[type][arr[id].name] = raw[key];
+									}
+								}
+
+								const ms = /^stageInfo_(\d+)$/.exec(key);
+								if (ms) {
+									const stageConfig = (typeof $SRWConfig !== 'undefined') ? $SRWConfig.stageInfo : null;
+									const stageEntry = stageConfig && stageConfig[ms[1]];
+									if (stageEntry && stageEntry.name) {
+										if (!byName.stageInfo) byName.stageInfo = {};
+										byName.stageInfo[stageEntry.name] = raw[key];
+									}
+								}
+							});
+						} catch(e) {
+							console.error('Failed to parse names localization file: ' + localeName, e);
+						}
+					}
+					resolve();
+				};
+				xhr.onerror = function() { resolve(); };
+				xhr.send();
+			});
+
+			// Load abilities localization JSON
+		await new Promise(function(resolve) {
+			var xhr = new XMLHttpRequest();
+			xhr.open('GET', 'data/localization/' + localeName + '_abilities.json');
+			xhr.onload = function() {
+				if (xhr.status < 400) {
+					try {
+						DataManager._abilityLocalizationData = JSON.parse(xhr.responseText);
+						if (typeof $SRWConfig !== 'undefined' && $SRWConfig.abilityZonesLocalizationSet) {
+							$SRWConfig._abilityZonesLocalizationSetOverride = {};
+							Object.keys($SRWConfig.abilityZonesLocalizationSet).forEach(function(key) {
+								const section = DataManager._abilityLocalizationData['abilityZoneStr'];
+							const entry = section && section[key];
+								if (entry && entry.desc && String(entry.desc).trim()) {
+									$SRWConfig._abilityZonesLocalizationSetOverride[key] = entry.desc;
+								}
+							});
+						}
+					} catch(e) {
+						console.error('Failed to parse abilities localization file: ' + localeName, e);
+					}
+				}
+				resolve();
+			};
+			xhr.onerror = function() { resolve(); };
+			xhr.send();
+		});
+
+		// Load locale-specific Appstrings override
 			await new Promise(function(resolve) {
 				var el = document.createElement('script');
 				el.onload = function() {
@@ -590,6 +780,27 @@
 				el.src = 'data/localization/Appstrings_' + localeName + '.conf.js';
 				document.body.appendChild(el);
 			});
+		};
+
+		DataManager.getLocalizedName = function(type, id, originalName) {
+			const info = DataManager._nameLocalizationInfo;
+			if (info) {
+				if (id != null && info.byId) {
+					const byId = info.byId[type + '_' + id];
+					if (byId) return byId;
+				}
+				if (type && originalName && info.byName && info.byName[type]) {
+					const byName = info.byName[type][originalName];
+					if (byName) return byName;
+				}
+			}
+			return originalName;
+		};
+
+		var _Game_Enemy_name = Game_Enemy.prototype.name;
+		Game_Enemy.prototype.name = function() {
+			var original = _Game_Enemy_name.call(this);
+			return DataManager.getLocalizedName('enemy', this.enemyId(), original);
 		};
 
 		DataManager.loadGameWithoutRescue = function(savefileId) {
@@ -1753,7 +1964,7 @@
 											});
 										}
 										if(active && !expressionInfo.name){
-											name = $dataClasses[active.deployedId].name;
+											name = DataManager.getLocalizedName('mech', active.deployedId, $dataClasses[active.deployedId].name);
 										}
 									}
 								}
@@ -2195,7 +2406,7 @@
 				if (value !== undefined) {
 					return Number(value).clamp(0, 100);
 				} else {
-					return 100;
+					return 60;
 				}
 			};		
 	}

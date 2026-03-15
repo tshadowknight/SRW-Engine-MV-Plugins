@@ -114,7 +114,7 @@ function GameStateManager(){
 GameStateManager.prototype.updateStateButtonPrompts = function(items, displayKey){
 	let hasBlockingMenu = ($gameTemp.menuStack && $gameTemp.menuStack.length > 0);
 	if($gameTemp && $gameTemp.buttonHintManager){		
-		if($gameSystem && ConfigManager["mapHints"]){
+		if($gameSystem && ConfigManager["mapHints"] && !Utils.isMobileDevice()){
 			if(!hasBlockingMenu){
 				$gameTemp.buttonHintManager.setHelpButtons(items);
 				$gameTemp.buttonHintManager.show(displayKey);
@@ -1675,6 +1675,8 @@ GameState_normal.prototype.update = function(scene){
 	$gameTemp.unitDamageInfo = {};
 	$gameTemp.currentMapAttacker = null;
 	$gameTemp.hasTwinned = false;
+
+	$gameTemp.enableCancelButton = true;
 	
 	if(!scene._mapButtonsWindow.visible && !$gameTemp.onMapSaving){
 		scene._mapButtonsWindow.open();
@@ -1820,7 +1822,7 @@ GameState_normal.prototype.update = function(scene){
 		$SRWGameState.updateStateButtonPrompts([["pause_menu"], ["move_cursor", "speed_up_cursor"], ["navigate_units", "navigate_enemies"], [menuAction]], "GameState_normal_empty"+menuAction);
 	}	
 	
-	if(TouchInput.isCancelled()){
+	if(TouchInput.isCancelled() && !Utils.isMobileDevice()){
 		$gameSystem.setSubBattlePhase('pause_menu');		
 		scene._mapButtonsWindow.requestRedraw();	
 		return;	

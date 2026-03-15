@@ -13,5 +13,9 @@ SRWStageInfoManager.prototype.getStageInfo = function(id){
 			displayId: "---"
 		}
 	}
-	return this._stageInfo[id] || {};
+	const info = this._stageInfo[id];
+	if (!info) return {};
+	const localizedName = DataManager.getLocalizedName('stageInfo', id, info.name);
+	if (localizedName === info.name) return info;
+	return Object.assign({}, info, { name: localizedName });
 }
