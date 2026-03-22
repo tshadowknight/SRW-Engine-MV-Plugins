@@ -23,13 +23,16 @@
     border: 0.2vw solid #FFFFFF;
     margin-left: auto;
     margin-right: -1vw;
-    height: 4vw;
-    width: 4vw;
-	background-color: var(--section-bg-color-solid);
-    position: relative; 
+    height: 6vw;
+    width: 6vw;
+    background-color: var(--section-bg-color-solid);
+    position: relative;
     cursor: pointer;
     padding: 1%;
-	top: 50%;
+    /* top: 50%; */
+    display: flex;
+    align-items: center;
+    justify-content: center;
 }
 
 .map_button.menu.active {
@@ -52,10 +55,12 @@
 
 #map_buttons.menu_bg {
 	background: none;
-	position: absolute;
-    top: 0;
-    left: 0;
-	z-index: -1;
+    position: absolute;
+    top: 50%;
+    right: 5.5vw;
+    z-index: -1;
+    height: fit-content;
+    width: fit-content;
 }
 
 #map_buttons .bg_fade_container {
@@ -64,6 +69,8 @@
 	color: #FFFFFF;
 	display: flex;
     justify-content: center;
+	width: fit-content;
+    height: fit-content;
 }
 
 .map_button.cancel {
@@ -90,10 +97,23 @@
 #map_cancel_button {
 	width: auto;
     height: auto;
-    position: fixed;
+    position: absolute;
     top: 35%;
     right: 6vw;
     pointer-events: none;
+    z-index: 10;
+}
+
+#map_cancel_button.battle_window {
+    top: 14%;
+}
+
+#map_cancel_button.scene_save {
+    display: none;
+}
+
+#map_cancel_button.intermission {
+    top: 43%;
 }
 
 #map_cancel_button.menu_bg {

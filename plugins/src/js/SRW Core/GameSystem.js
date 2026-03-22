@@ -476,6 +476,7 @@
 			$statCalc.invalidateAbilityCache();
 			//$statCalc.createActiveAbilityLookup();
 			$gameTemp.deployMode = "";		
+			$gameTemp.enableCancelButton = true;
 			this.setAutomaticDifficultyLevel();	
 		}
 		

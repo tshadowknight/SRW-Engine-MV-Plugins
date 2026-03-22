@@ -128,6 +128,8 @@ Window_Intermission.prototype.initialize = function() {
 	this._handlers = {};
 	this._internalHandlers = {
 		"next_map": function(){
+			//stop confirm touch from bleeding into the map as a held input
+			TouchInput.clear();
 			if(this._handlers.intermissionEnd){
 				this._handlers.intermissionEnd();
 			}
@@ -196,10 +198,16 @@ Window_Intermission.prototype.initialize = function() {
 			$gameTemp.pushMenu = "sell_item";
 		}, 
 		"data_save": function(){
+			if($gameTemp.mapCancelButton){
+				$gameTemp.mapCancelButton.hideForSave();
+			}
 			_this.hide();
 			SceneManager.push(Scene_Save);
 		},	
 		"data_load": function(){
+			if($gameTemp.mapCancelButton){
+				$gameTemp.mapCancelButton.hideForSave();
+			}
 			_this.hide();
 			SceneManager.push(Scene_Load);
 		},	

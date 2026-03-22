@@ -81,7 +81,7 @@
 		};
 
 		SceneManager.getCurrentSceneFade = function(){
-			if(!this._scene || !this._scene._fadeSprite){
+			if(!this._scene || !this._scene._fadeSprite || this._scene._fadeDuration <= 0){
 				return 255;
 			}
 			return 255 - (this._scene._fadeSprite.opacity || 0);

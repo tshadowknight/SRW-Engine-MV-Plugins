@@ -28,6 +28,20 @@ function getBase(){
 
 //disable touch support
 
+Utils.isMobileDevice = function() {
+    // Primary: userAgent check (broadened)
+    var uaRegex = /Android|webOS|iPhone|iPad|iPod|BlackBerry|IEMobile|Opera Mini|Mobile|mobile|CriOS/i;
+    if (navigator.userAgent.match(uaRegex)) return true;
+
+    // Secondary: userAgentData API (modern browsers)
+    if (navigator.userAgentData && navigator.userAgentData.mobile) return true;
+
+    // Tertiary: touch support + small screen
+    if ('ontouchstart' in window && window.screen.width <= 1024) return true;
+
+    return false;
+};
+
 
 TouchInput.update = function() {
 	if(typeof ENGINE_SETTINGS != "undefined" && !ENGINE_SETTINGS.DISABLE_TOUCH){
@@ -745,6 +759,10 @@ SceneManager.isInSaveScene = function(){
 	Scene_Map.prototype.restart = function() {
 		$gameTemp.buttonHintManager = this._buttonHintsWindow;
 		$gameTemp.buttonHintManager.hide();
+
+		$gameTemp.mapCancelButton = this._mapCancelButtonWindow;
+		$gameTemp.mapCancelButton.hide()
+
 		this.closePauseMenu();
 
 		this._waitCount = 0;
@@ -1072,15 +1090,22 @@ SceneManager.isInSaveScene = function(){
 		SceneManager.snapForBackground();
 		SceneManager.push(Scene_GameEnd);
 	};
+
+	
+	Scene_GameEnd.prototype.create = function() {
+		Scene_MenuBase.prototype.create.call(this);
+		this.createCommandWindow();
+	};
 	
 	Scene_GameEnd.prototype.commandToTitle = function() {
 		this.fadeOutAll();
 		SceneManager.goto(Scene_Title);		
-	};
+	};	
 	
 	Scene_Map.prototype.commandSave = function() {
 		if(ENGINE_SETTINGS.DEBUG_SAVING){
 			$gameTemp.onMapSaving = true;
+			this._mapCancelButtonWindow.hideForSave();
 			this._mapButtonsWindow.hide();
 			this._mapButtonsWindow.close();
 			//hacks to hide button prompts in the save window
@@ -1942,6 +1967,7 @@ SceneManager.isInSaveScene = function(){
 		this.addWindow(this._mapCancelButtonWindow);
 		this._mapCancelButtonWindow.show();
 		this.idToMenu["map_cancel_button"] = this._mapCancelButtonWindow;
+		$gameTemp.mapCancelButton = this._mapCancelButtonWindow;
     };
 	
 	Scene_Map.prototype.createLevelUpWindow = function() {
@@ -2064,7 +2090,11 @@ SceneManager.isInSaveScene = function(){
 			return;
 		}	
 		//Soft Reset
-		if(!($gameSystem.isSubBattlePhase() == "deploy_selection_window") &&!$gameSystem.isIntermission()  && !_this._messageWindow.isOpen() && !_this._messageWindow.isClosing() && !$gameMessage.isBusy() && (!$gameTemp.menuStack || $gameTemp.menuStack.length == 0) && Input.isPressed("ok") && Input.isPressed("cancel") && Input.isPressed("pageup") && Input.isPressed("pagedown")){			
+
+		let isInteractionSoftReset = !($gameSystem.isSubBattlePhase() == "deploy_selection_window") && !$gameSystem.isIntermission()  && !_this._messageWindow.isOpen() && !_this._messageWindow.isClosing() && !$gameMessage.isBusy() && (!$gameTemp.menuStack || $gameTemp.menuStack.length == 0) && Input.isPressed("ok") && Input.isPressed("cancel") && Input.isPressed("pageup") && Input.isPressed("pagedown");
+
+		if($gameTemp.menuSoftReset || isInteractionSoftReset){		
+			$gameTemp.menuSoftReset = false;	
 			let continueSlotIsPopulated = false;
 			try {
 				JsonEx.parse(StorageManager.load("continue"));//check if the continue slot exists first by trying to parse it

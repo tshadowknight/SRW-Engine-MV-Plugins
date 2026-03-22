@@ -7,6 +7,24 @@
 	pointer-events: none;
 }
 
+#zone_summary #zone_tap_icon {
+	position: absolute;
+    width: 19%;
+    filter: var(--white-filter);
+    top: 77%;
+    right: -4%;
+    animation: zone_tap_pulse 1.5s ease-in-out infinite;
+}
+
+@keyframes zone_tap_pulse {
+    0%, 100% { opacity: 1; }
+    50% { opacity: 0.4; }
+}
+
+#zone_summary .shw_menu_bg{
+	pointer-events: none;
+}
+
 #zone_summary .bg_fade_container {
     -webkit-mask-image: none;   
     justify-content: center;  
@@ -21,6 +39,7 @@
 	left: 0;
 	border-top-right-radius: 1vw;
 	border-bottom-right-radius: 1vw;
+	pointer-events: all;
 }
 
 #zone_summary .bg_fade_container.enemy {
@@ -34,6 +53,7 @@
 	color: #FFFFFF;
 	position: relative;
 	margin-top: 1%;
+	pointer-events: all;
 }
 #zone_summary .zone_summary_content .entry{
 	display: flex;

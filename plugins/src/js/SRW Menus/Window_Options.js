@@ -2,7 +2,11 @@ import Window_CSS from "./Window_CSS.js";
 import "./style/Window_Options.css"
 
 export default function Window_Options() {
-	this.initialize.apply(this, arguments);	
+	if (Window_Options._instance) {
+		return Window_Options._instance;
+	}
+	this.initialize.apply(this, arguments);
+	Window_Options._instance = this;
 }
 
 Window_Options.prototype = Object.create(Window_CSS.prototype);
@@ -56,55 +60,57 @@ Window_Options.prototype.initialize = function() {
 	}*/
 
 	// Game Options
-	this._gameOptions.push({
-		name: APPSTRINGS.OPTIONS.label_fullscreen,
-		display: function(){
-			return ConfigManager["Fullscreen"] ? "ON" : "OFF";
-		},
-		update: function(){
-			var newState = !ConfigManager["Fullscreen"];
-			ConfigManager["Fullscreen"] = newState;
-			if(newState){
-				Graphics._requestFullScreen();
-			} else {
-				Graphics._cancelFullScreen();
-			}
-			
-		}
-	});
 
-	const buttonImgs = {"xbox": "XBox", "ds": "Playstation", "nin": "Nintendo"};
-	
-	this._gameOptions.push({
-		name: APPSTRINGS.OPTIONS.label_button_set,
-		display: function(){
-			return buttonImgs[$gameSystem.getOptionPadSet()];
-		},
-		update: function(){
-			const padSet = $gameSystem.getOptionPadSet();
-			if(padSet == "xbox"){
-				ConfigManager["padSet"] = "ds";
-			} else if(padSet == "ds"){
-				ConfigManager["padSet"] = "nin";
-			} else if(padSet == "nin"){
-				ConfigManager["padSet"] = "xbox";
+	if(!Utils.isMobileDevice()){		
+		this._gameOptions.push({
+			name: APPSTRINGS.OPTIONS.label_fullscreen,
+			display: function(){
+				return ConfigManager["Fullscreen"] ? "ON" : "OFF";
+			},
+			update: function(){
+				var newState = !ConfigManager["Fullscreen"];
+				ConfigManager["Fullscreen"] = newState;
+				if(newState){
+					Graphics._requestFullScreen();
+				} else {
+					Graphics._cancelFullScreen();
+				}
+				
 			}
-			if($gameTemp.buttonHintManager){
-				$gameTemp.buttonHintManager.redraw();
-			}
-		}
-	});
+		});
 
-	this._gameOptions.push({
-		name: APPSTRINGS.OPTIONS.label_show_map_buttons,
-		display: function(){
-			return ConfigManager["mapHints"] ? "ON" : "OFF";
-		},
-		update: function(){
-			ConfigManager["mapHints"] = !ConfigManager["mapHints"];
-		}
-	});
-	
+		const buttonImgs = {"xbox": "XBox", "ds": "Playstation", "nin": "Nintendo"};
+		
+		this._gameOptions.push({
+			name: APPSTRINGS.OPTIONS.label_button_set,
+			display: function(){
+				return buttonImgs[$gameSystem.getOptionPadSet()];
+			},
+			update: function(){
+				const padSet = $gameSystem.getOptionPadSet();
+				if(padSet == "xbox"){
+					ConfigManager["padSet"] = "ds";
+				} else if(padSet == "ds"){
+					ConfigManager["padSet"] = "nin";
+				} else if(padSet == "nin"){
+					ConfigManager["padSet"] = "xbox";
+				}
+				if($gameTemp.buttonHintManager){
+					$gameTemp.buttonHintManager.redraw();
+				}
+			}
+		});	
+
+		this._gameOptions.push({
+			name: APPSTRINGS.OPTIONS.label_show_map_buttons,
+			display: function(){
+				return ConfigManager["mapHints"] ? "ON" : "OFF";
+			},
+			update: function(){
+				ConfigManager["mapHints"] = !ConfigManager["mapHints"];
+			}
+		});
+	}	
 	
 	this._gameOptions.push({
 		name: APPSTRINGS.OPTIONS.label_grid,
@@ -441,24 +447,6 @@ Window_Options.prototype.createComponents = function() {
 	var _this = this;
 	var windowNode = this.getWindowNode();
 
-	// Check if our components already exist in the DOM
-	// Workaround for issue where a custom title screen(or possible other scene in the future) can also instantiate an option window and interfere with the global Scene_Map Window_Options instance
-	var existingHeader = document.getElementById(this.createId("header"));
-	if(existingHeader && windowNode.contains(existingHeader)){
-		// Components already exist, rebind references to existing DOM nodes
-		this._bgFadeContainer = windowNode.querySelector(".bg_fade_container");
-		this._bgTextureContainer = windowNode.querySelector(".bg_container");
-		// _customMenuBg is user-created with no guaranteed class; it's already in the DOM and not referenced elsewhere
-		this._header = existingHeader;
-		this._headerText = existingHeader.firstChild;
-		this._generalOptionsTabButton = windowNode.querySelector(".general_options_button");
-		this._soundOptionsTabButton = windowNode.querySelector(".sound_options_button");
-		this._graphicsOptionsTabButton = windowNode.querySelector(".graphics_options_button") || null;
-		this._tweaksTabButton = windowNode.querySelector(".tweaks_button") || null;
-		this._optionsList = windowNode.querySelector(".list_container");
-		return;
-	}
-
 	Window_CSS.prototype.createComponents.call(this);
 	windowNode = this.getWindowNode();
 
@@ -747,10 +735,11 @@ Window_Options.prototype.redraw = function() {
 	var windowNode = this.getWindowNode();
 	var entries = windowNode.querySelectorAll(".entry");
 	entries.forEach(function(entry){
-		entry.addEventListener("click", function(){			
-			var idx = this.getAttribute("data-idx"); 
+		entry.addEventListener("click", function(){
+			var idx = this.getAttribute("data-idx");
 			if(idx != null){
 				idx*=1;
+				_this._currentUIState = "options_editing";
 				if(idx == _this._currentSelection){
 					_this._optionInfo[_this._currentSelection].update("up");
 					_this.requestRedraw();

@@ -92,6 +92,9 @@ Window_ButtonHints.prototype.clearDisplayKey = function() {
 }
 
 Window_ButtonHints.prototype.show = function(displayKey, immediate) {
+	if(Utils.isMobileDevice()){
+		return;
+	}
 	if(displayKey){
 		this._usedContexts[displayKey] = true;
 	}

@@ -278,6 +278,14 @@ Imported.CXJ_Exit = "1.0.1";
         Scene_GameEnd.prototype.createCommandWindow = function() {
           oldCreateCommandWindow.call(this);
           this._commandWindow.setHandler('exit',  this.commandExit.bind(this));
+          this._commandWindow.setHandler('reload',  this.commandReload.bind(this));
+        }
+
+        Scene_GameEnd.prototype.commandReload = function() {
+          this._commandWindow.close();
+          //this.fadeOutAll();
+          $gameTemp.menuSoftReset = true;
+          SceneManager.pop();
         }
         
         Scene_GameEnd.prototype.commandExit = function() {
@@ -289,6 +297,18 @@ Imported.CXJ_Exit = "1.0.1";
         var oldMakeCommandList = Window_GameEnd.prototype.makeCommandList;
         Window_GameEnd.prototype.makeCommandList = function() {
           oldMakeCommandList.call(this);
+
+          for(var idx = 0; idx < this._list.length; idx++) {
+            if(this._list[idx].symbol == 'cancel') {
+              this._list.splice(idx, 0, {name: "Reload", symbol: 'reload', enabled: true, ext: null});
+              break;
+            }
+          }
+
+
+          if(Utils.isMobileDevice()){
+            return;
+          }         
           for(var idx = 0; idx < this._list.length; idx++) {
             if(this._list[idx].symbol == 'cancel') {
               this._list.splice(idx, 0, {name: TextManager.cxjToDesktop, symbol: 'exit', enabled: true, ext: null});

@@ -38,8 +38,8 @@
 	--widthpixels: 192;
     --heightpixels: 192;
     position: absolute;
-    top: -20px;
-    z-index: 5;	
+    top: -10%;
+    z-index: 5;
 }
 
 .spirit_anim_container {

@@ -114,7 +114,7 @@ function GameStateManager(){
 GameStateManager.prototype.updateStateButtonPrompts = function(items, displayKey){
 	let hasBlockingMenu = ($gameTemp.menuStack && $gameTemp.menuStack.length > 0);
 	if($gameTemp && $gameTemp.buttonHintManager){		
-		if($gameSystem && ConfigManager["mapHints"] && !Utils.isMobileDevice()){
+		if($gameSystem && ConfigManager["mapHints"]){
 			if(!hasBlockingMenu){
 				$gameTemp.buttonHintManager.setHelpButtons(items);
 				$gameTemp.buttonHintManager.show(displayKey);
@@ -219,7 +219,7 @@ function GameState_hover_map_button(){
 	this.allowedActions = {
 		cursor: false,
 		menu: true,
-		summaries: false
+		summaries: true
 	};
 }
 

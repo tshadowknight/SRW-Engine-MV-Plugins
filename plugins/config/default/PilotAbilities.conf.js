@@ -2333,5 +2333,21 @@ $SRWConfig.pilotAbilties = function(){
 		[0],
 		4
 	);
+	
+	this.addDefinition(
+		113, 
+		"Negative Range Test", 
+		"An example of an ability that uses negative range values.", 
+		false,
+		true,
+		function(actor, level){	
+			return {type: "range_ranged", modType: "addFlat", value: -2};
+		},
+		function(actor, level){
+			return true;
+		},
+		[0],
+		1,
+	);
 
 }

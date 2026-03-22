@@ -2,7 +2,11 @@ import Window_CSS from "./Window_CSS.js";
 import "./style/Window_MapButtons.css";
 
 export default function Window_MapCancelButton() {
+	if (Window_MapCancelButton._instance) {
+		return Window_MapCancelButton._instance;
+	}
 	this.initialize.apply(this, arguments);
+	Window_MapCancelButton._instance = this;
 }
 
 Window_MapCancelButton.prototype = Object.create(Window_CSS.prototype);
@@ -25,6 +29,7 @@ Window_MapCancelButton.prototype.initialize = function() {
 	this.getWindowNode().style.display = this._visibility;
 
 	this._hasBeenRendered = false;
+	this._visibilityUpdateLock = 0;
 }
 
 Window_MapCancelButton.prototype.createComponents = function() {
@@ -33,19 +38,56 @@ Window_MapCancelButton.prototype.createComponents = function() {
 }
 
 Window_MapCancelButton.prototype.isValidForDisplay = function() {
-	return !$gameMap.isEventRunning() && $gameSystem.isSRPGMode() && $gameTemp.enableCancelButton;
+	return (($gameSystem.isBattlePhase() != "AI_phase" && !$gameMap.isEventRunning()) || $gameSystem.isIntermission()) && $gameTemp.enableCancelButton;
+}
+
+Window_MapCancelButton.prototype.hideForSave = function(){
+	const windowNode = this.getWindowNode();
+	windowNode.classList.add("scene_save");
+	//hack to prevent update from being called one last time before the next scene is loaded
+	this._visibilityUpdateLock = 3;
+}
+
+Window_MapCancelButton.prototype.toggle = function() {
+	this.update();
 }
 
 Window_MapCancelButton.prototype.update = function() {
 	Window_Base.prototype.update.call(this);
+	if(this._visibilityUpdateLock > 0){
+		this._visibilityUpdateLock--;
+		return;
+	}
 
+	const windowNode = this.getWindowNode();
+
+	windowNode.classList.remove("battle_window");
+	windowNode.classList.remove("scene_save");
+	windowNode.classList.remove("intermission");
+	
+	try {
+		if($gameSystem.isSubBattlePhase() == "battle_window"){
+			windowNode.classList.add("battle_window");
+		} 
+
+		if($gameSystem.isIntermission()){
+			windowNode.classList.add("intermission");
+		}		
+	} catch(e){
+		console.log("Error while resolving cancel button state:" + (e.message || e));
+	}
+	
 	if(!this.isValidForDisplay()){
 		this._visibility = "none";
 	} else {
 		this._visibility = "";
-		let screenFade = $gameScreen.brightness() / 255;
-		let sceneFade = SceneManager.getCurrentSceneFade() / 255;
-		this.getWindowNode().style.opacity = Math.min(screenFade, sceneFade);
+		if($gameSystem.isIntermission()){
+			windowNode.style.opacity = 1;
+		} else {			
+			let screenFade = $gameScreen.brightness() / 255;
+			let sceneFade = SceneManager.getCurrentSceneFade() / 255;
+			windowNode.style.opacity = Math.min(screenFade, sceneFade);
+		}		
 	}	
 
 	if(this.isOpen() && !this._handlingInput){

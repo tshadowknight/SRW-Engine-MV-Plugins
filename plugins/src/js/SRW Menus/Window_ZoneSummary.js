@@ -34,12 +34,21 @@ Window_ZoneSummary.prototype._createEntrySlot = function() {
 }
 
 Window_ZoneSummary.prototype.createComponents = function() {
+	const _this = this;
 	Window_CSS.prototype.createComponents.call(this);
 	this._bgFadeContainer.innerHTML = "";
 
 	this._contentContainer = document.createElement("div");
 	this._contentContainer.classList.add("zone_summary_content");
 	this._bgFadeContainer.appendChild(this._contentContainer);
+
+	if(!$gameSystem.hasTappedZoneSummary && Utils.isMobileDevice()){
+		this._tapIcon = document.createElement("img");
+		this._tapIcon.src = "svg/tap.svg";
+		this._tapIcon.id = "zone_tap_icon";
+		this._bgFadeContainer.appendChild(this._tapIcon);
+	}
+	
 
 	// Pre-create 4 entry slots (max 3 normal + 1 overflow "...")
 	this._entrySlots = [];
@@ -49,9 +58,23 @@ Window_ZoneSummary.prototype.createComponents = function() {
 		this._entrySlots.push(slot);
 	}
 
-	this._bgFadeContainer.addEventListener("click", function(){
+	const handleContainerClick = function(e){
+		e.stopPropagation();
 		$gameSystem.setSubBattlePhase('wait');
 		$gameTemp.pushMenu = "zone_status";	
+		$gameSystem.hasTappedZoneSummary = true;
+		if(_this._tapIcon){
+			_this._tapIcon.style.display = "none";
+		}
+	}
+
+	this._bgFadeContainer.addEventListener("mousedown", function(e){
+		if (e.button !== 0) return;
+		handleContainerClick(e);
+	});
+	this._bgFadeContainer.addEventListener("touchstart", function(e){
+		e.preventDefault();
+		handleContainerClick(e);
 	});
 }
 
