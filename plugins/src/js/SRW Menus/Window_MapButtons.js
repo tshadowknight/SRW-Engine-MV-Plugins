@@ -64,8 +64,14 @@ Window_MapButtons.prototype.redraw = function() {
 		content+="<img src='svg/menu.svg'>"
 		content+="<div>";			
 	}
-	_this._bgFadeContainer.innerHTML = content;	
-	
+	_this._bgFadeContainer.innerHTML = content;
+
+	_this._bgFadeContainer.querySelectorAll(".map_button.menu").forEach(function(btn) {
+		_this.updateScaledDiv(btn);
+		var img = btn.querySelector("img");
+		if (img) _this.updateScaledDiv(img, false, true); // width only
+	});
+
 	var buttonDeploy = _this._bgFadeContainer.querySelector("#button_deploy");
 	if(buttonDeploy){
 		var overListener = buttonDeploy.addEventListener("mouseover", function(){

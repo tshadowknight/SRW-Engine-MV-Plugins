@@ -951,6 +951,7 @@ SceneManager.isInSaveScene = function(){
 		this.createGameModesWindow();
 		this.createMapButtonsWindow();
 		this.createMapCancelButtonWindow();
+		this.createMobileDpadWindow();
 		this.createOpeningCrawlWindow();
 		this.createTextLogWindow();
 		this.createLoaderOverlayWindow();
@@ -1968,6 +1969,14 @@ SceneManager.isInSaveScene = function(){
 		this._mapCancelButtonWindow.show();
 		this.idToMenu["map_cancel_button"] = this._mapCancelButtonWindow;
 		$gameTemp.mapCancelButton = this._mapCancelButtonWindow;
+    };
+
+	Scene_Map.prototype.createMobileDpadWindow = function() {
+		/*this._mobileDpadWindow = new Window_MobileDpad(0, 0);
+		this._mobileDpadWindow.open();
+		this.addWindow(this._mobileDpadWindow);
+		this._mobileDpadWindow.show();
+		this.idToMenu["mobile_dpad"] = this._mobileDpadWindow;*/
     };
 	
 	Scene_Map.prototype.createLevelUpWindow = function() {

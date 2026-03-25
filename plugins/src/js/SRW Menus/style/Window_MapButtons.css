@@ -1,5 +1,5 @@
 .map_button {
-	background-color: var(--section-bg-color-solid);	
+	background-color: var(--section-bg-color-solid);
 	position: absolute;
 	cursor: pointer;
 	padding: 1%;
@@ -9,9 +9,9 @@
 	bottom: 0px;
 	margin-left: auto;
 	margin-right: auto;
-	border-top: 0.2vw solid #FFFFFF;
-	border-left: 0.2vw solid #FFFFFF;
-	border-right: 0.2vw solid #FFFFFF;
+	border-top: 1px solid #FFFFFF;
+	border-left: 1px solid #FFFFFF;
+	border-right: 1px solid #FFFFFF;
 	border-top-right-radius: 9999px;
 	border-top-left-radius: 9999px;
 	padding-left: 3%;
@@ -19,32 +19,33 @@
 }
 
 .map_button.menu {
+	/* Base size for 1110px canvas — set by updateScaledDiv at runtime */
+	--widthpixels: 67;
+	--heightpixels: 67;
 	border-radius: 99999px;
-    border: 0.2vw solid #FFFFFF;
-    margin-left: auto;
-    margin-right: -1vw;
-    height: 6vw;
-    width: 6vw;
-    background-color: var(--section-bg-color-solid);
-    position: relative;
-    cursor: pointer;
-    padding: 1%;
-    /* top: 50%; */
-    display: flex;
-    align-items: center;
-    justify-content: center;
+	border: 1px solid #FFFFFF;
+	margin-left: auto;
+	margin-right: -1%;
+	background-color: var(--section-bg-color-solid);
+	position: relative;
+	cursor: pointer;
+	padding: 1%;
+	display: flex;
+	align-items: center;
+	justify-content: center;
 }
 
 .map_button.menu.active {
 	background-color: #FFFFFF;
 }
 
-.map_button.menu img{
-	width: 4vw;
+.map_button.menu img {
+	/* Base width for 1110px canvas — set by updateScaledDiv (width only) at runtime */
+	--widthpixels: 44;
 	filter: var(--white-filter);
 }
 
-.map_button.menu.active img{
+.map_button.menu.active img {
 	filter: var(--menu-bg-color-filter);
 }
 
@@ -55,12 +56,12 @@
 
 #map_buttons.menu_bg {
 	background: none;
-    position: absolute;
-    top: 50%;
-    right: 5.5vw;
-    z-index: -1;
-    height: fit-content;
-    width: fit-content;
+	position: absolute;
+	top: 50%;
+	right: 5.5%;
+	z-index: -1;
+	height: fit-content;
+	width: fit-content;
 }
 
 #map_buttons .bg_fade_container {
@@ -68,52 +69,54 @@
 	-webkit-mask-image: none;
 	color: #FFFFFF;
 	display: flex;
-    justify-content: center;
+	justify-content: center;
 	width: fit-content;
-    height: fit-content;
+	height: fit-content;
 }
 
 .map_button.cancel {
-	border-top-left-radius: 1vw;
-    border-bottom-left-radius: 1vw;
-    border: 0.2vw solid #FFFFFF;
-    height: 6vw;
-    width: 6vw;
-    background-color: var(--section-bg-color-solid);
-    position: relative;
-    cursor: pointer;
-    padding: 1%;
-    pointer-events: auto;
-    display: flex;
-    align-items: center;
-    justify-content: center;
+	/* Base size for 1110px canvas — set by updateScaledDiv at runtime */
+	--widthpixels: 67;
+	--heightpixels: 67;
+	border-top-left-radius: 8px;
+	border-bottom-left-radius: 8px;
+	border: 1px solid #FFFFFF;
+	background-color: var(--section-bg-color-solid);
+	position: relative;
+	cursor: pointer;
+	padding: 1%;
+	pointer-events: auto;
+	display: flex;
+	align-items: center;
+	justify-content: center;
 }
 
 .map_button.cancel img {
-	width: 5vw;
+	/* Base width for 1110px canvas — set by updateScaledDiv (width only) at runtime */
+	--widthpixels: 56;
 	filter: var(--white-filter);
 }
 
 #map_cancel_button {
 	width: auto;
-    height: auto;
-    position: absolute;
-    top: 35%;
-    right: 6vw;
-    pointer-events: none;
-    z-index: 10;
+	height: auto;
+	position: absolute;
+	top: 35%;
+	right: 6%;
+	pointer-events: none;
+	z-index: 10;
 }
 
 #map_cancel_button.battle_window {
-    top: 14%;
+	top: 14%;
 }
 
 #map_cancel_button.scene_save {
-    display: none;
+	display: none;
 }
 
 #map_cancel_button.intermission {
-    top: 43%;
+	top: 43%;
 }
 
 #map_cancel_button.menu_bg {

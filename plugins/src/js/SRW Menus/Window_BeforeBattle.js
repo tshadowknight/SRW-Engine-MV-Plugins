@@ -381,11 +381,13 @@ Window_BeforeBattle.prototype.update = function() {
 						};
 						$gameTemp.attackWindowCallback = function(attack){
 							$gameTemp.popMenu = true;	
+							$gameTemp.forceCancelButton = false;
 							supporter.action.type = "attack";
 							supporter.action.attack = attack;
 							_this._currentSelection = 0;
 							_this.requestRedraw();							
 						};		
+						$gameTemp.forceCancelButton = true;
 						$gameTemp.pushMenu = "attack_list";
 					} 				
 				}
@@ -401,12 +403,14 @@ Window_BeforeBattle.prototype.update = function() {
 					};
 					$gameTemp.attackWindowCallback = function(attack){
 						$gameTemp.popMenu = true;	
+						$gameTemp.forceCancelButton = false;
 						$gameTemp.actorAction.type = "attack";
 						$gameTemp.actorAction.attack = attack;
 						_this._currentUIState = "main_selection";
 						_this._currentSelection = 0;
 						_this.requestRedraw();							
 					};		
+					$gameTemp.forceCancelButton = true;
 					$gameTemp.pushMenu = "attack_list";
 				}
 				if(_this._currentActionSelection == 1){

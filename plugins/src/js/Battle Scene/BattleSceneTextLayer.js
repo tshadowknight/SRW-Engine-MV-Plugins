@@ -252,10 +252,10 @@ BattleSceneTextLayer.prototype.registerNoiseUpdate = function() {
 		}
 	});
 	if(!_this._noiseUpdate){
+		var imgd = _this._noiseCtx.createImageData(_this._noiseCanvas.width, _this._noiseCanvas.height);
 		_this._noiseUpdate = function noise(){	
 			if(_this._noiseCtx){
-				_this._noiseCtr++;
-				var imgd = _this._noiseCtx.createImageData(_this._noiseCanvas.width, _this._noiseCanvas.height);
+				_this._noiseCtr++;				
 				var pix = imgd.data;
 
 				for (var i = 0, n = pix.length; i < n; i += 4) {
@@ -265,10 +265,8 @@ BattleSceneTextLayer.prototype.registerNoiseUpdate = function() {
 
 					if(!_this._runNoise){
 						pix[i+3] = 0;
-					}
-					
+					}					
 				}
-
 				
 				_this._noiseCtx.putImageData(imgd, 0, 0);
 				//time = (time + 1) % canvas.height;

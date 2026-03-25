@@ -107,6 +107,9 @@ window.Window_MapButtons = Window_MapButtons;
 import Window_MapCancelButton from "./Window_MapCancelButton.js";
 window.Window_MapCancelButton = Window_MapCancelButton;
 
+import Window_MobileDpad from "./Window_MobileDpad.js";
+window.Window_MobileDpad = Window_MobileDpad;
+
 import Window_OpeningCrawl from "./Window_OpeningCrawl.js";
 window.Window_OpeningCrawl = Window_OpeningCrawl;
 

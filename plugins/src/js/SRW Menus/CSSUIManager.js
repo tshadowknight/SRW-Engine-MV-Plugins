@@ -211,6 +211,7 @@ CSSUIManager.prototype.initAllWindows = function(){
 	this.initWindow("button_hints");
 	this.initWindow("mode_selection");
 	this.initWindow("attr_chart");
+	//this.initWindow("mobile_dpad");
 	this.initWindow("map_cancel_button");//should always be on top
 }
 

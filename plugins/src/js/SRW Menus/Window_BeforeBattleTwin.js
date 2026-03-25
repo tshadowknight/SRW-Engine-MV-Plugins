@@ -731,6 +731,7 @@ Window_BeforebattleTwin.prototype.update = function() {
 										mech: supporter.actor.subTwin.SRWStats.mech
 									};
 									$gameTemp.attackWindowCallback = function(attack){
+										$gameTemp.forceCancelButton = false;
 										$gameTemp.popMenu = true;	
 										$gameTemp.twinSupportAttack = {actor: supporter.actor.subTwin, action: {type: "attack", attack: attack}}
 										$gameTemp.allAttackSelectionRequired = false;
@@ -738,6 +739,7 @@ Window_BeforebattleTwin.prototype.update = function() {
 										_this._currentSelection = 0;
 										_this.requestRedraw();	
 									};
+									$gameTemp.forceCancelButton = true;
 									$gameTemp.pushMenu = "attack_list";
 								} else {
 									$gameTemp.allAttackSelectionRequired = false;
@@ -756,9 +758,11 @@ Window_BeforebattleTwin.prototype.update = function() {
 													
 						};	
 						$gameTemp.attackWindowCancelCallback = function(){
+							$gameTemp.forceCancelButton = false;
 							$gameTemp.allAttackSelectionRequired = false;
 							$gameTemp.isSupportAttackSelection = false;
 						}	
+						$gameTemp.forceCancelButton = true;
 						$gameTemp.pushMenu = "attack_list";
 						return;
 					}  else {
@@ -870,8 +874,10 @@ Window_BeforebattleTwin.prototype.update = function() {
 						};		
 						
 						$gameTemp.attackWindowCancelCallback = function(){
+							$gameTemp.forceCancelButton = false;
 							$gameTemp.allAttackSelectionRequired = false;
 						}
+						$gameTemp.forceCancelButton = true;
 						$gameTemp.pushMenu = "attack_list";
 					} else {
 						SoundManager.playBuzzer();

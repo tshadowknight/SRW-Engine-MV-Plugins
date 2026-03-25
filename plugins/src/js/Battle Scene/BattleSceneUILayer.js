@@ -580,19 +580,22 @@ BattleSceneUILayer.prototype.showDamage = function(entityType, amount, offsets, 
 	//display.classList.add("shake");
 	var characters = String(amount).split("");
 	var charCtr = 0;
+	var html = "";
 	for(var i = 0; i < characters.length; i++){
-		display.innerHTML+="<div data-ctr='"+i+"' class='digit disabled'>"+characters[i]+"</div>"
+		html += "<div class='digit disabled'>"+characters[i]+"</div>";
 	}
+	display.innerHTML = html;
+	var digitElems = display.querySelectorAll(".digit");
 	function displayCharacter(){
 		if(charCtr < characters.length){
-			display.querySelector(".digit[data-ctr = '"+charCtr+"']").classList.remove("disabled");
-			display.querySelector(".digit[data-ctr = '"+charCtr+"']").classList.add("reveal");
-			charCtr++;
+			var digit = digitElems[charCtr++];
+			digit.classList.remove("disabled");
+			digit.classList.add("reveal");
 			setTimeout(displayCharacter, 100);
 		} else {
 			setTimeout(function(){display.className = "scaled_text hide";}, 1000);
 		}
-	}	
+	}
 	displayCharacter();
 }
 

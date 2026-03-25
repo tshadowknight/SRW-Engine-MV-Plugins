@@ -1,0 +1,136 @@
+/* Sizes are defined for the 1110px base canvas.
+   updateScaledDiv() multiplies by Graphics.getScale() at runtime.
+   --fontsize values are % of canvas width, handled by CSSUIManager. */
+
+#mobile_dpad.menu_bg {
+	background: none;
+	position: absolute;
+	bottom: 0;
+	left: 0;
+	width: 100%;
+	pointer-events: none;
+	z-index: 50;
+}
+
+#mobile_dpad .bg_fade_container {
+	background: none;
+	-webkit-mask-image: none;
+	mask-image: none;
+	pointer-events: none;
+	display: flex;
+	flex-direction: row;
+	justify-content: space-between;
+	align-items: flex-end;
+	padding: 1.8%;
+	box-sizing: border-box;
+	width: 100%;
+}
+
+/* ── D-PAD ───────────────────────────────────────── */
+
+.mobile_dpad_container {
+	display: flex;
+    flex-direction: column;
+    align-items: center;
+    pointer-events: auto;
+    touch-action: none;
+    user-select: none;
+    -webkit-user-select: none;
+    position: absolute;
+    top: 30%;
+    left: 4%;
+}
+
+.dpad_middle_row {
+	display: flex;
+	flex-direction: row;
+	align-items: center;
+}
+
+.dpad_btn {
+	/* Base size for 1110px canvas — set by updateScaledDiv at runtime */
+	--widthpixels: 80;
+	--heightpixels: 80;
+	/* Arrow glyph font size as % of canvas width — set by CSSUIManager */
+	--fontsize: 3;
+	background-color: rgba(0, 0, 0, 0.5);
+	border: 1px solid rgba(0, 0, 0, 0.55);
+	display: flex;
+	align-items: center;
+	justify-content: center;
+	cursor: pointer;
+	-webkit-tap-highlight-color: rgba(0, 0, 0, 0);
+	box-sizing: border-box;
+	color: rgba(255, 255, 255, 0.85);
+	overflow: hidden;
+}
+
+.dpad_btn.active {
+	background-color: rgba(0, 0, 0, 0.25);
+}
+
+
+.dpad_center {
+	/* Same cell size as buttons — set by updateScaledDiv at runtime */
+	--widthpixels: 80;
+	--heightpixels: 80;
+	background-color: rgba(0, 0, 0, 0.5);
+	border-top: 1px solid rgba(0, 0, 0, 0.55);
+	border-bottom: 1px solid rgba(0, 0, 0, 0.55);
+	box-sizing: border-box;
+}
+
+/* ── ACTION BUTTONS ──────────────────────────────── */
+
+.mobile_action_container {
+	display: flex;
+    flex-direction: column;
+    align-items: center;
+    pointer-events: none;
+    position: absolute;
+    top: 35%;
+    right: 8%;
+}
+
+.action_gap {
+	/* Spacer between action buttons — height set by updateScaledDiv at runtime */
+	--heightpixels: 18;
+}
+
+.mobile_action_btn {
+	/* Base size for 1110px canvas — set by updateScaledDiv at runtime */
+	--widthpixels: 90;
+	--heightpixels: 90;
+	/* Label font size as % of canvas width — set by CSSUIManager */
+	--fontsize: 3.5;
+	background-color: rgba(0, 0, 0, 0.5);
+	border: 1px solid rgba(0, 0, 0, 0.55);
+	border-radius: 50%;
+	display: flex;
+	align-items: center;
+	justify-content: center;
+	cursor: pointer;
+	pointer-events: auto;
+	touch-action: none;
+	user-select: none;
+	-webkit-user-select: none;
+	-webkit-tap-highlight-color: rgba(0, 0, 0, 0);
+	box-sizing: border-box;
+	color: rgba(255, 255, 255, 0.85);
+}
+
+.mobile_action_btn.active {
+	background-color: rgba(255, 255, 255, 0.25);
+}
+
+.action_ok {
+	border-color: rgba(100, 180, 255, 0.7);
+}
+
+.action_cancel {
+	border-color: rgba(255, 120, 120, 0.7);
+}
+
+#mobile_btn_ok {
+	margin-left: -80%;
+}

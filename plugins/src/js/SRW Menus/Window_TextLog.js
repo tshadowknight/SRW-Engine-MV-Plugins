@@ -89,6 +89,9 @@ Window_TextLog.prototype.redraw = function() {
 		
 		content+="</div>";
 		_this._bgFadeContainer.innerHTML = content;
+		var logContainer = _this._bgFadeContainer.querySelector(".log_container");
+		logContainer.addEventListener('touchstart', function(e) { e.stopPropagation(); }, {passive: true});
+		logContainer.addEventListener('touchmove',  function(e) { e.stopPropagation(); }, {passive: true});
 	}
 	this.updateScaledDiv(_this._bgFadeContainer);
 	this.updateScaledDiv(_this._bgFadeContainer.querySelector(".funds_gained_value"), false, true);

@@ -18,6 +18,8 @@
     overflow-x: hidden;
     background-color: rgba(0,0,0,0.2);
     margin: auto;
+    touch-action: pan-y;
+    -webkit-overflow-scrolling: touch;
 }
 
 #text_log .log_container .entry{

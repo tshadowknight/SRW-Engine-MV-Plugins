@@ -1677,6 +1677,7 @@ GameState_normal.prototype.update = function(scene){
 	$gameTemp.hasTwinned = false;
 
 	$gameTemp.enableCancelButton = true;
+	$gameTemp.forceCancelButton = false;
 	
 	if(!scene._mapButtonsWindow.visible && !$gameTemp.onMapSaving){
 		scene._mapButtonsWindow.open();

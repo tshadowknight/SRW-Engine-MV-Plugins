@@ -2341,7 +2341,7 @@ $SRWConfig.pilotAbilties = function(){
 		false,
 		true,
 		function(actor, level){	
-			return {type: "range_ranged", modType: "addFlat", value: -2};
+			return [{type: "range_ranged", modType: "addFlat", value: -2}];
 		},
 		function(actor, level){
 			return true;

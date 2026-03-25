@@ -2602,6 +2602,9 @@ BattleSceneManager.prototype.disposeBarrierEffects = function(){
 BattleSceneManager.prototype.disposeRMMVBackgrounds = function(){
 	this._RMMVSpriteInfo.forEach(function(bg){
 		bg.sprite.dispose();
+		if(bg.renderer){
+			bg.renderer.destroy();
+		}
 		bg.canvas.isReleased = true;
 	});
 	this._RMMVSpriteInfo = [];

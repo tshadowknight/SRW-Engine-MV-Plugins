@@ -38,7 +38,7 @@ Window_MapCancelButton.prototype.createComponents = function() {
 }
 
 Window_MapCancelButton.prototype.isValidForDisplay = function() {
-	return (($gameSystem.isBattlePhase() != "AI_phase" && !$gameMap.isEventRunning()) || $gameSystem.isIntermission()) && $gameTemp.enableCancelButton;
+	return $gameTemp.forceCancelButton || ((($gameSystem.isBattlePhase() != "AI_phase" && !$gameMap.isEventRunning()) || $gameSystem.isIntermission()) && $gameTemp.enableCancelButton);
 }
 
 Window_MapCancelButton.prototype.hideForSave = function(){
@@ -121,6 +121,9 @@ Window_MapCancelButton.prototype.redraw = function() {
 
 	var buttonCancel = _this._bgFadeContainer.querySelector("#button_cancel");
 	if(buttonCancel){
+		_this.updateScaledDiv(buttonCancel);
+		var img = buttonCancel.querySelector("img");
+		if (img) _this.updateScaledDiv(img, false, true); // width only
 		buttonCancel.addEventListener("click", function(){
 			TouchInput.clear();
 			TouchInput._onCancel(TouchInput.x, TouchInput.y);
