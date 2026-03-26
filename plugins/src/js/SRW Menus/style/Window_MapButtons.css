@@ -3,19 +3,26 @@
 	position: absolute;
 	cursor: pointer;
 	padding: 1%;
+	pointer-events: auto;
 }
 
 .map_button.center {
 	bottom: 0px;
-	margin-left: auto;
-	margin-right: auto;
-	border-top: 1px solid #FFFFFF;
-	border-left: 1px solid #FFFFFF;
-	border-right: 1px solid #FFFFFF;
-	border-top-right-radius: 9999px;
-	border-top-left-radius: 9999px;
-	padding-left: 3%;
-    padding-right: 3%;
+    margin-left: auto;
+    margin-right: auto;
+    border-top: 1px solid #FFFFFF;
+    border-left: 1px solid #FFFFFF;
+    border-right: 1px solid #FFFFFF;
+    border-top-right-radius: 9999px;
+    border-top-left-radius: 9999px;
+    padding-left: 5%;
+    padding-right: 5%;
+    /* height: 5%; */
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    padding-top: 0;
+    padding-bottom: 0;
 }
 
 .map_button.menu {
@@ -29,10 +36,11 @@
 	background-color: var(--section-bg-color-solid);
 	position: relative;
 	cursor: pointer;
-	padding: 1%;
+	padding: 0.5%;
 	display: flex;
 	align-items: center;
 	justify-content: center;
+	top: 48%;
 }
 
 .map_button.menu.active {
@@ -57,11 +65,10 @@
 #map_buttons.menu_bg {
 	background: none;
 	position: absolute;
-	top: 50%;
-	right: 5.5%;
+	top: 0;
+	right: 0;
 	z-index: -1;
-	height: fit-content;
-	width: fit-content;
+	pointer-events: none;
 }
 
 #map_buttons .bg_fade_container {
@@ -70,8 +77,6 @@
 	color: #FFFFFF;
 	display: flex;
 	justify-content: center;
-	width: fit-content;
-	height: fit-content;
 }
 
 .map_button.cancel {
@@ -89,6 +94,7 @@
 	display: flex;
 	align-items: center;
 	justify-content: center;
+	pointer-events: auto;
 }
 
 .map_button.cancel img {
