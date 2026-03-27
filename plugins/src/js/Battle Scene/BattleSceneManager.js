@@ -2895,6 +2895,42 @@ BattleSceneManager.prototype.runAnimations = function(deltaTime){
 		
 	}
 }
+
+//puts all animation commands that needs to be excuted on this tick in _this._animQueue
+BattleSceneManager.prototype.updateAnimQueue = function(){
+	const _this = this;
+	for(var i = 0; i <=_this._currentAnimationTick; i++){					
+		if(_this._animationList[i]){
+			let current = _this._animationList[i];
+			_this._animationList[i] = null;
+			let tickConditionalOK = true;
+			_this._tempAnimQueue = [];
+			for(var j = 0; j < current.length; j++){
+				//_this.executeAnimation(_this._animationList[i][j], i);
+				if(current[j].type == "tick_conditional" && tickConditionalOK){// if multiple blocks are included, all must be true
+					let actor = _this._currentAnimatedAction.ref;
+					try {
+						tickConditionalOK = eval(current[j].params.expression);
+					} catch(e){
+						console.log(e.message);
+					}
+				} else {
+					_this._tempAnimQueue.push({
+						def: current[j],
+						tick: i
+					});
+				}							
+			}
+			if(tickConditionalOK){
+				for(let entry of _this._tempAnimQueue){
+					_this._animQueue.push(entry)
+				}
+			}
+		}
+	}
+	_this._animQueue.sort((a, b) => a.tick - b.tick);
+}
+
 BattleSceneManager.prototype.startScene = function(){
 	var _this = this;
 	//_this.initScene();
@@ -2939,42 +2975,14 @@ BattleSceneManager.prototype.startScene = function(){
 				//_this._currentAnimationTick+=ticksSinceLastUpdate;			
 				
 				
-				for(var i = 0; i <=_this._currentAnimationTick; i++){					
-					if(_this._animationList[i]){
-						let current = _this._animationList[i];
-						_this._animationList[i] = null;
-						let tickConditionalOK = true;
-						_this._tempAnimQueue = [];
-						for(var j = 0; j < current.length; j++){
-							//_this.executeAnimation(_this._animationList[i][j], i);
-							if(current[j].type == "tick_conditional" && tickConditionalOK){// if multiple blocks are included, all must be true
-								let actor = _this._currentAnimatedAction.ref;
-								try {
-									tickConditionalOK = eval(current[j].params.expression);
-								} catch(e){
-									console.log(e.message);
-								}
-							} else {
-								_this._tempAnimQueue.push({
-									def: current[j],
-									tick: i
-								});
-							}							
-						}
-						if(tickConditionalOK){
-							for(let entry of _this._tempAnimQueue){
-								_this._animQueue.push(entry)
-							}
-						}
-					}
-				}
+				_this.updateAnimQueue();
 				let command = _this._animQueue.shift();
 				while(command){
 					_this.executeAnimation(command.def, command.tick);
 					command = null;
-					//if(!_this._isLoading){
-						command = _this._animQueue.shift();
-					//}
+					//call updateAnimQueue again to account for edge cases where due to lag, ticks might have been inserted "in the past" by commands like merge_complete_animation
+					_this.updateAnimQueue();
+					command = _this._animQueue.shift();					
 				}
 				
 					

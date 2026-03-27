@@ -44,6 +44,9 @@ Window_ZoneStatus.prototype.createComponents = function() {
 	this._listContainer.classList.add("list_container");
 	this._listContainer.classList.add("styled_scroll");	
 	windowNode.appendChild(this._listContainer);	
+
+	this._listContainer.addEventListener('touchstart', function(e) { e.stopPropagation(); }, {passive: true});
+	this._listContainer.addEventListener('touchmove',  function(e) { e.stopPropagation(); }, {passive: true});
 }	
 
 
@@ -127,6 +130,9 @@ Window_ZoneStatus.prototype.redraw = function() {
 		content+="</div>";
 	}	
 	this._listContainer.innerHTML = content;
+
+	
+
 	this.loadImages();
 	Graphics._updateCanvas();
 }

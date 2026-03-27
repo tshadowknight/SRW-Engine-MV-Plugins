@@ -88,6 +88,9 @@ Window_MapButtons.prototype.redraw = function() {
 			$gameTemp.setMapButton("deploy");
 			this.parentElement.removeChild(this);
 		});
+		buttonDeploy.addEventListener("touchend", function(){
+			TouchInput.clear();
+		});
 	}
 	
 	var buttonMenu = _this._bgFadeContainer.querySelector("#button_menu");

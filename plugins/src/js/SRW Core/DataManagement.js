@@ -75,6 +75,282 @@
 			}
 		};
 		
+		//====================================================================
+		// File Storage Backend (cordova-plugin-file, mobile only)
+		//====================================================================
+
+		if (Utils.isMobileDevice()) {
+			StorageManager._fileCache   = {};
+			StorageManager._fileReady   = false;
+			StorageManager._deviceReady = false;
+
+			// Capture deviceready as early as possible; initMobileStorage will
+			// wait on this promise regardless of when it is called.
+			StorageManager._deviceReadyPromise = new Promise(function(resolve) {
+				document.addEventListener('deviceready', function() {
+					StorageManager._deviceReady = true;
+					resolve();
+				}, {once: true});
+			});
+
+			// Resolves the save directory entry, creating it if needed.
+			StorageManager._getSaveDir = function() {
+				return new Promise(function(resolve, reject) {
+					window.resolveLocalFileSystemURL(cordova.file.externalDataDirectory, function(dirEntry) {
+						dirEntry.getDirectory('save', {create: true}, resolve, reject);
+					}, reject);
+				});
+			};
+
+			// Maps a savefileId to a filename identical to the desktop build.
+			StorageManager.mobileFileName = function(savefileId) {
+				if (savefileId == "continue") return "continue";
+				if (savefileId < 0)  return 'config.rpgsave';
+				if (savefileId === 0) return 'global.rpgsave';
+				return 'file%1.rpgsave'.format(savefileId);
+			};
+
+			StorageManager.mobileBackupFileName = function(savefileId) {
+				return StorageManager.mobileFileName(savefileId) + '.bak';
+			};
+
+			// Read a file from the save directory; resolves with text or null.
+			StorageManager._readFile = function(saveDir, filename) {
+				return new Promise(function(resolve) {
+					saveDir.getFile(filename, {create: false}, function(fileEntry) {
+						fileEntry.file(function(file) {
+							var reader = new FileReader();
+							reader.onloadend = function() { resolve(reader.result); };
+							reader.onerror   = function() { resolve(null); };
+							reader.readAsText(file);
+						}, function() { resolve(null); });
+					}, function() { resolve(null); });
+				});
+			};
+
+			// Write text to a file in the save directory asynchronously.
+			StorageManager._writeFile = function(saveDir, filename, data) {
+				saveDir.getFile(filename, {create: true}, function(fileEntry) {
+					fileEntry.createWriter(function(writer) {
+						writer.onwriteend = function() {
+							// Truncate any leftover bytes from a previous shorter write.
+							if (writer.length !== writer.position) {
+								writer.truncate(writer.position);
+							}
+						};
+						writer.write(new Blob([data], {type: 'text/plain'}));
+					});
+				});
+			};
+
+			// Delete a file from the save directory asynchronously.
+			StorageManager._deleteFile = function(saveDir, filename) {
+				saveDir.getFile(filename, {create: false}, function(fileEntry) {
+					fileEntry.remove(function() {}, function() {});
+				}, function() {});
+			};
+
+			// Opens the save directory, pre-loads all known save files into the
+			// in-memory cache, then runs the one-time localStorage migration.
+			StorageManager.initMobileStorage = function() {
+				return new Promise(function(resolve) {
+					StorageManager._deviceReadyPromise.then(function() {
+						if (!window.cordova || !cordova.file) {
+							// Plugin not present – fall back to localStorage silently.
+							resolve();
+							return;
+						}
+						StorageManager._getSaveDir().then(function(saveDir) {
+							StorageManager._mSaveDir = saveDir;
+
+							// Pre-load every possible save file into cache.
+							var maxSaves = DataManager.maxSavefiles ? DataManager.maxSavefiles() : 20;
+							var ids = [-1, 0, "continue"];
+							for (var i = 1; i <= maxSaves; i++) ids.push(i);
+
+							var reads = ids.map(function(id) {
+								var name = StorageManager.mobileFileName(id);
+								var bak  = StorageManager.mobileBackupFileName(id);
+								return Promise.all([
+									StorageManager._readFile(saveDir, name).then(function(data) {
+										if (data) StorageManager._fileCache[name] = data;
+									}),
+									StorageManager._readFile(saveDir, bak).then(function(data) {
+										if (data) StorageManager._fileCache[bak] = data;
+									})
+								]);
+							});
+
+							Promise.all(reads).then(function() {
+								return StorageManager._migrateFromLocalStorage(saveDir);
+							}).then(function() {
+								StorageManager._fileReady = true;
+								resolve();
+							});
+						}, function(err) {
+							console.error('SRW: cordova-plugin-file init failed, falling back to localStorage.', err);
+							resolve();
+						});
+					});
+				});
+			};
+
+			// One-time, non-destructive migration of RPG save keys from localStorage.
+			// Sentinel file 'migrated' in the save dir prevents re-running.
+			// Existing files are never overwritten (file wins over localStorage).
+			StorageManager._migrateFromLocalStorage = function(saveDir) {
+				return new Promise(function(resolve) {
+					StorageManager._readFile(saveDir, 'migrated').then(function(sentinel) {
+						if (sentinel !== null) { resolve(); return; }
+
+						var migrations = [];
+						for (var i = 0; i < localStorage.length; i++) {
+							var key = localStorage.key(i);
+							if (!key || key.indexOf('RPG ') !== 0) continue;
+							// Derive the savefileId from the localStorage key.
+							(function(lsKey) {
+								var data = localStorage.getItem(lsKey);
+								if (!data) return;
+								// Match key to filename; skip if already on disk.
+								var id = StorageManager._savefileIdFromWebKey(lsKey);
+								if (id === null) return;
+								var filename = StorageManager.mobileFileName(id);
+								if (StorageManager._fileCache[filename]) return; // disk wins
+								StorageManager._fileCache[filename] = data;
+								migrations.push(new Promise(function(res) {
+									saveDir.getFile(filename, {create: true}, function(fileEntry) {
+										fileEntry.createWriter(function(writer) {
+											writer.onwriteend = res;
+											writer.onerror    = res;
+											writer.write(new Blob([data], {type: 'text/plain'}));
+										}, res);
+									}, res);
+								}));
+							})(key);
+						}
+
+						Promise.all(migrations).then(function() {
+							StorageManager._writeFile(saveDir, 'migrated', '1');
+							if (migrations.length) {
+								console.log('SRW: Migrated ' + migrations.length + ' save(s) from localStorage to file storage.');
+							}
+							resolve();
+						});
+					});
+				});
+			};
+
+			// Reverse-maps a webStorageKey string back to its savefileId.
+			StorageManager._savefileIdFromWebKey = function(key) {
+				if (key === 'RPG Config') return -1;
+				if (key === 'RPG Global') return 0;
+				var m = key.match(/^RPG File(\d+)$/);
+				return m ? parseInt(m[1]) : null;
+			};
+
+			// File-backed equivalents of the web-storage methods.
+			StorageManager.saveToMobileFile = function(savefileId, json) {
+				var filename = this.mobileFileName(savefileId);
+				var data     = LZString.compressToBase64(json);
+				this._fileCache[filename] = data;
+				this._writeFile(this._mSaveDir, filename, data);
+			};
+
+			StorageManager.loadFromMobileFile = function(savefileId) {
+				var data = this._fileCache[this.mobileFileName(savefileId)] || null;
+				return LZString.decompressFromBase64(data);
+			};
+
+			StorageManager.mobileFileExists = function(savefileId) {
+				return !!this._fileCache[this.mobileFileName(savefileId)];
+			};
+
+			StorageManager.removeMobileFile = function(savefileId) {
+				var filename = this.mobileFileName(savefileId);
+				delete this._fileCache[filename];
+				this._deleteFile(this._mSaveDir, filename);
+			};
+
+			StorageManager.backupMobileFile = function(savefileId) {
+				if (this.mobileFileExists(savefileId)) {
+					var filename = this.mobileFileName(savefileId);
+					var bakName  = this.mobileBackupFileName(savefileId);
+					var data     = this._fileCache[filename];
+					this._fileCache[bakName] = data;
+					this._writeFile(this._mSaveDir, bakName, data);
+				}
+			};
+
+			StorageManager.mobileBackupExists = function(savefileId) {
+				return !!this._fileCache[this.mobileBackupFileName(savefileId)];
+			};
+
+			StorageManager.cleanMobileBackup = function(savefileId) {
+				var bakName = this.mobileBackupFileName(savefileId);
+				delete this._fileCache[bakName];
+				this._deleteFile(this._mSaveDir, bakName);
+			};
+
+			StorageManager.restoreFromMobileBackup = function(savefileId) {
+				if (this.mobileBackupExists(savefileId)) {
+					var filename = this.mobileFileName(savefileId);
+					var bakName  = this.mobileBackupFileName(savefileId);
+					var data     = this._fileCache[bakName];
+					this._fileCache[filename] = data;
+					delete this._fileCache[bakName];
+					this._writeFile(this._mSaveDir, filename, data);
+					this._deleteFile(this._mSaveDir, bakName);
+				}
+			};
+
+			// Override the main StorageManager API to route through file storage when
+			// ready, falling back to the original implementation otherwise.
+			(function() {
+				var _save          = StorageManager.save;
+				var _load          = StorageManager.load;
+				var _exists        = StorageManager.exists;
+				var _remove        = StorageManager.remove;
+				var _backup        = StorageManager.backup;
+				var _backupExists  = StorageManager.backupExists;
+				var _cleanBackup   = StorageManager.cleanBackup;
+				var _restoreBackup = StorageManager.restoreBackup;
+
+				StorageManager.save = function(savefileId, json) {
+					if (this._fileReady) { this.saveToMobileFile(savefileId, json); }
+					else                 { _save.call(this, savefileId, json); }
+				};
+				StorageManager.load = function(savefileId) {
+					return this._fileReady ? this.loadFromMobileFile(savefileId) : _load.call(this, savefileId);
+				};
+				StorageManager.exists = function(savefileId) {
+					return this._fileReady ? this.mobileFileExists(savefileId) : _exists.call(this, savefileId);
+				};
+				StorageManager.remove = function(savefileId) {
+					if (this._fileReady) { this.removeMobileFile(savefileId); }
+					else                 { _remove.call(this, savefileId); }
+				};
+				StorageManager.backup = function(savefileId) {
+					if (this._fileReady) { this.backupMobileFile(savefileId); }
+					else                 { _backup.call(this, savefileId); }
+				};
+				StorageManager.backupExists = function(savefileId) {
+					return this._fileReady ? this.mobileBackupExists(savefileId) : _backupExists.call(this, savefileId);
+				};
+				StorageManager.cleanBackup = function(savefileId) {
+					if (this._fileReady) { this.cleanMobileBackup(savefileId); }
+					else                 { _cleanBackup.call(this, savefileId); }
+				};
+				StorageManager.restoreBackup = function(savefileId) {
+					if (this._fileReady) { this.restoreFromMobileBackup(savefileId); }
+					else                 { _restoreBackup.call(this, savefileId); }
+				};
+			})();
+		}
+
+		//====================================================================
+		// Boot / kit checks
+		//====================================================================
+
 		DataManager.checkSRWKit = async function(){
 			var _this = this;
 			if (Utils.isNwjs() && process.versions["nw-flavor"] === "sdk") {
@@ -82,20 +358,23 @@
 				var path = require('path');
 				var base = getBase();
 				let filesToCheck = ["AllyPilots", "Mechs", "MechWeapons", "EnemyPilots", "DeployActions", "MapAttacks", "ScriptCharacters", "Patterns", "BattleAnimations", "BattleEnvironments", "BattleText"];
-				let missingFiles = [];	
+				let missingFiles = [];
 				filesToCheck.forEach(function(file){
 					if (!fs.existsSync("data/"+file+".json")) {
 						missingFiles.push(file);
 					}
 				});
 				if(missingFiles.length){
-					var c = confirm("Some required data files are not present, this may be due to upgrading to a new engine version. Perform auto upgrade?");	
+					var c = confirm("Some required data files are not present, this may be due to upgrading to a new engine version. Perform auto upgrade?");
 					if(c){
 						await this.upgradeSRWKit(missingFiles);
 					}
-				}		
+				}
 			}
-			this._SRWKitChecked = true;	
+			if (Utils.isMobileDevice() && StorageManager.initMobileStorage) {
+				await StorageManager.initMobileStorage();
+			}
+			this._SRWKitChecked = true;
 		}
 		
 		DataManager.upgradeSRWKit = async function(missingFiles){
