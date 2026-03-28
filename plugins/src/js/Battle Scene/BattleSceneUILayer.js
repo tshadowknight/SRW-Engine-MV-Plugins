@@ -298,14 +298,16 @@ BattleSceneUILayer.prototype.animateStat = function(slot, elems, maxValue, oldPe
 		clearInterval(_this[animIntervalKey]);
 	}
 	let startTime = Date.now();
-	_this[animIntervalKey] = setInterval(function(){	
+	let revealApplied = false;
+	_this[animIntervalKey] = setInterval(function(){
 		let t = (Date.now() - startTime) / duration;
 		if(t > 1){
 			t = 1;
 		}
 		var currentVal = oldValue+Math.floor(totalDelta * t);//Math.floor(tickValue * currentTick * direction)
-		if(t < 1){		
-			if(type == "HP" && newValue <= 100000){ 
+		if(t < 1){
+			if(!revealApplied && type == "HP" && newValue <= 100000){
+				revealApplied = true;
 				isHidden = false;
 				if(target == "actor"){
 					if(slot == "twin"){
@@ -314,7 +316,7 @@ BattleSceneUILayer.prototype.animateStat = function(slot, elems, maxValue, oldPe
 					} else {
 						$statCalc.setRevealed(_this._currentActor.ref);
 						_this.setStat(_this._currentActor, "EN");
-					}					
+					}
 				}
 				if(target == "enemy"){
 					if(slot == "twin"){
@@ -324,8 +326,8 @@ BattleSceneUILayer.prototype.animateStat = function(slot, elems, maxValue, oldPe
 						$statCalc.setRevealed(_this._currentEnemy.ref);
 						_this.setStat(_this._currentEnemy, "EN");
 					}
-				}		
-				
+				}
+
 			}
 			_this.updateStatContent(elems, maxValue, currentVal, type, isHidden);
 		} else {
@@ -457,8 +459,8 @@ BattleSceneUILayer.prototype.updateStatContent = function(elems, maxValue, value
 		currentVal = Math.round(value);
 		maxVal = Math.round(maxValue);
 	}
-	elems.label.innerHTML = currentVal;
-	elems.maxLabel.innerHTML = maxVal;
+	elems.label.textContent = currentVal;
+	elems.maxLabel.textContent = maxVal;
 	
 	const percent =  Math.round(value / maxValue * 100);
 	if(type == "HP"){

@@ -351,7 +351,7 @@ APPSTRINGS.ATTACKLIST = {
 		value: {
 			melee: "This is a Melee attack.",
 			ranged: "This is a Ranged attack.",
-			combination: "A T indicates that the weapon is a team-up weapon, it requires a parter to be available.",
+			combination: "A T indicates that the weapon is a team-up weapon, it requires a parnter to be available.",
 			counter: "A C indicates that the weapon will always go first, even when counter attacking.",
 		}
 	}
