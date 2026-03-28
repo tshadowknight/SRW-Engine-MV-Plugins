@@ -3319,8 +3319,8 @@ BattleSceneManager.prototype.registerFOVAnimation = function(from, to, startTick
 		easingFunction.setEasingMode(easingMode);
 	}
 	this._FOVAnimation = {
-		from: from, 
-		to: to,
+		from: from * 1,
+		to: to * 1,
 		startTick: startTick,
 		duration: duration,
 		easingFunction: easingFunction,
@@ -3395,8 +3395,8 @@ BattleSceneManager.prototype.registerFadeAnimation = function(targetObj, startFa
 	}
 	this._fadeAnimations[this._fadeAnimationCtr++] = {
 		targetObj: targetObj,
-		startFade: startFade,
-		endFade: endFade,
+		startFade: startFade * 1,
+		endFade: endFade * 1,
 		startTick: startTick,
 		duration: duration,
 		easingFunction: easingFunction,
@@ -3409,8 +3409,8 @@ BattleSceneManager.prototype.registerEffekseerDynamicParamAnimation = function(t
 	}
 	this._effekserDynParamAnimations[this._effekserDynParamAnimationCtr++] = {
 		targetObj: targetObj,
-		startValue: startValue,
-		endValue: endValue,
+		startValue: startValue * 1,
+		endValue: endValue * 1,
 		startTick: startTick,
 		duration: duration,
 		easingFunction: easingFunction,

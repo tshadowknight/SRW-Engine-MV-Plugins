@@ -1425,10 +1425,10 @@
 	};
 	
 	Window_LocationHeader.prototype.refresh = function() {
-		this.contents.clear();		
-		
+		this.contents.clear();
+		this.resetTextColor();
 		this.drawText($gameTemp.locationHeader, 0, 0, 1110 - 38);
-			
+
 	};
 
 	Window_LocationHeader.prototype.open = function() {
