@@ -33,6 +33,14 @@
 			this._mapButtons = {};
 			this.summariesTimeout = 0;
 			this.objURLS = {};
+
+			this.debugAutoPlay = false;//if true the game will play through stages by itself using the Actor AI mode, only accessible from the debugger
+			
+			this.debugAttackAnims = false;
+			/*if true the game will:
+			-set all damage inflicted to 0
+			-track which attacks have been shown in the current session and have the AI prefer selecting new ones
+			*/
 		};
 		
 		

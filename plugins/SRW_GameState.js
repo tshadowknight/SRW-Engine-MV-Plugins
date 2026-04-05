@@ -1684,6 +1684,70 @@ GameState_normal.prototype.update = function(scene){
 		scene._mapButtonsWindow.show();
 	}
 	
+
+	if($gameTemp.debugAutoPlay){
+		if($gameSystem.isSubBattlePhase() == "normal"){
+			//TODO: figure out why the normal state runs when in the start_srpg game state
+			let isAutoPlayInit = false;
+			if(!$gameTemp.hasRunAsAutoPlay){
+				isAutoPlayInit = true;
+			}
+			$gameTemp.hasRunAsAutoPlay = true;
+			if(ENGINE_SETTINGS.AUTO_PLAY_STOP_IDS && ENGINE_SETTINGS.AUTO_PLAY_STOP_IDS[$gameMap.mapId()]){
+				$gameTemp.debugAutoPlay = false;
+				return;
+			}
+
+			$statCalc.iterateAllActors("actor", function(actor, event){
+				$statCalc.setSpirit(actor, "strike");
+				$statCalc.setSpirit(actor, "wall");
+				$statCalc.setSpirit(actor, "valor");
+
+				$statCalc.setAIFlags(actor, {
+					terrain: 1,   
+					formation: 1, 
+					reposition: 1, 
+					preferTarget: 1,
+				});
+
+				if(isAutoPlayInit){
+					$statCalc.calculateSRWActorStats(actor, false);
+				}
+			});
+
+			const activeUnitCount = $gameSystem.getActorsWithAction().length;
+			
+			if(activeUnitCount == 0){
+				$gameTemp.lastActiveUnitCount = null;
+				$gameTemp.lastActiveUnitCounter = 0;
+				$gameTemp.setTurnEndFlag(true);
+				$gameTemp.setAutoBattleFlag(false);	
+			} else {
+				if($gameTemp.lastActiveUnitCount != activeUnitCount) {
+					$gameTemp.lastActiveUnitCount = activeUnitCount;
+					$gameTemp.lastActiveUnitCounter = 0;
+				} else {
+					$gameTemp.lastActiveUnitCounter++;
+					//assume autoplay got stuck after 10s of no change in active unit count
+					if($gameTemp.lastActiveUnitCounter > 600){						
+						$gameTemp.lastActiveUnitCount = null;
+						$gameTemp.lastActiveUnitCounter = 0;
+						$gameTemp.setTurnEndFlag(true);
+						$gameTemp.setAutoBattleFlag(false);	
+					}	
+				}
+			}
+		}
+	} else {
+		if($gameTemp.hasRunAsAutoPlay){
+			$gameTemp.hasRunAsAutoPlay = false;
+			$statCalc.iterateAllActors("actor", function(actor, event){
+				$statCalc.setIsAI(actor, false);//also makes units that are supposed to be AI controllable, but not a huge issue
+				$statCalc.calculateSRWActorStats(actor, false);
+			});	
+		}
+	}
+	
 	if (!$gameSystem.isSRPGMode()){
 		if(Input.isTriggered('menu')){
 			//scene.showPauseMenu();
@@ -2051,6 +2115,9 @@ GameState_enemy_command.prototype.constructor = GameState_enemy_command;
 GameState_enemy_command.prototype.update = function(scene){
 	if (!$gameMap.isEventRunning()) {
 		$gameTemp.didEnemyAttack = false;
+		if($gameTemp.AIWaitTimer == null){
+			$gameTemp.AIWaitTimer = 0;
+		}
 		$gameTemp.AIWaitTimer--;
 		if($gameTemp.AIWaitTimer < 0){		
 			$gameTemp.unitHitInfo = {};
@@ -2341,7 +2408,7 @@ GameState_rewards_display.prototype = Object.create(GameState.prototype);
 GameState_rewards_display.prototype.constructor = GameState_rewards_display;
 
 GameState_rewards_display.prototype.update = function(scene){
-	if (Input.isTriggered('cancel') || Input.isTriggered('ok') || TouchInput.isCancelled() || TouchInput.isTriggered() || ($gameTemp.rewardsDisplayTimer <= 0 && (Input.isLongPressed('ok') || Input.isLongPressed('cancel') || TouchInput.isLongPressed()))) {
+	if ($gameTemp.debugAutoPlay || (Input.isTriggered('cancel') || Input.isTriggered('ok') || TouchInput.isCancelled() || TouchInput.isTriggered() || ($gameTemp.rewardsDisplayTimer <= 0 && (Input.isLongPressed('ok') || Input.isLongPressed('cancel') || TouchInput.isLongPressed())))) {
 		 $gameTemp.popMenu = true;			 
 		 if($gameTemp.rewardsInfo.levelResult.length){			
 			$gameSystem.setSubBattlePhase("level_up_display");
@@ -2364,7 +2431,7 @@ GameState_level_up_display.prototype.constructor = GameState_level_up_display;
 
 GameState_level_up_display.prototype.update = function(scene){
 	if($gameTemp.awaitingLevelUpWindow){
-		if (Input.isTriggered('cancel') || Input.isTriggered('ok') || TouchInput.isTriggered() || TouchInput.isCancelled()|| ($gameTemp.rewardsDisplayTimer <= 0 && (Input.isLongPressed('ok') || Input.isLongPressed('cancel') || TouchInput.isLongPressed()))) {
+		if ($gameTemp.debugAutoPlay || (Input.isTriggered('cancel') || Input.isTriggered('ok') || TouchInput.isTriggered() || TouchInput.isCancelled()|| ($gameTemp.rewardsDisplayTimer <= 0 && (Input.isLongPressed('ok') || Input.isLongPressed('cancel') || TouchInput.isLongPressed())))) {
 			$gameTemp.popMenu = true;			
 			if($gameTemp.rewardsInfo.levelResult.length){
 				$gameTemp.awaitingLevelUpWindow = false;
@@ -2730,7 +2797,7 @@ GameState_rearrange_deploys.prototype.update = function(scene){
 		$gameTemp.menuStillHeld = false;
 	}
 
-	if((!$gameTemp.menuStillHeld && Input.isTriggered("menu")) || $gameTemp.mapButtonClicked("deploy")){	
+	if($gameTemp.debugAutoPlay || ((!$gameTemp.menuStillHeld && Input.isTriggered("menu")) || $gameTemp.mapButtonClicked("deploy"))){	
 		$gameTemp.clearMapButton("deploy");
 		$gameSystem.removeDeployTileHighlights();
 		$gameTemp.doingManualDeploy = false;
@@ -2895,7 +2962,7 @@ GameState_stage_conditions.prototype = Object.create(GameState.prototype);
 GameState_stage_conditions.prototype.constructor = GameState_stage_conditions;
 
 GameState_stage_conditions.prototype.update = function(scene){
-	if (Input.isTriggered('cancel') || TouchInput.isCancelled() || Input.isTriggered('ok') || TouchInput.isTriggered()) {
+	if (Input.isTriggered('cancel') || TouchInput.isCancelled() || Input.isTriggered('ok') || TouchInput.isTriggered() || $gameTemp.debugAutoPlay) {
 		$gameSystem.setSubBattlePhase($gameTemp.contextState);	
 		$gameTemp.popMenu = true;
 		$gameTemp.showingStageConditions = false;

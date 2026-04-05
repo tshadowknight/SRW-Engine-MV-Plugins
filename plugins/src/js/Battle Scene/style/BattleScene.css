@@ -126,12 +126,12 @@
 
 #swipe_box.swipe_left.in #swipe_image {
 	transform: scaleX(-1);
-	right: 100%;
+	right: 99.5%;
 }
 
 #swipe_box.swipe_left.out #swipe_image {
 	transform: scaleX(1);
-	left: 100%;
+	left: 99.5%;
 }
 
 #swipe_box.swipe_left.in {
@@ -164,12 +164,12 @@
 
 #swipe_box.swipe_right.in #swipe_image {
 	transform: scaleX(1);
-	left: 100%;
+	left: 99.5%;
 }
 
 #swipe_box.swipe_right.out #swipe_image {
 	transform: scaleX(-1);
-	right: 100%;
+	right: 99.5%;
 }
 
 #swipe_box.swipe_right.in {

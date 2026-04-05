@@ -56,6 +56,28 @@ DescriptionOverlay.prototype.decrementSelection = function(sourceContainer){
 	}
 }
 
+DescriptionOverlay.prototype.jumpIncrementSelection = function(sourceContainer){
+	const describedElements = this._sourceContainer.querySelectorAll(".described_element");
+	const describedElement = describedElements[this._elementIdx];
+	const jumpAmount = describedElement.getAttribute("data-jump") * 1;
+	if(jumpAmount){
+		for(let i = 0; i < jumpAmount; i++){
+			this.incrementSelection();
+		}
+	}
+}
+
+DescriptionOverlay.prototype.jumpDecrementSelection = function(sourceContainer){
+	const describedElements = this._sourceContainer.querySelectorAll(".described_element");
+	const describedElement = describedElements[this._elementIdx];
+	const jumpAmount = describedElement.getAttribute("data-jump") * 1;
+	if(jumpAmount){
+		for(let i = 0; i < jumpAmount; i++){
+			this.decrementSelection();
+		}
+	}
+}
+
 DescriptionOverlay.prototype.hide = function(){
 	this._isVisible = false;
 	this._container.style.display = "none";	

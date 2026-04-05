@@ -19,11 +19,20 @@ Window_MechListDeployed.prototype.initialize = function() {
 
 Window_MechListDeployed.prototype.getAvailableUnits = function(){
 	var _this = this;
+	let result = [];
 	if($gameTemp.searchInfo){
-		return $statCalc.getSearchedActors("actor", $gameTemp.searchInfo);
+		result = $statCalc.getSearchedActors("actor", $gameTemp.searchInfo);
 	} else {
-		return $statCalc.getAllActors("actor");
+		result = $statCalc.getAllActors("actor");
 	}	
+	let tmp = [];
+	for(let entry of result){
+		let referenceEvent = $statCalc.getReferenceEvent(entry);
+		if(referenceEvent && (!referenceEvent.isErased() || $statCalc.isBoarded(entry))){
+			tmp.push(entry);
+		}
+	}
+	return tmp;
 }
 
 Window_MechListDeployed.prototype.rowEnabled = function(actor){
@@ -167,7 +176,18 @@ Window_MechListDeployed.prototype.update = function() {
 				$gameTemp.pushMenu = "detail_pages";	
 			}*/			
 			const selectedActor = this.getCurrentSelection().actor;
-			var event = $statCalc.getReferenceEvent(selectedActor);
+			var event;
+			
+			if($statCalc.isBoarded(selectedActor)){
+				$statCalc.iterateAllActors("actor", function(actor, iEvent){
+					if($statCalc.hasBoardedUnit(actor, selectedActor)){
+						event = iEvent;
+					}
+				});
+			} else {
+				event = $statCalc.getReferenceEvent(selectedActor);
+			}	
+			
 			$gamePlayer.locate(event.posX(), event.posY(), false);		
 			$gameTemp.popMenu = true;
 			$gameTemp.buttonHintManager.hide();

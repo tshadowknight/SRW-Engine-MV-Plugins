@@ -2706,6 +2706,10 @@ BattleSceneManager.prototype.getCurrentRatio = function(){
 	if(this._fastForward){
 		ratio*=5;
 	}
+
+	if($gameTemp.debugAutoPlay){
+		ratio = 10;
+	}
 		
 	return ratio;
 }

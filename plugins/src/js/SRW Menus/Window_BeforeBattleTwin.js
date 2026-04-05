@@ -420,6 +420,15 @@ Window_BeforebattleTwin.prototype.update = function() {
 	var _this = this;
 	this.updateGlow();
 	if(this.isOpen() && !this._handlingInput){
+
+		if($gameTemp.debugAutoPlay){		
+			this._battleStarting = true;
+			if(this._callbacks["selected"]){
+				this._callbacks["selected"]();
+			}	
+			setTimeout(function(){_this.getWindowNode().style.display = "none"; _this.close()}, 1000); //hack to make sure the pre battle window is hidden after returning from the battle scene
+		}
+		
 		if(Input.isTriggered('down') || Input.isRepeated('down')){
 			this.requestRedraw();
 			

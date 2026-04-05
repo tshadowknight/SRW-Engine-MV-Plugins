@@ -2496,7 +2496,7 @@ SceneManager.isInSaveScene = function(){
 
 		let multiKilledSubTwins = {};
 		let multiKilledMainTwins = {};
-
+		
 		Object.keys($gameTemp.battleEffectCache).forEach(function(cacheRef){
 			var battleEffect = $gameTemp.battleEffectCache[cacheRef];
 			if(battleEffect.isDestroyed){
@@ -2530,6 +2530,12 @@ SceneManager.isInSaveScene = function(){
 				}				
 			}			
 		});
+
+		if($gameTemp.debugAttackAnims){
+			$gameTemp.deathQueue = [];
+			$gameTemp.destroyTransformQueue= [];
+		}
+
 		if($gameTemp.destroyTransformQueue.length){
 			$gameSystem.setSubBattlePhase("process_destroy_transform_queue");
 			this.eventBeforeDestruction();
@@ -2693,6 +2699,12 @@ SceneManager.isInSaveScene = function(){
 			let actorIsDestroyed = false;
 			Object.keys($gameTemp.battleEffectCache).forEach(function(cacheRef){
 				var battleEffect = $gameTemp.battleEffectCache[cacheRef];
+				if($gameTemp.debugAttackAnims){
+					battleEffect.isDestroyed = false;
+					if(battleEffect.attacked){
+						battleEffect.attacked.isDestroyed = false;
+					}
+				}
 				
 				if(battleEffect.isActor && (battleEffect.type == "initiator" || battleEffect.type == "defender")){
 					if(battleEffect.isDestroyed) {
@@ -2782,6 +2794,13 @@ SceneManager.isInSaveScene = function(){
 			}
 			Object.keys($gameTemp.battleEffectCache).forEach(function(cacheRef){
 				var battleEffect = $gameTemp.battleEffectCache[cacheRef];
+
+				if($gameTemp.debugAttackAnims){
+					battleEffect.isDestroyed = false;
+					if(battleEffect.attacked){
+						battleEffect.attacked.isDestroyed = false;
+					}
+				}
 				
 				/*if(battleEffect.ref){
 					if(battleEffect.HPRestored){
@@ -3565,6 +3584,10 @@ SceneManager.isInSaveScene = function(){
 		var result = [];
 		var deltaX = originEvent.posX();
 		var deltaY = originEvent.posY();
+
+		if($gameTemp.debugAttackAnims){
+			return result;
+		}
 		
 		var mapAttackDef = $mapAttackManager.getDefinition(attack.mapId);
 		
@@ -4528,7 +4551,9 @@ SceneManager.isInSaveScene = function(){
 				}
 				formula = translateTagTokens(formula);
 				var score = eval(formula);
-				
+				if($gameTemp.debugAttackAnims){
+					score = Math.random();
+				}
 				if(score > bestScore || bestScore == -1){
 					bestScore = score;
 					bestTarget = targetsByHit[ctr].event;
@@ -5022,19 +5047,74 @@ SceneManager.isInSaveScene = function(){
 				target: 0
 			};
 		} else {
-			var weapon = $battleCalc.getBestWeapon(actorInfo, enemyInfo, true);
-			if(weapon){
-				$gameTemp.actorAction = {
-					type: "attack",
-					attack: weapon,
-					target: 0
-				};
-			} else {
-				$gameTemp.actorAction = {
-					type: "defend",
-					attack: 0,
-					target: 0
-				};
+			//needs to be initialized to an object to avoid crashes in getBestWeapon related to combo attacks
+			$gameTemp.actorAction = {};
+			if($statCalc.isAI(actorInfo.actor)){
+				if(actorInfo.actor.counterBehavior == "defend"){
+					$gameTemp.actorAction = {
+						type: "defend",
+						attack: 0,
+						target: 0
+					};
+				} else if(actorInfo.actor.counterBehavior == "evade"){
+					$gameTemp.actorAction = {
+						type: "evade",
+						attack: 0,
+						target: 0
+					};
+				} else if(actorInfo.actor.counterBehavior == "defend_low"){
+					var stats = $statCalc.getCalculatedMechStats(actorInfo.actor);
+					if(stats.currentHP / stats.maxHP <= 0.25){
+						$gameTemp.actorAction = {
+							type: "defend",
+							attack: 0,
+							target: 0
+						};	
+					} 										
+				} else if(actorInfo.actor.counterBehavior == "evade_low"){
+					var stats = $statCalc.getCalculatedMechStats(actorInfo.actor);
+					if(stats.currentHP / stats.maxHP <= 0.25){
+						$gameTemp.actorAction = {
+							type: "evade",
+							attack: 0,
+							target: 0
+						};
+					}
+				} else if(actorInfo.actor.counterBehavior == "survive"){
+					var weaponResult = $battleCalc.getBestWeaponAndDamage(enemyInfo, actorInfo);											
+					var stats = $statCalc.getCalculatedMechStats(actorInfo.actor);
+					if(weaponResult.damage >= stats.currentHP){
+						if(weaponResult.damage <= stats.currentHP * 2){
+							$gameTemp.actorAction = {
+								type: "defend",
+								attack: 0,
+								target: 0
+							};
+						} else {
+							$gameTemp.actorAction = {
+								type: "evade",
+								attack: 0,
+								target: 0
+							};
+						}												
+					}
+				}
+			}
+			if(actorInfo.actor.counterBehavior == "attack" || !actorInfo.actor.counterBehavior || !$gameTemp.actorAction.type){
+				var weapon = $battleCalc.getBestWeapon(actorInfo, enemyInfo);
+				if(weapon){
+					$gameTemp.actorAction = {
+						type: "attack",
+						attack: weapon,
+						target: 0
+					};
+				} else {
+					$gameTemp.actorAction = {
+						type: "defend",
+						attack: 0,
+						target: 0
+					};
+				}
 			}
 		}
 		
@@ -5420,6 +5500,7 @@ SceneManager.isInSaveScene = function(){
 	SceneManager.snap = function() {
 		return Bitmap.snap(this._scene);
 	};
+	
 	
 
 //====================================================================

@@ -50,19 +50,18 @@ Window_OpeningCrawl.prototype.update = function() {
 	
 	if(this.isOpen() && !this._handlingInput){	
 		this._counter+=1*$gameTemp.textCrawlSpeed;
-		if(Input.isPressed('ok') || TouchInput.isPressed()){			
+		if(Input.isPressed('ok') || TouchInput.isPressed()){
 			this._counter+=4*$gameTemp.textCrawlSpeed;
 			if(Input.isPressed('pagedown')){
 				this._counter+=16*$gameTemp.textCrawlSpeed;
 			}
 		}
-		var step = Math.floor(this._counter / 1);
-		var currentOffset = Math.floor((this._startOffset - (0.1 * step)) * 1000) / 1000;	
-		
-		this._text.style.top = currentOffset + "%";
+		var windowNode = this.getWindowNode();
+		var windowHeight = windowNode.getBoundingClientRect().height;
+		var scrollPixels = this._counter * 0.001 * windowHeight;
+		this._text.style.transform = "translateY(-" + scrollPixels + "px)";
 		
 		var endReached = false;
-		var windowNode = this.getWindowNode();
 		var windowRect = windowNode.getBoundingClientRect();
 		
 		var textRect = this._text.getBoundingClientRect();

@@ -280,6 +280,8 @@ Window_DetailPages.prototype.update = function() {
 					SoundManager.playCursor();
 					this._attackList.incrementSelection();
 				}
+
+				
 			
 			} else if (Input.isTriggered('up') || Input.isRepeated('up')){//|| Input.isRepeated('up')
 				
@@ -289,10 +291,16 @@ Window_DetailPages.prototype.update = function() {
 					this._attackList.decrementSelection();
 				}
 			}
-		}
-		
+		} else {
+			if(Input.isTriggered('down') || Input.isRepeated('down')){//|| Input.isRepeated('down')
+				this._descriptionOverlay.jumpIncrementSelection();
+				this.requestRedraw();
+			} else if (Input.isTriggered('up') || Input.isRepeated('up')){//|| Input.isRepeated('up')
+				this._descriptionOverlay.jumpDecrementSelection();
+				this.requestRedraw();
+			}
+		}	
 					
-
 		if(Input.isTriggered('left') || Input.isRepeated('left')){// 
 			this.requestRedraw();
 			SoundManager.playCursor();

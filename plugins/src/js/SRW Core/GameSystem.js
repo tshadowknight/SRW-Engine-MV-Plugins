@@ -478,6 +478,12 @@
 			$gameTemp.deployMode = "";		
 			$gameTemp.enableCancelButton = true;
 			this.setAutomaticDifficultyLevel();	
+
+			if($gameTemp.debugAutoPlay){
+				if(ENGINE_SETTINGS.AUTO_PLAY_SAVE_SLOT){
+					DataManager.saveGame(ENGINE_SETTINGS.AUTO_PLAY_SAVE_SLOT);
+				}	
+			}
 		}
 		
 		Game_System.prototype.isIntermission = function(id){
@@ -1469,6 +1475,11 @@
 		Game_System.prototype.srpgStartActorTurn = function() {
 			var _this = this;
 			$statCalc.invalidateAbilityCache();
+
+			if($gameTemp.debugAutoPlay){	
+				$gameSystem.setSubBattlePhase('normal');
+				DataManager.saveContinueSlot();					
+			}
 			
 			$gameTemp.currentFaction = -1;
 			$songManager.playStageSong();
@@ -1594,7 +1605,11 @@
 		Game_System.prototype.srpgStartEnemyTurn = function(factionId) {
 			var _this = this;
 			$gameTemp.buttonHintManager.hide();
-			
+
+			if(isNaN(factionId)){
+				//hack fix for issue where factionId is corrupt after loading an auto play save
+				factionId = 1;
+			}			
 			
 			$gameTemp.showAllyAttackIndicator = false;
 			$gameTemp.showAllyDefendIndicator = false;
@@ -3118,6 +3133,12 @@
 		Game_System.prototype.getCurrentDifficultyLevel = function() {
 			if(this._currentDifficulty == null){
 				if(ENGINE_SETTINGS.DIFFICULTY_MODS){
+					this._currentDifficulty = ENGINE_SETTINGS.DIFFICULTY_MODS.default;
+				}
+			}
+			if(ENGINE_SETTINGS.DIFFICULTY_MODS){
+				if(!ENGINE_SETTINGS.DIFFICULTY_MODS.levels[this._currentDifficulty]){
+					console.log("The stored difficulty level was " + this._currentDifficulty + " which is invalid!");
 					this._currentDifficulty = ENGINE_SETTINGS.DIFFICULTY_MODS.default;
 				}
 			}

@@ -3,6 +3,7 @@ import Window_CSS from "../SRW Menus/Window_CSS.js";
 import "./style/BattleSceneUILayer.css";
 
 export default function BattleSceneUILayer() {
+	this._maxDamageDigits = 7;
 	this.initialize.apply(this, arguments);	
 	this._currentName = "";
 	this._currentText = ""; 
@@ -16,7 +17,7 @@ export default function BattleSceneUILayer() {
 	this._currentActor;
 	this._currentEnemy;
 
-	this._statBoxesLocked = false;
+	this._statBoxesLocked = false;	
 }
 
 BattleSceneUILayer.prototype = Object.create(Window_CSS.prototype);
@@ -108,21 +109,38 @@ BattleSceneUILayer.prototype.setStatBoxVisible = function(type, inTwinContext){
 }
 
 BattleSceneUILayer.prototype.createComponents = function() {
+	const _this = this;
 	Window_CSS.prototype.createComponents.call(this);
 	
 	var windowNode = this.getWindowNode();
 
 	windowNode.classList.add("UI_window");//required for auto scaling/fitting functionality
+
+	function populateDamageDisplay(display, digits){
+		var charCtr = _this._maxDamageDigits;
+		for(var i = 0; i < charCtr; i++){
+			//html += "<div class='digit disabled'></div>";
+			const div = document.createElement("div");
+			div.classList.add("digit");
+			div.classList.add("disabled");
+			display.appendChild(div);
+			digits.push(div);
+		}
+	}
 	
 	this._damageDisplay = document.createElement("div");
 	this._damageDisplay.id = this.createId("damage_display");	
 	this._damageDisplay.classList.add("scaled_text");
+	this._damageDigitElems = [];
+	populateDamageDisplay(this._damageDisplay, this._damageDigitElems);
 	windowNode.appendChild(this._damageDisplay);
 	
 	this._damageDisplayTwin = document.createElement("div");
 	this._damageDisplayTwin.id = this.createId("damage_display_twin");
 	/*this._damageDisplayTwin.style.top = "55%";	*/
 	this._damageDisplayTwin.classList.add("scaled_text");
+	this._damageDigitElemsTwin = [];
+	populateDamageDisplay(this._damageDisplayTwin, this._damageDigitElemsTwin);
 	windowNode.appendChild(this._damageDisplayTwin);
 	
 	this._allyStats = document.createElement("div");
@@ -550,15 +568,20 @@ BattleSceneUILayer.prototype.setPopupNotification = function(side, barriers, add
 }
 
 BattleSceneUILayer.prototype.showDamage = function(entityType, amount, offsets, displayNum){
-	var _this = this;
-	var display;
+	const _this = this;
+	let display;
+	let digits;
 	if(displayNum == 0){
 		display = this._damageDisplay;
+		digits = this._damageDigitElems;
 	} else {
 		display = this._damageDisplayTwin;
+		digits = this._damageDigitElemsTwin;
 	}
-	display.innerHTML = "";
+	//display.innerHTML = "";
+	display.getAnimations().forEach(anim => anim.cancel());
 	display.className = "scaled_text show";
+
 	/*display.style.display = "flex";*/
 	/*display.style.top = "";
 	display.style.left = "";
@@ -583,14 +606,19 @@ BattleSceneUILayer.prototype.showDamage = function(entityType, amount, offsets, 
 	var characters = String(amount).split("");
 	var charCtr = 0;
 	var html = "";
-	for(var i = 0; i < characters.length; i++){
-		html += "<div class='digit disabled'>"+characters[i]+"</div>";
+	for(var i = 0; i < _this._maxDamageDigits; i++){
+		digits[i].getAnimations().forEach(anim => anim.cancel());
+    	digits[i].className = "digit disabled";  // clears reveal + any other state
+		if(i < characters.length){
+			digits[i].textContent = characters[i];
+			digits[i].style.display = "";
+		} else {
+			digits[i].style.display = "none";
+		}
 	}
-	display.innerHTML = html;
-	var digitElems = display.querySelectorAll(".digit");
 	function displayCharacter(){
 		if(charCtr < characters.length){
-			var digit = digitElems[charCtr++];
+			var digit = digits[charCtr++];
 			digit.classList.remove("disabled");
 			digit.classList.add("reveal");
 			setTimeout(displayCharacter, 100);

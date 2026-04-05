@@ -237,6 +237,11 @@ Window_DeploymentTwin.prototype.update = function() {
 	
 	
 	if(this.isOpen() && !this._handlingInput){
+
+		if($gameTemp.debugAutoPlay){
+			this.onMenu();
+		}
+
 		if(Input.isTriggered('down') || Input.isRepeated('down')){
 			this.requestRedraw();
 		

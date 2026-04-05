@@ -183,6 +183,11 @@ BattleCalc.prototype.performHitCalculation = function(attackerInfo, defenderInfo
 	var result = 0;
 	var attackerAction = attackerInfo.action;
 	if(attackerAction.type == "attack"){
+
+		if($gameTemp.debugAttackAnims){
+			return Math.random() < 0.75 ? 1 : 0;
+		}
+
 		if(!ignoreAlert && $statCalc.getActiveSpirits(defenderInfo.actor).alert){
 			return 0;
 		}
@@ -704,6 +709,9 @@ BattleCalc.prototype.performDamageCalculation = function(attackerInfo, defenderI
 		
 		result.damage = Math.floor(finalDamage);
 	}
+	if($gameTemp.debugAttackAnims){
+		result.damage = Math.random() < 0.5 ? 0 : 500000;
+	}
 	return result;
 }
 BattleCalc.prototype.getActorDamageOutput = function(){
@@ -764,12 +772,37 @@ BattleCalc.prototype.prepareBattleCache = function(actionObject, type){
 
 BattleCalc.prototype.generateBattleResult = function(isPrediction){
 	var _this = this;
+
+	if($gameTemp.debugAttackAnims){
+		if(!$gameTemp.debugAttackTracking){
+			$gameTemp.debugAttackTracking = {};
+		}
+	}
 	
 	$statCalc.setCurrentAttack($gameTemp.currentBattleActor, $gameTemp.actorAction.attack);	
+
+	if($gameTemp.debugAttackAnims){
+		if(!$gameTemp.debugAttackTracking[$gameTemp.actorAction.attack.id]){
+			$gameTemp.debugAttackTracking[$gameTemp.actorAction.attack.id] = 0;
+			console.log("Performing new attack: " + $gameTemp.actorAction.attack.id);
+		}
+		$gameTemp.debugAttackTracking[$gameTemp.actorAction.attack.id]++;
+	}
+
 	if($gameTemp.currentBattleActor.subTwin){
 		$statCalc.setCurrentAttack($gameTemp.currentBattleActor.subTwin, $gameTemp.actorTwinAction.attack);	
+		
 	}
 	$statCalc.setCurrentAttack($gameTemp.currentBattleEnemy, $gameTemp.enemyAction.attack);	
+
+	if($gameTemp.debugAttackAnims){
+		if(!$gameTemp.debugAttackTracking[$gameTemp.enemyAction.attack.id]){
+			$gameTemp.debugAttackTracking[$gameTemp.enemyAction.attack.id] = 0;
+			console.log("Performing new attack: " + $gameTemp.enemyAction.attack.id);
+		}
+		$gameTemp.debugAttackTracking[$gameTemp.enemyAction.attack.id]++;
+	}
+
 	if($gameTemp.currentBattleEnemy.subTwin){
 		$statCalc.setCurrentAttack($gameTemp.currentBattleEnemy.subTwin, $gameTemp.enemyTwinAction.attack);	
 	}
@@ -1922,45 +1955,56 @@ BattleCalc.prototype.getBestWeaponAndDamage = function(attackerInfo, defenderInf
 			}
 			
 			
-			if(isInRange || isReachable){				
-				if(optimizeCost){
-					var currentWeaponCanShootDown = false;
-					if(damageResult.damage >= defenderHP){
-						canShootDown = true;
-						currentWeaponCanShootDown = true;
+			if(isInRange || isReachable){	
+				if($gameTemp.debugAttackAnims && $gameTemp.debugAttackTracking) {
+					if(!bestWeapon){
+						bestWeapon = weapon;
+					} else {
+						if(($gameTemp.debugAttackTracking[bestWeapon.id] || 0) > ($gameTemp.debugAttackTracking[weapon.id] || 0)){
+							bestWeapon = weapon;
+						}
 					}
-					if(canShootDown){
-						if(currentWeaponCanShootDown){
-							var currentENCost = weapon.ENCost;
-							var currentTotalAmmo = weapon.totalAmmo;
-							if(currentTotalAmmo != -1){//ammo using weapon
-								if(maxTotalAmmo == -2 || currentTotalAmmo > maxTotalAmmo){
-									if(minENCost == -2 || minENCost > 100/currentTotalAmmo){
-										bestDamage = damageResult.damage;
-										bestWeapon = weapon;
-										currentTotalAmmo = maxTotalAmmo;
+				} else {
+					if(optimizeCost){
+						var currentWeaponCanShootDown = false;
+						if(damageResult.damage >= defenderHP){
+							canShootDown = true;
+							currentWeaponCanShootDown = true;
+						}
+						if(canShootDown){
+							if(currentWeaponCanShootDown){
+								var currentENCost = weapon.ENCost;
+								var currentTotalAmmo = weapon.totalAmmo;
+								if(currentTotalAmmo != -1){//ammo using weapon
+									if(maxTotalAmmo == -2 || currentTotalAmmo > maxTotalAmmo){
+										if(minENCost == -2 || minENCost > 100/currentTotalAmmo){
+											bestDamage = damageResult.damage;
+											bestWeapon = weapon;
+											currentTotalAmmo = maxTotalAmmo;
+										}
 									}
-								}
-							} else {
-								if(minENCost == -2 || minENCost > currentENCost){
-									if(maxTotalAmmo == -2 || 100/currentTotalAmmo > currentENCost){
-										bestDamage = damageResult.damage;
-										bestWeapon = weapon;
-										minENCost = currentENCost;
+								} else {
+									if(minENCost == -2 || minENCost > currentENCost){
+										if(maxTotalAmmo == -2 || 100/currentTotalAmmo > currentENCost){
+											bestDamage = damageResult.damage;
+											bestWeapon = weapon;
+											minENCost = currentENCost;
+										}
 									}
 								}
 							}
+						} else if(damageResult.damage > bestDamage){
+							bestDamage = damageResult.damage;
+							bestWeapon = weapon;
 						}
-					} else if(damageResult.damage > bestDamage){
-						bestDamage = damageResult.damage;
-						bestWeapon = weapon;
-					}
-				} else {
-					if(damageResult.damage > bestDamage){
-						bestDamage = damageResult.damage;
-						bestWeapon = weapon;
+					} else {
+						if(damageResult.damage > bestDamage){
+							bestDamage = damageResult.damage;
+							bestWeapon = weapon;
+						}
 					}
 				}
+				
 			}
 		}
 	});		

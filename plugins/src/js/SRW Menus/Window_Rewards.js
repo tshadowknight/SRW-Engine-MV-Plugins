@@ -43,6 +43,9 @@ Window_Rewards.prototype.update = function() {
 	
 	if(this.isOpen() && !this._handlingInput){	
 	
+		if($gameTemp.debugAutoPlay){
+			
+		}
 		
 		if(Input.isTriggered('ok')){
 			//$gameTemp.popMenu = true;	

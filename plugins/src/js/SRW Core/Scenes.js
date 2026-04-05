@@ -18,6 +18,24 @@
 			}			
 		};
 
+		SceneManager.update_ = function() {
+			try {
+				this.tickStart();
+				if (Utils.isMobileSafari()) {
+					this.updateInputData();
+				}
+				this.updateManagers();
+				this.updateMain();
+				this.tickEnd();
+			} catch (e) {
+				this.catchException(e);
+			}
+		};
+
+		SceneManager.update = function() {
+			SceneManager.update_();
+		}
+
 		//keep a copy of the Scene_Map in memory to reuse, workaround for memory of menu components created in Scene_Map
 		SceneManager._globalMapScene = null;
 		SceneManager.initGlobalMapScene = function(){

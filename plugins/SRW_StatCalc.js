@@ -1252,6 +1252,9 @@ StatCalc.prototype.isConfused = function(actor){
 }
 
 StatCalc.prototype.isAI = function(actor){
+	if($gameTemp.debugAutoPlay){
+		return true;
+	}
 	if(this.isActorSRWInitialized(actor)){
 		return !actor.isActor() || actor.SRWStats.stageTemp.isAI || this.isConfused(actor);
 	} else {
@@ -3491,12 +3494,20 @@ StatCalc.prototype.calculateSRWActorStats = function(actor, preserveVolatile){
 		Object.keys(growthRates).forEach(function(baseStateName){
 			var growthInfo = growthRates[baseStateName];
 			if(growthInfo.type == "flat"){
-				calculatedStats[baseStateName] = baseStats[baseStateName] + Math.floor(level * growthInfo.rate);	
+				if($gameTemp.debugAutoPlay && actor.isActor()){
+					calculatedStats[baseStateName] = _this.getMaxPilotStat();
+				} else {
+					calculatedStats[baseStateName] = baseStats[baseStateName] + Math.floor(level * growthInfo.rate);	
+				}				
 			} else {				
 				var min = baseStats[baseStateName];
 				var max = growthInfo.target;
 				var rate = growthInfo.rate;				
-				calculatedStats[baseStateName] = eval(ENGINE_SETTINGS.STAT_GROWTH_FORMULA);
+				if($gameTemp.debugAutoPlay && actor.isActor()){
+					calculatedStats[baseStateName] = _this.getMaxPilotStat();
+				} else {
+					calculatedStats[baseStateName] = eval(ENGINE_SETTINGS.STAT_GROWTH_FORMULA);
+				}				
 			}						
 		});
 		var upgrades = actor.SRWStats.pilot.stats.upgrades;
@@ -4286,7 +4297,11 @@ StatCalc.prototype.getWeaponPower = function(actor, weapon){
 				levels.push(i)
 			}
 		} else {
-			for(var i = 0; i < actor.SRWStats.mech.stats.upgradeLevels.weapons; i++){
+			let upgradeLevels = actor.SRWStats.mech.stats.upgradeLevels.weapons;
+			if($gameTemp.debugAutoPlay){
+				upgradeLevels = 15;
+			}
+			for(var i = 0; i < upgradeLevels; i++){
 				levels.push(i);
 			}
 		}		
@@ -6806,6 +6821,10 @@ StatCalc.prototype.applyHPRegen = function(type, factionId){
 				_this.recoverHPPercent(actor, _this.getCurrentTerrainMods(actor).hp_regen);	
 				_this.recoverHPPercent(actor, ENGINE_SETTINGS.DEFAULT_HP_REGEN || 0);	
 			}
+
+			if(($gameTemp.debugAutoPlay && type == "actor") || $gameTemp.debugAttackAnims){
+				_this.recoverHPPercent(actor, 100);	
+			}
 		}		
 	});
 }
@@ -7057,6 +7076,10 @@ StatCalc.prototype.applyENRegen = function(type, factionId){
 				_this.recoverENPercent(actor, ENGINE_SETTINGS.DEFAULT_EN_REGEN || 0);			
 				_this.recoverEN(actor, 5);	
 			}	
+
+			if(($gameTemp.debugAutoPlay && type == "actor") || $gameTemp.debugAttackAnims){
+				_this.recoverENPercent(actor, 100);	
+			}
 		}	
 	});
 }
@@ -7197,7 +7220,11 @@ StatCalc.prototype.applyAmmoRegen = function(type, factionId){
 	var _this = this;
 	this.iterateAllActors(type, function(actor, event){	
 		if(actor.isActor() || actor.factionId == factionId || factionId == null){
-			_this.recoverAmmoPercent(actor, _this.applyStatModsToValue(actor, 0, ["ammo_regen"]));				
+			_this.recoverAmmoPercent(actor, _this.applyStatModsToValue(actor, 0, ["ammo_regen"]));
+			
+			if(($gameTemp.debugAutoPlay && type == "actor") || $gameTemp.debugAttackAnims){
+				_this.recoverAmmoPercent(actor, 100);	
+			}
 		}	
 	});
 }

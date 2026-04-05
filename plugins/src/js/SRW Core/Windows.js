@@ -167,6 +167,9 @@
 
 		
 		Window_Message.prototype.isInstantText = function() {
+			if($gameTemp.debugAutoPlay){
+				return true;
+			}
 			return Input.isPressed('ok') && Input.isPressed('pagedown');
 		}
 		
@@ -1363,6 +1366,7 @@
 	Window_SRWAbilityDescription.prototype.drawText = function(text, x, y, maxWidth, align) {
 		//text = this.convertEscapeCharacters(text);
 		//this.processEscapeCharacter(text);
+		this.resetTextColor();
 		var parts = text.split("\n");
 		for(var i = 0; i < parts.length; i++){
 			Window_Base.prototype.drawText.call(this, parts[i], x, y + (35 * i), maxWidth, align)

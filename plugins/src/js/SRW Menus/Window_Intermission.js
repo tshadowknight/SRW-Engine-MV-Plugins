@@ -446,6 +446,12 @@ Window_Intermission.prototype.update = function() {
 	_this.updateGlow();
 	if(this.isOpen() && !this._handlingInput){
 		
+		if($gameTemp.debugAutoPlay){
+			if(this._handlers.intermissionEnd){
+				this._handlers.intermissionEnd();
+			}
+		}		
+		
 		if(_this._state == "confirm_title"){
 			if(Input.isTriggered('left') || Input.isRepeated('left')){
 				_this.titleConfirmSelection = !_this.titleConfirmSelection;

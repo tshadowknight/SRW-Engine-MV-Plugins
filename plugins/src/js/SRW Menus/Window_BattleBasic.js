@@ -1473,7 +1473,7 @@ Window_BattleBasic.prototype.update = function() {
 			
 		}
 		
-		if (Input.isTriggered('ok') || Input.isPressed('ok') || this._touchDoubleSpeed) {
+		if (Input.isTriggered('ok') || Input.isPressed('ok') || this._touchDoubleSpeed || $gameTemp.debugAutoPlay) {
 			this._doubleSpeedEnabled = true;
 			this.getWindowNode().classList.add("double_speed");
 		} else {
