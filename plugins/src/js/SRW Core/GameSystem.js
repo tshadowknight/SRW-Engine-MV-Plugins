@@ -368,8 +368,10 @@
 				$statCalc.applyBattleStartWill(actor);
 			}
 			
-			this._availableUnits.forEach(function(actor){		
-				actor.event = null									
+			this._availableUnits.forEach(function(actor){	
+				if(targetMechId == null || actor._classId == targetMechId){
+					actor.event = null		
+				}												
 			});
 			
 			if(!noReload){
