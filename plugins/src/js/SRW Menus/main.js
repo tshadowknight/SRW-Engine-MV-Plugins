@@ -101,6 +101,12 @@ window.Window_Search = Window_Search;
 import Window_Options from "./Window_Options.js";
 window.Window_Options = Window_Options;
 
+import Window_BattleBGM from "./Window_BattleBGM.js";
+window.Window_BattleBGM = Window_BattleBGM;
+
+import Window_Jukebox from "./Window_Jukebox.js";
+window.Window_Jukebox = Window_Jukebox;
+
 import Window_MapButtons from "./Window_MapButtons.js";
 window.Window_MapButtons = Window_MapButtons;
 

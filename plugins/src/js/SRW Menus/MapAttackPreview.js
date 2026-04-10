@@ -81,6 +81,14 @@ MapAttackPreview.prototype.showPreview = function(attack){
 	var borderPercent = 2;
 	var borderSize = Math.ceil(blockSize / 100 * borderPercent / 2);
 	blockSize-= borderSize * 2;
+
+	if(!attack.ignoresFriendlies){
+		previewContent+="<div class='friendly_fire_warning scaled_text'>";
+		previewContent+="<img src='svg/hazard-sign.svg'>";		
+		previewContent+=APPSTRINGS.DETAILPAGES.label_friendly_fire;	
+		previewContent+="</div>";
+	}	
+
 	previewContent+="<div class='preview_grid'>";
 	for(var i = 0; i < gridSize; i++){
 		for(var j = 0; j < gridSize; j++){	

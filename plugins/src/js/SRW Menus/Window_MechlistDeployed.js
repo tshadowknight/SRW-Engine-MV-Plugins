@@ -188,10 +188,13 @@ Window_MechListDeployed.prototype.update = function() {
 				event = $statCalc.getReferenceEvent(selectedActor);
 			}	
 			
-			$gamePlayer.locate(event.posX(), event.posY(), false);		
+			if(event){		
+				$gamePlayer.locate(event.posX(), event.posY(), false);		
+			}
 			$gameTemp.popMenu = true;
 			$gameTemp.buttonHintManager.hide();
 			this._mechList.resetSelection();
+			$gameTemp.searchInfo = null;
 			Input.clear();
 			
 			if($gameTemp.mechListWindowSearchSelectionCallback){

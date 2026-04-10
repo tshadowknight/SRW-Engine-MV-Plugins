@@ -814,8 +814,6 @@ SceneManager.isInSaveScene = function(){
 		//create pixi child objects
 		this.createSpriteset();
 		this.createMapNameWindow();		
-		this.createWindowLayer();			
-		this.createAllWindows();
 
 		//create windows
 		if(!this._windowsInitialized){
@@ -823,6 +821,9 @@ SceneManager.isInSaveScene = function(){
 			this.createCSSWindowLayer();
 			this.createAllCSSWindows();
 		} 
+
+		this.createWindowLayer();			
+		this.createAllWindows();		
 	};
 	
 	Scene_Map.prototype.processMapTouch = function() {
@@ -908,6 +909,8 @@ SceneManager.isInSaveScene = function(){
 		this.createAbilityWindow();
 		this.createTransformWindow();
 		this.createPilotSwapWindow();
+
+		this.createOptionsWindow(); //is a CSS window but should be processed on each restart since it can become detached if used on the title screen, is safe for reuse as it's implemented as a singleton
 	}
 
     // マップのウィンドウ作成
@@ -946,9 +949,11 @@ SceneManager.isInSaveScene = function(){
 		this.createDeploymentInStageWindow();
 		this.createDeploySelectionWindow();
 		this.createSearchWindow();
-		this.createOptionsWindow();
+
 		this.createAttrChartWindow();
 		this.createGameModesWindow();
+		this.createBattleBGMWindow();
+		this.createJukeboxWindow();
 		this.createMapButtonsWindow();
 		this.createMapCancelButtonWindow();
 		this.createMobileDpadWindow();
@@ -1544,11 +1549,38 @@ SceneManager.isInSaveScene = function(){
 	Scene_Map.prototype.createGameModesWindow = function() {
 		var _this = this;
 		this._gameModeWindow = new Window_Game_Modes(0, 0, Graphics.boxWidth, Graphics.boxHeight);
-		
+
 		this._gameModeWindow.close();
 		this.addWindow(this._gameModeWindow);
 		this._gameModeWindow.hide();
 		this.idToMenu["game_modes"] = this._gameModeWindow;
+    };
+
+	Scene_Map.prototype.createJukeboxWindow = function() {
+		this._jukeboxWindow = new Window_Jukebox(0, 0, Graphics.boxWidth, Graphics.boxHeight);
+		this._jukeboxWindow.registerCallback("closed", function(){
+			if($gameTemp.jukeboxWindowCancelCallback){
+				$gameTemp.jukeboxWindowCancelCallback();
+			}
+		});
+		this._jukeboxWindow.close();
+		this.addWindow(this._jukeboxWindow);
+		this._jukeboxWindow.hide();
+		this.idToMenu["jukebox"] = this._jukeboxWindow;
+    };
+
+	Scene_Map.prototype.createBattleBGMWindow = function() {
+		var _this = this;
+		this._battleBGMWindow = new Window_BattleBGM(0, 0, Graphics.boxWidth, Graphics.boxHeight);
+		this._battleBGMWindow.registerCallback("closed", function(){
+			if($gameTemp.battleBGMWindowCancelCallback){
+				$gameTemp.battleBGMWindowCancelCallback();
+			}
+		});
+		this._battleBGMWindow.close();
+		this.addWindow(this._battleBGMWindow);
+		this._battleBGMWindow.hide();
+		this.idToMenu["battle_bgm_assign"] = this._battleBGMWindow;
     };
 
     // アクターコマンドウィンドウを作る
@@ -2952,6 +2984,15 @@ SceneManager.isInSaveScene = function(){
 		if(battleEffect && battleEffect.attacked){
 			hasDefeatedOpponent	= battleEffect.attacked.isDestroyed;
 		}		
+
+		if(battleEffect && battleEffect.attackedMap){
+			for(let entry of battleEffect.attackedMap){
+				if(entry.isDestroyed){
+					hasDefeatedOpponent = true;
+				}
+			}
+		}
+
 		var hasContinuousAction = $statCalc.applyStatModsToValue(battler, 0, ["continuous_action"]) && !$statCalc.hasUsedContinuousAction(battler);
 		
 		if(hasDefeatedOpponent && hasContinuousAction){

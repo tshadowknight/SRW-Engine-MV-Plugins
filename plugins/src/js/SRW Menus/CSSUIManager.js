@@ -202,7 +202,9 @@ CSSUIManager.prototype.initAllWindows = function(){
 	this.initWindow("pilot_reassign_select");
 	this.initWindow("search");
 	this.initWindow("options");
-	this.initWindow("map_buttons");	
+	this.initWindow("battle_bgm_assign");
+	this.initWindow("jukebox");
+	this.initWindow("map_buttons");
 	this.initWindow("opening_crawl");
 	this.initWindow("text_log");
 	this.initWindow("load_overlay");

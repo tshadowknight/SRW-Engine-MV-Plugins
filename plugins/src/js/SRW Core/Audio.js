@@ -5,6 +5,25 @@
 	function patches(){};
 	
 	patches.apply = function(){
+		AudioManager.createBuffer = function(folder, name) {
+			var ext = this.audioFileExt();
+			var url;
+			if(name && name.indexOf('file:///') === 0){
+				// Absolute file:// URL for custom BGMs in deployed builds — use directly
+				url = name + ext;
+			} else {
+				var encodedName = name.split('/').map(encodeURIComponent).join('/');
+				url = this._path + folder + '/' + encodedName + ext;
+			}
+			if (this.shouldUseHtml5Audio() && folder === 'bgm') {
+				if(this._blobUrl) Html5Audio.setup(this._blobUrl);
+				else Html5Audio.setup(url);
+				return Html5Audio;
+			} else {
+				return new WebAudio(url);
+			}
+		};
+
 		AudioManager.staticSeStates = {};
 		AudioManager.playStaticSe = function(se) {
 			if (se.name) {
@@ -131,6 +150,48 @@
 			return '.ogg';
 		};
 		
+		var _WebAudio_load = WebAudio.prototype._load;
+		WebAudio.prototype._load = function(url) {
+			if (WebAudio._context && Decrypter.hasEncryptedAudio && url.indexOf('custom/') !== -1) {
+				// Custom BGMs are plain .ogg — bypass encryption handling
+				var xhr = new XMLHttpRequest();
+				xhr.open('GET', url);
+				xhr.responseType = 'arraybuffer';
+				xhr.onload = function() {
+					if (xhr.status < 400) {
+						this._onXhrLoad(xhr);
+					}
+				}.bind(this);
+				xhr.onerror = this._loader || function(){ this._hasError = true; }.bind(this);
+				xhr.send();
+			} else {
+				_WebAudio_load.call(this, url);
+			}
+		};
+
+		var _WebAudio_onXhrLoad = WebAudio.prototype._onXhrLoad;
+		WebAudio.prototype._onXhrLoad = function(xhr) {
+			if (Decrypter.hasEncryptedAudio && this._url && this._url.indexOf('custom/') !== -1) {
+				// Plain file — skip decryption
+				var array = xhr.response;
+				this._readLoopComments(new Uint8Array(array));
+				WebAudio._context.decodeAudioData(array, function(buffer) {
+					this._buffer = buffer;
+					this._totalTime = buffer.duration;
+					if (this._loopLength > 0 && this._sampleRate > 0) {
+						this._loopStart /= this._sampleRate;
+						this._loopLength /= this._sampleRate;
+					} else {
+						this._loopStart = 0;
+						this._loopLength = 0;
+					}
+					this._onLoad();
+				}.bind(this));
+			} else {
+				_WebAudio_onXhrLoad.call(this, xhr);
+			}
+		};
+
 		WebAudio.prototype.play = function(loop, offset) {
 			if (this.isReady()) {
 				offset = offset || 0;

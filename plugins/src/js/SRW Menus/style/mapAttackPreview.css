@@ -46,3 +46,25 @@
         opacity: 0.5;
     }
 }
+
+.friendly_fire_warning {
+	position: absolute;
+    top: 0;
+    right: 0;
+    background-color: rgba(0,0,0,0.5);
+    padding: 0%;
+    z-index: 4;
+    color: #FFF;
+    display: flex;
+    align-items: center;
+	--fontsize: 1.5px;
+	white-space: nowrap;
+}
+
+.friendly_fire_warning img{
+	width: 12%;
+    margin-left: 2%;
+    filter: invert(14%) sepia(91%) saturate(7187%) hue-rotate(11deg) brightness(99%) contrast(103%);
+    margin-top: 1%;
+    margin-right: 2%;
+}

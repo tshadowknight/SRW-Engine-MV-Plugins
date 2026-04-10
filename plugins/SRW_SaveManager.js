@@ -82,6 +82,7 @@ SRWSaveManager.prototype.refundMechUpgrades = function(mechId){
 		}		
 	}
 	if(!isNaN(refundAmount)){
+		mechData.genericFUBAbilityIdx = -1;//unset generic FUB
 		$gameParty.gainGold(refundAmount);	
 		this.storeMechData(mechId, mechData);
 	}

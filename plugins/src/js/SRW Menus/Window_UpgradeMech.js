@@ -271,7 +271,7 @@ Window_UpgradeMech.prototype.update = function() {
 					var refData = this.createReferenceData(mechData);
 					$statCalc.applyMechUpgradeDeltas(refData, this._currentUpgradeDeltas);
 					$statCalc.storeMechData(mechData);
-					$gameSystem.updateAvailableUnits();
+					$gameSystem.updateTargetMechData(mechData.id);
 					if($statCalc.getOverallModificationLevel(this.createReferenceData(mechData)) >= 100){
 						if($statCalc.getGenericFUB(refData) == -1 || $statCalc.getGenericFUB(refData) == null){
 							this._UIState = "fub_selection";
@@ -294,7 +294,7 @@ Window_UpgradeMech.prototype.update = function() {
 					$statCalc.applyGenericFUB(refData, this._genericFUBInfo[this._currentGenericFUBSelection].id);
 					if(refData.SRWStats.mech.FUBTransform != null){
 						$SRWSaveManager.registerEvolvedMech(refData.SRWStats.mech.id, refData.SRWStats.mech.FUBTransform);
-						$gameSystem.updateAvailableUnits();
+						$gameSystem.updateTargetMechData(mechData.id);
 					}					
 					
 					$statCalc.storeMechData(mechData);

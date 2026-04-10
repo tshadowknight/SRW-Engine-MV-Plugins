@@ -1745,6 +1745,8 @@ BattleCalc.prototype.generateMapBattleResult = function(){
 	aCache.fundGain = 0;	
 	aCache.gainDonors = [];
 
+	aCache.attackedMap = [];
+
 	let inflictedDamge = false;
 		
 	
@@ -1754,6 +1756,8 @@ BattleCalc.prototype.generateMapBattleResult = function(){
 		$statCalc.invalidateAbilityCache(target);
 		//temp variable used to resolve weapon effects per target in StatCalc.prototype.getActiveStatMods
 		$gameTemp.currentBattleTarget = target;
+
+		
 		
 		if(aCache.action.attack && 
 			(
@@ -1781,6 +1785,7 @@ BattleCalc.prototype.generateMapBattleResult = function(){
 			
 			_this.prepareBattleCache(defender, "defender");
 			var dCache = $gameTemp.battleEffectCache[defender.actor._cacheReference];
+			aCache.attackedMap.push(dCache);
 			if(interactionType != Game_System.INTERACTION_DAMAGE){
 				var statusEffects = {
 					inflict_accuracy_down: $statCalc.applyStatModsToValue(aCache.ref, 0, ["inflict_accuracy_down"]),

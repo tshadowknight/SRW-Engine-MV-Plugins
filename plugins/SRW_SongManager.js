@@ -32,11 +32,26 @@ SRWSongManager.prototype.setCustomActorSong = function(actorId, weaponId, songId
 	$gameSystem.customActorSongInfo[actorId] = actorInfo;
 }
 
+SRWSongManager.prototype.isCustomSongAvailable = function(songId){
+	if(!songId){ return false; }
+	var custom = DataManager._customBGMList || [];
+	return custom.indexOf(songId) !== -1;
+}
+
 SRWSongManager.prototype.getActorSongInfo = function(actorId){
 	if(!$gameSystem.customActorSongInfo){
 		$gameSystem.customActorSongInfo = {};
-	}	
-	return $gameSystem.customActorSongInfo[actorId] || this._actorSongMapping[actorId];
+	}
+	var customInfo = $gameSystem.customActorSongInfo[actorId];
+	if(customInfo !== undefined){
+		var defaultSong = typeof customInfo === "string" ? customInfo : customInfo.default;
+		// Only check availability for custom file songs; game songs are always available
+		if(defaultSong && (!defaultSong.match('.*custom/') || this.isCustomSongAvailable(defaultSong))){
+			return customInfo;
+		}
+		// custom song file is missing — fall back to config default
+	}
+	return this._actorSongMapping[actorId];
 }
 
 SRWSongManager.prototype.getEnemySongInfo = function(enemyId){

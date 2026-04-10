@@ -259,6 +259,8 @@ Window_Options.prototype.initialize = function() {
 	
 
 	// Sound Options
+	
+
 	this._soundOptions.push({
 		name: APPSTRINGS.OPTIONS.label_battle_bgm,
 		display: function(){
@@ -329,6 +331,40 @@ Window_Options.prototype.initialize = function() {
 			ConfigManager["meVolume"] = current;
 
 		}
+	});
+	
+	this._soundOptions.push({
+		name: "Battle BGM Assignment",
+		display: function(){
+			if($gameSystem.isIntermission()){
+				return "";
+			} else {
+				return APPSTRINGS.OPTIONS.label_intermission_only;
+			}
+		},
+		update: function(){
+			if($gameSystem.isIntermission()){
+				$gameTemp.pushMenu = "battle_bgm_assign";
+			}
+		},
+		isSubMenu: true
+	});
+
+	this._soundOptions.push({
+		name: APPSTRINGS.OPTIONS.label_jukebox,
+		display: function(){
+			if($gameSystem.isIntermission()){
+				return "";
+			} else {
+				return APPSTRINGS.OPTIONS.label_play_in_intermission;
+			}
+		},
+		update: function(){
+			if($gameSystem.isIntermission()){
+				$gameTemp.pushMenu = "jukebox";
+			}
+		},
+		isSubMenu: true
 	});
 
 	// Tweaks Options (Game Modes)
@@ -688,21 +724,26 @@ Window_Options.prototype.redraw = function() {
 		this._optionInfo = this._soundOptions;
 	} else if(currentTabKey === "graphics"){
 		this._optionInfo = this._graphicsOptions;
-	} else if(currentTabKey === "tweaks"){
+	} else if(currentTabKey === "tweaks"){	
 		this._optionInfo = this._tweaksOptions;
 	}
 
-	// Update button hints based on UI state
-	if(this._currentUIState == "tab_selection"){
-		$gameTemp.buttonHintManager.setHelpButtons([["tab_nav"], ["tab_selection"]]);
-	} else if(this._currentUIState == "options_editing"){
-		if(ENGINE_SETTINGS.ENABLE_TWEAKS_MENU){
-			$gameTemp.buttonHintManager.setHelpButtons([["select_option"], ["toggle_option"], ["enter_sub_menu"]]);
-		} else {
-			$gameTemp.buttonHintManager.setHelpButtons([["select_option"], ["toggle_option"]]);
+	if($gameTemp.buttonHintManager){
+		//there appears to be a race condition bug when leaving the title menu through loading where this is called just after the save is loaded and $gameTemp is reset, leaving $gameTemp.buttonHintManager as null.
+		//exact triggers conditions not yet replicated. This guard should suppress the crash.
+		// Update button hints based on UI state
+		if(this._currentUIState == "tab_selection"){
+			$gameTemp.buttonHintManager.setHelpButtons([["tab_nav"], ["tab_selection"]]);
+		} else if(this._currentUIState == "options_editing"){
+			if(ENGINE_SETTINGS.ENABLE_TWEAKS_MENU){
+				$gameTemp.buttonHintManager.setHelpButtons([["select_option"], ["toggle_option"], ["enter_sub_menu"]]);
+			} else {
+				$gameTemp.buttonHintManager.setHelpButtons([["select_option"], ["toggle_option"]]);
+			}
 		}
+		$gameTemp.buttonHintManager.show();
 	}
-	$gameTemp.buttonHintManager.show();
+
 
 	var content = "";
 	if(currentTabKey == "tweaks" && !$gameSystem?._isIntermission){

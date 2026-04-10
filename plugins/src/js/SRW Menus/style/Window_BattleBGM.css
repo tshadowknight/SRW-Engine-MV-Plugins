@@ -1,0 +1,129 @@
+#battle_bgm_assign .sub_header {
+	position: absolute;
+	top: 14%;
+	left: 11.5%;
+	width: 77%;
+	text-align: center;
+	color: var(--text-color-highlight2);
+	--fontsize: 1.6px;
+}
+
+#battle_bgm_assign .list_container {
+	height: 62%;
+	border: 0.1vw solid #FFFFFF;
+	border-radius: 1vw;
+	display: block;
+	width: 77%;
+	background-color: var(--section-bg-color);
+	overflow-y: scroll;
+	border-top-right-radius: 0px;
+	border-bottom-right-radius: 0px;
+	padding: 1%;
+	top: 23%;
+}
+
+#battle_bgm_assign .entry {
+	display: flex;
+	align-items: center;
+	width: 95%;
+	--fontsize: 1.8px;
+	margin-left: auto;
+	margin-right: auto;
+	color: #FFFFFF;
+	padding: 0.5%;
+	height: 11%;
+}
+
+#battle_bgm_assign .entry.selected {
+	background-color: var(--selected-color);
+}
+
+#battle_bgm_assign .entry.title {
+	color: var(--text-color-highlight2);
+	--fontsize: 2px;
+}
+
+#battle_bgm_assign .entry.group_header {
+    color: var(--text-color-highlight2);
+    --fontsize: 1.8px;
+    border-bottom: 0.1vw solid var(--text-color-highlight2);
+    pointer-events: none;
+}
+
+#battle_bgm_assign .face_col {
+	width: 5%;
+	aspect-ratio: 1 / 1;
+	flex-shrink: 0;
+	overflow: hidden;
+}
+
+#battle_bgm_assign .face_col .face_pic_container {
+	width: 100%;
+	height: 100%;
+}
+
+#battle_bgm_assign .face_col .face_pic_container canvas {
+	width: 100%;
+	height: 100%;
+}
+
+#battle_bgm_assign .entry .label {
+	flex: 1;
+	min-width: 0;
+	margin-left: 3%;
+	margin-right: 2%;
+	text-align: left;
+}
+
+#battle_bgm_assign .confirm_container {
+	position: absolute;
+	top: 0;
+	left: 0;
+	width: 100%;
+	height: 100%;
+	display: flex;
+	align-items: center;
+	justify-content: center;
+	background-color: rgba(0, 0, 0, 0.3);
+}
+
+#battle_bgm_assign .confirm_container .confirm {
+	width: 40%;
+}
+
+#battle_bgm_assign .entry .warn_icon {
+	--widthscaling: 2px;
+	width: 4%;
+	flex-shrink: 0;
+	margin-left: 1%;
+	filter: invert(85%) sepia(100%) saturate(500%) hue-rotate(0deg) brightness(105%);
+	pointer-events: none;
+}
+
+#battle_bgm_assign .entry .play_btn {
+	--widthscaling: 2px;
+	width: 5%;
+	flex-shrink: 0;
+	margin-left: 2%;
+	margin-right: 1%;
+	filter: var(--white-filter);
+	cursor: pointer;
+	opacity: 0.7;
+}
+
+#battle_bgm_assign .entry .play_btn:hover {
+	opacity: 1;
+}
+
+#battle_bgm_assign .entry .value {
+	width: 28%;
+	flex-shrink: 0;
+	margin-left: 2%;
+	margin-right: 2%;
+	text-align: center;
+	color: var(--text-color-highlight2);
+	white-space: nowrap;
+	display: flex;
+    align-items: center;
+    justify-content: center;
+}

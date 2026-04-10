@@ -217,6 +217,7 @@ APPSTRINGS.DETAILPAGES = {
 	label_pilot_exp: "Exp",
 	label_pilot_SP: "SP",
 	label_pilot_MP: "MP",
+	label_friendly_fire: "Friendly Fire",
 }	
 
 APPSTRINGS.MECHUPGRADES = {
@@ -423,7 +424,9 @@ APPSTRINGS.OPTIONS = {
 	label_tweaks: "Modes",
 	label_button_set: "Button Display",
 	label_show_map_buttons: "Map Button Hints",
-	label_intermission_only: "Edit in Intermission"
+	label_intermission_only: "Edit in Intermission",
+	label_play_in_intermission: "Play in Intermission",
+	label_jukebox: "Jukebox",
 }
 
 APPSTRINGS.MODE_SELECTION = {
@@ -516,6 +519,32 @@ APPSTRINGS.TERRAIN_DETAILS = {
 	label_en_regen: "EN Regen"
 }
 
+APPSTRINGS.JUKEBOX = {
+	header: "Jukebox",
+	sub_header: "Select a song to play",
+	now_playing: "Now Playing: ",
+	label_no_songs: "No songs unlocked",
+	label_type_game: "Game",
+	label_type_custom: "Custom",
+}
+
+APPSTRINGS.BATTLE_BGM = {
+	header: "Assign BGM",
+	sub_header_unit: "Select a pilot to assign a battle BGM",
+	sub_header_bgm: "Assign BGM: ",
+	label_default: "Default",
+	label_none: "None",
+	label_unknown_unit: "---",
+	label_unknown_unit_fallback: "???",
+	label_no_pilots: "No pilots available",
+	label_group_others: "Others",
+	label_no_bgms: "No BGMs unlocked",
+	label_type_game: "Game",
+	label_type_custom: "Custom",
+	confirm_apply_all: "Apply \"%s\" to all pilots?",
+	confirm_reset_all: "Reset all pilots to default BGM?",
+}
+
 APPSTRINGS.BUTTON_HINTS = {
 	test: {text: "This is a test action", action: 'menu'},
 	test2: {text: "This is a test action2", action: 'ok'},
@@ -604,9 +633,15 @@ APPSTRINGS.BUTTON_HINTS = {
 	select_deploy_target_slot: {text: "Select a Slot", action: "up"}, 
 	confirm_deploy_unit: {text: "Place Unit", action: "ok"}, 
 	
-	move_to_front:  {text: "Move to Front", action: "pageup"}, 
-	move_to_back:  {text: "Move to Back", action: "pagedown"}, 
-	
+	move_to_front:  {text: "Move to Front", action: "pageup"},
+	move_to_back:  {text: "Move to Back", action: "pagedown"},
+
+	apply_all_bgm: {text: "Apply BGM to All Pilots", action: "pageup"},
+	reset_all_bgm: {text: "Reset All to Default", action: "pagedown"},
+	select_bgm_pilot: {text: "Select Pilot", action: "ok"},
+	assign_bgm: {text: "Assign BGM", action: "ok"},
+	preview_bgm: {text: "Preview BGM", action: "menu"},
+	play_jukebox_song: {text: "Play Song", actions: ["ok", "menu"]},
 	deploy: {text: "Deploy", action: "menu"},  
 	
 	//spirits

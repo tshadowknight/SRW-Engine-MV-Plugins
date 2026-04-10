@@ -317,7 +317,11 @@
 			this._searchedItemList = [];
 		};
 
-		Game_System.prototype.updateAvailableUnits = function(ignoreEventDeploys, preservePilotTypes, noReload){
+		Game_System.prototype.updateTargetMechData = function(targetMechId){
+			this.updateAvailableUnits(null, null, null, targetMechId);
+		}
+
+		Game_System.prototype.updateAvailableUnits = function(ignoreEventDeploys, preservePilotTypes, noReload, targetMechId){
 			const _this = this;
 			this._availableMechs = [];//available mechs must be cleared to avoid conflicts with previously serialized entries in the listing
 			this._availableUnits = $gameParty.allMembers();
@@ -330,6 +334,7 @@
 				//revert any class changes made during the stage by a deploy action
 				var refEvent = $statCalc.getReferenceEvent(actor);
 				if(!ignoreEventDeploys || !refEvent || !refEvent.isScriptedDeploy){
+					
 					//if(actor._intermissionClassId){
 					//	actor._classId = actor._intermissionClassId;
 						//actor.isSubPilot = false;
@@ -339,6 +344,10 @@
 						let info = _this._pilotFallbackInfo[actor.actorId()];
 						actor._classId = info.classId;
 						actor.isSubPilot = info.isSubPilot;
+					}
+
+					if(targetMechId != null && actor._classId != targetMechId){
+						return;
 					}
 					
 					var targetMech = $statCalc.getMechData($dataClasses[actor._classId], true);					
@@ -408,6 +417,9 @@
 					/*if(!preservePilotTypes){
 						actor.isSubPilot = false;
 					}*/
+					if(targetMechId != null && actor._classId != targetMechId){
+						return;
+					}
 					if(isSubTwin[actor.actorId()]){
 						actor.isSubTwin = true;
 						actor.subTwin = null;
@@ -472,6 +484,7 @@
 			ImageManager.clearFullCache();
 			//$statCalc.reloadSRWActors();
 			this.updateAvailableUnits();
+			this.unlockDefaultBGMs();
 			$gameTemp.summaryUnit = null;
 			$statCalc.invalidateAbilityCache();
 			//$statCalc.createActiveAbilityLookup();
@@ -3249,5 +3262,95 @@
 				this.indicatorSetting = 0;
 			}
 			return this.indicatorSetting;
+		}
+
+		Game_System.prototype._initUnlockedBGMs = function() {
+			if(!this._unlockedBGMs){
+				this._unlockedBGMs = [];
+			}
+		}
+
+		Game_System.prototype.unlockBGM = function(songId) {
+			this._initUnlockedBGMs();
+			if(this._unlockedBGMs.indexOf(songId) == -1){
+				this._unlockedBGMs.push(songId);
+			}
+		}
+
+		Game_System.prototype.lockBGM = function(songId) {
+			this._initUnlockedBGMs();
+			var idx = this._unlockedBGMs.indexOf(songId);
+			if(idx != -1){
+				this._unlockedBGMs.splice(idx, 1);
+			}
+		}
+
+		Game_System.prototype.isBGMUnlocked = function(songId) {
+			this._initUnlockedBGMs();
+			return this._unlockedBGMs.indexOf(songId) != -1;
+		}
+
+		Game_System.prototype.getUnlockedBGMs = function() {
+			this._initUnlockedBGMs();
+			return this._unlockedBGMs.slice();
+		}
+
+		Game_System.prototype._initUnlockedJukeboxSongs = function() {
+			if(!this._unlockedJukeboxSongs){
+				this._unlockedJukeboxSongs = [];
+			}
+		}
+
+		Game_System.prototype.unlockJukeboxSong = function(songId) {
+			this._initUnlockedJukeboxSongs();
+			if(this._unlockedJukeboxSongs.indexOf(songId) == -1){
+				this._unlockedJukeboxSongs.push(songId);
+			}
+		}
+
+		Game_System.prototype.lockJukeboxSong = function(songId) {
+			this._initUnlockedJukeboxSongs();
+			var idx = this._unlockedJukeboxSongs.indexOf(songId);
+			if(idx != -1){
+				this._unlockedJukeboxSongs.splice(idx, 1);
+			}
+		}
+
+		Game_System.prototype.isJukeboxSongUnlocked = function(songId) {
+			this._initUnlockedJukeboxSongs();
+			return this._unlockedJukeboxSongs.indexOf(songId) != -1;
+		}
+
+		Game_System.prototype.getUnlockedJukeboxSongs = function() {
+			this._initUnlockedJukeboxSongs();
+			return this._unlockedJukeboxSongs.slice();
+		}
+
+		Game_System.prototype.clearCustomActorSong = function(actorId) {
+			if(!this.customActorSongInfo){
+				this.customActorSongInfo = {};
+			}
+			delete this.customActorSongInfo[actorId];
+		}
+
+		Game_System.prototype.unlockDefaultBGMs = function() {
+			if(!this._availableUnits){ return; }
+			const _this = this;
+			const mapping = $SRWConfig.battleSongs.actorSongMapping;
+			this._availableUnits.forEach(function(unit) {
+				if(!unit.actorId || unit.actorId() <= 0){ return; }
+				const info = mapping && mapping[unit.actorId()];
+				if(!info){ return; }
+				let songId;
+				if(typeof info === "string"){
+					songId = info;
+				} else if(info.default){
+					songId = info.default;
+				}
+				if(songId){
+					_this.unlockBGM(songId);
+					_this.unlockJukeboxSong(songId);
+				}
+			});
 		}
 	}

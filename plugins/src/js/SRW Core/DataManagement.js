@@ -20,6 +20,7 @@
 			DataManager.checkSRWKit().then(async function(){
 				DataManager.loadDatabase();
 				await DataManager.loadSRWConfig();
+				DataManager.loadCustomBGMs();
 				ConfigManager.load();	
 				await DataManager.loadLocalization();
 				if(ENGINE_SETTINGS.PRELOADER){
@@ -1259,16 +1260,59 @@
 		StorageManager.localFileDirectoryPath = function() {
 			var path = require('path');
 
-		
+
 			if(process.versions["nw-flavor"] === "sdk"){
 			return getBase()+"save/";
 			} else {
 				var base = path.dirname(process.execPath);
 				return path.join(base, '/../save/');
-				
-			}			
+
+			}
 		};
-		
+
+		DataManager.getCustomBGMDirectoryPath = function() {
+			var path = require('path');
+			if(process.versions["nw-flavor"] === "sdk"){
+				return getBase() + "bgm_custom/";
+			} else {
+				var base = path.dirname(process.execPath);
+				return path.join(base, '/../bgm_custom/');
+			}
+		};
+
+		DataManager.loadCustomBGMs = function() {
+			const _this = this;
+			this._customBGMList = [];
+			if(!Utils.isNwjs()){ return; }
+			const fs = require('fs');
+			const path = require('path');
+			const customDir = this.getCustomBGMDirectoryPath();
+
+			if(!fs.existsSync(customDir)){
+				fs.mkdirSync(customDir, { recursive: true });
+			}
+
+			let files;
+			try {
+				files = fs.readdirSync(customDir);
+			} catch(e) {
+				return;
+			}
+
+			files.forEach(function(file){
+				if(!file.toLowerCase().endsWith('.ogg')){ return; }
+				var songId;
+				if(process.versions["nw-flavor"] === "sdk"){
+					songId = "../../" + _this.getCustomBGMDirectoryPath() + file.replace(/\.ogg$/i, '');
+				} else {
+					// Absolute path — convert to file:// URL so AudioManager can use it directly
+					var absPath = path.join(_this.getCustomBGMDirectoryPath(), file.replace(/\.ogg$/i, ''));
+					songId = "file:///" + absPath.replace(/\\/g, '/');
+				}
+				DataManager._customBGMList.push(songId);
+			});
+		};
+
 		DataManager.interpretTextScript = function(scriptId) {
 			var _this = this;
 			var functionDefs = {};
@@ -1302,6 +1346,10 @@
 				setStageSong: true,
 				setSpecialTheme: true,
 				clearSpecialTheme: true,
+				unlockBGM: true,
+				lockBGM: true,
+				unlockJukeboxSong: true,
+				lockJukeboxSong: true,
 				addItem: true,
 				addAllItems: true,
 				removeItem: true,

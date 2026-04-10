@@ -274,6 +274,7 @@
 	border-bottom-right-radius: 1vw;
 	display: none;
 	padding-bottom: 0.6vw;
+	position: relative;
 }
 
 #attack_list_map_preview.active {

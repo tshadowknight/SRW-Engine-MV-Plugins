@@ -3589,7 +3589,7 @@ StatCalc.prototype.applyMechUpgradeDeltas = function(actor, deltas){
 			upgradeLevels[upgradeStat]+=deltas[upgradeStat];
 		}
 	});
-	this.calculateSRWMechStats(actor.SRWStats.mech);
+	this.calculateSRWMechStats(actor.SRWStats.mech, false, actor);
 }
 
 StatCalc.prototype.applyInheritedMechUpgradeDeltas = function(actor, deltas){

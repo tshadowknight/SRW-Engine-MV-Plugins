@@ -107,6 +107,23 @@
 				if (command === 'LockUnit') {
 					$SRWSaveManager.setUnitLocked(args[0]);
 				}
+				if (command === 'unlockBGM') {
+					var songId = args.join(' ');
+					if(songId){ $gameSystem.unlockBGM(songId); }
+				}
+				if (command === 'lockBGM') {
+					var songId = args.join(' ');
+					if(songId){ $gameSystem.lockBGM(songId); }
+				}
+				if (command === 'unlockJukeboxSong') {
+					var songId = args.join(' ');
+					if(songId){ $gameSystem.unlockJukeboxSong(songId); }
+				}
+				if (command === 'lockJukeboxSong') {
+					var songId = args.join(' ');
+					if(songId){ $gameSystem.lockJukeboxSong(songId); }
+				}
+
 				if (command === 'SetLevel') {
 					$SRWSaveManager.setPilotLevel(args[0], args[1]);
 				}
