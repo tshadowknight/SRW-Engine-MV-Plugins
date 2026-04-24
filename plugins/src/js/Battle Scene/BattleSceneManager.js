@@ -2047,8 +2047,6 @@ BattleSceneManager.prototype.hookBeforeRender = function(){
 	
 	_this._scene.registerBeforeRender(function() {
 		var deltaTime = _this._engine.getDeltaTime();
-		_this._effekseerWasTranslated = false;
-		
 		var ratio = _this.getCurrentRatio();
 		ratio*=_this._animRatio;
 		deltaTime*=ratio;
@@ -2685,9 +2683,6 @@ BattleSceneManager.prototype.updateParentedEffekseerEffect = function(effekInfo)
 				(rotation.z + effekInfo.offsetRotation.z) * mirrorFactor
 			);
 		}
-		
-		
-		this._effekseerWasTranslated = true;
 	}
 }
 
@@ -2722,18 +2717,23 @@ BattleSceneManager.prototype.runAnimations = function(deltaTime){
 		var animation = _this._matrixUpdates[animationId];
 		var targetObj = animation.targetObj;
 		if(targetObj){
+			//track if a translation or rotation occurred so effekseer handles aren't synced with uninitialized scratchpad content
+			let hasTranslate = false;
+			let hasRotate = false;
 			if(animation.type == "translate" || animation.type == "translate_relative" || animation.type == "translate_effek"){
 				BABYLON.Vector3.LerpToRef(animation.startPosition, animation.endPosition, 1, targetObj.position);
 				(targetObj.realPosition || (targetObj.realPosition = new BABYLON.Vector3())).copyFrom(targetObj.position);
+				hasTranslate = true;
 			} else {
 				BABYLON.Vector3.LerpToRef(animation.startPosition, animation.endPosition, 1, targetObj.rotation);
+				hasRotate = true;
 			}
 
 			if(targetObj.handle){ //support for effekseer handles
-				if(targetObj.position){
+				if(targetObj.position && hasTranslate){
 					targetObj.handle.setLocation(targetObj.position.x, targetObj.position.y, targetObj.position.z);
 				}
-				if(targetObj.rotation){
+				if(targetObj.rotation && hasRotate){
 					//targetObj.handle.setRotation(targetObj.rotation.x, targetObj.rotation.y, targetObj.rotation.z);
 					//targetObj.offsetRotation = {x: targetObj.rotation.x, y: targetObj.rotation.y, z: targetObj.rotation.z};
 					
@@ -2743,8 +2743,7 @@ BattleSceneManager.prototype.runAnimations = function(deltaTime){
 						targetObj.handle.setRotation(targetObj.rotation.x, targetObj.rotation.y, targetObj.rotation.z);
 					}	
 				}
-				_this._effekseerWasTranslated = true;
-			}	
+			}
 		}
 	}		
 	_this._matrixUpdates = {};
@@ -2752,7 +2751,10 @@ BattleSceneManager.prototype.runAnimations = function(deltaTime){
 	for(let animationId in _this._matrixAnimations){
 		var animation = _this._matrixAnimations[animationId];
 		var targetObj = animation.targetObj;
-		if(targetObj){				
+		if(targetObj){	
+			//track if a translation or rotation occurred so effekseer handles aren't synced with uninitialized scratchpad content
+			let hasTranslate = false;
+			let hasRotate = false;			
 		
 			if(animation.type == "translate_relative"){
 				if(!animation.startPointSet){
@@ -2762,7 +2764,7 @@ BattleSceneManager.prototype.runAnimations = function(deltaTime){
 					}	
 					
 					animation.startPointSet = true;
-					animation.startPosition = new BABYLON.Vector3(targetObj.position.x, targetObj.position.y, targetObj.position.z);				
+					animation.startPosition = new BABYLON.Vector3(targetObj.relStartPos.x, targetObj.relStartPos.y, targetObj.relStartPos.z);				
 					animation.endPosition.x =animation.startPosition.x + (animation.endPosition.x * directionFactor);
 					animation.endPosition.y+=animation.startPosition.y;
 					animation.endPosition.z+=animation.startPosition.z;
@@ -2791,24 +2793,29 @@ BattleSceneManager.prototype.runAnimations = function(deltaTime){
 							_this._tmp_vec_catmullPos1.x *= _this._animationDirection;
 							_this._tmp_vec_catmullPos4.x *= _this._animationDirection;
 							hasValidSpline = true;
-							targetObj.position = BABYLON.Vector3.CatmullRom(_this._tmp_vec_catmullPos1, animation.startPosition, animation.endPosition, _this._tmp_vec_catmullPos4, t);
+							targetObj.position.copyFrom(BABYLON.Vector3.CatmullRom(_this._tmp_vec_catmullPos1, animation.startPosition, animation.endPosition, _this._tmp_vec_catmullPos4, t));
+							hasTranslate = true;
 						}
 					} 
 
 					if(!hasValidSpline){
 						BABYLON.Vector3.LerpToRef(animation.startPosition, animation.endPosition, t, targetObj.position);
+						hasTranslate = true;
 					}						
 					(targetObj.realPosition || (targetObj.realPosition = new BABYLON.Vector3())).copyFrom(targetObj.position);
 				} else {
 					BABYLON.Vector3.LerpToRef(animation.startPosition, animation.endPosition, t, targetObj.rotation);
+					hasRotate = true;
 				}
 				
 			} else {
 				if(animation.type == "translate" || animation.type == "translate_relative" || animation.type == "translate_effek"){
 					BABYLON.Vector3.LerpToRef(animation.startPosition, animation.endPosition, 1, targetObj.position);
 					(targetObj.realPosition || (targetObj.realPosition = new BABYLON.Vector3())).copyFrom(targetObj.position);
+					hasTranslate = true;
 				} else {
 					BABYLON.Vector3.LerpToRef(animation.startPosition, animation.endPosition, 1, targetObj.rotation);
+					hasRotate = true;
 				}
 				if(animation.hide){
 					targetObj.isVisible = false;
@@ -2816,21 +2823,24 @@ BattleSceneManager.prototype.runAnimations = function(deltaTime){
 				delete _this._matrixAnimations[animationId];
 			}	
 			if(targetObj.handle){ //support for effekseer handles
-				if(targetObj.position){
+				if(targetObj.position && hasTranslate){
 					targetObj.handle.setLocation(targetObj.position.x, targetObj.position.y, targetObj.position.z);
+					//track new position in the effekseer parent's offset
+					targetObj.offset.x = targetObj.position.x;
+					targetObj.offset.y = targetObj.position.y;
+					targetObj.offset.z = targetObj.position.z;
 				}
-				if(targetObj.rotation){
+				if(targetObj.rotation && hasRotate){
 					//targetObj.handle.setRotation(targetObj.rotation.x, targetObj.rotation.y, targetObj.rotation.z);
 					//targetObj.offsetRotation = {x: targetObj.rotation.x, y: targetObj.rotation.y, z: targetObj.rotation.z};
 					
 					if(targetObj.parent && !targetObj.ignoreParentRotation){			
-						targetObj.offsetRotation = {x: params.rotation.x, y: params.rotation.y, z: params.rotation.z};
+						targetObj.offsetRotation = {x: targetObj.rotation.x, y: targetObj.rotation.y, z: targetObj.rotation.z};
 					} else {
 						targetObj.handle.setRotation(targetObj.rotation.x, targetObj.rotation.y, targetObj.rotation.z);
 					}	
 				}
-				_this._effekseerWasTranslated = true;
-			}	
+			}
 		}
 	}	
 	
@@ -3049,7 +3059,6 @@ BattleSceneManager.prototype.startScene = function(){
 			}			
 		}		
 		
-		_this._effekseerWasTranslated = false;
 		//do a 0 speed update to rerender the effect at the new location without progressing the animation
 		for(let info of this._effekseerInfo){
 			info.context.updateHandle(info.handle, 0);
@@ -3956,9 +3965,9 @@ BattleSceneManager.prototype.executeAnimation = function(animation, startTick){
 					let directionFactor = _this._animationDirection;
 					if(targetObj.handle){
 						directionFactor = 1;//do not convert relative motions for effekseer handlers as mirrored instance there are handled through a mirrored renderer
-						if(!targetObj.position){
-							targetObj.position = {x: targetObj.offset.x, y: targetObj.offset.y, z: targetObj.offset.z};
-						}
+						targetObj.relStartPos = new BABYLON.Vector3(targetObj.offset.x,targetObj.offset.y,targetObj.offset.z);
+					} else {
+						targetObj.relStartPos = targetObj.position.clone();
 					}
 					/*startPosition = {x: targetObj.position.x, y:  targetObj.position.y, z: targetObj.position.z};				
 					targetPosition.x = startPosition.x + (targetPosition.x * directionFactor);
@@ -5157,8 +5166,8 @@ BattleSceneManager.prototype.executeAnimation = function(animation, startTick){
 					context: targetContext, 
 					offset: {x: position.x, y: position.y, z: position.z}, 
 					offsetRotation: {x: rotation.x, y: rotation.y, z: rotation.z},
-					position: new BABYLON.Vector3(position.x, position.y, position.z), //needed to copy animation result into
-					rotation: new BABYLON.Vector3(rotation.x, rotation.y, rotation.z) //needed to copy animation result into
+					position: new BABYLON.Vector3(0,0,0), //needed to copy animation result into
+					rotation: new BABYLON.Vector3(0,0,0) //needed to copy animation result into
 				};
 				info.handle = handle;
 				info.isSysEffect = params.isSysEffect;
@@ -5564,7 +5573,8 @@ BattleSceneManager.prototype.executeAnimation = function(animation, startTick){
 					}
 					if(targetObj.lastAnimation == "block"){
 						if(action.damageInflicted / $statCalc.getCalculatedMechStats(targetAction.ref).maxHP < (ENGINE_SETTINGS.BATTLE_SCENE.BLOCK_BREAK_THRESHOLD || 0.2) && targetAction.destroyer != action.ref){
-							params.name = "block";	
+							//params.name = "block";	
+							return;
 						}										
 					} else if(battleEffect.damageInflicted == 0){						
 						params.name = "main";												
@@ -6185,7 +6195,7 @@ BattleSceneManager.prototype.executeAnimation = function(animation, startTick){
 			}
 			
 			if(originalAction.damageInflicted > 0){
-				var resistance = $statCalc.applyMaxStatModsToValue(action, 0, ["status_resistance"]);
+				var resistance = $statCalc.applyMaxStatModsToValue(action.ref, 0, ["status_resistance"]);
 				if(resistance < 1 || (originalAction.hasFury && resistance == 1)){
 					Object.keys(originalAction.statusEffects).forEach(function(inflictionId){
 						if(originalAction.statusEffects[inflictionId]){

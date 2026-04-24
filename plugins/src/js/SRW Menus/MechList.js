@@ -45,6 +45,7 @@ MechList.prototype.rowEnabled = function(actor){
 MechList.prototype.resetSelection = function(){
 	this._currentPage = 0;	
 	this._currentSelection = 0;
+	this._availableUnits = this.getAvailableUnits();
 }
 
 MechList.prototype.setCurrentSelection = function(value){

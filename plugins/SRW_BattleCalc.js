@@ -343,7 +343,7 @@ BattleCalc.prototype.doesSupportHit = function(){
 	return Math.random() < this.getSupportFinalHit();
 }	
 
-BattleCalc.prototype.performDamageCalculation = function(attackerInfo, defenderInfo, noCrit, noBarrier, isSupportDefender, isSupportAttacker, isMismatchedTwin){
+BattleCalc.prototype.performDamageCalculation = function(attackerInfo, defenderInfo, noCrit, noBarrier, isSupportDefender, isSupportAttacker, isMismatchedTwin, noPersist){
 	var result = {
 		damage: 0,
 		isCritical: false,
@@ -527,7 +527,7 @@ BattleCalc.prototype.performDamageCalculation = function(attackerInfo, defenderI
 			finalDamage*=SRW_CONSTANTS.TWIN_MISMATCH;
 		}
 		
-		if(activeDefenderSpirits.persist){
+		if(activeDefenderSpirits.persist && !noPersist){
 			var persistInfo = SRW_CONSTANTS.PERSIST || {type: "fixed", value: 10};
 			if(persistInfo.type == "fixed"){
 				finalDamage = 10;
@@ -1926,13 +1926,13 @@ BattleCalc.prototype.generateMapBattleResult = function(){
 	
 }
 
-BattleCalc.prototype.getBestWeapon = function(attackerInfo, defenderInfo, optimizeCost, ignoreRange, postMoveEnabledOnly){
+BattleCalc.prototype.getBestWeapon = function(attackerInfo, defenderInfo, optimizeCost, ignoreRange, postMoveEnabledOnly, noPersist){
 	var _this = this;
-	var result = _this.getBestWeaponAndDamage(attackerInfo, defenderInfo, optimizeCost, ignoreRange, postMoveEnabledOnly);
+	var result = _this.getBestWeaponAndDamage(attackerInfo, defenderInfo, optimizeCost, ignoreRange, postMoveEnabledOnly, null, null, noPersist);
 	return result.weapon;
 }
 
-BattleCalc.prototype.getBestWeaponAndDamage = function(attackerInfo, defenderInfo, optimizeCost, ignoreRange, postMoveEnabledOnly, allRequired, considerBarrier){
+BattleCalc.prototype.getBestWeaponAndDamage = function(attackerInfo, defenderInfo, optimizeCost, ignoreRange, postMoveEnabledOnly, allRequired, considerBarrier, noPersist){
 	var _this = this;
 	var allWeapons = $statCalc.getActorMechWeapons(attackerInfo.actor);
 	var bestWeapon;
@@ -1951,7 +1951,11 @@ BattleCalc.prototype.getBestWeaponAndDamage = function(attackerInfo, defenderInf
 				{actor: attackerInfo.actor, action: {type: "attack", attack: weapon}},
 				{actor: defenderInfo.actor, action: {type: "none"}},
 				true,
-				!considerBarrier
+				!considerBarrier,
+				null,
+				null,
+				null,
+				noPersist
 			);
 			var isReachable;
 			if(!isInRange){

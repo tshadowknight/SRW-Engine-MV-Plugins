@@ -333,39 +333,43 @@ Window_Options.prototype.initialize = function() {
 		}
 	});
 	
-	this._soundOptions.push({
-		name: "Battle BGM Assignment",
-		display: function(){
-			if($gameSystem.isIntermission()){
-				return "";
-			} else {
-				return APPSTRINGS.OPTIONS.label_intermission_only;
-			}
-		},
-		update: function(){
-			if($gameSystem.isIntermission()){
-				$gameTemp.pushMenu = "battle_bgm_assign";
-			}
-		},
-		isSubMenu: true
-	});
+	if(ENGINE_SETTINGS.ENABLE_BGM_ASSIGN){	
+		this._soundOptions.push({
+			name: "Battle BGM Assignment",
+			display: function(){
+				if($gameSystem.isIntermission()){
+					return "";
+				} else {
+					return APPSTRINGS.OPTIONS.label_intermission_only;
+				}
+			},
+			update: function(){
+				if($gameSystem.isIntermission()){
+					$gameTemp.pushMenu = "battle_bgm_assign";
+				}
+			},
+			isSubMenu: true
+		});
+	}
 
-	this._soundOptions.push({
-		name: APPSTRINGS.OPTIONS.label_jukebox,
-		display: function(){
-			if($gameSystem.isIntermission()){
-				return "";
-			} else {
-				return APPSTRINGS.OPTIONS.label_play_in_intermission;
-			}
-		},
-		update: function(){
-			if($gameSystem.isIntermission()){
-				$gameTemp.pushMenu = "jukebox";
-			}
-		},
-		isSubMenu: true
-	});
+	if(ENGINE_SETTINGS.ENABLE_CUSTOM_BGM){	
+		this._soundOptions.push({
+			name: APPSTRINGS.OPTIONS.label_jukebox,
+			display: function(){
+				if($gameSystem.isIntermission()){
+					return "";
+				} else {
+					return APPSTRINGS.OPTIONS.label_play_in_intermission;
+				}
+			},
+			update: function(){
+				if($gameSystem.isIntermission()){
+					$gameTemp.pushMenu = "jukebox";
+				}
+			},
+			isSubMenu: true
+		});
+	}
 
 	// Tweaks Options (Game Modes)
 

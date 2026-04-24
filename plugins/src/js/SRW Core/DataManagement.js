@@ -20,7 +20,9 @@
 			DataManager.checkSRWKit().then(async function(){
 				DataManager.loadDatabase();
 				await DataManager.loadSRWConfig();
-				DataManager.loadCustomBGMs();
+				if(ENGINE_SETTINGS.ENABLE_CUSTOM_BGM){
+					DataManager.loadCustomBGMs();
+				}				
 				ConfigManager.load();	
 				await DataManager.loadLocalization();
 				if(ENGINE_SETTINGS.PRELOADER){

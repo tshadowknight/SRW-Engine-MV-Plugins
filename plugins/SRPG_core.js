@@ -747,6 +747,7 @@ SceneManager.isInSaveScene = function(){
 		//this._deathQueue = [];
 		this.idToMenu = {};
 		$gameTemp.menuStack = [];
+		this._CSSWindows = [];
     };
 
 	Scene_Map.prototype.create = function() {
@@ -782,6 +783,16 @@ SceneManager.isInSaveScene = function(){
 		this.removeChild(this._windowLayer);
 		this.removeChild(this._spriteset);
 
+		for(let entry of this._CSSWindows){
+			try {
+				if(entry.resetSelection){
+					entry.resetSelection();
+				}
+			} catch(e){
+				console.error(e);
+			}						
+		}
+
 
 		this._transfer = $gamePlayer.isTransferring();
 		var mapId = this._transfer ? $gamePlayer.newMapId() : $gameMap.mapId();
@@ -797,6 +808,7 @@ SceneManager.isInSaveScene = function(){
 	};
 
 	Scene_Map.prototype.addCSSWindow = function(window) {
+		this._CSSWindows.push(window);
 		this._CSSWindowLayer.addChild(window);		
 	};
 

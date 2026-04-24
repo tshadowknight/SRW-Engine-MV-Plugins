@@ -61,6 +61,9 @@ Window_DetailPages.prototype.resetRenderedTabs = function(){
 
 Window_DetailPages.prototype.getCurrentSelection = function(){
 	var unit = $gameTemp.currentMenuUnit;	
+	if(!unit){
+		return;
+	}
 	
 	if(unit.actor.isSubPilot){
 		unit = {

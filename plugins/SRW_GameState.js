@@ -1075,7 +1075,7 @@ GameState_actor_target.prototype.updateMapEvent = function(x, y, triggers){
 						}
 						
 						if(enemyInfo.actor.counterBehavior == "attack" || $gameTemp.enemyAction == null){
-							var weapon = $battleCalc.getBestWeapon(enemyInfo, actorInfo);
+							var weapon = $battleCalc.getBestWeapon(enemyInfo, actorInfo, null, null, null, true);
 							if($gameTemp.currentBattleEnemy.battleMode() !== 'disabled' && weapon){
 								$gameTemp.enemyAction = {
 									type: "attack",

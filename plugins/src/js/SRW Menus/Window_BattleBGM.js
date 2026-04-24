@@ -16,7 +16,9 @@ Window_BattleBGM.prototype.resetSelection = function(){
 	this._currentSelection = 0;
 	this._currentPage = 0;
 	this._imagesLoaded = false;
-	this._lastBGM = AudioManager._currentBgm.name;
+	if(AudioManager._currentBgm){
+		this._lastBGM = AudioManager._currentBgm.name;
+	}	
 }
 
 Window_BattleBGM.prototype.initialize = function() {
