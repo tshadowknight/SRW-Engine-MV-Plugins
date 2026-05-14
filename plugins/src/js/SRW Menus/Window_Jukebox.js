@@ -249,10 +249,14 @@ Window_Jukebox.prototype.redraw = function() {
 		entry.addEventListener("click", function(){
 			const idx = parseInt(this.getAttribute("data-idx"), 10);
 			if(!isNaN(idx)){
-				_this._currentSelection = idx;
-				const e = _this._availableSongs[idx];
-				if(e){ _this._playEntry(e.songId); }
-				else { _this.requestRedraw(); }
+				if(idx === _this._currentSelection){
+					const e = _this._availableSongs[idx];
+					if(e){ _this._playEntry(e.songId); }
+				} else {
+					_this._currentSelection = idx;
+					_this._needsFullRedraw = false;
+					_this.requestRedraw();
+				}
 			}
 		});
 	});

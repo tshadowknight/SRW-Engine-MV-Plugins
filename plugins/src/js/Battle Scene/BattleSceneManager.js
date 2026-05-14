@@ -3601,11 +3601,25 @@ BattleSceneManager.prototype.getTargetObject = function(name){
 		if(!obj){//check dynamic unit models
 			var ctr = 0;
 			while(!obj && ctr < _this._instantiatedUnits.length){
-				if(_this._instantiatedUnits[ctr].name == name){
+				if(_this._instantiatedUnits[ctr].name == name && _this._instantiatedUnits[ctr].animationIdx == _this._currentAnimationIdx){
 					obj = _this._instantiatedUnits[ctr].sprite;
 				}
 				ctr++;
 			}
+			//check without the animationIdx as bodge for potential oversights in the _currentAnimationIdx implementaiton
+			
+			if(!obj){//check dynamic unit models
+				var ctr = 0;
+				while(!obj && ctr < _this._instantiatedUnits.length){
+					if(_this._instantiatedUnits[ctr].name == name){
+						obj = _this._instantiatedUnits[ctr].sprite;
+					}
+					ctr++;
+				}
+				if(obj){
+					console.warn("Could not get a dynamic model for '"+name+"' with a matching animationIdx '"+_this._currentAnimationIdx+"' but got one without!");
+				}
+			} 			
 		}
 
 		if(!obj){//check dynamic unit models
@@ -4966,7 +4980,7 @@ BattleSceneManager.prototype.executeAnimation = function(animation, startTick){
 		create_unit_model: function(target, params){
 			
 			
-			var targetObj = getTargetObject(target);
+			var targetObj = getTargetObject(target, _this._currentAnimationIdx);
 			if(targetObj){
 				if(targetObj.setEnabled){
 					targetObj.setEnabled(true); 
@@ -7658,7 +7672,7 @@ BattleSceneManager.prototype.earlyPreloadSceneAssets = async function(){
 	_this.preloadSceneAssets();
 }
 
-BattleSceneManager.prototype.preloadDynamicUnitModel = async function(target, params, flipX){
+BattleSceneManager.prototype.preloadDynamicUnitModel = async function(target, params, flipX, animationIdx){
 	const _this = this;
 	const name = target;
 
@@ -7757,13 +7771,15 @@ BattleSceneManager.prototype.preloadDynamicUnitModel = async function(target, pa
 	spriteInfo.name = target;
 	spriteInfo.ref = currentPilot;
 
+	spriteInfo.animationIdx = animationIdx;
+
 	const shadowInfo = $statCalc.getBattleSceneShadowInfo(currentPilot);
 	this.configureSprite(spriteInfo, "dynamicShadow", shadowInfo, "actor");		
 	
 	
 	this._instantiatedUnits.push(spriteInfo);
 	
-	var targetObj = _this.getTargetObject(name);
+	var targetObj = spriteInfo.sprite;
 	if(targetObj){
 		if(targetObj.setEnabled){
 			targetObj.setEnabled(false); 
@@ -7826,7 +7842,7 @@ BattleSceneManager.prototype.preloadSceneAssets = function(){
 		_this._dynamicUnitsUnderPreload = {}; //tracks dynamic units created during preload by target name so information is available to link them to battle actors for sprite frame preloading
 		_this._preloadAliases = {}; //track assigned aliases during preload so that default sprite mode units can get preloaded correctly if they were aliased
 		
-		function handleAnimCommand(action, animCommand, animId, animType, tick, flipX){
+		function handleAnimCommand(action, animCommand, animId, animType, tick, flipX, animationIdx){
 			var target = animCommand.target;
 			var params = animCommand.params;
 			
@@ -7848,7 +7864,7 @@ BattleSceneManager.prototype.preloadSceneAssets = function(){
 			}
 			
 			if(animCommand.type == "create_unit_model"){				
-				promises.push(_this.preloadDynamicUnitModel(target, params, flipX));			
+				promises.push(_this.preloadDynamicUnitModel(target, params, flipX, animationIdx));			
 			}
 			
 			if(animCommand.type == "register_alias"){						
@@ -7974,6 +7990,7 @@ BattleSceneManager.prototype.preloadSceneAssets = function(){
 		
 		for(var i = 0; i < _this._actionQueue.length; i++){
 			var nextAction = _this._actionQueue[i];
+			const animationIdx = nextAction.actionOrder;
 			if(nextAction){			
 				var attack = nextAction.action.attack;
 				
@@ -8060,16 +8077,16 @@ BattleSceneManager.prototype.preloadSceneAssets = function(){
 							Object.keys(animationList[animType]).forEach(function(tick){
 								const batch = animationList[animType][tick];
 								batch.forEach(function(animCommand){
-									handleAnimCommand(nextAction, animCommand, animId, animType, tick, nextAction.side == "enemy");
+									handleAnimCommand(nextAction, animCommand, animId, animType, tick, nextAction.side == "enemy", animationIdx);
 									if(animCommand.type == "next_phase"){
 										if(animCommand.params.commands){
 											for(let command of animCommand.params.commands){
-												handleAnimCommand(nextAction, command, animId, animType, tick, nextAction.side == "enemy");	
+												handleAnimCommand(nextAction, command, animId, animType, tick, nextAction.side == "enemy", animationIdx);	
 											}
 										}
 										if(animCommand.params.cleanUpCommands){
 											for(let command of animCommand.params.cleanUpCommands){
-												handleAnimCommand(nextAction, command, animId, animType, tick, nextAction.side == "enemy");	
+												handleAnimCommand(nextAction, command, animId, animType, tick, nextAction.side == "enemy", animationIdx);	
 											}
 										}
 									}	
@@ -8112,6 +8129,7 @@ BattleSceneManager.prototype.showScene = async function() {
 	_this._systemFadeContainer.style.display = "block";
 	_this._swipeContainer.style.display = "block";
 	_this._shadowFloor = 0;
+	_this._currentAnimationIdx = 0;
 	//_this.resetScene();
 	_this._assetsPreloaded = false;
 	await _this.readBattleCache();	
@@ -8498,7 +8516,7 @@ BattleSceneManager.prototype.processActionQueue = function() {
 			nextAction = _this._actionQueue.shift();
 		}
 		
-		
+		_this._currentAnimationIdx = nextAction.actionOrder;
 		
 		
 		if(nextAction && nextAction.hasActed && nextAction.action.type != "defend" && nextAction.action.type != "evade" && nextAction.action.type != "none"){

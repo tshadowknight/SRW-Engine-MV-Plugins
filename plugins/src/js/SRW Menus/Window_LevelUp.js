@@ -227,6 +227,11 @@ Window_LevelUp.prototype.redraw = function() {
 		content+="</div>";
 		content+="</div>";
 		_this._bgFadeContainer.innerHTML = content;
+		var skillsScroll = _this._bgFadeContainer.querySelector(".skills_scroll");
+		if(skillsScroll) {
+			skillsScroll.addEventListener('touchstart', function(e) { e.stopPropagation(); }, {passive: true});
+			skillsScroll.addEventListener('touchmove',  function(e) { e.stopPropagation(); }, {passive: true});
+		}
 		this.updateScaledDiv(_this._bgFadeContainer);
 		this.updateScaledDiv(_this._bgFadeContainer.querySelector("#level_up_icon"));	
 		var actorIcon = this._bgFadeContainer.querySelector("#level_up_icon");

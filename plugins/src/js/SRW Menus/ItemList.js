@@ -240,6 +240,7 @@ ItemList.prototype.redraw = function() {
 					_this.redraw();
 					_this.notifyObserver("redraw");
 					Graphics._updateCanvas();
+					$CSSUIManager.doUpdateScaledText();
 				}
 			}						
 		});		

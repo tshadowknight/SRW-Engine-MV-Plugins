@@ -32,6 +32,7 @@
 	color: #FFFFFF;
 	padding: 0.5%;
 	height: 11%;
+	touch-action: pan-y;
 }
 
 #battle_bgm_assign .entry.selected {

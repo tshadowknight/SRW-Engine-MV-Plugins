@@ -77,10 +77,11 @@ Window_Search.prototype.createComponents = function() {
 	this._listContainer = document.createElement("div");
 	this._listContainer.classList.add("list_container");
 	this._listContainer.classList.add("styled_scroll");
-	windowNode.appendChild(this._listContainer);	
-	
-	
-	
+	windowNode.appendChild(this._listContainer);
+	this._listContainer.addEventListener('touchstart', function(e) { e.stopPropagation(); }, {passive: true});
+	this._listContainer.addEventListener('touchmove',  function(e) { e.stopPropagation(); }, {passive: true});
+
+
 	this._detailContainer = document.createElement("div");
 	this._detailContainer.classList.add("list_detail");
 	this._detailContainer.classList.add("scaled_text");

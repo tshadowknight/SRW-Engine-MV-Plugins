@@ -59,6 +59,7 @@
     color: #FFFFFF;
     border: 0.1vw solid #AAAAAA;
 	white-space: nowrap;
+	touch-action: pan-y;
 }
 
 #search .list_container .entry.disabled {

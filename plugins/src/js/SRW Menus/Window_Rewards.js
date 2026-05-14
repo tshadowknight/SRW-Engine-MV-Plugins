@@ -174,6 +174,13 @@ Window_Rewards.prototype.redraw = function() {
 		content+="</div>";
 		content+="</div>";
 		_this._bgFadeContainer.innerHTML = content;
+		[".gains_scroll", ".items_scroll"].forEach(function(sel) {
+			var el = _this._bgFadeContainer.querySelector(sel);
+			if(el) {
+				el.addEventListener('touchstart', function(e) { e.stopPropagation(); }, {passive: true});
+				el.addEventListener('touchmove',  function(e) { e.stopPropagation(); }, {passive: true});
+			}
+		});
 	}
 	this.updateScaledDiv(_this._bgFadeContainer);
 	this.updateScaledDiv(_this._bgFadeContainer.querySelector(".funds_gained_value"), false, true);

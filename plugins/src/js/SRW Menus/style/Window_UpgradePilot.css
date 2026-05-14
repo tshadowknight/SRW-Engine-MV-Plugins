@@ -471,6 +471,8 @@
 	height: 90%;
 	width: 100%;
 	overflow-y: auto;
+	touch-action: pan-y;
+	-webkit-overflow-scrolling: touch;
 }
 
 #upgrade_pilot .ability_list_scroll.styled_scroll::-webkit-scrollbar {
@@ -487,6 +489,7 @@
 	align-items: center;
 	padding: 2%;
 	height: 9.5%;
+	touch-action: pan-y;
 }
 
 #upgrade_pilot .pilot_stat_container.selected {

@@ -68,10 +68,19 @@ const _addEventListener = EventTarget.prototype.addEventListener;
 EventTarget.prototype.addEventListener = function(type, handler, options) {
     _addEventListener.call(this, type, handler, options);
     if (type === 'click') {
+         let lastTouch = 0;
+
         _addEventListener.call(this, 'touchstart', function(e) {
-            e.preventDefault();
+            lastTouch = Date.now();
             handler.call(this, e);
         }, options);
+
+        // Swallow the phantom click if it follows a touch within 500ms
+        _addEventListener.call(this, 'click', function(e) {
+            if (Date.now() - lastTouch < 500) {
+                e.stopImmediatePropagation();
+            }
+        }, true); // capture phase so it runs before the real handler
     }
 };
 

@@ -699,13 +699,13 @@
 					}	
 				}
 				
-				function moveEventToPoint(eventId, x, y, follow, asynchronous, ignoreObstacles){
-					$gameMap._interpreter.setWaitMode("move_to_point");
-					if(!((asynchronous || 0) * 1)){
-						$gameSystem.setSrpgWaitMoving(true);
-					}				
+				function moveEventToPoint(eventId, x, y, follow, asynchronous, ignoreObstacles){									
 					var event = $gameMap.event(eventId);
-					if(event){
+					if(event && $gameSystem.EventToUnit(event.eventId()) && !event.isErased()){
+						$gameMap._interpreter.setWaitMode("move_to_point");
+						if(!((asynchronous || 0) * 1)){
+							$gameSystem.setSrpgWaitMoving(true);
+						}
 						var position = $statCalc.getAdjacentFreeSpace({x: x, y: y}, null, event.eventId(), {x: event.posX(), y: event.posY()});
 						var ignoreObstacles = !((ignoreObstacles || 0) * 1);
 						event.srpgMoveToPoint(position, true, ignoreObstacles);
@@ -720,13 +720,13 @@
 					moveEventToPoint(args[0], args[1], args[2], args[3], args[4], args[5]);
 				}
 				
-				if (command === 'moveActorToPoint') {
-					$gameMap._interpreter.setWaitMode("move_to_point");
-					if(!args[4] * 1){
-						$gameSystem.setSrpgWaitMoving(true);
-					}
+				if (command === 'moveActorToPoint') {					
 					var event = $statCalc.getReferenceEvent($gameActors.actor(resolveDeployedActorId(args[0])));
-					if(event){
+					if(event && $gameSystem.EventToUnit(event.eventId()) && !event.isErased()){
+						$gameMap._interpreter.setWaitMode("move_to_point");
+						if(!args[4] * 1){
+							$gameSystem.setSrpgWaitMoving(true);
+						}
 						var position = $statCalc.getAdjacentFreeSpace({x: args[1], y: args[2]}, null, event.eventId(), {x: event.posX(), y: event.posY()});
 						var ignoreObstacles = !((args[5] || 0) * 1);
 						event.srpgMoveToPoint(position, true, ignoreObstacles);
@@ -737,14 +737,15 @@
 					}					
 				}
 				
-				if (command === 'moveEventToEvent') {
-					$gameMap._interpreter.setWaitMode("move_to_point");
-					if(!args[3] * 1){
-						$gameSystem.setSrpgWaitMoving(true);
-					}
+				if (command === 'moveEventToEvent') {					
 					var targetEvent = $gameMap.event(args[1]);
 					var event = $gameMap.event(args[0]);
-					if(event && targetEvent){
+					if(event && targetEvent && $gameSystem.EventToUnit(event.eventId()) && !event.isErased()){
+						$gameMap._interpreter.setWaitMode("move_to_point");
+						if(!args[3] * 1){
+							$gameSystem.setSrpgWaitMoving(true);
+						}
+
 						var position = $statCalc.getAdjacentFreeSpace({x: targetEvent.posX(), y: targetEvent.posY()}, null, event.eventId(), {x: event.posX(), y: event.posY()});
 						var ignoreObstacles = !((args[4] || 0) * 1);
 						event.srpgMoveToPoint(position, true, ignoreObstacles);
@@ -755,14 +756,14 @@
 					}
 				}
 				
-				if (command === 'moveActorToEvent') {
-					$gameMap._interpreter.setWaitMode("move_to_point");
-					if(!args[3] * 1){
-						$gameSystem.setSrpgWaitMoving(true);
-					}
+				if (command === 'moveActorToEvent') {					
 					var targetEvent = $gameMap.event(args[1]);
 					var event = $statCalc.getReferenceEvent($gameActors.actor(resolveDeployedActorId(args[0])));
-					if(event && targetEvent){
+					if(event && targetEvent && $gameSystem.EventToUnit(event.eventId()) && !event.isErased()){
+						$gameMap._interpreter.setWaitMode("move_to_point");
+						if(!args[3] * 1){
+							$gameSystem.setSrpgWaitMoving(true);
+						}
 						var position = $statCalc.getAdjacentFreeSpace({x: targetEvent.posX(), y: targetEvent.posY()}, null, event.eventId(), {x: event.posX(), y: event.posY()});
 						var ignoreObstacles = !((args[4] || 0) * 1);
 						event.srpgMoveToPoint(position, true, ignoreObstacles);
@@ -773,14 +774,14 @@
 					}						
 				}
 				
-				if (command === 'moveEventToActor') {
-					$gameMap._interpreter.setWaitMode("move_to_point");
-					if(!args[3] * 1){
-						$gameSystem.setSrpgWaitMoving(true);
-					}
+				if (command === 'moveEventToActor') {					
 					var targetEvent = $statCalc.getReferenceEvent($gameActors.actor(resolveDeployedActorId(args[1])));
 					var event = $gameMap.event(args[0]);
-					if(event && targetEvent){
+					if(event && targetEvent && $gameSystem.EventToUnit(event.eventId()) && !event.isErased()){
+						$gameMap._interpreter.setWaitMode("move_to_point");
+						if(!args[3] * 1){
+							$gameSystem.setSrpgWaitMoving(true);
+						}
 						var position = $statCalc.getAdjacentFreeSpace({x: targetEvent.posX(), y: targetEvent.posY()}, null, event.eventId(), {x: event.posX(), y: event.posY()});
 						var ignoreObstacles = !((args[4] || 0) * 1);
 						event.srpgMoveToPoint(position, true, ignoreObstacles);
@@ -791,14 +792,14 @@
 					}
 				}
 				
-				if (command === 'moveActorToActor') {
-					$gameMap._interpreter.setWaitMode("move_to_point");
-					if(!args[3] * 1){
-						$gameSystem.setSrpgWaitMoving(true);
-					}
+				if (command === 'moveActorToActor') {					
 					var targetEvent = $statCalc.getReferenceEvent($gameActors.actor(resolveDeployedActorId(args[1])));
 					var event = $statCalc.getReferenceEvent($gameActors.actor(args[0]));
-					if(event && targetEvent){
+					if(event && targetEvent && $gameSystem.EventToUnit(event.eventId()) && !event.isErased()){
+						$gameMap._interpreter.setWaitMode("move_to_point");
+						if(!args[3] * 1){
+							$gameSystem.setSrpgWaitMoving(true);
+						}
 						var position = $statCalc.getAdjacentFreeSpace({x: targetEvent.posX(), y: targetEvent.posY()}, null, event.eventId(), {x: event.posX(), y: event.posY()});
 						var ignoreObstacles = !((args[4] || 0) * 1);
 						event.srpgMoveToPoint(position, true, ignoreObstacles);

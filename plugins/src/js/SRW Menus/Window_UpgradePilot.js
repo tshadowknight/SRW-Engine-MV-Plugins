@@ -41,7 +41,8 @@ Window_UpgradePilot.prototype.initialize = function() {
 	
 	this._maxEquipSelection = $gameSystem.getMaxPilotAbilities();
 	this._currentEquipSelection = 0;
-	
+	this._abilityScrollTop = 0;
+
 	this._currentFavSkillSelection = 0;
 	this._currentFavSkillsPending = {};
 	
@@ -963,7 +964,14 @@ Window_UpgradePilot.prototype.redraw = function() {
 	}
 	currentAbilitiesContent+="</div>";		
 	this._currentAbilities.innerHTML = currentAbilitiesContent;
-	
+	var abilityScroll = this._currentAbilities.querySelector(".ability_list_scroll");
+	if(abilityScroll) {
+		abilityScroll.scrollTop = this._abilityScrollTop;
+		abilityScroll.addEventListener('scroll', function() { _this._abilityScrollTop = abilityScroll.scrollTop; });
+		abilityScroll.addEventListener('touchstart', function(e) { e.stopPropagation(); }, {passive: true});
+		abilityScroll.addEventListener('touchmove',  function(e) { e.stopPropagation(); }, {passive: true});
+	}
+
 	const currentActiveBlock = this._currentAbilities.querySelector(".pilot_stat_container.selected");
 	
 	
@@ -1139,7 +1147,7 @@ Window_UpgradePilot.prototype.redraw = function() {
 	this.loadImages();
 	Graphics._updateCanvas();
 	
-	if(currentActiveBlock){
-		currentActiveBlock.scrollIntoView(false);
-	}
+	//if(currentActiveBlock){
+	//	currentActiveBlock.scrollIntoView(false);
+	//}
 }

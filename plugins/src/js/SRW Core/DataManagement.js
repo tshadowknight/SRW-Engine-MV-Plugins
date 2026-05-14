@@ -1164,7 +1164,7 @@
 		DataManager.saveContinueSlot = function() {
 			var savefileId = "continue";
 			$gameSystem.onBeforeSave();
-			var json = JsonEx.stringify({date: Date.now(), content: this.makeSaveContents()});		
+			var json = JsonEx.stringify({date: Date.now(), content: this.makeSaveContents(), lastAccessedSavefileId: this._lastAccessedId});		
 			StorageManager.save(savefileId, json);
 			return true;
 		};
@@ -1175,7 +1175,11 @@
 				var globalInfo = this.loadGlobalInfo();		
 				var json = StorageManager.load(savefileId);
 				this.createGameObjects();
-				this.extractSaveContents(JsonEx.parse(json).content);
+				const saveInfo = JsonEx.parse(json);
+				this.extractSaveContents(saveInfo.content);
+				if(saveInfo.lastAccessedSavefileId != null){
+					this._lastAccessedId = saveInfo.lastAccessedSavefileId;
+				}
 				if(ENGINE_SETTINGS.SAVE_UPDATE_FUNCTION){
 					ENGINE_SETTINGS.SAVE_UPDATE_FUNCTION();
 				}

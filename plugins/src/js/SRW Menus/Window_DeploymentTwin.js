@@ -129,8 +129,10 @@ Window_DeploymentTwin.prototype.createComponents = function() {
 	this._deployedList.classList.add("scrolled_list");
 	this._deployedList.classList.add("deployed_list");
 	this._deployedList.classList.add("styled_scroll");
-	windowNode.appendChild(this._deployedList);	
-	
+	windowNode.appendChild(this._deployedList);
+	this._deployedList.addEventListener('touchstart', function(e) { e.stopPropagation(); }, {passive: true});
+	this._deployedList.addEventListener('touchmove',  function(e) { e.stopPropagation(); }, {passive: true});
+
 	this._detailBarMechDetail = new DetailBarMechDetail(this._deployedList, {
 		getCurrentSelection: function(){
 			var actorId;
@@ -159,8 +161,10 @@ Window_DeploymentTwin.prototype.createComponents = function() {
 	this._availableList.classList.add("scrolled_list");
 	this._availableList.classList.add("available_list");
 	this._availableList.classList.add("styled_scroll");
-	windowNode.appendChild(this._availableList);	
-	
+	windowNode.appendChild(this._availableList);
+	this._availableList.addEventListener('touchstart', function(e) { e.stopPropagation(); }, {passive: true});
+	this._availableList.addEventListener('touchmove',  function(e) { e.stopPropagation(); }, {passive: true});
+
 	this._availableListLabel = document.createElement("div");
 	this._availableListLabel.classList.add("available_list_label");
 	this._availableListLabel.classList.add("list_label");

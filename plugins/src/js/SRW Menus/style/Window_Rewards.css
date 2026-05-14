@@ -146,6 +146,8 @@
     align-items: center;
     overflow: auto;
     overflow-x: hidden;
+	touch-action: pan-y;
+	-webkit-overflow-scrolling: touch;
 }
 
 #rewards .gains_scroll {
@@ -155,4 +157,6 @@
     align-items: center;
     overflow: auto;
     overflow-x: hidden;
+	touch-action: pan-y;
+	-webkit-overflow-scrolling: touch;
 }

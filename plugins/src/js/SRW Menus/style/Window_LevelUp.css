@@ -172,6 +172,8 @@
 #level_up .skills_scroll {
 	height: 87%;
 	overflow-y: auto;
+	touch-action: pan-y;
+	-webkit-overflow-scrolling: touch;
 }
 
 #level_up .skills_scroll.styled_scroll::-webkit-scrollbar {

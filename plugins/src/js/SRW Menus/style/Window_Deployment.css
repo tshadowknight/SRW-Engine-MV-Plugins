@@ -90,6 +90,7 @@
 	border-radius: 1vw;
 	border: 0.2vw solid rgba(255, 255, 255, 0);
 	position: relative;
+	touch-action: pan-y;
 }
 
 .list_row .entry .locked_icon{
