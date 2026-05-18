@@ -468,7 +468,7 @@ var ENGINE_SETTINGS = {
 		//example return value, optional. This example makes every unit in the game deal double the regular damage.
 		//return [{type: "final_damage", modType: "mult", value: 2}];
 
-		if($gameMap.mapId() == 123){//if we are on a specific map
+		if($dataMap && $gameMap && $gameMap.mapId() == 5){//if we are on a specific map
 			const referenceEvent = $statCalc.getReferenceEvent(actor);
 			if(referenceEvent) {
 				if($gameMap.regionId(referenceEvent.posX(), referenceEvent.posY()) == 143){ //if we are on region 143

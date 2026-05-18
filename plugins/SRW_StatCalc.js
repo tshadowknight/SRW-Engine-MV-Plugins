@@ -5920,7 +5920,7 @@ StatCalc.prototype.isEventBelowHP = function(id, hp){
 	var result = false;
 	this.iterateAllActors(null, function(actor, event){	
 		if(!event.isErased()){	
-			if(actor.event.eventId() == id && _this.getCalculatedMechStats(actor).currentHP < hp){
+			if(event.eventId() == id && _this.getCalculatedMechStats(actor).currentHP < hp){
 				result = true;
 			}	
 		}	
