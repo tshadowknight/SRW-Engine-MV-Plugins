@@ -6098,7 +6098,7 @@ StatCalc.prototype.getAdjacentFreeStandableSpace = function(actor, position, typ
 StatCalc.prototype.getAdjacentFreeSpace = function(position, type, eventId, sourcePosition, hardBias, usedPositions, onlyStandable, refActor){
 	var occupiedCoordLookup = {};
 	this.iterateAllActors(type, function(actor, event){			
-		if(!event.isErased() && event.eventId() != eventId){
+		if(!event.isErased() && event.eventId() != eventId && !event._pendingMoveToPoint){
 			if(!occupiedCoordLookup[event.posX()]){
 				occupiedCoordLookup[event.posX()] = {};
 			}
