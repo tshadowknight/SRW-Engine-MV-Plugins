@@ -3739,6 +3739,11 @@ SceneManager.isInSaveScene = function(){
 		var bestDirection = "up";
 		var bestPosition;
 		var bestTargets = [];
+
+		var mapAttackDef = $mapAttackManager.getDefinition(attack.mapId);
+		if(mapAttackDef.lockRotation){
+			directions = ["up"];
+		}
 		
 		directions.forEach(function(direction){
 			var targetResults = _this.getMapAttackTargets(originEvent, attack, type, direction);
@@ -3978,23 +3983,23 @@ SceneManager.isInSaveScene = function(){
 		const event = $gameTemp.activeEvent();
 		const enemy = $gameSystem.EventToUnit(event.eventId())[1];
         if (_srpgStandUnitSkip === 'true' && enemy.battleMode() === 'stand' || enemy.battleMode() === 'fixed') {
+
+			var mapAttackInfo = this.getEnemyMapAttackInfo(event, false);	
+			if(mapAttackInfo && mapAttackInfo.targets.length >= 1){//if the map attack has at least one target, use it if no regular targets exist without moving
+				$gameTemp.AIWaitTimer = $gameSystem.getScaledTime(30);
+				this.doEnemyMapAttack(event, false);	
+				return;
+			}
            
             $gameSystem.srpgMakeMoveTable(event);
             var canAttackTargets = this.srpgMakeCanAttackTargets(enemy, null, true); //行動対象としうるユニットのリストを作成
             $gameTemp.clearMoveTable();
-            if (canAttackTargets.length === 0) {
-				var mapAttackInfo = this.getEnemyMapAttackInfo(event, false);	
-				if(mapAttackInfo && mapAttackInfo.targets.length >= 1){//if the map attack has at least one target, use it if no regular targets exist without moving
-					$gameTemp.AIWaitTimer = $gameSystem.getScaledTime(30);
-					this.doEnemyMapAttack(event, false);	
-					return;
-				} else {
-					enemy.onAllActionsEnd();
-					$gameTemp.AIWaitTimer = $gameSystem.getScaledTime(10);
-					$gamePlayer.locate(event.posX(), event.posY());		
-					this.srpgAfterAction();
-					return;
-				}               
+            if (canAttackTargets.length === 0) {				 
+				enemy.onAllActionsEnd();
+				$gameTemp.AIWaitTimer = $gameSystem.getScaledTime(10);
+				$gamePlayer.locate(event.posX(), event.posY());		
+				this.srpgAfterAction();
+				return;				             
 			} 
         }
 		
@@ -4024,7 +4029,7 @@ SceneManager.isInSaveScene = function(){
 		var enemy = $gameSystem.EventToUnit(event.eventId())[1];		
 		var mapWeapons = $statCalc.getActiveMapWeapons(enemy, isPostMove);
 		var bestMapAttack;
-		if(mapWeapons.length){
+		if(mapWeapons.length && enemy.attackBehavior != "none"){
 			mapWeapons.forEach(function(mapWeapon){
 				var targetInfo = _this.getBestMapAttackTargets(event, mapWeapon, $gameSystem.isEnemy(enemy) ? "actor" : "enemy");
 				if(targetInfo.targets.length && (!bestMapAttack || targetInfo.targets.length > bestMapAttack.targets.length)){
@@ -4043,7 +4048,11 @@ SceneManager.isInSaveScene = function(){
 		var bestMapAttack;
 		if(mapWeapons.length){
 			mapWeapons.forEach(function(mapWeapon){
-				var targetInfo = _this.getBestMapAttackTargets(event, mapWeapon, $gameSystem.isEnemy(enemy) ? "actor" : "enemy");
+				var type = "";
+				if(mapWeapon.ignoresFriendlies){
+					type = $gameSystem.isEnemy(enemy) ? "actor" : "enemy";
+				}
+				var targetInfo = _this.getBestMapAttackTargets(event, mapWeapon, type);
 				if(targetInfo.targets.length && (!bestMapAttack || targetInfo.targets.length > bestMapAttack.targets.length)){
 					bestMapAttack = targetInfo;
 					bestMapAttack.attack = mapWeapon;
