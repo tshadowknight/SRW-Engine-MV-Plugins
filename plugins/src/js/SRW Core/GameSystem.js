@@ -958,7 +958,7 @@
 			$statCalc.initSRWStats(actor_unit);
 			
 			var increment = 1;
-			if(actor_unit.SRWStats.mech.combinesFrom){
+			if(actor_unit.SRWStats.mech.combinesFrom?.length){
 				increment = actor_unit.SRWStats.mech.combinesFrom.length;
 			}
 			$gameVariables.setValue(_existActorVarID, oldValue + increment);
