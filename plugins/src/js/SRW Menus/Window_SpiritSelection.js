@@ -212,6 +212,7 @@ Window_SpiritSelection.prototype.update = function() {
 
 			
 			var spiritIsAlreadyBatched = false;
+			var isValidTwinSpirit = true;
 			if(_this._twinSpiritSelection){
 				let actor;
 				if(_this._currentSlot == 0){
@@ -220,14 +221,39 @@ Window_SpiritSelection.prototype.update = function() {
 					actor = $gameTemp.currentMenuUnit.actor.subTwin;
 				}
 				const twinSpiritInfo = $statCalc.getTwinSpirit(actor);
-				spiritIsAlreadyBatched = this.getCurrentBatchedSpirits(_this._currentSlot)[twinSpiritInfo.idx] != null;
+				if(twinSpiritInfo){
+					spiritIsAlreadyBatched = this.getCurrentBatchedSpirits(_this._currentSlot)[twinSpiritInfo.idx] != null;
+				} else {
+					isValidTwinSpirit = false;
+				}				
 			} else {
 				spiritIsAlreadyBatched = this.getCurrentBatchedSpirits(_this._currentSlot)[spiritList[selectedIdx].idx] != null;
 			}
 		
-			var enabledState = Math.min(_this.getSpiritEnabledState(null, 0, true, _this._currentSlot), _this.getSpiritEnabledState(null, 1, true, _this._currentSlot));
+			var twinEnabledState = Math.min(_this.getSpiritEnabledState(null, 0, true, _this._currentSlot), _this.getSpiritEnabledState(null, 1, true, _this._currentSlot));
 
-			if(spiritList[selectedIdx] && (spiritList[selectedIdx].level <= currentLevel ||_this._twinSpiritSelection) && ((!_this._twinSpiritSelection && this.getSpiritEnabledState(selectedIdx) > 0) || (_this._twinSpiritSelection && enabledState > 0) || spiritIsAlreadyBatched)){
+			let slotIsEnabled = true;
+			if(_this._twinSpiritSelection){
+				if(!isValidTwinSpirit){
+					slotIsEnabled = false;
+				}
+				if(twinEnabledState <= 0){
+					slotIsEnabled = false;
+				}
+			} else {
+				if(!spiritList[selectedIdx]){
+					slotIsEnabled = false;
+				} else {
+					if(spiritList[selectedIdx].level > currentLevel){
+						slotIsEnabled = false;
+					}
+					if(this.getSpiritEnabledState(selectedIdx) <= 0){
+						slotIsEnabled = false;
+					}
+				}
+			}
+		
+			if(slotIsEnabled || spiritIsAlreadyBatched){
 				var spirits = [];				
 				var type;
 				
@@ -470,10 +496,16 @@ Window_SpiritSelection.prototype.getSpiritEnabledState = function(listIdx, slot,
 	
 	if(!caster.isSubPilot){		
 		if(this._currentBatchInfo && this._currentBatchInfo[0] && this._currentBatchInfo[0][0] && this._currentBatchInfo[0][0]["twin"]){
-			pendingBatchCost+=$statCalc.getTwinSpirit($gameTemp.currentMenuUnit.actor).cost;
+			const twinInfo = $statCalc.getTwinSpirit($gameTemp.currentMenuUnit.actor);
+			if(twinInfo){
+				pendingBatchCost+=twinInfo.cost;
+			}					
 		} 
 		if(this._currentBatchInfo && this._currentBatchInfo[1] && this._currentBatchInfo[1][0] && this._currentBatchInfo[1][0]["twin"]){
-			pendingBatchCost+=$statCalc.getTwinSpirit($gameTemp.currentMenuUnit.actor.subTwin).cost;
+			const twinInfo = $statCalc.getTwinSpirit($gameTemp.currentMenuUnit.actor.subTwin);
+			if(twinInfo){
+				pendingBatchCost+=twinInfo.cost;
+			}
 		} 		
 	}
 	
@@ -658,9 +690,10 @@ Window_SpiritSelection.prototype.redraw = function() {
 			actor = $gameTemp.currentMenuUnit.actor.subTwin;
 		}
 		var twinSpiritInfo = $statCalc.getTwinSpirit(actor);
-		var displayInfo = $spiritManager.getSpiritDisplayInfo(twinSpiritInfo.idx);
-	
-		content+=displayInfo.desc;	
+		if(twinSpiritInfo){
+			var displayInfo = $spiritManager.getSpiritDisplayInfo(twinSpiritInfo.idx);	
+			content+=displayInfo.desc;	
+		}		
 	} else {
 		var referenceList;
 		if(this._currentSlot == 1){

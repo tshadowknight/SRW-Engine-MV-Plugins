@@ -4675,9 +4675,13 @@ StatCalc.prototype.getSpiritList = function(actor){
 
 StatCalc.prototype.getTwinSpirit = function(actor){
 	if(this.isActorSRWInitialized(actor)){
-		return actor.SRWStats.pilot.twinSpirit;
+		let result = actor.SRWStats.pilot.twinSpirit;
+		if(!result || result.idx == null || result.idx == ""){
+			return null;
+		}
+		return result;
 	} else {
-		return [];
+		return null;
 	}
 }
 
