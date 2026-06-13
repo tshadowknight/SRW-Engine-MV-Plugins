@@ -226,7 +226,7 @@ Window_SpiritSelection.prototype.update = function() {
 				} else {
 					isValidTwinSpirit = false;
 				}				
-			} else {
+			} else if(spiritList[selectedIdx] != null){
 				spiritIsAlreadyBatched = this.getCurrentBatchedSpirits(_this._currentSlot)[spiritList[selectedIdx].idx] != null;
 			}
 		
