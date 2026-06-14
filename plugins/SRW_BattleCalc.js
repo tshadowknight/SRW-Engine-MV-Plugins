@@ -1633,7 +1633,10 @@ BattleCalc.prototype.generateBattleResult = function(isPrediction){
 				$statCalc.clearSpirit(gainRecipient, "fortune");
 			}
 		}
-	
+		
+		if(aCache.expGain > ENGINE_SETTINGS.EXP_YIELD.MAX){
+			aCache.expGain = ENGINE_SETTINGS.EXP_YIELD.MAX;
+		}
 	
 	} else {
 		console.log("!!! Gainrecipient " + gainRecipient.actorId() + " does not have a valid battle cache ref!");
@@ -1921,6 +1924,9 @@ BattleCalc.prototype.generateMapBattleResult = function(){
 	
 	var mapRewardsScaling = 1;//1 / (targets.length / 2);
 	aCache.expGain = Math.floor(aCache.expGain * mapRewardsScaling);
+	if(aCache.expGain > ENGINE_SETTINGS.EXP_YIELD.MAX){
+		aCache.expGain = ENGINE_SETTINGS.EXP_YIELD.MAX;
+	}
 	aCache.ppGain = Math.floor(aCache.ppGain * mapRewardsScaling);
 	aCache.fundGain = Math.floor(aCache.fundGain * mapRewardsScaling);
 	
