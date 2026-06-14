@@ -2669,6 +2669,7 @@ SceneManager.isInSaveScene = function(){
 				let expGain = entry.expGain;
 				if(expGain > ENGINE_SETTINGS.EXP_YIELD.MAX){
 					expGain = ENGINE_SETTINGS.EXP_YIELD.MAX;
+					entry.expGain = expGain; //also cap the displayed gain
 				}
 				expResults.push({actor: entry.actor, details: $statCalc.addExp(entry.actor, expGain)});				
 			});				
