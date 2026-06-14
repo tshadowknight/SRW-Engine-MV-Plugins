@@ -2350,4 +2350,6 @@ $SRWConfig.pilotAbilties = function(){
 		1,
 	);
 
+
+	//new stuff goes here
 }
