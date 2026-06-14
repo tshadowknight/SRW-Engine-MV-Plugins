@@ -2666,7 +2666,11 @@ SceneManager.isInSaveScene = function(){
 			var expResults = [];
 			gainResults.forEach(function(entry){						
 				$statCalc.addPP(entry.actor, battleEffect.ppGain);
-				expResults.push({actor: entry.actor, details: $statCalc.addExp(entry.actor, entry.expGain)});				
+				let expGain = entry.expGain;
+				if(expGain > ENGINE_SETTINGS.EXP_YIELD.MAX){
+					expGain = ENGINE_SETTINGS.EXP_YIELD.MAX;
+				}
+				expResults.push({actor: entry.actor, details: $statCalc.addExp(entry.actor, expGain)});				
 			});				
 			
 			$gameTemp.rewardsInfo = {
