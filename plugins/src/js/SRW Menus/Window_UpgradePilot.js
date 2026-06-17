@@ -396,11 +396,13 @@ Window_UpgradePilot.prototype.update = function() {
 		if(Input.isTriggered('down') || Input.isRepeated('down')){
 			this.requestRedraw();
 			this.incrementSelection();
+			this._wasKeyInputMove = true;
 			this.refresh();
 			return;	
 		} else if (Input.isTriggered('up') || Input.isRepeated('up')) {
 			this.requestRedraw();			
 			this.decrementSelection();
+			this._wasKeyInputMove = true;
 			this.refresh();
 			return;	
 		}			
@@ -1147,7 +1149,8 @@ Window_UpgradePilot.prototype.redraw = function() {
 	this.loadImages();
 	Graphics._updateCanvas();
 	
-	//if(currentActiveBlock){
-	//	currentActiveBlock.scrollIntoView(false);
-	//}
+	if(currentActiveBlock && this._wasKeyInputMove){
+		this._wasKeyInputMove = false;
+		currentActiveBlock.scrollIntoView(false);
+	}
 }

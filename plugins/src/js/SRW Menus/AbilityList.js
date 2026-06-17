@@ -8,7 +8,7 @@ export default function AbilityList(container, selectionProvider, excludeUnique)
 	this._maxPageSize = 8;
 	this._selectionProvider = selectionProvider;
 	this._excludeUnique = excludeUnique;
-	this._orderedAbilityIdxs = $gameSystem.getPurchasbleAbilities();
+	
 	this._abilityDisplayInfo = [];
 	this.initDisplayInfo();
 }
@@ -17,7 +17,19 @@ export default function AbilityList(container, selectionProvider, excludeUnique)
 AbilityList.prototype = Object.create(Window_CSS.prototype);
 AbilityList.prototype.constructor = AbilityList;
 
+AbilityList.prototype.refresh = function() {
+	if(this._redrawRequested){
+		this.initDisplayInfo();
+		this._redrawRequested = false;
+		this.redraw();		
+	}
+	this.resetTouchState();
+	this._isValidTouchInteraction = false;
+	this.getWindowNode().style.display = this._visibility;
+}
+
 AbilityList.prototype.initDisplayInfo = function(){
+	this._orderedAbilityIdxs = $gameSystem.getPurchasbleAbilities();
 	var tmp = [];
 	for(var i = 0; i < this._orderedAbilityIdxs.length; i++){
 		var abilityIdx = this._orderedAbilityIdxs[i];

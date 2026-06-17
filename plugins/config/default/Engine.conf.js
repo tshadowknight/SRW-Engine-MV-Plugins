@@ -13,6 +13,7 @@ var ENGINE_SETTINGS = {
 	DISABLE_SHIFT_QUICK_MOVE: false,
 	SEND_TO_TITLE_ON_GAME_OVER: false,
 	PLACE_PARALLAX_ABOVE_MAP: true,
+	MAX_ABI_ZONE_LAYERS: 7,//maxinum number of ability zone sprites that can be created
 	ENABLE_HEALTH_BARS_ON_MAP: true,
 	FONT_SCALE: 1,//used to scale the text in CSS menus.
 	FONT_LINE_HEIGHT_SCALE: 0,//used to offset text in CSS menus.

@@ -954,7 +954,7 @@ Window_DetailPages.prototype.drawPilotStats2 = function() {
 	this._isPilotAbiOverflow = isOverflow;
 	const abilityDisplaySlots = 6;
 	
-	function createAbiBlockContent(abilityDef, nameOverride, noDescribe){
+	function createAbiBlockContent(abilityDef, nameOverride, noDescribe, isMoreButton){
 		let content = "";
 		var displayName = "---";
 		var displayClass = "";
@@ -988,7 +988,7 @@ Window_DetailPages.prototype.drawPilotStats2 = function() {
 				}
 			}
 		}
-		content+="<div "+descriptionData+" class='pilot_stat_container "+descriptionClass+" scaled_text scaled_width fitted_text "+displayClass+" "+i+"'>";
+		content+="<div "+descriptionData+" class='pilot_stat_container "+(isMoreButton ? "more_button" : "")+" "+descriptionClass+" scaled_text scaled_width fitted_text "+displayClass+" "+i+"'>";
 		content+="<div class='unique_skill_mark scaled_width'>"+uniqueString+"</div>";
 		content+="<div class='stat_value'>"+(nameOverride || displayName)+"</div>";
 		content+="</div>";
@@ -1034,7 +1034,7 @@ Window_DetailPages.prototype.drawPilotStats2 = function() {
 		
 		
 		if(i == (abilityDisplaySlots - 1) && isOverflow){
-			detailContent+=createAbiBlockContent(abilityDef, "...", true);
+			detailContent+=createAbiBlockContent(abilityDef, "...", true, true);
 		} else {
 			detailContent+=createAbiBlockContent(abilityDef, null, this.isAbiDetailState());
 		}	
@@ -1254,9 +1254,16 @@ Window_DetailPages.prototype.redraw = function() {
 	if(this.getCurrentSelection().actor.SRWStats.pilot.id != -1){
 		this.drawPilotStats1();
 		this.drawPilotStats2();	
+
+		const moreButton = this.getWindowNode().querySelector(".more_button");
+		if(moreButton){
+			moreButton.addEventListener("click", function(){				
+				_this._uiState = "pilot_abi_detail";
+				_this.resetRenderedTabs();
+				_this.requestRedraw();
+			});
+		}
 	}
-	
-	
 	
 	if(this._selectedTab == 0){
 		if(this._isPilotAbiOverflow){
@@ -1317,6 +1324,12 @@ Window_DetailPages.prototype.redraw = function() {
 					idx = [].indexOf.call(_this._detailContainer.querySelectorAll(".described_element"), this);
 					_this._uiState = "description";
 				}				
+				_this._descriptionOverlay._elementIdx = idx;
+				_this._descriptionOverlay.redraw();
+			} else if(_this._uiState == "pilot_abi_detail"){			
+				idx = [].indexOf.call(_this._pilotInfoTab.querySelectorAll(".described_element"), this);
+				_this._descriptionOverlay.show(_this._pilotInfoTab);
+				_this._uiState = "description_abi_detail";				
 				_this._descriptionOverlay._elementIdx = idx;
 				_this._descriptionOverlay.redraw();
 			}

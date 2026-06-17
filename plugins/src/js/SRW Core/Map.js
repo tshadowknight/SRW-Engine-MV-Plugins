@@ -361,7 +361,8 @@
 			this._gridSprite = new Sprite_SrpgGrid();
 			this._baseSprite.addChild(this._gridSprite); 
 			
-			for(var i = 0; i < 7; i++){
+			let maxAbilityZoneLayers = ENGINE_SETTINGS.MAX_ABI_ZONE_LAYERS || 7;
+			for(var i = 0; i < maxAbilityZoneLayers; i++){
 				this._baseSprite.addChild(new Sprite_AreaHighlights("ability_zone", i)); 
 			}
 			

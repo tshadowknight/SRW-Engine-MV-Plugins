@@ -57,6 +57,9 @@ DescriptionOverlay.prototype.decrementSelection = function(sourceContainer){
 }
 
 DescriptionOverlay.prototype.jumpIncrementSelection = function(sourceContainer){
+	if(!this._sourceContainer){
+		return;
+	}
 	const describedElements = this._sourceContainer.querySelectorAll(".described_element");
 	const describedElement = describedElements[this._elementIdx];
 	if(describedElement){
@@ -70,6 +73,9 @@ DescriptionOverlay.prototype.jumpIncrementSelection = function(sourceContainer){
 }
 
 DescriptionOverlay.prototype.jumpDecrementSelection = function(sourceContainer){
+	if(!this._sourceContainer){
+		return;
+	}
 	const describedElements = this._sourceContainer.querySelectorAll(".described_element");
 	const describedElement = describedElements[this._elementIdx];
 	if(describedElement){
