@@ -770,6 +770,41 @@ BattleCalc.prototype.prepareBattleCache = function(actionObject, type){
 	};
 }
 
+BattleCalc.prototype.getSpecialEvasion = function(attacker, defender, isPrediction){
+	var specialEvasion = null;
+	if(isPrediction){//do not factor in special evasion when predicting damage
+		return specialEvasion;
+	}
+	var isHit = 1;
+	var weaponref = attacker.action.attack; 
+	var specialEvadeInfo = $statCalc.getModDefinitions(defender.actor, ["special_evade"]);
+	var weaponType = weaponref.particleType;
+	var aSkill = $statCalc.getPilotStat(attacker.actor, "skill");
+	var dSkill = $statCalc.getPilotStat(defender.actor, "skill");		
+	
+	var ctr = 0;
+	
+	if(!$statCalc.getActiveSpirits(attacker.actor).strike && !$statCalc.getActiveSpirits(attacker.actor).fury){
+		while(isHit && ctr < specialEvadeInfo.length){
+			var evasionType = specialEvadeInfo[ctr].subType;
+			if(evasionType == weaponType || evasionType == "all" || (evasionType == "ranged" && weaponref.type == "R") || (evasionType == "melee" && weaponref.type == "M")){
+				if($SRWConfig.customSpecialEvasionActivationCheckers && $SRWConfig.customSpecialEvasionActivationCheckers[specialEvadeInfo[ctr].activation]){
+					isHit = !$SRWConfig.customSpecialEvasionActivationCheckers[specialEvadeInfo[ctr].activation](specialEvadeInfo[ctr].originLevel, attacker, defender);
+				} else if(specialEvadeInfo[ctr].activation == "skill"){
+					isHit = dSkill < aSkill;
+				} else if(specialEvadeInfo[ctr].activation == "random"){
+					isHit = Math.random() > specialEvadeInfo[ctr].value;
+				}
+				if(!isHit){
+					specialEvasion = specialEvadeInfo[ctr];
+				}
+			}
+			ctr++;
+		}
+	}
+	return specialEvasion;
+}
+
 BattleCalc.prototype.generateBattleResult = function(isPrediction){
 	var _this = this;
 
@@ -1123,7 +1158,7 @@ BattleCalc.prototype.generateBattleResult = function(isPrediction){
 							sCache.isDoubleImage = true;
 							isHit = 0;
 						}*/
-						var specialEvasion = this.getSpecialEvasion(this._attacker, activeDefender);
+						var specialEvasion = _this.getSpecialEvasion(this._attacker, activeDefender, isPrediction);
 						if(specialEvasion && !isBuffingAttack){
 							sCache.specialEvasion = specialEvasion;
 							isHit = false;
@@ -1335,40 +1370,7 @@ BattleCalc.prototype.generateBattleResult = function(isPrediction){
 		this._attacker.actor._cacheReference = storedCacheRef;
 	}
 	
-	BattleAction.prototype.getSpecialEvasion = function(attacker, defender){
-		var specialEvasion = null;
-		if(isPrediction){//do not factor in special evasion when predicting damage
-			return specialEvasion;
-		}
-		var isHit = 1;
-		var weaponref = attacker.action.attack; 
-		var specialEvadeInfo = $statCalc.getModDefinitions(defender.actor, ["special_evade"]);
-		var weaponType = weaponref.particleType;
-		var aSkill = $statCalc.getPilotStat(attacker.actor, "skill");
-		var dSkill = $statCalc.getPilotStat(defender.actor, "skill");		
-		
-		var ctr = 0;
-		
-		if(!$statCalc.getActiveSpirits(attacker.actor).strike && !$statCalc.getActiveSpirits(attacker.actor).fury){
-			while(isHit && ctr < specialEvadeInfo.length){
-				var evasionType = specialEvadeInfo[ctr].subType;
-				if(evasionType == weaponType || evasionType == "all" || (evasionType == "ranged" && weaponref.type == "R") || (evasionType == "melee" && weaponref.type == "M")){
-					if($SRWConfig.customSpecialEvasionActivationCheckers && $SRWConfig.customSpecialEvasionActivationCheckers[specialEvadeInfo[ctr].activation]){
-						isHit = !$SRWConfig.customSpecialEvasionActivationCheckers[specialEvadeInfo[ctr].activation](specialEvadeInfo[ctr].originLevel, attacker, defender);
-					} else if(specialEvadeInfo[ctr].activation == "skill"){
-						isHit = dSkill < aSkill;
-					} else if(specialEvadeInfo[ctr].activation == "random"){
-						isHit = Math.random() > specialEvadeInfo[ctr].value;
-					}
-					if(!isHit){
-						specialEvasion = specialEvadeInfo[ctr];
-					}
-				}
-				ctr++;
-			}
-		}
-		return specialEvasion;
-	}
+	
 	
 	BattleAction.prototype.determineTargetInfo = function(){		
 		function getTargetInfo(attacker, defender){	
@@ -1399,15 +1401,32 @@ BattleCalc.prototype.generateBattleResult = function(isPrediction){
 			if(isBuffingAttack){//you can't dodge status effects by allies(assumed to be beneficial ones)
 				hitRate = 1;
 			}
-			
-			var isHit = Math.random() <= hitRate;
-			var specialEvasion = null;
-			if(isHit){		
-				specialEvasion = this.getSpecialEvasion(attacker, defender);
-				if(!isBuffingAttack && specialEvasion){
-					isHit = false;
+
+			var isHit;		
+			var specialEvasion;			
+			if(ENGINE_SETTINGS.SPECIAL_EVASION_FIRST){
+				if(!isBuffingAttack){	
+					specialEvasion = _this.getSpecialEvasion(attacker, defender,isPrediction);
+					if(!specialEvasion){
+						isHit = Math.random() <= hitRate;
+					} else {
+						isHit = false;
+					}
+				} else {
+					isHit = true;
+				}				
+			} else {
+				isHit = Math.random() <= hitRate;
+				specialEvasion = null;
+				if(isHit){		
+					specialEvasion = _this.getSpecialEvasion(attacker, defender,isPrediction);
+					if(!isBuffingAttack && specialEvasion){
+						isHit = false;
+					}
 				}
 			}
+
+			
 			if(isHit && this._supportDefender && !this._supportDefender.blockedHit){
 				this._supportDefender.blockedHit = true;
 				finalTarget = this._supportDefender;
@@ -1807,20 +1826,38 @@ BattleCalc.prototype.generateMapBattleResult = function(){
 			
 			dCache.isAttacked = true;
 			dCache.attackedBy = aCache;
-			var isHit = Math.random() < _this.performHitCalculation(
-				attacker,
-				defender		
-			);
+			
 			if(isBetweenFriendlies && interactionType == Game_System.INTERACTION_STATUS){//you can't dodge status effects by allies(assumed to be beneficial ones)
 				isHit = 1;
 				dCache.receivedBuff = true;
 			}
-			if(isHit){
-				if(Math.random() < $statCalc.applyStatModsToValue(defender.actor, 0, ["double_image_rate"])){
-					dCache.isDoubleImage = true;
-					isHit = 0;
+			if(!dCache.receivedBuff){			
+				if(ENGINE_SETTINGS.SPECIAL_EVASION_FIRST){
+					var specialEvasion = _this.getSpecialEvasion(attacker, defender,false);
+					if(specialEvasion){
+						dCache.specialEvasion = specialEvasion;
+						isHit = false;
+					} else {
+						var isHit = Math.random() < _this.performHitCalculation(
+							attacker,
+							defender		
+						);
+					}
+				} else {
+					var isHit = Math.random() < _this.performHitCalculation(
+						attacker,
+						defender		
+					);
+					if(isHit){
+						var specialEvasion = _this.getSpecialEvasion(attacker, defender,false);
+						if(specialEvasion){
+							dCache.specialEvasion = specialEvasion;
+							isHit = false;
+						}
+					}
 				}
 			}
+			
 			var damageResult = {
 				damage: 0,
 				isCritical: false,
