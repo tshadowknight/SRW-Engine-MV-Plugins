@@ -775,6 +775,9 @@ BattleCalc.prototype.getSpecialEvasion = function(attacker, defender, isPredicti
 	if(isPrediction){//do not factor in special evasion when predicting damage
 		return specialEvasion;
 	}
+	if(!attacker.action?.attack){
+		return specialEvasion;
+	}
 	var isHit = 1;
 	var weaponref = attacker.action.attack; 
 	var specialEvadeInfo = $statCalc.getModDefinitions(defender.actor, ["special_evade"]);
