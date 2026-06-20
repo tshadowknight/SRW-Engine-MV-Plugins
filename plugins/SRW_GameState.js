@@ -1119,9 +1119,11 @@ GameState_actor_target.prototype.updateMapEvent = function(x, y, triggers){
 						
 						$gameTemp.supportDefendCandidates = [];
 						$gameTemp.supportDefendSelected = -1;
+						$gameTemp.twinSupportAttack = null;
 						
 						$gameTemp.supportAttackCandidates = [];
-						$gameTemp.supportAttackSelected = -1;						
+						$gameTemp.supportAttackSelected = -1;					
+						$gameTemp.twinSupportAttack = null;	
 						
 						let canUseSupporter = true;
 						if($gameTemp.actorAction){					
