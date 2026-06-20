@@ -2982,6 +2982,20 @@ SceneManager.isInSaveScene = function(){
 	
 	Scene_Map.prototype.srpgPrepareNextAction = function(){
 		$gameTemp.rewardsInfo = null;	
+		if(!$gameTemp.activeEvent()){
+			console.log("!!activeEvent was somehow unset when reaching srpgPrepareNextAction");
+			debugger;
+			$gameSystem.setSubBattlePhase('check_item_pickup');	
+
+			$gameSystem.clearSrpgActorCommandWindowNeedRefresh();
+			$gameSystem.clearSrpgActorCommandStatusWindowNeedRefresh();        
+			$gameTemp.clearTargetEvent();
+			$gameParty.clearSrpgBattleActors();
+			$gameTroop.clearSrpgBattleEnemys();
+			$gameTemp.battleEffectCache = null;
+
+			return;
+		}
 		var battler = $gameSystem.EventToUnit($gameTemp.activeEvent().eventId())[1];
 		$statCalc.invalidateAbilityCache(battler);
 		$gameTemp.activeEvent().lastMoveCount = 0;
@@ -4054,7 +4068,7 @@ SceneManager.isInSaveScene = function(){
 		if(mapWeapons.length){
 			mapWeapons.forEach(function(mapWeapon){
 				var type = "";
-				if(mapWeapon.ignoresFriendlies){
+				if(mapWeapon.ignoresFriendlies || $gameTemp.debugAutoPlay){ //prevent autoplay being interrupted by allies shooting each other down and triggering loss conditions
 					type = $gameSystem.isEnemy(enemy) ? "actor" : "enemy";
 				}
 				var targetInfo = _this.getBestMapAttackTargets(event, mapWeapon, type);
@@ -4067,7 +4081,7 @@ SceneManager.isInSaveScene = function(){
 		if(bestMapAttack){
 			$gameTemp.enemyMapAttackDef = bestMapAttack;
 			var type = "";
-			if(bestMapAttack.attack.ignoresFriendlies){
+			if(bestMapAttack.attack.ignoresFriendlies || $gameTemp.debugAutoPlay){
 				type = $gameSystem.isEnemy(enemy) ? "actor" : "enemy";
 			}
 			var targetInfo = _this.getMapAttackTargets(event, bestMapAttack.attack, type, bestMapAttack.direction);
