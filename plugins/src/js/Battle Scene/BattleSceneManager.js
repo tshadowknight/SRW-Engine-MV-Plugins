@@ -445,11 +445,12 @@ BattleSceneManager.prototype.preloadTexture = async function(path, context){
 		}
 	} else {
 		let objURL = bitmap._image.src; //after loading an image through the manager with asBlob=true, the returned bitmap has an image with an Object URL src
-		new BABYLON.Texture(objURL, _this._scene, false, true, BABYLON.Texture.NEAREST_NEAREST);
+		let texture = new BABYLON.Texture(objURL, _this._scene, false, true, BABYLON.Texture.NEAREST_NEAREST);
 		_this._activeTextureCache[path] = {
-			imgData: objURL
-		};		
-	}	
+			imgData: objURL,
+			texture: texture
+		};
+	}
 }
 
 BattleSceneManager.prototype.getCachedTexture = function(path){
@@ -478,6 +479,9 @@ BattleSceneManager.prototype.disposeTextureCache = function(){
 		for(let cacheKey in this._activeTextureCache){
 			let objURL = this._activeTextureCache[cacheKey].imgData;
 			window.URL.revokeObjectURL(objURL);
+			if(this._activeTextureCache[cacheKey].texture){
+				this._activeTextureCache[cacheKey].texture.dispose();
+			}
 		}
 	}
 	this._activeTextureCache = {};
@@ -7209,7 +7213,7 @@ BattleSceneManager.prototype.setBgMode = function(mode) {
 
 BattleSceneManager.prototype.resetScene = function() {
 	var _this = this;
-	this.initScene();
+	
 	
 	this._isEnvPreview = false;
 	this._textProviderOverride = null;
@@ -7261,7 +7265,11 @@ BattleSceneManager.prototype.resetScene = function() {
 	_this._fixedBgs.forEach(function(bg){
 		bg.dispose();
 	});
+	_this._fixedBgs = [];
 	_this._cachedBgs = {};
+
+	this.stopScene();
+	this.initScene();
 	
 	var cameraMainIdle = _this._defaultPositions.camera_main_idle;
 	
@@ -8371,36 +8379,38 @@ BattleSceneManager.prototype.setUpActionSceneState = function(action) {
 	}
 }
 
-BattleSceneManager.prototype.endScene = function(force) {
+BattleSceneManager.prototype.endScene = function(force, immediate) {
 	var _this = this;
 	_this.lastAnimId = -1;
 	var sanityCheck = true;
-	_this.endSceneTimeOut = setTimeout(function(){
-		if(sanityCheck){
-			console.log("battle scene ended due to sanity check");			
-			_this.disposeAnimationSprites();
-			_this.disposeAnimationBackgrounds();
-			_this.disposeSpriterBackgrounds();
-			_this.disposeLights();
-			_this.disposeEffekseerInstances();
-			_this.disposeMovieBackgrounds();
-			_this.disposeRMMVBackgrounds();			
-			_this.disposeTextureCache();
-			_this.disposeDynamicModels();
-			_this.disposeRenderTargets();
-			_this._UIcontainer.style.display = "";
-			_this._TextContainer.style.display = "";
-			_this._PIXIContainer.style.display = "";	
-			_this.stopScene();
-			$gameSystem.setSubBattlePhase('after_battle');
-		}
-		//fail safe against state bugs with the system fade and swipe container
-		_this._systemFadeContainer.style.display = "none";
-		_this._swipeContainer.style.display = "none";
-		_this._runningAnimation = false;
-		_this._animationList = [];
-		_this.endSceneTimeOut = null;
-	}, 2500);
+	if(!immediate){	
+		_this.endSceneTimeOut = setTimeout(function(){
+			if(sanityCheck){
+				console.log("battle scene ended due to sanity check");			
+				_this.disposeAnimationSprites();
+				_this.disposeAnimationBackgrounds();
+				_this.disposeSpriterBackgrounds();
+				_this.disposeLights();
+				_this.disposeEffekseerInstances();
+				_this.disposeMovieBackgrounds();
+				_this.disposeRMMVBackgrounds();			
+				_this.disposeTextureCache();
+				_this.disposeDynamicModels();
+				_this.disposeRenderTargets();
+				_this._UIcontainer.style.display = "";
+				_this._TextContainer.style.display = "";
+				_this._PIXIContainer.style.display = "";	
+				_this.stopScene();
+				$gameSystem.setSubBattlePhase('after_battle');
+			}
+			//fail safe against state bugs with the system fade and swipe container
+			_this._systemFadeContainer.style.display = "none";
+			_this._swipeContainer.style.display = "none";
+			_this._runningAnimation = false;
+			_this._animationList = [];
+			_this.endSceneTimeOut = null;
+		}, 2500);
+	}
 	if(!_this._sceneIsEnding || force){
 		_this._sceneIsEnding = true;	
 		_this.systemFadeToBlack(400, 400).then(function(){			
@@ -8963,18 +8973,6 @@ BattleSceneManager.prototype.startAnimations = function() {
 BattleSceneManager.prototype.showEnvironmentScene = async function() {
 	var _this = this;		
 	
-	_this._bgs.forEach(function(bg){
-		bg.dispose();
-	});	
-	_this._bgs = [];
-	_this._bgInstances = [];
-	
-	_this._fixedBgs.forEach(function(bg){
-		bg.dispose();
-	});
-	_this._cachedBgs = {};
-	_this._bgLayerInfo = {};
-	
 	_this._sceneCanEnd = false;
 	_this._sceneIsEnding = false;
 	_this._UIcontainer.style.display = "block";	
@@ -9001,7 +8999,8 @@ BattleSceneManager.prototype.showEnvironmentScene = async function() {
 	_this._TextlayerManager.resetTextBox();
 	_this._camera.position.copyFrom(_this._defaultPositions.camera_main_idle);
 	_this._camera.rotation.copyFrom(_this._defaultRotations.camera_main_idle);
-	//_this.stopScene();
+	
+
 	_this.startScene();		
 	await _this.createEnvironment();
 	_this.showEnvironment(null, true);

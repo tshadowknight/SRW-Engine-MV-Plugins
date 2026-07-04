@@ -1546,7 +1546,7 @@ SRWEditor.prototype.show = function(){
 			}
 			if(c){
 				_this._modified = false;
-				$battleSceneManager.endScene();
+				$battleSceneManager.endScene(true, true);
 				//_this._currentDefinition = 0;
 				//_this._currentEnvironmentDefinition = 0;
 				_this._currentEditor = this.value;
@@ -1707,12 +1707,13 @@ SRWEditor.prototype.showBattleTextEditor = function(){
 	
 	
 	this.showBattleTextEditorControls();
+	$battleSceneManager.showEnvironmentScene();	
 }
 
 SRWEditor.prototype.showBattleTextEditorControls = function(){
 	var _this = this;
 	_this._battleTextBuilder.isLoaded().then(function(){
-		$battleSceneManager.showEnvironmentScene();	
+		$battleSceneManager.startScene();
 		var containerNode = _this._contentDiv.querySelector(".content");
 		var content = "";
 		
@@ -2800,6 +2801,7 @@ SRWEditor.prototype.showEnvironmentEditor = function(){
 	//$battleSceneManager.showEnvironmentScene();
 		
 	this.showEnvironmentEditorControls();
+	
 }
 
 
@@ -2808,8 +2810,8 @@ SRWEditor.prototype.showEnvironmentEditorControls = function(){
 	_this._environmentBuilder.isLoaded().then(function(){
 		var containerNode = _this._contentDiv.querySelector(".content");
 		var content = "";
-		$battleSceneManager.showEnvironmentScene();	
 		
+		$battleSceneManager.showEnvironmentScene();	
 		content+="<div class='selection_controls'>";
 		content+="<select class='definition_select'>";
 		var definitions = _this._environmentBuilder.getDefinitions();
