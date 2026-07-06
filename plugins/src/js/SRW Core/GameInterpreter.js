@@ -107,11 +107,7 @@
 				throw msg;
 			}
 			
-			if(result == null){
-				return true;
-			} else {
-				return result;
-			}
+			return true;
 		};
 		
 		Game_Interpreter.prototype.distanceBetweenEvents = function(eventId1, eventId2) {
