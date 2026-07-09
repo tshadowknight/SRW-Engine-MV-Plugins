@@ -1823,32 +1823,81 @@ SceneManager.isInSaveScene = function(){
 	Scene_Map.prototype.handleEventSpirits = function(spirits) {
 		var _this = this;
 		$gameTemp.playingSpiritAnimations = true;
-		var currentSpirit = spirits.pop();	
+		var regularSpirits = [];
+		var mapSpirits = [];
+
+		for(let spirit of spirits){
+			var spiritDef = $spiritManager.getSpiritDef(spirit.idx);
+			if(spiritDef.targetType == "ally_all" || spiritDef.targetType == "enemy_all"){
+				mapSpirits.push(spirit);
+			} else {
+				regularSpirits.push(spirit);
+			}
+		}
+		var currentSpirit;
 		this._spiritWindow.close();
 		
 		function applySpirit(){
+			$gameTemp.mapSpiritContext = null;
 			_this.applyAdditionalSpiritEffects(currentSpirit, currentSpirit.target, currentSpirit.caster);					
 			$spiritManager.applyEffect(currentSpirit.idx, currentSpirit.caster, [currentSpirit.target], 0);			
 			$gameTemp.spiritTargetActor = currentSpirit.target;
 			$gameTemp.queuedActorEffects = [{type: "spirit", parameters: {target: currentSpirit.target, idx: currentSpirit.idx}}];	
 			_this._spiritAnimWindow.show(true);	
 		}
-			
-		$gameTemp.spiritWindowDoneHandler = function(){
-			if(!spirits.length){
-				$gameSystem.setSubBattlePhase($gameTemp.eventSpiritPhaseContext || 'normal');	
-				$gameTemp.eventSpiritPhaseContext = null;
-				$gameTemp.playingSpiritAnimations = false;
+
+		function processNextSpirit(){
+			if(!regularSpirits.length){
 				$gameTemp.popMenu = true;
+				if(!mapSpirits.length){
+					$gameSystem.setSubBattlePhase($gameTemp.eventSpiritPhaseContext || 'normal');	
+					$gameTemp.eventSpiritPhaseContext = null;
+					$gameTemp.playingSpiritAnimations = false;
+				} else {
+					applyMapSpirit();
+				}				
 			} else {
-				currentSpirit = spirits.pop();	
+				currentSpirit = regularSpirits.pop();	
 				applySpirit();
 			}
 		}
-		
-		$gameSystem.setSubBattlePhase('spirit_activation');	
-		$gameTemp.pushMenu = "spirit_activation";
-		applySpirit();
+			
+		$gameTemp.spiritWindowDoneHandler = processNextSpirit;
+
+		function applyMapSpirit(){
+			var initialTargetingResult = $spiritManager.performInitialTargeting(currentSpirit.idx, null, {x: 0, y: 0});
+			$spiritManager.applyEffect(currentSpirit.idx, currentSpirit.caster, initialTargetingResult.targets, 0);
+			$gameTemp.setActiveEvent($statCalc.getReferenceEvent(currentSpirit.caster));	
+			$gameTemp.mapSpiritAnimationStarted = false;
+			$gameTemp.mapSpiritContext = "auto";
+			$gameTemp.queuedEffectSpiritId = currentSpirit.idx; 
+			$gameSystem.setSubBattlePhase("map_spirit_animation");			
+		}
+
+		function processNextMapSpirit(){
+			if(!mapSpirits.length){
+				$gameTemp.popMenu = true;
+				$gameSystem.setSubBattlePhase($gameTemp.eventSpiritPhaseContext || 'normal');	
+				$gameTemp.eventSpiritPhaseContext = null;
+				$gameTemp.playingSpiritAnimations = false;						
+			} else {
+				currentSpirit = mapSpirits.pop();	
+				applyMapSpirit();
+			}
+		}
+
+		$gameTemp.autoMapSpiritDoneHandler = processNextMapSpirit;
+
+		if(regularSpirits.length){
+			currentSpirit = regularSpirits.pop();	
+			$gameSystem.setSubBattlePhase('spirit_activation');	
+			$gameTemp.pushMenu = "spirit_activation";
+			applySpirit();
+		} else if(mapSpirits.length){
+			currentSpirit = mapSpirits.pop();	
+			$gameSystem.setSubBattlePhase('spirit_activation');	
+			applyMapSpirit();
+		}		
 	}
 	
 	Scene_Map.prototype.handleSpiritSelection = function(spiritInfo, callback) {
