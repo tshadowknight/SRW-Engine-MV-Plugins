@@ -97,6 +97,8 @@ export default function BattleSceneManager(){
 	this._effekserDynParamAnimations = {};
 	this._effekserDynParamAnimationCtr = 0;
 	
+	this._afterImages = {};
+	
 	this._nextEffekseerUniqueId = 0;
 	
 	this._bgScrolls = {};
@@ -497,6 +499,30 @@ BattleSceneManager.prototype.disposeDynamicModels = function(){
 	this._instantiatedUnits = [];
 }
 
+BattleSceneManager.prototype.disposeAfterImages = function(){
+	for(let targetName in this._afterImages){
+		const entry = this._afterImages[targetName];
+		for(let afterImage of entry.images){
+			//dispose recurses into the cloned hierarchy
+			afterImage.sprite.dispose();
+		}
+		if(entry.materials){
+			for(let material of entry.materials){
+				//babylon registers every texture with the scene, so the snapshot copies are never collected on their own. the tag makes sure
+				//only the ones made for the after images are disposed, the rest are shared with the source material and must be left alone.
+				const textures = [material.diffuseTexture, material.albedoTexture];
+				for(let texture of textures){
+					if(texture && texture.afterImageSource){
+						texture.dispose();
+					}
+				}
+				material.dispose();
+			}
+		}
+	}
+	this._afterImages = {};
+}
+
 BattleSceneManager.prototype.disposeRenderTargets = function(){
 	for(let targetId in this._renderTargets){
 		const entry = this._renderTargets[targetId];
@@ -535,6 +561,7 @@ BattleSceneManager.prototype.dispose = function(){
 	this.disposeMovieBackgrounds();
 	this.disposeRMMVBackgrounds();
 	this._animationList = [];
+	this.disposeAfterImages();
 	this.disposeTextureCache();
 	this.disposeDynamicModels();
 	this.disposeRenderTargets();
@@ -2903,6 +2930,209 @@ BattleSceneManager.prototype.runAnimations = function(deltaTime){
 		}
 		
 	}
+
+	for(let targetName in this._afterImages){
+		let entry = this._afterImages[targetName];
+
+		const parent = this.getTargetObject(targetName);
+
+		for(let afterImage of entry.images){
+			if(afterImage.isActive){
+				afterImage.accumulator-=deltaTime;
+
+				const fadeDuration = entry.fadeTime * _this.getTickDuration();
+				const rampUpDuration = entry.rampUpTime * _this.getTickDuration();
+				const lifeTime = rampUpDuration + fadeDuration;
+				const elapsed = lifeTime - afterImage.accumulator;
+
+				let visibility;
+				if(rampUpDuration > 0 && elapsed < rampUpDuration){
+					//ramping up from nothing to the peak opacity
+					visibility = entry.peakOpacity * (elapsed / rampUpDuration);
+				} else if(fadeDuration > 0){
+					//fading out from the peak opacity, the accumulator holds exactly the fade duration when the ramp up ends
+					visibility = entry.peakOpacity * (afterImage.accumulator / fadeDuration);
+				} else {
+					visibility = 0;
+				}
+
+				if(visibility <= 0){
+					visibility = 0;
+				}
+				if(visibility > entry.peakOpacity){
+					visibility = entry.peakOpacity;
+				}
+
+				const meshes = afterImage.meshes;
+				for(let m = 0; m < meshes.length; m++){
+					meshes[m].visibility = visibility;
+				}
+
+				if(entry.hasColorRamp){
+					//the color ramp follows the age of the after image, it is deliberately independent of the opacity envelope
+					let t = lifeTime > 0 ? elapsed / lifeTime : 1;
+					if(t < 0){
+						t = 0;
+					}
+					if(t > 1){
+						t = 1;
+					}
+					for(let material of afterImage.materials){
+						//written in place, the emissive color is a plain uniform and does not need the material marked as dirty
+						BABYLON.Color3.LerpToRef(entry.startColor, entry.endColor, t, material.emissiveColor);
+					}
+				}
+
+				if(afterImage.accumulator <= 0){
+					afterImage.isActive = false;
+				}
+			}
+		}
+
+		if(entry.isRunning){			
+
+			entry.accumulator-=deltaTime;
+			if(entry.accumulator <= 0){
+				let afterImage;
+
+				for(let candidate of entry.images){
+					if(!candidate.isActive){
+						afterImage = candidate;
+						break;
+					}
+				}
+
+				if(afterImage != null){
+					if(afterImage.setEnabled){
+						afterImage.sprite.setEnabled(true); 
+					} else {
+						afterImage.sprite.isVisible = true;
+					}
+					
+					afterImage.isActive = true;
+					afterImage.accumulator = (entry.rampUpTime + entry.fadeTime) * _this.getTickDuration();
+
+					//the envelope only updates the after image from the next frame on, without this a recycled one shows the end of its previous run for a frame
+					const spawnVisibility = entry.rampUpTime > 0 ? 0 : entry.peakOpacity;
+					const spawnMeshes = afterImage.meshes;
+					for(let m = 0; m < spawnMeshes.length; m++){
+						spawnMeshes[m].visibility = spawnVisibility;
+					}
+
+					for(let material of afterImage.materials){
+						material.emissiveColor.copyFrom(entry.startColor);
+					}
+
+					if(entry.hasColorRamp){
+						for(let material of afterImage.materials){
+							material.emissiveColor.copyFrom(entry.startColor);
+						}
+					}
+
+					var scale = new BABYLON.Vector3(0, 0, 0);
+					var rotation = new BABYLON.Quaternion();
+					var position = new BABYLON.Vector3(0,0,0);
+					var tempWorldMatrix = parent.computeWorldMatrix(true);
+					tempWorldMatrix.decompose(scale, rotation, position);
+
+					//the glb animation groups only target the source nodes, so the after image is posed by snapshotting the local transform of the source hierarchy
+					const sourceNodes = afterImage.sourceNodes;
+					const ghostNodes = afterImage.ghostNodes;
+
+					//the pose is only touched here, in between spawns the world matrices are frozen so babylon stops recomputing the whole hierarchy every frame
+					if(ghostNodes){
+						for(let n = 0; n < ghostNodes.length; n++){
+							if(ghostNodes[n].unfreezeWorldMatrix){
+								ghostNodes[n].unfreezeWorldMatrix();
+							}
+						}
+					}
+
+					if(sourceNodes && ghostNodes){
+						//index 0 is the root, it is unparented and gets the source's world transform below instead
+						for(let i = 1; i < sourceNodes.length && i < ghostNodes.length; i++){
+							const sourceNode = sourceNodes[i];
+							const ghostNode = ghostNodes[i];
+							if(!sourceNode || !ghostNode){
+								continue;
+							}
+							if(sourceNode.position && ghostNode.position){
+								ghostNode.position.copyFrom(sourceNode.position);
+							}
+							if(sourceNode.scaling && ghostNode.scaling){
+								ghostNode.scaling.copyFrom(sourceNode.scaling);
+							}
+							if(sourceNode.rotationQuaternion){
+								if(ghostNode.rotationQuaternion){
+									ghostNode.rotationQuaternion.copyFrom(sourceNode.rotationQuaternion);
+								} else {
+									ghostNode.rotationQuaternion = sourceNode.rotationQuaternion.clone();
+								}
+							} else if(sourceNode.rotation && ghostNode.rotation){
+								ghostNode.rotationQuaternion = null;
+								ghostNode.rotation.copyFrom(sourceNode.rotation);
+							}							
+						}
+
+						for(let i = 0; i < sourceNodes.length && i < ghostNodes.length; i++){
+							const sourceNode = sourceNodes[i];
+							const ghostNode = ghostNodes[i];
+							if(!sourceNode || !ghostNode){
+								continue;
+							}
+							//2d sprites hold their material on the root itself, so unlike the transform pass this one starts at index 0
+							if(sourceNode.material && ghostNode.material){
+								const sourceTexture = sourceNode.material.diffuseTexture || sourceNode.material.albedoTexture;
+								if(sourceTexture){
+									let ghostTexture = ghostNode.material.diffuseTexture || ghostNode.material.albedoTexture;
+									//the uv offsets live on the texture object, so sharing the source's would keep animating along with it
+									if(!ghostTexture || ghostTexture.afterImageSource != sourceTexture){
+										//the tag marks the copies made here, the texture material.clone left on the ghost is still the source's own
+										if(ghostTexture && ghostTexture.afterImageSource){
+											ghostTexture.dispose();
+										}
+										ghostTexture = sourceTexture.clone();
+										ghostTexture.afterImageSource = sourceTexture;
+										if(sourceNode.material.diffuseTexture){
+											ghostNode.material.diffuseTexture = ghostTexture;
+										} else {
+											ghostNode.material.albedoTexture = ghostTexture;
+										}
+									}
+									//snapshot the uv state, this is what freezes a sprite mid animation
+									ghostTexture.uOffset = sourceTexture.uOffset;
+									ghostTexture.vOffset = sourceTexture.vOffset;
+									ghostTexture.uScale = sourceTexture.uScale;
+									ghostTexture.vScale = sourceTexture.vScale;
+								}
+							}
+						}
+					}
+
+					//the after image is not parented to the source, so the root takes the decomposed world transform
+					afterImage.sprite.position.copyFrom(position);
+					afterImage.sprite.position.z+=Math.random() * 0.01;
+					afterImage.sprite.scaling.copyFrom(scale);
+					if(afterImage.sprite.rotationQuaternion){
+						afterImage.sprite.rotationQuaternion.copyFrom(rotation);
+					} else {
+						afterImage.sprite.rotationQuaternion = rotation.clone();
+					}
+
+					//ghostNodes is a pre order walk, so every parent is recomputed before its children get frozen against it
+					if(ghostNodes){
+						for(let n = 0; n < ghostNodes.length; n++){
+							if(ghostNodes[n].freezeWorldMatrix){
+								ghostNodes[n].freezeWorldMatrix();
+							}
+						}
+					}
+				}
+
+				entry.accumulator = entry.spawnRate * _this.getTickDuration();
+			}
+		}
+	}
 }
 
 //puts all animation commands that needs to be excuted on this tick in _this._animQueue
@@ -3156,7 +3386,11 @@ BattleSceneManager.prototype.startScene = function(){
 				_this._camera.getWorldMatrix().invertToRef(_this._tmp_mat_worldInv);
 				_this._effksContextAttached.setCameraMatrix(_this._tmp_mat_worldInv.m);
 				_this._effksContextAttached.draw();
-			}			
+			}
+
+			//effekseer sets its own blend, depth mask, cull and buffer bindings on the shared context. babylon caches gl state and skips redundant
+			//calls, so without this everything it draws after this point in the frame would be working from a stale cache.
+			_this._engine.wipeCaches(true);
 		}
 	}
 	
@@ -4924,6 +5158,16 @@ BattleSceneManager.prototype.executeAnimation = function(animation, startTick){
 			_this.applyMutator(targetObj, (mesh) => {
 				mesh.renderingGroupId = params.id;
 			});
+			//the after images are standalone copies in the scene, they are not children of the target and have to be moved along with it
+			const afterImageInfo = _this._afterImages[target];
+			if(afterImageInfo){
+				for(let afterImage of afterImageInfo.images){
+					const meshes = afterImage.meshes;
+					for(let m = 0; m < meshes.length; m++){
+						meshes[m].renderingGroupId = params.id;
+					}
+				}
+			}
 		},
 		create_model_instance: function(target, params){
 			var targetObj = getTargetObject(params.parent);
@@ -4993,6 +5237,33 @@ BattleSceneManager.prototype.executeAnimation = function(animation, startTick){
 				}				
 			} 
 			//return spriteInfo;	
+		},
+		start_after_images: function(target, params){
+			var targetObj = getTargetObject(target);
+			if(_this._afterImages[target]){
+				_this._afterImages[target].isRunning = true;
+			}
+		},
+		stop_after_images: function(target, params){
+			var targetObj = getTargetObject(target);
+			if(_this._afterImages[target]){
+				_this._afterImages[target].isRunning = false;
+			}
+		},
+		remove_after_images: function(target, params){
+			var targetObj = getTargetObject(target);
+			if(_this._afterImages[target]){
+				_this._afterImages[target].isRunning = false;
+				const images = _this._afterImages[target].images;
+				for(const image of images){
+					image.isActive = false;
+					image.accumulator = 0;
+					const meshes = image.meshes;
+					for(let i = 0; i < meshes.length; i++){
+						meshes[i].visibility = 0;
+					}
+				}
+			}
 		},
 		set_spriter_bg_anim: function(target, params){
 			var targetObj;
@@ -7228,6 +7499,7 @@ BattleSceneManager.prototype.resetScene = function() {
 	_this.disposeLights();
 	_this.disposeMovieBackgrounds();
 	_this.disposeRMMVBackgrounds();
+	_this.disposeAfterImages();
 	_this.disposeTextureCache();
 	_this.disposeDynamicModels();
 	_this.disposeRenderTargets();
@@ -7795,6 +8067,8 @@ BattleSceneManager.prototype.preloadDynamicUnitModel = async function(target, pa
 			targetObj.isVisible = false;
 		}				
 	} 
+
+	
 }
 
 
@@ -7874,6 +8148,8 @@ BattleSceneManager.prototype.preloadSceneAssets = function(){
 			if(animCommand.type == "create_unit_model"){				
 				promises.push(_this.preloadDynamicUnitModel(target, params, flipX, animationIdx));			
 			}
+
+			
 			
 			if(animCommand.type == "register_alias"){						
 				_this._preloadAliases[params.id] = target;
@@ -7999,7 +8275,8 @@ BattleSceneManager.prototype.preloadSceneAssets = function(){
 		for(var i = 0; i < _this._actionQueue.length; i++){
 			var nextAction = _this._actionQueue[i];
 			const animationIdx = nextAction.actionOrder;
-			if(nextAction){			
+			if(nextAction){				
+				
 				var attack = nextAction.action.attack;
 				
 				const animIdsToPreload = {};
@@ -8126,6 +8403,299 @@ BattleSceneManager.prototype.preloadSceneAssets = function(){
 	return this._preloadPromise;
 }
 
+//the after image blend colors are optional, a missing or blank component disables the tint instead of blacking the model out
+BattleSceneManager.prototype.parseAfterImageColor = function(r, g, b){
+	if(r == null || r === "" || g == null || g === "" || b == null || b === ""){
+		return null;
+	}
+	const color = new BABYLON.Color3(r / 255, g / 255, b / 255);
+	if(isNaN(color.r) || isNaN(color.g) || isNaN(color.b)){
+		return null;
+	}
+	return color;
+}
+
+BattleSceneManager.prototype.preloadAfterImages = function(){
+	const _this = this;
+	
+
+	function handleAnimCommand(action, animCommand, animId, animType, tick, flipX, animationIdx){	
+		var target = animCommand.target;
+		var params = animCommand.params;	
+		if(animCommand.type == "start_after_images"){
+			let count = params.count;
+			if(count > 32){
+				count = 32;
+			}
+			const sourceObj = _this.getTargetObject(target);
+			if(sourceObj){
+				if(!_this._afterImages[target]){
+					//the colors are optional, animations made before they were added leave them blank
+					const startColor = _this.parseAfterImageColor(params.rStart, params.gStart, params.bStart);
+					const endColor = _this.parseAfterImageColor(params.rEnd, params.gEnd, params.bEnd);
+					//0 keeps the model's own colors, 1 blacks them out so only the blend color is left
+					let flatten = params.flatten * 1;
+					if(isNaN(flatten) || flatten < 0){
+						flatten = 0;
+					}
+					if(flatten > 1){
+						flatten = 1;
+					}
+					//the opacity an after image reaches at the top of its ramp up, blank defaults to fully opaque
+					let peakOpacity = params.peakOpacity * 1;
+					if(isNaN(peakOpacity) || peakOpacity <= 0 || peakOpacity > 1){
+						peakOpacity = 1;
+					}
+					//how long an after image takes to ramp up to the peak opacity, in ticks. it is added on top of the fade time rather than taken out of it
+					let rampUpTime = params.rampUpTime * 1;
+					if(isNaN(rampUpTime) || rampUpTime < 0){
+						rampUpTime = 0;
+					}
+					//a blank end color holds the start color for the whole life of an after image
+					const rampEndColor = endColor || startColor;
+					_this._afterImages[target] = {
+						images: [],
+						materials: [],
+						isRunning: false,
+						isEnding: false,
+						//kept as numbers, they are added together as well as multiplied and the editor hands them over as strings
+						spawnRate: params.spawnRate * 1,
+						fadeTime: params.fadeTime * 1,
+						accumulator: 0,
+						startColor: startColor,
+						endColor: rampEndColor,
+						hasColor: startColor != null,
+						//only a color that actually changes needs to be updated per frame, and only then does each after image need its own materials
+						hasColorRamp: startColor != null && !startColor.equals(rampEndColor),
+						flatten: flatten,
+						peakOpacity: peakOpacity,
+						rampUpTime: rampUpTime,
+						is2D: params.is2D == 1
+					};
+				}
+				const entry = _this._afterImages[target];
+
+				//cloning this many materials in one go cascades dirty flags through the scene, blocking that keeps the preload from hitching
+				const previousBlockDirty = _this._scene.blockMaterialDirtyMechanism;
+				_this._scene.blockMaterialDirtyMechanism = true;
+
+				//without a live color ramp every after image looks the same at all times, so they can all share one set of materials
+				const sharedMaterials = {};
+
+				for(let i = 0; i < count; i++){
+					//promises.push(_this.preloadDynamicUnitModel(target+"after_image_" + i, params, flipX, animationIdx, target));
+
+					const ghost = sourceObj.clone(target + "_after_image_" + i);
+					ghost.parent = null;
+					//the root is driven with the source's decomposed world matrix, which already has the source's pivot baked into it. the clone carries that
+					//same pivot and would apply it a second time. descendants keep theirs, they are posed with local transforms just like on the source.
+					if(ghost.setPivotMatrix){
+						ghost.setPivotMatrix(BABYLON.Matrix.Identity(), false);
+					}
+
+					//mesh.clone shares the material with the source, so the after images need their own copy to avoid forcing the source into the transparent pass
+					const ghostMaterials = entry.hasColorRamp ? {} : sharedMaterials;
+					const imageMaterials = [];
+					//the visibility of these is set every frame, caching them avoids walking the hierarchy and allocating a new list each time
+					const ghostMeshes = [];
+
+					_this.applyMutator(ghost, (mesh) => {
+						mesh.visibility = 0;
+						//the after images are never picked and never need collision or accurate bounds
+						mesh.isPickable = false;
+						mesh.doNotSyncBoundingInfo = true;
+						ghostMeshes.push(mesh);
+						if(mesh.material){
+							let ghostMaterial = ghostMaterials[mesh.material.uniqueId];
+							if(!ghostMaterial){
+								ghostMaterial = mesh.material.clone(mesh.material.name + "_after_image" + (entry.hasColorRamp ? "_" + i : ""));
+								if(ghostMaterial){
+									ghostMaterial.transparencyMode = BABYLON.Material.MATERIAL_ALPHABLEND;
+									//deliberately left without a depth write. it would stop the far side of the model showing through the near side, but a
+									//translucent object that writes depth also rejects anything drawn after it, which swallows the effekseer particles
+									//behind the after images. use set_rendering_group on the target to place them relative to the particle layer instead.
+									if(!entry.is2D){
+										ghostMaterial.forceDepthWrite = true;
+									}									
+									//ghostMaterial.unlit = true;
+									if(entry.flatten > 0){
+										//the base color multiplies the albedo/diffuse texture, so scaling it down darkens the model's own colors as well
+										const baseFactor = 1 - entry.flatten;
+										if(ghostMaterial.albedoColor){
+											ghostMaterial.albedoColor = ghostMaterial.albedoColor.scale(baseFactor);
+										}
+										if(ghostMaterial.diffuseColor){
+											ghostMaterial.diffuseColor = ghostMaterial.diffuseColor.scale(baseFactor);
+										}
+									}
+									//a blend color that never changes is applied once here instead of being written every frame
+									if(entry.hasColor && !entry.hasColorRamp){
+										ghostMaterial.emissiveColor.copyFrom(entry.startColor);
+									}
+									ghostMaterials[mesh.material.uniqueId] = ghostMaterial;
+									entry.materials.push(ghostMaterial);
+								}
+							}
+							if(ghostMaterial){
+								mesh.material = ghostMaterial;
+								//only a live ramp writes to these per frame, the shared case never needs the list
+								if(entry.hasColorRamp && imageMaterials.indexOf(ghostMaterial) == -1){
+									imageMaterials.push(ghostMaterial);
+								}
+							}
+						}
+
+					});
+
+					//the animation groups loaded from the glb hold references to the source nodes, so the clones are never animated and would stay in the
+					//default pose. they are posed by copying the source hierarchy on spawn instead. clone preserves the child order, so the nodes line up by index.
+					entry.images.push({
+						sprite: ghost,
+						materials: imageMaterials,
+						meshes: ghostMeshes,
+						sourceNodes: [sourceObj].concat(sourceObj.getDescendants()),
+						ghostNodes: [ghost].concat(ghost.getDescendants()),
+						accumulator: 0,
+						isActive: false
+					});
+				}
+
+				_this._scene.blockMaterialDirtyMechanism = previousBlockDirty;
+			}
+		}
+	}
+
+
+	for(var i = 0; i < _this._actionQueue.length; i++){
+		var nextAction = _this._actionQueue[i];
+		const animationIdx = nextAction.actionOrder;
+		if(nextAction){		
+			//set up participant info so getTargetObject class are available during preload				
+			_this.setUpParticipantsSprites(nextAction);
+			var attack = nextAction.action.attack;
+			
+			const animIdsToPreload = {};
+			
+			let animId;
+			if(attack && typeof attack.animId != "undefined" && attack.animId != -1){
+				animId = attack.animId;
+			} else if(attack){
+				animId = _this.getDefaultAnim(attack);//default
+			}
+			if(animId != null){
+				animIdsToPreload[animId] = true;
+			}					
+
+			if(nextAction.isDestroyed){
+				let animId = $statCalc.getBattleSceneInfo(nextAction.action.ref).deathAnimId;
+				if(animId == null || animId == ''){
+					animId = ENGINE_SETTINGS.BATTLE_SCENE.DEFAULT_ANIM.DESTROY;
+				}
+				animIdsToPreload[animId] = true;
+			}
+			
+			
+			if(nextAction.attacked && nextAction.attacked.isDestroyed){
+				let animId = $statCalc.getBattleSceneInfo(nextAction.attacked.ref).deathAnimId;
+				if(animId == null || animId == ''){
+					animId = ENGINE_SETTINGS.BATTLE_SCENE.DEFAULT_ANIM.DESTROY;
+				}
+				animIdsToPreload[animId] = true;
+			}			
+						
+			const visitedAnims = {};
+			
+			const stack = [];
+			for(let animId in animIdsToPreload){
+				stack.push(animId);
+			}
+			
+			while(stack.length){
+				const animId = stack.pop();
+				if(!visitedAnims[animId]){
+					visitedAnims[animId] = true;
+					var animationList = _this._animationBuilder.buildAnimation(animId, _this);
+					if(!animationList){
+						alert("Animation "+animId+" does not have a definition!");
+						throw("Animation "+animId+" does not have a definition!");
+					}
+					Object.keys(animationList).forEach(function(animType){
+						Object.keys(animationList[animType]).forEach(function(tick){
+							const batch = animationList[animType][tick];
+							batch.forEach(function(animCommand){
+								handleAnimCommand(nextAction, animCommand, animId, animType, tick, nextAction.side == "enemy", animationIdx);
+								if(animCommand.type == "next_phase"){
+									if(animCommand.params.commands){
+										for(let command of animCommand.params.commands){
+											handleAnimCommand(nextAction, command, animId, animType, tick, nextAction.side == "enemy", animationIdx);	
+										}
+									}
+									if(animCommand.params.cleanUpCommands){
+										for(let command of animCommand.params.cleanUpCommands){
+											handleAnimCommand(nextAction, command, animId, animType, tick, nextAction.side == "enemy", animationIdx);	
+										}
+									}
+								}	
+								if(animCommand.type == "include_animation"){
+									stack.push(animCommand.params.battleAnimId);
+								}
+								if(animCommand.type == "merge_complete_animation"){
+									stack.push(animCommand.params.battleAnimId);
+								}								
+							});
+						});				
+					});	
+				}
+			}					
+		}	
+	} 
+}
+
+BattleSceneManager.prototype.setUpParticipantsSprites = function(nextAction) {
+	const _this = this;
+	if(nextAction.side == "actor"){
+		_this._enemyTwinSprite.sprite.setEnabled(false);						
+		_this._animationDirection = 1;
+		//_this.setBgScrollDirection(1, false);
+		_this._active_main = _this._actorSprite.sprite;	
+		_this._active_twin =  _this._actorTwinSprite.sprite;
+		_this._active_support_attacker = _this._actorSupporterSprite.sprite;
+		_this._active_support_defender = _this._enemySupporterSprite.sprite;
+		if(nextAction.attacked.type == "support defend" && nextAction.attacked.ref.isSubTwin){
+			
+			_this._active_support_defender = _this._enemyTwinSupporterSprite.sprite;
+		}
+		if(nextAction.attacked_all_sub){
+			_this._active_target = _this._enemySprite.sprite;									
+			_this._active_target_twin = _this._enemyTwinSprite.sprite;	
+		} else if(nextAction.originalTarget.ref.isSubTwin){
+			_this._active_target = _this._enemyTwinSprite.sprite;		
+		} else {
+			_this._active_target = _this._enemySprite.sprite;		
+		}						
+	} else {
+		_this._actorTwinSprite.sprite.setEnabled(false);
+		_this._animationDirection = -1;
+		//_this.setBgScrollDirection(-1, false);
+		_this._active_main = _this._enemySprite.sprite;
+		_this._active_twin =  _this._enemyTwinSprite.sprite;
+		_this._active_support_attacker = _this._enemySupporterSprite.sprite;
+		_this._active_support_defender = _this._actorSupporterSprite.sprite;
+		if(nextAction.attacked?.type == "support defend" && nextAction.attacked?.ref.isSubTwin){
+			_this._active_support_defender = _this._actorTwinSupporterSprite.sprite;
+		}
+		if(nextAction.attacked_all_sub){
+			_this._active_target = _this._actorSprite.sprite;									
+			_this._active_target_twin = _this._actorTwinSprite.sprite;	
+		} else
+		if(nextAction.originalTarget?.ref.isSubTwin){
+			_this._active_target = _this._actorTwinSprite.sprite;
+		} else {
+			_this._active_target = _this._actorSprite.sprite;		
+		}	
+	}
+}
+
 BattleSceneManager.prototype.showScene = async function() {
 	var _this = this;		
 	_this._instanceId++;
@@ -8173,6 +8743,7 @@ BattleSceneManager.prototype.showScene = async function() {
 	async function finalize(){
 		_this._assetsPreloaded = true;
 		await _this.readBattleCache();			
+		await _this.preloadAfterImages();
 		
 		_this._TextlayerManager.resetTextBox();
 		if(_this._participantInfo.actor.participating){
@@ -8394,6 +8965,7 @@ BattleSceneManager.prototype.endScene = function(force, immediate) {
 				_this.disposeEffekseerInstances();
 				_this.disposeMovieBackgrounds();
 				_this.disposeRMMVBackgrounds();			
+				_this.disposeAfterImages();
 				_this.disposeTextureCache();
 				_this.disposeDynamicModels();
 				_this.disposeRenderTargets();
@@ -8431,6 +9003,7 @@ BattleSceneManager.prototype.endScene = function(force, immediate) {
 			_this.disposeRMMVBackgrounds();
 			_this.disposeMovieBackgrounds();
 			_this._animationList = [];
+			_this.disposeAfterImages();
 			_this.disposeTextureCache();
 			_this.disposeDynamicModels();
 			_this.disposeRenderTargets();
@@ -8672,47 +9245,7 @@ BattleSceneManager.prototype.processActionQueue = function() {
 					_this._active_target_twin = null;					
 					_this._currentAnimatedAction = nextAction;					
 					
-					if(nextAction.side == "actor"){
-						_this._enemyTwinSprite.sprite.setEnabled(false);						
-						_this._animationDirection = 1;
-						//_this.setBgScrollDirection(1, false);
-						_this._active_main = _this._actorSprite.sprite;	
-						_this._active_twin =  _this._actorTwinSprite.sprite;
-						_this._active_support_attacker = _this._actorSupporterSprite.sprite;
-						_this._active_support_defender = _this._enemySupporterSprite.sprite;
-						if(nextAction.attacked.type == "support defend" && nextAction.attacked.ref.isSubTwin){
-							
-							_this._active_support_defender = _this._enemyTwinSupporterSprite.sprite;
-						}
-						if(nextAction.attacked_all_sub){
-							_this._active_target = _this._enemySprite.sprite;									
-							_this._active_target_twin = _this._enemyTwinSprite.sprite;	
-						} else if(nextAction.originalTarget.ref.isSubTwin){
-							_this._active_target = _this._enemyTwinSprite.sprite;		
-						} else {
-							_this._active_target = _this._enemySprite.sprite;		
-						}						
-					} else {
-						_this._actorTwinSprite.sprite.setEnabled(false);
-						_this._animationDirection = -1;
-						//_this.setBgScrollDirection(-1, false);
-						_this._active_main = _this._enemySprite.sprite;
-						_this._active_twin =  _this._enemyTwinSprite.sprite;
-						_this._active_support_attacker = _this._enemySupporterSprite.sprite;
-						_this._active_support_defender = _this._actorSupporterSprite.sprite;
-						if(nextAction.attacked.type == "support defend" && nextAction.attacked.ref.isSubTwin){
-							_this._active_support_defender = _this._actorTwinSupporterSprite.sprite;
-						}
-						if(nextAction.attacked_all_sub){
-							_this._active_target = _this._actorSprite.sprite;									
-							_this._active_target_twin = _this._actorTwinSprite.sprite;	
-						} else
-						if(nextAction.originalTarget.ref.isSubTwin){
-							_this._active_target = _this._actorTwinSprite.sprite;
-						} else {
-							_this._active_target = _this._actorSprite.sprite;		
-						}	
-					}
+					_this.setUpParticipantsSprites(nextAction);
 
 					function updateRenderingGroup(elem){
 						if(ENGINE_SETTINGS.BATTLE_SCENE.USE_RENDER_GROUPS){

@@ -444,6 +444,21 @@ SRWEditor.prototype.init = function(){
 			params: ["mechId", "position"],//"animGroup",  "animName", , "unlit"
 			desc: "Spawn a new model for the specified mech id."
 		},
+		start_after_images: {
+			hasTarget: true,
+			params: ["count", "spawnRate", "fadeTime", "peakOpacity", "rampUpTime", "rStart", "gStart", "bStart", "rEnd", "gEnd", "bEnd", "flatten", "is2D"],//"animGroup",  "animName", , "unlit"
+			desc: "Spawn fading after images of the target. The blend color goes from the start color to the end color as each after image fades out, leave the color blank to keep the model's own colors. Flatten goes from 0 to 1 and darkens the model's own colors so the blend color dominates."
+		},
+		stop_after_images: {
+			hasTarget: true,
+			params: [],//"animGroup",  "animName", , "unlit"
+			desc: "Stops new after images being spawned for the target."
+		},
+		remove_after_images: {
+			hasTarget: true,
+			params: [],//"animGroup",  "animName", , "unlit"
+			desc: "Immediately remove the after images for the target and reset the state of the reserved after images."
+		},
 		create_model_instance: {
 			hasTarget: true,
 			params: ["parent"],
@@ -773,6 +788,12 @@ SRWEditor.prototype.init = function(){
 		g: "The green component of a color 0-255",
 		b: "The blue component of a color 0-255",
 		a: "The alpha component of a color 0-255",
+		rStart: "The red component of a color 0-255",
+		gStart: "The green component of a color 0-255",
+		bStart: "The blue component of a color 0-255",
+		rEnd: "The red component of a color 0-255",
+		gEnd: "The green component of a color 0-255",
+		bEnd: "The blue component of a color 0-255",
 		x_fraction: "A screen space position defined by a percentage of the width of the screen.",
 		y_fraction: "A screen space position defined by a percentage of the height of the screen.",
 		shaderName: "The name of the shader effect to apply",
@@ -799,6 +820,13 @@ SRWEditor.prototype.init = function(){
 		animName: "The name of the animation that will be shown",
 		moveOriginToParent: "If 1 set the origin of the object to the parent's absolute position",
 		mechId: "The numeric id of the target mech.",
+		spawnRate: "The rate at which new after images are created.",
+		count: "The number of after image slots created.",
+		fadeTime: "The rate at which an after image fades.",
+		peakOpacity: "The highest opacity an after image reaches, 0 to 1. Blank or 0 means fully opaque.",
+		rampUpTime: "How long an after image takes to fade in to the peak opacity, in ticks. Added on top of the fade time. Blank or 0 means it appears at full opacity right away.",
+		flatten: "How much the after images lose the model's own colors, 0 to 1. At 1 only the blend color is left.",
+		is2D: "Set to 1 for 2D unit sprites. Disables depth writes.",
 		unlit: "If 1 the target will not receive influence from lights",
 		canvasWidth: "The width of the rendering surface for the external renderer", 
 		canvasHeight: "The height of the rendering surface for the external renderer",
@@ -916,6 +944,24 @@ SRWEditor.prototype.init = function(){
 		a: function(value){
 			
 		},
+		rStart: function(value){
+			
+		},
+		gStart: function(value){
+			
+		},
+		bStart: function(value){
+			
+		},
+		rEnd: function(value){
+			
+		},
+		gEnd: function(value){
+			
+		},
+		bEnd: function(value){
+			
+		},
 		x_fraction: function(value){
 			
 		},
@@ -991,6 +1037,27 @@ SRWEditor.prototype.init = function(){
 		},
 		mechId: function(value){
 			
+		},
+		spawnRate: function(value){
+			
+		},
+		fadeTime: function(value){
+			
+		},
+		count: function(value){
+
+		},
+		flatten: function(value){
+
+		},
+		is2D: function(value){
+
+		},
+		peakOpacity: function(value){
+
+		},
+		rampUpTime: function(value){
+
 		},
 		animGroup: function(value){
 			
