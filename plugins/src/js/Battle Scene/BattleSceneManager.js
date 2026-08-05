@@ -162,15 +162,82 @@ export default function BattleSceneManager(){
 	//editor control
 	this._maxAnimationTick = -1;
 	
-	this._shaderManagement = {
-		shockWave: {
-			isPlaying: false,
-			targetTime: 0.9,
-			currentTime: 0,
-			params: [{type: "vector2", name: "iWaveCentre"}, {type: "float", name: "iIntensity"}]
+	//the loaders scan the shader directory and cannot know what a given .fx declares, so anything not
+	//wanting the shockwave uniform set has to be described here
+	this._shaderDefaults = {
+		impactFrame: {
+			targetTime: 0.25,
+			params: [
+				{type: "vector2", name: "iBurstCentre"},
+				{type: "float", name: "iIntensity"},
+				{type: "float", name: "iLineWidth"},
+				{type: "float", name: "iLineThreshold"},
+				{type: "float", name: "iDebugMask"},
+				{type: "float", name: "iMaskDetail"},
+				{type: "float", name: "iLineDistanceScale"},
+				{type: "float", name: "iLineDistanceRef"},
+				{type: "float", name: "iBurstScale"},
+				{type: "float", name: "iBurstCoreSize"},
+				{type: "float", name: "iBurstStartRadius"},
+				{type: "float", name: "iBurstStartVariance"},
+				{type: "float", name: "iBurstSpokes"},
+				{type: "float", name: "iBurstSpokeLength"},
+				{type: "float", name: "iBurstSpokeSharpness"},
+				{type: "float", name: "iBurstSpokeRandom"},
+				{type: "float", name: "iBurstVaryRate"},
+				{type: "float", name: "iBurstLineWidth"},
+				{type: "float", name: "iBurstLineReach"},
+				{type: "float", name: "iBurstLineReachGrowth"},
+				{type: "float", name: "iBurstLineTaper"},
+				{type: "float", name: "iBurstLineProbeRadius"},
+				{type: "float", name: "iDeadZone"},
+				{type: "float", name: "iDeadZoneFeather"},
+				{type: "float", name: "iGeometryEdges"},
+				{type: "float", name: "iNormalsEncoded"},
+				{type: "float", name: "iDepthBias"},
+				{type: "float", name: "iNormalBias"},
+				{type: "float", name: "iLumaBias"},
+				{type: "vector3_f", name: "iLineColor"},
+				{type: "vector3_f", name: "iFlashColor"}
+			],
+			samplers: ["maskSampler", "depthSampler", "normalSampler"]
+		},
+		radialBlurEngine: {
+			targetTime: 1,
+			params: [
+				{type: "vector2", name: "iCentre"},
+				{type: "float", name: "iStrengthFrom"},
+				{type: "float", name: "iStrengthTo"},
+				{type: "float", name: "iInnerFrom"},
+				{type: "float", name: "iInnerTo"},
+				{type: "float", name: "iFeather"},
+				{type: "float", name: "iMix"},
+				{type: "float", name: "iDither"},
+				{type: "float", name: "iRampTime"},
+				{type: "float", name: "iHoldTime"},
+				{type: "float", name: "iOfframpTime"}
+			]
+		},
+		fade: {
+			targetTime: 1,
+			params: [
+				{type: "vector3_f", name: "iColor"},
+				{type: "float", name: "iFrom"},
+				{type: "float", name: "iTo"},
+				{type: "float", name: "iEnd"},
+				{type: "float", name: "iFadeTime"},
+				{type: "float", name: "iHoldTime"},
+				{type: "float", name: "iOfframpTime"}
+			]
 		}
 	}
-	
+
+	this._shaderManagement = {
+		shockWave: this.getShaderDefinition("shockWave")
+	}
+
+	this._impactFrame = null;
+
 	this._canvasPoolMaxSize = 20;
 	this._canvasPool = [];
 	
@@ -565,6 +632,7 @@ BattleSceneManager.prototype.dispose = function(){
 	this.disposeTextureCache();
 	this.disposeDynamicModels();
 	this.disposeRenderTargets();
+	this.disposeImpactFrame();
 }
 
 BattleSceneManager.prototype.initEffekseerParticles = async function(){
@@ -591,6 +659,12 @@ BattleSceneManager.prototype.initEffekseerParticles = async function(){
 	await Promise.all(promises);	
 }
 
+BattleSceneManager.prototype.buildShaderName = function(parts){
+	return parts.slice(0, -1).map(function(part, index){
+		return index == 0 ? part : part.charAt(0).toUpperCase() + part.slice(1);
+	}).join("");
+}
+
 BattleSceneManager.prototype.initShaders = function(){
 	var _this = this;
 	if (Utils.isNwjs()){
@@ -601,19 +675,16 @@ BattleSceneManager.prototype.initShaders = function(){
 		FILESYSTEM.readdirSync(dir).forEach(function(file) {
 			var name = file.replace(/\.fx$/, "");
 			var parts = name.split("_");
-			var shaderName = parts[0];
-			var shaderType = parts[1] == "fragment" ? "Fragment" : "Vertex";
+			var shaderType = parts[parts.length - 1] == "fragment" ? "Fragment" : "Vertex";
+			//everything ahead of the type makes the name, camel cased, so a file can carry tags to keep it
+			//out of the slot a project shader of the same base name would take
+			var shaderName = _this.buildShaderName(parts);
 			file = dir+'/'+file;
 			var data = FILESYSTEM.readFileSync(file, 'utf8');		
-			BABYLON.Effect.ShadersStore[shaderName+shaderType+'Shader'] = data;		
-					
-			_this._shaderManagement[shaderName] = {
-				isPlaying: false,
-				targetTime: 0.9,
-				currentTime: 0,
-				params: [{type: "vector2", name: "iWaveCentre"}, {type: "float", name: "iIntensity"}]
-			}
-		});	
+			BABYLON.Effect.ShadersStore[shaderName+shaderType+'Shader'] = data;
+
+			_this._shaderManagement[shaderName] = _this.getShaderDefinition(shaderName);
+		});
 	}
 }
 
@@ -621,8 +692,8 @@ BattleSceneManager.prototype.initShader = async function(name, params){
 	let _this = this;
 	return new Promise(function(resolve, reject){	
 		var parts = name.split("_");
-		var shaderName = parts[0];
-		var shaderType = parts[1] == "fragment" ? "Fragment" : "Vertex";
+		var shaderType = parts[parts.length - 1] == "fragment" ? "Fragment" : "Vertex";
+		var shaderName = _this.buildShaderName(parts);
 		var base = getBase();
 
 		var xhr = new XMLHttpRequest();
@@ -633,15 +704,16 @@ BattleSceneManager.prototype.initShader = async function(name, params){
 				let data = xhr.responseText;
 				BABYLON.Effect.ShadersStore[shaderName+shaderType+'Shader'] = data;		
 				
-				let shaderParams = [];
+				let shaderParams = null;
 				if(params){
+					shaderParams = [];
 					for(var i = 0; i < 10; i++){
 						if(params["shaderParam"+i]){
 							var parts = params["shaderParam"+i].match(/^(.*)\:(.*)\=(.*)/);
 							if(parts && parts.length >= 4){
 								var type = parts[1];
 								var varName = parts[2];
-							
+
 								shaderParams.push({
 									type: type,
 									name: varName
@@ -649,19 +721,11 @@ BattleSceneManager.prototype.initShader = async function(name, params){
 							}
 						}
 					}
-				} else {
-					shaderParams = [{type: "vector2", name: "iWaveCentre"}, {type: "float", name: "iIntensity"}]  
 				}
-				
-				
-				_this._shaderManagement[shaderName] = {
-					isPlaying: false,
-					targetTime: 0.9,
-					currentTime: 0,
-					params: shaderParams
-				}	
-				
-				resolve(1);					
+
+				_this._shaderManagement[shaderName] = _this.getShaderDefinition(shaderName, shaderParams);
+
+				resolve(1);
 			} else {
 				resolve(-1);
 			}
@@ -934,10 +998,50 @@ BattleSceneManager.prototype.initScene = function(){
 	});
 }
 
+BattleSceneManager.prototype.getShaderDefinition = function(shaderName, params){
+	const defaults = (this._shaderDefaults || {})[shaderName] || {};
+	return {
+		isPlaying: false,
+		targetTime: defaults.targetTime != null ? defaults.targetTime : 0.9,
+		currentTime: 0,
+		samplers: defaults.samplers || null,
+		textures: null,
+		onStop: defaults.onStop || null,
+		onBeforeBind: defaults.onBeforeBind || null,
+		//an empty list means the caller declared nothing, which still falls through to the defaults
+		params: (params && params.length) ? params : (defaults.params || [{type: "vector2", name: "iWaveCentre"}, {type: "float", name: "iIntensity"}])
+	}
+}
+
+//babylon appends new post processes to the end of the chain, and screen shaders are created at play
+//time, long after the antialiasing pass was set up with the scene. left there they run after it, so
+//nothing the shader itself draws ever gets antialiased
+BattleSceneManager.prototype.moveShaderEffectBeforeAntialiasing = function(postEffect){
+	const camera = this._camera;
+	const chain = camera._postProcesses;
+	if(!chain){
+		return;
+	}
+
+	//detached first so the search cannot find the effect's own slot
+	camera.detachPostProcess(postEffect);
+
+	let antialiasIndex = -1;
+	for(let i = 0; i < chain.length; i++){
+		//matched on type rather than a stored handle, so the rendering pipeline's own pass is found too
+		if(chain[i] instanceof BABYLON.FxaaPostProcess){
+			antialiasIndex = i;
+			break;
+		}
+	}
+
+	camera.attachPostProcess(postEffect, antialiasIndex >= 0 ? antialiasIndex : null);
+}
+
 BattleSceneManager.prototype.initShaderEffect = function(id){
 	var _this = this;
 	var def = _this._shaderManagement[id];
-	if(def){	
+	if(def){
 		var effectUniforms = ["iTime", "iResolution"];
 		var params = def.params;
 		if(params){
@@ -945,11 +1049,12 @@ BattleSceneManager.prototype.initShaderEffect = function(id){
 				effectUniforms.push(paramDef.name);
 			});
 		}
-		const postEffect = new BABYLON.PostProcess(id, id, effectUniforms, [], 1, this._camera);
+		const postEffect = new BABYLON.PostProcess(id, id, effectUniforms, def.samplers || [], 1, this._camera);
+		_this.moveShaderEffectBeforeAntialiasing(postEffect);
 		_this._shaderManagement[id].effectHandle = postEffect;
-		postEffect.onApply = function (effect) {			
-			_this.runShaderEffect(id, effect, postEffect);						
-		};	
+		postEffect.onApply = function (effect) {
+			_this.runShaderEffect(id, effect, postEffect);
+		};
 	}
 }
 
@@ -963,6 +1068,13 @@ BattleSceneManager.prototype.runShaderEffect = function(id, effect, postEffect){
 	
 	//console.log(_this._shaderManagement[id].currentTime);
 			
+	//anything derived from the camera is worked out here rather than in the animation tick. the tick
+	//applies shakes and matrix animations after its own shader pass, so a value computed there is a
+	//frame behind the camera it was projected against. by bind time the frame's camera is final
+	if(_this._shaderManagement[id].onBeforeBind){
+		_this._shaderManagement[id].onBeforeBind.call(_this, id);
+	}
+
 	effect.setVector2('iResolution', new BABYLON.Vector2(postEffect.width, postEffect.height));
 	//effect.setBool('iPlaying', true);
 	effect.setFloat('iTime', _this._shaderManagement[id].currentTime);
@@ -977,12 +1089,42 @@ BattleSceneManager.prototype.runShaderEffect = function(id, effect, postEffect){
 			effect.setFloat(paramDef.name, paramDef.value);
 		}
 	});
+
+	const samplers = _this._shaderManagement[id].samplers;
+	if(samplers){
+		const textures = _this._shaderManagement[id].textures || {};
+		for(let samplerName of samplers){
+			//an unbound sampler reads whatever happens to be on that texture unit
+			effect.setTexture(samplerName, textures[samplerName] || _this.getFallbackTexture());
+		}
+	}
+
 	if(!this._shaderManagement[id].isPlaying || _this._shaderManagement[id].currentTime > _this._shaderManagement[id].targetTime){
 		//effect.setBool('iPlaying', false);
 		this._camera.detachPostProcess(this._shaderManagement[id].effectHandle);
 		this._shaderManagement[id].isPlaying = false;
+		if(this._shaderManagement[id].onStop){
+			this._shaderManagement[id].onStop.call(this, id);
+		}
 	}
-	 
+
+}
+
+//a 1x1 black texture, used to keep declared samplers bound when a shader is run without them
+BattleSceneManager.prototype.getFallbackTexture = function(){
+	if(!this._fallbackTexture){
+		this._fallbackTexture = new BABYLON.RawTexture(
+			new Uint8Array([0, 0, 0, 255]),
+			1,
+			1,
+			BABYLON.Engine.TEXTUREFORMAT_RGBA,
+			this._scene,
+			false,
+			false,
+			BABYLON.Texture.NEAREST_SAMPLINGMODE
+		);
+	}
+	return this._fallbackTexture;
 }
 
 BattleSceneManager.prototype.playShaderEffect = function(id, params, duration){
@@ -990,13 +1132,647 @@ BattleSceneManager.prototype.playShaderEffect = function(id, params, duration){
 		if(this._shaderManagement[id].effectHandle){
 			this._camera.detachPostProcess(this._shaderManagement[id].effectHandle);
 		}
+		//must land before the effect is built, initShaderEffect derives the uniform list from them and
+		//an undeclared uniform is silently dropped on bind
+		this._shaderManagement[id].params = params;
 		this.initShaderEffect(id);
 		this._shaderManagement[id].isPlaying = true;
 		this._shaderManagement[id].currentTime = 0;
-		this._shaderManagement[id].params = params;
 		if(duration != null){
 			this._shaderManagement[id].targetTime = duration;
 		}
+	}
+}
+
+//the targets are rasterised a second time into a mask using a flat stand in material, rather than
+//edge detecting the scene colour, so that the effect works on unlit targets that have no shading
+BattleSceneManager.prototype.getEffectMask = function(id){
+	if(!this._effectMasks){
+		this._effectMasks = {};
+	}
+	if(this._effectMasks[id]){
+		return this._effectMasks[id];
+	}
+
+	const mask = new BABYLON.RenderTargetTexture(
+		id + "_mask",
+		{width: ENGINE_SETTINGS.BATTLE_SCENE.RENDER_WIDTH, height: ENGINE_SETTINGS.BATTLE_SCENE.RENDER_HEIGHT},
+		this._scene,
+		false
+	);
+	//the mask is consumed in screen space, so it has to be rasterised from the main camera. a render
+	//target with its own camera, like the ones create_render_target makes, would not line up
+	mask.activeCamera = this._camera;
+	//alpha carries coverage and rgb carries the target's own texture, so the clear has to be
+	//transparent rather than opaque black
+	mask.clearColor = new BABYLON.Color4(0, 0, 0, 0);
+	mask.renderList = [];
+	//a render target only clamps itself when its sampling mode is NEAREST, otherwise it inherits the
+	//repeat default. the shaders sample past the edges when they dilate, and repeating wraps those
+	//taps to the opposite side of the screen and draws a false silhouette along the border
+	mask.wrapU = BABYLON.Texture.CLAMP_ADDRESSMODE;
+	mask.wrapV = BABYLON.Texture.CLAMP_ADDRESSMODE;
+
+	this._effectMasks[id] = {
+		id: id,
+		mask: mask,
+		materials: {},
+		isActive: false
+	}
+	return this._effectMasks[id];
+}
+
+BattleSceneManager.prototype.getEffectMaskMaterial = function(entry, sourceMesh){
+	const sourceMaterial = sourceMesh.material;
+	//keyed off the source material rather than the mesh, a mech shares a handful of materials across
+	//dozens of leaves and every distinct one costs a shader compile
+	const key = sourceMaterial ? sourceMaterial.id : "__untextured";
+
+	if(!entry.materials[key]){
+		const material = new BABYLON.StandardMaterial(entry.id + "_mask_" + key, this._scene);
+		material.disableLighting = true;
+		material.emissiveColor = new BABYLON.Color3(1, 1, 1);
+		//with lighting disabled the diffuse term is still applied, zeroing it leaves emissive alone
+		material.diffuseColor = new BABYLON.Color3(0, 0, 0);
+		material.specularColor = new BABYLON.Color3(0, 0, 0);
+		material.ambientColor = new BABYLON.Color3(0, 0, 0);
+
+		/*
+			The mask carries two things in one target. Standard material works its colour out as
+			(diffuse * diffuseColor + emissive) * baseColor, where baseColor is the diffuse texture, so
+			handing it the texture makes the emissive white come back multiplied by it: rgb ends up
+			holding the target's own texture, which the shader edge detects for interior line work.
+			Alpha is untouched by that and stays flat, so it carries coverage.
+
+			The cutout goes through the opacity map rather than useAlphaFromDiffuseTexture, which would
+			drag the texture's alpha into the coverage channel as well. Setting hasAlpha on the source
+			would mutate a texture the main render shares, so only textures already declaring it get one.
+		*/
+		const sourceTexture = sourceMaterial ? (sourceMaterial.diffuseTexture || sourceMaterial.albedoTexture) : null;
+		if(sourceTexture){
+			material.diffuseTexture = sourceTexture;
+			if(sourceTexture.hasAlpha){
+				material.opacityTexture = sourceTexture;
+				material.transparencyMode = BABYLON.Material.MATERIAL_ALPHATEST;
+				material.alphaCutOff = 0.4;
+			}
+		}
+
+		entry.materials[key] = material;
+	}
+
+	return entry.materials[key];
+}
+
+BattleSceneManager.prototype.setEffectMaskTargets = function(entry, targetNames){
+	const _this = this;
+	const renderList = [];
+
+	function addMesh(mesh){
+		//applyMutator also hands back transform nodes and empties, which the render list rejects
+		if(mesh && mesh.getTotalVertices && mesh.getTotalVertices() > 0 && renderList.indexOf(mesh) == -1){
+			renderList.push(mesh);
+		}
+	}
+
+	for(let name of targetNames){
+		const targetObj = _this.getTargetObject(name);
+		if(!targetObj){
+			console.warn("Effect target '" + name + "' could not be resolved for " + entry.id + ".");
+			continue;
+		}
+		_this.applyMutator(targetObj, addMesh);
+
+		//after images are standalone copies rather than children of the target, so they have to be
+		//collected separately, same as set_rendering_group has to
+		const afterImageInfo = _this._afterImages[name];
+		if(afterImageInfo){
+			for(let afterImage of afterImageInfo.images){
+				if(afterImage.isActive){
+					for(let mesh of afterImage.meshes){
+						addMesh(mesh);
+					}
+				}
+			}
+		}
+	}
+
+	entry.mask.renderList = renderList;
+	for(let mesh of renderList){
+		entry.mask.setMaterialForRendering(mesh, _this.getEffectMaskMaterial(entry, mesh));
+	}
+
+	return renderList.length;
+}
+
+BattleSceneManager.prototype.setEffectMaskActive = function(entry, active){
+	if(!entry){
+		return;
+	}
+	const customRenderTargets = this._scene.customRenderTargets;
+	const idx = customRenderTargets.indexOf(entry.mask);
+	if(active && idx == -1){
+		customRenderTargets.push(entry.mask);
+	} else if(!active && idx != -1){
+		customRenderTargets.splice(idx, 1);
+	}
+	entry.isActive = !!active;
+}
+
+/*
+	The geometry buffer re-renders the whole scene every frame it is live, so it is held only while an
+	effect needs it. Refcounted because more than one effect can want it at once and the first to
+	finish must not pull it out from under the others.
+*/
+BattleSceneManager.prototype.acquireGeometryBuffer = function(){
+	if(!this._geometryBuffer){
+		this._geometryBuffer = this._scene.enableGeometryBufferRenderer();
+		if(!this._geometryBuffer){
+			console.warn("Geometry buffer is unavailable, effects depending on scene normals will be degraded.");
+			return null;
+		}
+	}
+
+	this._geometryBufferUsers = (this._geometryBufferUsers || 0) + 1;
+	this._geometryBuffer.getGBuffer().refreshRate = BABYLON.RenderTargetTexture.REFRESHRATE_RENDER_ONEVERYFRAME;
+
+	const textures = this._geometryBuffer.getGBuffer().textures;
+	//the slots move depending on which optional buffers are enabled, so they are looked up
+	let depthIndex = 0;
+	let normalIndex = 1;
+	if(this._geometryBuffer.getTextureIndex){
+		const resolvedDepth = this._geometryBuffer.getTextureIndex(BABYLON.GeometryBufferRenderer.DEPTH_TEXTURE_TYPE);
+		const resolvedNormal = this._geometryBuffer.getTextureIndex(BABYLON.GeometryBufferRenderer.NORMAL_TEXTURE_TYPE);
+		if(resolvedDepth >= 0){
+			depthIndex = resolvedDepth;
+		}
+		if(resolvedNormal >= 0){
+			normalIndex = resolvedNormal;
+		}
+	}
+
+	return {
+		depth: textures[depthIndex],
+		normal: textures[normalIndex],
+		//normals are only packed into 0..1 when the buffer is running on an unsigned target
+		normalsEncoded: !!this._geometryBuffer.normalsAreUnsigned
+	}
+}
+
+BattleSceneManager.prototype.releaseGeometryBuffer = function(){
+	if(!this._geometryBuffer || !this._geometryBufferUsers){
+		return;
+	}
+	this._geometryBufferUsers--;
+	if(this._geometryBufferUsers <= 0){
+		this._geometryBufferUsers = 0;
+		this._geometryBuffer.getGBuffer().refreshRate = BABYLON.RenderTargetTexture.REFRESHRATE_RENDER_ONCE;
+	}
+}
+
+BattleSceneManager.prototype.initImpactFrame = function(){
+	if(this._impactFrame){
+		return this._impactFrame;
+	}
+
+	this._impactFrame = {
+		maskEntry: this.getEffectMask("impact_frame"),
+		holdsGeometryBuffer: false,
+		centreTarget: null,
+		centrePosition: null
+	}
+
+	this._shaderManagement.impactFrame = this._shaderManagement.impactFrame || this.getShaderDefinition("impactFrame");
+	//the buffers are expensive to leave running, so they come down as soon as the effect expires
+	this._shaderManagement.impactFrame.onStop = function(){
+		this.setImpactFrameActive(false);
+	}
+	this._shaderManagement.impactFrame.onBeforeBind = function(){
+		this.syncImpactFrameToCamera();
+	}
+
+	return this._impactFrame;
+}
+
+/*
+	Optional world space anchoring for the burst. Without it the centre is the screen fraction the
+	animator gave and stays put while the camera moves under it, which is usually what an impact frame
+	wants. Anchored, the burst is projected from a point in the scene every frame and stays welded to
+	whatever it was aimed at.
+*/
+BattleSceneManager.prototype.projectToScreenUV = function(world){
+	const projected = BABYLON.Vector3.Project(
+		world,
+		BABYLON.Matrix.Identity(),
+		this._scene.getTransformMatrix(),
+		new BABYLON.Viewport(0, 0, 1, 1)
+	);
+	//Project reports screen space, where y runs down. the shaders' uv runs up
+	return new BABYLON.Vector2(projected.x, 1.0 - projected.y);
+}
+
+//resolves a command's centreTarget or centrePosition to a world point, or null for screen space
+BattleSceneManager.prototype.resolveEffectAnchor = function(state){
+	if(state.centreTarget){
+		const anchor = this.getTargetObject(state.centreTarget);
+		if(anchor && anchor.getAbsolutePosition){
+			return anchor.getAbsolutePosition();
+		}
+	}
+	return state.centrePosition;
+}
+
+BattleSceneManager.prototype.readEffectAnchorParams = function(state, params){
+	state.centreTarget = params.centreTarget || null;
+	state.centrePosition = null;
+	//a target resolves to an already mirrored world position, a hand written one has to be mirrored
+	//here the same way every other position param is
+	if(!state.centreTarget && params.centrePosition){
+		const parts = String(params.centrePosition).split(",");
+		if(parts.length >= 3){
+			state.centrePosition = this.applyAnimationDirection(
+				new BABYLON.Vector3(parts[0] * 1, parts[1] * 1, parts[2] * 1)
+			);
+		}
+	}
+}
+
+BattleSceneManager.prototype.syncImpactFrameToCamera = function(){
+	const impactFrame = this._impactFrame;
+	if(!impactFrame){
+		return;
+	}
+
+	const def = this._shaderManagement.impactFrame;
+	const view = this._scene.getViewMatrix();
+
+	const world = this.resolveEffectAnchor(impactFrame);
+
+	//without an anchor x_fraction and y_fraction stand, the burst stays put on screen
+	if(world){
+		const centre = this.projectToScreenUV(world);
+		for(let paramDef of def.params){
+			if(paramDef.name == "iBurstCentre"){
+				paramDef.value = centre;
+			}
+		}
+	}
+
+	//the distance the line width is nominal at, taken from the subject so its own lines keep the
+	//width the animator asked for while everything nearer or further scales around it. view space z
+	//rather than a true distance, to match what the depth buffer holds
+	const renderList = impactFrame.maskEntry.mask.renderList;
+	if(renderList && renderList.length && renderList[0].getAbsolutePosition){
+		const viewPos = BABYLON.Vector3.TransformCoordinates(renderList[0].getAbsolutePosition(), view);
+		const reference = Math.max(Math.abs(viewPos.z), 0.001);
+		for(let paramDef of def.params){
+			if(paramDef.name == "iLineDistanceRef"){
+				paramDef.value = reference;
+			}
+		}
+	}
+}
+
+BattleSceneManager.prototype.setImpactFrameTargets = function(targetNames){
+	return this.setEffectMaskTargets(this.initImpactFrame().maskEntry, targetNames);
+}
+
+BattleSceneManager.prototype.setImpactFrameActive = function(active){
+	const impactFrame = this._impactFrame;
+	if(!impactFrame){
+		return;
+	}
+	this.setEffectMaskActive(impactFrame.maskEntry, active);
+	if(!active && impactFrame.holdsGeometryBuffer){
+		impactFrame.holdsGeometryBuffer = false;
+		this.releaseGeometryBuffer();
+	}
+}
+
+BattleSceneManager.prototype.playImpactFrame = function(targetNames, params){
+	params = params || {};
+
+	if(!BABYLON.Effect.ShadersStore.impactFrameFragmentShader){
+		console.warn("The impactFrame shader is not loaded, the effect will be skipped.");
+		return;
+	}
+
+	const impactFrame = this.initImpactFrame();
+	const meshCount = this.setImpactFrameTargets(targetNames);
+	if(!meshCount){
+		console.warn("Impact frame has no target geometry, only the starburst will be visible.");
+	}
+
+	//an omitted editor field arrives as an empty string, not undefined, so a plain null check would
+	//turn every blank into a zero instead of the documented default
+	function num(value, fallback){
+		if(value == null || value === ""){
+			return fallback;
+		}
+		const parsed = value * 1;
+		return isNaN(parsed) ? fallback : parsed;
+	}
+
+	const useGeometryEdges = num(params.geometryEdges, 0);
+	let lineDistanceScale = num(params.lineDistanceScale, 0);
+	let depthTexture = null;
+	let normalTexture = null;
+	let normalsEncoded = 0;
+	//both the creases and the distance scaling read the geometry buffer, one acquire covers them
+	if((useGeometryEdges || lineDistanceScale > 0) && !impactFrame.holdsGeometryBuffer){
+		const buffers = this.acquireGeometryBuffer();
+		if(buffers){
+			impactFrame.holdsGeometryBuffer = true;
+			depthTexture = buffers.depth;
+			normalTexture = buffers.normal;
+			normalsEncoded = buffers.normalsEncoded ? 1 : 0;
+		}
+	}
+	//without depth the ratio would divide into the fallback texture's zero and blow the width up
+	if(!depthTexture){
+		lineDistanceScale = 0;
+	}
+
+	this._shaderManagement.impactFrame.textures = {
+		maskSampler: impactFrame.maskEntry.mask,
+		depthSampler: depthTexture,
+		normalSampler: normalTexture
+	}
+
+	this.setImpactFrameActive(true);
+
+	let x = num(params.x_fraction, 0.5);
+	if(this._animationDirection == -1){
+		x = 1 - x;
+	}
+	const y = num(params.y_fraction, 0.5);
+
+	this.readEffectAnchorParams(impactFrame, params);
+
+	function color(value, fallback){
+		if(value == null || value === ""){
+			return fallback;
+		}
+		const parts = String(value).split(",");
+		if(parts.length < 3){
+			console.warn("Impact frame color '" + value + "' is not in r,g,b form, falling back to the default.");
+			return fallback;
+		}
+		return new BABYLON.Vector3(parts[0] / 255, parts[1] / 255, parts[2] / 255);
+	}
+
+	this.playShaderEffect("impactFrame", [
+		{type: "vector2", name: "iBurstCentre", value: new BABYLON.Vector2(x, y)},
+		{type: "float", name: "iIntensity", value: num(params.intensity, 1)},
+		{type: "float", name: "iLineWidth", value: num(params.lineWidth, 1.5)},
+		//on by default, the partial line weights the sources produce read as uneven ink otherwise
+		{type: "float", name: "iLineThreshold", value: num(params.lineThreshold, 0.25)},
+		{type: "float", name: "iDebugMask", value: num(params.debugMask, 0)},
+		{type: "float", name: "iMaskDetail", value: num(params.maskDetail, 0.1)},
+		{type: "float", name: "iLineDistanceScale", value: lineDistanceScale},
+		//replaced every frame by syncImpactFrameToCamera
+		{type: "float", name: "iLineDistanceRef", value: 10},
+		{type: "float", name: "iBurstScale", value: num(params.burstScale, 1)},
+		{type: "float", name: "iBurstCoreSize", value: num(params.burstCoreSize, 0.06)},
+		{type: "float", name: "iBurstStartRadius", value: num(params.burstStartRadius, 0)},
+		{type: "float", name: "iBurstStartVariance", value: num(params.burstStartVariance, 0)},
+		{type: "float", name: "iBurstSpokes", value: num(params.burstSpokes, 16)},
+		//the frame's far corner is at most ~2.04 screen heights from any centre, so the default always
+		//runs off screen
+		{type: "float", name: "iBurstSpokeLength", value: num(params.burstSpokeLength, 3)},
+		{type: "float", name: "iBurstSpokeSharpness", value: num(params.burstSpokeSharpness, 18)},
+		{type: "float", name: "iBurstSpokeRandom", value: num(params.burstSpokeRandom, 0.5)},
+		{type: "float", name: "iBurstVaryRate", value: num(params.burstVaryRate, 0)},
+		{type: "float", name: "iBurstLineWidth", value: num(params.burstLineWidth, 0)},
+		{type: "float", name: "iBurstLineReach", value: num(params.burstLineReach, 24)},
+		{type: "float", name: "iBurstLineReachGrowth", value: num(params.burstLineReachGrowth, 0)},
+		{type: "float", name: "iBurstLineTaper", value: num(params.burstLineTaper, 1)},
+		{type: "float", name: "iBurstLineProbeRadius", value: num(params.burstLineProbeRadius, 3)},
+		{type: "float", name: "iDeadZone", value: num(params.deadZone, 0)},
+		{type: "float", name: "iDeadZoneFeather", value: num(params.deadZoneFeather, 0)},
+		{type: "float", name: "iGeometryEdges", value: (useGeometryEdges && depthTexture) ? 1 : 0},
+		{type: "float", name: "iNormalsEncoded", value: normalsEncoded},
+		//the depth buffer is in world units, so this is a fraction of the distance to the camera
+		{type: "float", name: "iDepthBias", value: num(params.depthBias, 0.02)},
+		{type: "float", name: "iNormalBias", value: num(params.normalBias, 0.35)},
+		{type: "float", name: "iLumaBias", value: num(params.lumaBias, 0.10)},
+		{type: "vector3_f", name: "iLineColor", value: color(params.lineColor, new BABYLON.Vector3(0.05, 0.04, 0.09))},
+		{type: "vector3_f", name: "iFlashColor", value: color(params.flashColor, new BABYLON.Vector3(1, 1, 1))}
+	//shaderDuration rather than duration, the shader clock runs in seconds while every "duration"
+	//param in the editor is in animation ticks
+	], num(params.shaderDuration, 0.25));
+}
+
+BattleSceneManager.prototype.stopImpactFrame = function(){
+	const def = this._shaderManagement.impactFrame;
+	if(def){
+		if(def.effectHandle){
+			this._camera.detachPostProcess(def.effectHandle);
+		}
+		def.isPlaying = false;
+	}
+	this.setImpactFrameActive(false);
+}
+
+//the post process shader and one stand in material per distinct target material all compile on first
+//use, which would otherwise land on the exact frame the effect fires
+BattleSceneManager.prototype.warmupImpactFrame = function(targetNames){
+	const _this = this;
+	if(!BABYLON.Effect.ShadersStore.impactFrameFragmentShader){
+		return;
+	}
+	this.playImpactFrame(targetNames || [], {intensity: 0, shaderDuration: 0, burstScale: 0});
+	//the shader clock only advances inside an animation tick, so a warmup outside one never reaches
+	//its expiry and would sit on the camera burning a full screen pass forever
+	this._scene.onAfterRenderObservable.addOnce(function(){
+		_this.stopImpactFrame();
+	});
+}
+
+/*
+	Must run at the end of every animation, not just on scene teardown. The mask materials are cached
+	against the source material's id, which is stable across battles because it comes from the model
+	file, while the textures they hold are destroyed by disposeTextureCache. A stale cache hands back a
+	material with a dead texture, which never reports ready, so babylon silently skips the mesh and the
+	mask comes out empty.
+*/
+BattleSceneManager.prototype.disposeImpactFrame = function(){
+	//the masks have to leave customRenderTargets before disposal or the next frame renders a dead target
+	if(this._camera && this._scene){
+		this.stopImpactFrame();
+	}
+	if(this._fallbackTexture){
+		this._fallbackTexture.dispose();
+		this._fallbackTexture = null;
+	}
+
+	for(let id in this._effectMasks || {}){
+		const entry = this._effectMasks[id];
+		entry.mask.dispose();
+		for(let key in entry.materials){
+			entry.materials[key].dispose();
+		}
+	}
+	this._effectMasks = {};
+
+	this._geometryBuffer = null;
+	this._geometryBufferUsers = 0;
+
+	this._impactFrame = null;
+	if(this._shaderManagement.impactFrame){
+		this._shaderManagement.impactFrame.textures = null;
+	}
+}
+
+BattleSceneManager.prototype.playRadialBlur = function(params){
+	params = params || {};
+
+	if(!BABYLON.Effect.ShadersStore.radialBlurEngineFragmentShader){
+		console.warn("The radialBlurEngine shader is not loaded, the effect will be skipped.");
+		return;
+	}
+
+	//an omitted editor field arrives as an empty string, not undefined
+	function num(value, fallback){
+		if(value == null || value === ""){
+			return fallback;
+		}
+		const parsed = value * 1;
+		return isNaN(parsed) ? fallback : parsed;
+	}
+
+	if(!this._radialBlur){
+		this._radialBlur = {centreTarget: null, centrePosition: null};
+		this._shaderManagement.radialBlurEngine = this._shaderManagement.radialBlurEngine || this.getShaderDefinition("radialBlurEngine");
+		this._shaderManagement.radialBlurEngine.onBeforeBind = function(){
+			this.syncRadialBlurToCamera();
+		}
+	}
+	this.readEffectAnchorParams(this._radialBlur, params);
+
+	let x = num(params.x_fraction, 0.5);
+	if(this._animationDirection == -1){
+		x = 1 - x;
+	}
+	const y = num(params.y_fraction, 0.5);
+
+	const rampTime = num(params.blurRampTime, 0.3);
+	const holdTime = num(params.blurHoldTime, 0);
+	const offrampTime = num(params.blurOfframpTime, 0);
+
+	//an offramp gives the effect a natural end so it can retire itself, otherwise it is held on a
+	//target it will not reach until stop_radial_blur
+	let lifetime = num(params.shaderDuration, 0);
+	if(lifetime <= 0){
+		lifetime = offrampTime > 0 ? (rampTime + holdTime + offrampTime) : 100000;
+	}
+
+	this.playShaderEffect("radialBlurEngine", [
+		{type: "vector2", name: "iCentre", value: new BABYLON.Vector2(x, y)},
+		{type: "float", name: "iStrengthFrom", value: num(params.strengthFrom, 0)},
+		{type: "float", name: "iStrengthTo", value: num(params.strengthTo, 0.3)},
+		{type: "float", name: "iInnerFrom", value: num(params.innerFrom, 0)},
+		{type: "float", name: "iInnerTo", value: num(params.innerTo, 0)},
+		{type: "float", name: "iFeather", value: num(params.feather, 0)},
+		{type: "float", name: "iMix", value: num(params.blurMix, 1)},
+		{type: "float", name: "iDither", value: num(params.blurDither, 1)},
+		{type: "float", name: "iRampTime", value: rampTime},
+		{type: "float", name: "iHoldTime", value: holdTime},
+		{type: "float", name: "iOfframpTime", value: offrampTime}
+	], lifetime);
+
+	this.syncRadialBlurToCamera();
+}
+
+BattleSceneManager.prototype.syncRadialBlurToCamera = function(){
+	if(!this._radialBlur){
+		return;
+	}
+	const world = this.resolveEffectAnchor(this._radialBlur);
+	//without an anchor x_fraction and y_fraction stand
+	if(!world){
+		return;
+	}
+	const centre = this.projectToScreenUV(world);
+	for(let paramDef of this._shaderManagement.radialBlurEngine.params){
+		if(paramDef.name == "iCentre"){
+			paramDef.value = centre;
+		}
+	}
+}
+
+BattleSceneManager.prototype.stopRadialBlur = function(){
+	const def = this._shaderManagement.radialBlurEngine;
+	if(def){
+		if(def.effectHandle){
+			this._camera.detachPostProcess(def.effectHandle);
+		}
+		def.isPlaying = false;
+	}
+}
+
+BattleSceneManager.prototype.playFade = function(params){
+	params = params || {};
+
+	if(!BABYLON.Effect.ShadersStore.fadeFragmentShader){
+		console.warn("The fade shader is not loaded, the effect will be skipped.");
+		return;
+	}
+
+	//an omitted editor field arrives as an empty string, not undefined
+	function num(value, fallback){
+		if(value == null || value === ""){
+			return fallback;
+		}
+		const parsed = value * 1;
+		return isNaN(parsed) ? fallback : parsed;
+	}
+
+	function color(value, fallback){
+		if(value == null || value === ""){
+			return fallback;
+		}
+		const parts = String(value).split(",");
+		if(parts.length < 3){
+			console.warn("Fade color '" + value + "' is not in r,g,b form, falling back to the default.");
+			return fallback;
+		}
+		return new BABYLON.Vector3(parts[0] / 255, parts[1] / 255, parts[2] / 255);
+	}
+
+	const fadeTime = num(params.fadeTime, 0.25);
+	const holdTime = num(params.holdTime, 0);
+	const offrampTime = num(params.offrampTime, 0);
+
+	/*
+		The shader's own timing is independent of how long the post process stays attached. Left blank,
+		an offramp gives the effect a natural end so it retires once it has played out, while a fade with
+		no offramp is held on a target it will not reach until stop_fade. Without that a held fade would
+		expire on the next tick and snap the screen back.
+	*/
+	let lifetime = num(params.shaderDuration, 0);
+	if(lifetime <= 0){
+		lifetime = offrampTime > 0 ? (fadeTime + holdTime + offrampTime) : 100000;
+	}
+
+	this.playShaderEffect("fade", [
+		{type: "vector3_f", name: "iColor", value: color(params.color, new BABYLON.Vector3(0, 0, 0))},
+		{type: "float", name: "iFrom", value: num(params.fadeFrom, 0)},
+		{type: "float", name: "iTo", value: num(params.fadeTo, 1)},
+		{type: "float", name: "iEnd", value: num(params.fadeEnd, 0)},
+		{type: "float", name: "iFadeTime", value: fadeTime},
+		{type: "float", name: "iHoldTime", value: holdTime},
+		{type: "float", name: "iOfframpTime", value: offrampTime}
+	], lifetime);
+}
+
+BattleSceneManager.prototype.stopFade = function(){
+	const def = this._shaderManagement.fade;
+	if(def){
+		if(def.effectHandle){
+			this._camera.detachPostProcess(def.effectHandle);
+		}
+		def.isPlaying = false;
 	}
 }
 
@@ -2202,8 +2978,8 @@ BattleSceneManager.prototype.hookBeforeRender = function(){
 		
 		for(let id in _this._shaderManagement){
 			if(_this._shaderManagement[id].isPlaying){
-				_this._shaderManagement[id].currentTime+=deltaTime * 0.001;	
-			}			
+				_this._shaderManagement[id].currentTime+=deltaTime * 0.001;
+			}
 		}
 		
 			
@@ -4075,6 +4851,38 @@ BattleSceneManager.prototype.executeAnimation = function(animation, startTick){
 				{type: "vector2", name: "iWaveCentre", value: new BABYLON.Vector2(x_fraction, params.y_fraction)},
 				{type: "float", name: "iIntensity", value: params.shockwave_intensity || 0.1}
 			]);
+		},
+		effect_radial_blur: function(target, params){
+			_this.playRadialBlur(params);
+		},
+		stop_radial_blur: function(target, params){
+			_this.stopRadialBlur();
+		},
+		effect_fade: function(target, params){
+			_this.playFade(params);
+		},
+		stop_fade: function(target, params){
+			_this.stopFade();
+		},
+		effect_impact_frame: function(target, params){
+			//targets can be a comma separated list, anything getTargetObject accepts. falls back to
+			//the command's own target so "enemy_main" style usage works without a params entry
+			const targetNames = String(params.targets || target || "").split(",").map(function(name){
+				return name.trim();
+			}).filter(function(name){
+				return name != "";
+			});
+			_this.playImpactFrame(targetNames, params);
+		},
+		prepare_impact_frame: function(target, params){
+			//run this a few ticks before the hit to take the shader and material compiles off the
+			//frame the effect actually fires on
+			const targetNames = String(params.targets || target || "").split(",").map(function(name){
+				return name.trim();
+			}).filter(function(name){
+				return name != "";
+			});
+			_this.warmupImpactFrame(targetNames);
 		},
 		effect_screen_shader: function(target, params){
 			var effectName = params.shaderName;
@@ -7503,6 +8311,7 @@ BattleSceneManager.prototype.resetScene = function() {
 	_this.disposeTextureCache();
 	_this.disposeDynamicModels();
 	_this.disposeRenderTargets();
+	_this.disposeImpactFrame();
 	
 	_this._spriteManagers = {};
 	_this.setBgScrollRatio(1);
@@ -8246,6 +9055,16 @@ BattleSceneManager.prototype.preloadSceneAssets = function(){
 			if(animCommand.type == "effect_shockwave"){
 				promises.push(_this.initShader("shockWave_fragment"));
 			}
+			if(animCommand.type == "effect_radial_blur"){
+				promises.push(_this.initShader("radialBlurEngine_fragment"));
+			}
+			if(animCommand.type == "effect_fade"){
+				promises.push(_this.initShader("fade_fragment"));
+			}
+			if(animCommand.type == "effect_impact_frame" || animCommand.type == "prepare_impact_frame"){
+				//no params, the uniform set comes from _shaderDefaults rather than the command
+				promises.push(_this.initShader("impactFrame_fragment"));
+			}
 			if(animCommand.type == "effect_screen_shader"){
 				promises.push(_this.initShader(params.shaderName+"_fragment", animCommand.params));
 			}
@@ -8269,8 +9088,13 @@ BattleSceneManager.prototype.preloadSceneAssets = function(){
 		} else if(ENGINE_SETTINGS.BATTLE_SCENE.SPRITES_FILTER_MODE == "NEAREST"){
 			sampleMode = BABYLON.Texture.NEAREST_NEAREST
 		}
-		
-		
+
+		const keys = Object.keys($gameTemp.battleEffectCache);
+		for(let i = 0; i < keys.length; i++){
+			const cacheRef = keys[i];		
+			var battleEffect = $gameTemp.battleEffectCache[cacheRef];		
+			_this.preloadDefaultFrames(battleEffect.ref, promises);
+		}			
 		
 		for(var i = 0; i < _this._actionQueue.length; i++){
 			var nextAction = _this._actionQueue[i];
@@ -8291,6 +9115,7 @@ BattleSceneManager.prototype.preloadSceneAssets = function(){
 					animIdsToPreload[animId] = true;
 				}				
 				
+				//TODO: figure out if these preloadDefaultFrames are still needed after adding a preload for everything in the battle cache up above
 				_this.preloadDefaultFrames(nextAction.ref, promises);
 				if(nextAction.ref.subTwin){
 					_this.preloadDefaultFrames(nextAction.ref.subTwin, promises);
@@ -8969,6 +9794,7 @@ BattleSceneManager.prototype.endScene = function(force, immediate) {
 				_this.disposeTextureCache();
 				_this.disposeDynamicModels();
 				_this.disposeRenderTargets();
+				_this.disposeImpactFrame();
 				_this._UIcontainer.style.display = "";
 				_this._TextContainer.style.display = "";
 				_this._PIXIContainer.style.display = "";	
@@ -9007,6 +9833,7 @@ BattleSceneManager.prototype.endScene = function(force, immediate) {
 			_this.disposeTextureCache();
 			_this.disposeDynamicModels();
 			_this.disposeRenderTargets();
+			_this.disposeImpactFrame();
 			_this._UIcontainer.style.display = "";
 			_this._TextContainer.style.display = "";
 			_this._PIXIContainer.style.display = "";	

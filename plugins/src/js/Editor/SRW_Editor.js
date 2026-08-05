@@ -187,6 +187,38 @@ SRWEditor.prototype.init = function(){
 			params: ["shaderName", "shaderDuration","shaderParam0","shaderParam1", "shaderParam2", "shaderParam4", "shaderParam5", "shaderParam6", "shaderParam7", "shaderParam8", "shaderParam9"],
 			desc: "Play custom screen shader effect."
 		},
+		effect_radial_blur: {
+			hasTarget: false,
+			params: ["x_fraction", "y_fraction", "centreTarget", "centrePosition", "strengthFrom", "strengthTo", "innerFrom", "innerTo", "feather", "blurMix", "blurDither", "blurRampTime", "blurHoldTime", "blurOfframpTime", "shaderDuration"],
+			desc: "Smear the screen along rays running out from a center point. The streaks grow with distance from that point on their own, so the center stays sharp. Ramps from the From values to the To values over blurRampTime, holds, then returns over blurOfframpTime. Anchor the center in the scene with centreTarget or centrePosition, or leave those blank to place it on screen with x_fraction and y_fraction."
+		},
+		stop_radial_blur: {
+			hasTarget: false,
+			params: [],
+			desc: "End the radial blur. Needed for one left holding, an offramp lets it retire on its own."
+		},
+		effect_fade: {
+			hasTarget: false,
+			params: ["color", "fadeFrom", "fadeTo", "fadeEnd", "fadeTime", "holdTime", "offrampTime", "shaderDuration"],
+			desc: "Fade the whole screen towards a solid color, in three phases: ramp from fadeFrom to fadeTo over fadeTime, hold for holdTime, then ramp to fadeEnd over offrampTime. The phase timers are independent of shaderDuration, which only decides how long the effect stays attached. Leave shaderDuration blank and it works itself out: with an offramp the effect retires once it has played out, without one it holds until stop_fade."
+		},
+		stop_fade: {
+			hasTarget: false,
+			params: [],
+			desc: "End the screen fade and return the scene to normal. Needed for a held fade, one given a duration ends on its own."
+		},
+		effect_impact_frame: {
+			hasTarget: false,
+			//geometryEdges, lumaBias, depthBias and normalBias are deliberately not listed. they still
+			//work if present in saved data, they are just not offered for editing
+			params: ["targets", "shaderDuration", "x_fraction", "y_fraction", "centreTarget", "centrePosition", "intensity", "lineWidth", "lineThreshold", "maskDetail", "lineDistanceScale", "debugMask", "burstScale", "burstCoreSize", "burstStartRadius", "burstStartVariance", "burstSpokes", "burstSpokeLength", "burstSpokeSharpness", "burstSpokeRandom", "burstVaryRate", "burstLineWidth", "burstLineReach", "burstLineReachGrowth", "burstLineTaper", "burstLineProbeRadius", "deadZone", "deadZoneFeather", "lineColor", "flashColor"],
+			desc: "Blow the screen out to a flat flash and keep only the outlines of the listed targets, with a starburst punched through the line work. 'targets' is a comma separated list of object names. Colors are 'r,g,b' in 0-255. Run prepare_impact_frame earlier in the animation to keep the shader compile off this tick."
+		},
+		prepare_impact_frame: {
+			hasTarget: false,
+			params: ["targets"],
+			desc: "Precompile the impact frame shader and the mask materials for the listed targets. Costs one frame, so place it well before the effect_impact_frame it is warming up."
+		},
 		kill_active_animations: {
 			hasTarget: false,
 			params: [],
@@ -809,6 +841,64 @@ SRWEditor.prototype.init = function(){
 		shaderParam8: "A parameter for the custom shader. Defined as <param type>:<param name>=<param value>",
 		shaderParam9: "A parameter for the custom shader. Defined as <param type>:<param name>=<param value>",
 		shockwave_intensity: "The intensity of the shockwave effect.",
+
+
+
+
+
+
+
+
+
+
+		targets: "A comma separated list of object names whose outlines will be kept. Accepts the same names as a command target, for example active_target or enemy_main.",
+		intensity: "How far the effect is blended over the scene, 0 to 1. Blank means 1. Impact frames read best held at full strength rather than faded in.",
+		lineWidth: "The thickness of the outlines in pixels. Blank means 1.5.",
+		centreTarget: "Optional. The name of an object to anchor the effect to, so its center follows that point in the scene instead of staying put on screen. Accepts the same names as a command target. Re-projected every frame, so the burst stays welded to it through a camera move. Overrides x_fraction and y_fraction, and takes priority over centrePosition.",
+		centrePosition: "Optional. A fixed world position to anchor the effect to as 'x,y,z', for when there is no object to aim at. Mirrored for enemy side animations like other positions. Overrides x_fraction and y_fraction. Leave both anchor params blank to keep the center in screen space.",
+		strengthFrom: "How long the streaks are when the ramp starts, as a fraction of each pixel's distance to the center. Blank means 0, an untouched image. 0.3 is a strong smear.",
+		strengthTo: "How long the streaks are when the ramp finishes. Blank means 0.3. Raising this over time is what makes the blur read as extending outwards.",
+		innerFrom: "Radius of the sharp zone held around the center when the ramp starts, as a fraction of the screen height. Blank means 0.",
+		innerTo: "Radius of the sharp zone when the ramp finishes. Blank means 0. Animating this apart from the strength is what makes the boundary between sharp and smeared visibly travel: growing it pushes the blur outwards and brings the subject back into focus, shrinking it drives the blur inwards.",
+		feather: "How softly the sharp zone gives way to the blur, as a fraction of the screen height. Blank means 0, a hard edge. The ramp is measured outwards from innerFrom and innerTo, so it still applies with those at 0, where it reads as a soft unblurred patch of this radius around the center rather than as a softened edge.",
+		blurMix: "How much of the blurred image replaces the original, 0 to 1. Blank means 1. Below 1 reads as a soft ghost rather than speed, so prefer the strength for force.",
+		blurDither: "Jitters each pixel's sample positions, 0 to 1. Blank means 1. Without it a long streak breaks into separate ghost copies of the image once it outruns the sample count. Trades that banding for a light grain.",
+		blurRampTime: "Seconds to travel from the From values to the To values. Blank means 0.3, 0 starts already at the To values.",
+		blurHoldTime: "Seconds spent at the To values before the offramp starts. Blank means 0. Ignored unless blurOfframpTime is set.",
+		blurOfframpTime: "Seconds to travel back to the From values. Blank or 0 means no offramp, the blur stays at the To values until stop_radial_blur.",
+		color: "The solid color the screen fades towards, as 'r,g,b' in 0-255. Blank means black.",
+		fadeFrom: "How far towards the color the fade starts, 0 to 1. Blank means 0, the untouched scene. Set both fadeFrom and fadeTo the same to hold at a fixed blend instead of ramping.",
+		fadeTo: "How far towards the color the ramp reaches, and what it holds at, 0 to 1. Blank means 1, fully solid. Set it above fadeFrom to fade out and below to fade in.",
+		fadeEnd: "How far towards the color the offramp finishes on, 0 to 1. Blank means 0, which returns the screen to the untouched scene. Set it to 1 to end fully solid instead. Does nothing unless offrampTime is set.",
+		fadeTime: "Seconds the ramp from fadeFrom to fadeTo takes. Blank means 0.25, 0 starts already at fadeTo.",
+		holdTime: "Seconds spent sitting at fadeTo before the offramp starts. Blank means 0. Ignored unless offrampTime is set, since without one the fade holds at fadeTo anyway.",
+		offrampTime: "Seconds the ramp from fadeTo to fadeEnd takes. Blank or 0 means no offramp, the fade stays at fadeTo until stop_fade.",
+		lineDistanceScale: "How much the line width follows distance from the camera, 0 to 1. Blank or 0 keeps every line the same weight across the frame. At 1 the width is fully inverse to depth, so a mech at the back of the shot is inked more lightly than one in front. The reference is the subject's own distance, so its lines keep the width lineWidth asks for and everything else scales around it. Costs an extra pass over the scene while it runs, since it needs the depth buffer.",
+		maskDetail: "How much contrast the target's own texture needs before it is drawn as an interior line. Blank means 0.1, 0 turns interior detail off and leaves a clean outline of the geometry alone. Read from the mask pass, so it sees the texture with no lighting, no background and nothing drawn over the mech. Lower values pick up fainter panel lines, higher values keep only the strongest.",
+		debugMask: "Set to 1 to draw the raw target mask instead of the effect, so you can see exactly which pixels the shader thinks belong to the targets. Should be flat white over the whole target and black everywhere else. Grey patches mean the mask is not clean and every line test over them will be weak or missing. Blank means 0.",
+		lineThreshold: "Forces every line to one flat solid color instead of letting them come out at different strengths. Any line at or above this weight is drawn solid, anything below is dropped. Blank means 0.25. Lower catches more faint detail and thickens the line work, higher keeps only the strongest lines. Set to 0 to switch it off and get the raw varying line strengths back.",
+		burstScale: "Overall size multiplier for the radial burst, applied on top of the core and spoke sizes. 0 removes the burst entirely, blank means 1.",
+		burstCoreSize: "Radius of the core the spokes run out of, as a fraction of the screen height and before burstScale is applied. Blank means 0.06.",
+		burstStartRadius: "How far out the spokes begin, as a fraction of the screen height and before burstScale is applied. Leaves the middle of the burst unfilled, so the subject still shows through instead of every spoke converging on one point. Blank or 0 starts them at the center as normal. Note this hollows out the core as well, so a value above burstCoreSize removes the core entirely.",
+		burstStartVariance: "How much the start radius varies from spoke to spoke, as a fraction of burstStartRadius. 0.5 means each spoke starts somewhere between half and one and a half times the base distance out. Blank or 0 starts every spoke at the same distance. Does nothing unless burstStartRadius is set, since it scales that value. Keep burstStartRadius at or above burstCoreSize when using this, or the varying start points cut visible steps into the core.",
+		burstLineProbeRadius: "How close in pixels the burst edge has to pass to the target's line work before a stroke is drawn there. Blank means 3. This is the main control over whether the strokes come out continuous: too low and they break into disconnected pieces wherever the edge drifts slightly away from a line, too high and they run almost everywhere the burst crosses the target. Only affects how the target's silhouette is found, the texture detail test stays tight regardless.",
+		burstLineTaper: "Shapes the burst outline like a brush stroke instead of a slab of even thickness. It is thickest where the burst edge crosses the target's line work and thins to a point at both ends of its reach. Blank means 1 for a full taper, 0 gives the old even thickness. It is the thickness that tapers, not the opacity, so the stroke stays one flat color. Note this makes the outline lighter overall, so burstLineWidth may want raising to compensate.",
+		burstLineReachGrowth: "How much burstLineReach grows with distance from the burst center, so the outline keeps a consistent weight out along a spoke instead of thinning out as the spokes spread apart. Measured per screen height, so 1 doubles the reach one screen height out from the center. Blank or 0 keeps the reach constant.",
+		burstSpokes: "How many spokes the burst has. Rounded to a whole number, since a fractional count leaves a seam where the shape wraps around. Blank means 16.",
+		burstSpokeLength: "How far the spokes reach, as a fraction of the screen height and before burstScale is applied. Blank means 3, which is past the far corner of the frame from any center, so the spokes always run off screen. Drop it below about 1 to bring the tips back inside the frame.",
+		burstSpokeSharpness: "How narrow each spoke is. Higher is thinner and more ray like, lower gives broad wedges. Blank means 18. Long spokes need a high value or they widen into wedges as they extend.",
+		burstSpokeRandom: "How much the burst is randomized, 0 for perfectly even and unrotated, 1 for the widest spread. Blank means 0.5. Varies spoke length and spoke width, and also rotates the whole burst. Once the spokes run off screen the length variation stops being visible, but the width variation and the rotation still read. The rotation only changes over time if burstVaryRate is set, otherwise it is a fixed offset for the whole effect.",
+		burstVaryRate: "How many times a second the spoke randomization is re-rolled. The shape snaps between variations rather than sliding, so this reads as animating on ones. Blank or 0 holds a single shape for the whole effect. Has no effect unless burstSpokeRandom is above 0.",
+		burstLineWidth: "The thickness in pixels of the outline drawn along the starburst's edge. The outline only appears where the edge runs across the target's own line work, so the star stays a solid shape elsewhere. Blank or 0 leaves the burst with no outline at all.",
+		burstLineReach: "How far in pixels the burst outline runs along the star's edge either side of each place it crosses the target's line work. Blank means 24. Large values approach outlining the whole star, 0 draws only the exact crossings.",
+		deadZone: "Radius in pixels around the burst center that is left free of the target's line work, so the point of impact is blown out. Useful because the center is where every spoke converges and the line work is at its most cluttered. The burst's own outline is not affected, so the spokes stay readable straight through it. Blank or 0 disables it.",
+		deadZoneFeather: "Width in pixels of the fade at the dead zone's edge, centered on the deadZone radius, so the target's line work falls away gradually instead of being cut off at a hard circle. Blank or 0 gives the hard cut. Note that a feathered edge leaves partly faded lines by design, which is the one place the flat coloring from lineThreshold is deliberately not applied.",
+		geometryEdges: "If 1 depth and normal creases are added to the interior line work, which picks out panel lines on 3D models. Costs a full extra pass over the scene and does nothing for 2D sprite targets, so leave it off unless the shot needs it.",
+		lumaBias: "How much contrast a texture edge needs before it becomes an interior line, blank means 0.1. Lower values give busier line work.",
+		depthBias: "How far apart two surfaces must be before a crease is drawn, as a fraction of the distance to the camera. Blank means 0.02. Only used when geometryEdges is 1.",
+		normalBias: "How sharply a surface must turn before a crease is drawn, 0 to 2. Blank means 0.35. Only used when geometryEdges is 1.",
+		lineColor: "The color of the outlines as 'r,g,b' in 0-255. Blank means near black.",
+		flashColor: "The color the screen is blown out to as 'r,g,b' in 0-255. Blank means white.",
 		lightIntensity: "The intensity of the light",
 		excludedObj: "The object that will be excluded from the target light source",
 		state: "The new state for the setting",
@@ -1005,7 +1095,161 @@ SRWEditor.prototype.init = function(){
 			
 		},
 		shockwave_intensity: function(value){
-			
+
+		},
+		targets: function(value){
+
+		},
+
+
+
+
+
+
+
+
+
+
+		intensity: function(value){
+
+		},
+		lineWidth: function(value){
+
+		},
+		centreTarget: function(value){
+
+		},
+		centrePosition: function(value){
+
+		},
+		strengthFrom: function(value){
+
+		},
+		strengthTo: function(value){
+
+		},
+		innerFrom: function(value){
+
+		},
+		innerTo: function(value){
+
+		},
+		feather: function(value){
+
+		},
+		blurMix: function(value){
+
+		},
+		blurDither: function(value){
+
+		},
+		blurRampTime: function(value){
+
+		},
+		blurHoldTime: function(value){
+
+		},
+		blurOfframpTime: function(value){
+
+		},
+		color: function(value){
+
+		},
+		fadeFrom: function(value){
+
+		},
+		fadeEnd: function(value){
+
+		},
+		fadeTime: function(value){
+
+		},
+		holdTime: function(value){
+
+		},
+		offrampTime: function(value){
+
+		},
+		fadeTo: function(value){
+
+		},
+		lineDistanceScale: function(value){
+
+		},
+		maskDetail: function(value){
+
+		},
+		debugMask: function(value){
+
+		},
+		lineThreshold: function(value){
+
+		},
+		burstScale: function(value){
+
+		},
+		burstCoreSize: function(value){
+
+		},
+		burstStartRadius: function(value){
+
+		},
+		burstStartVariance: function(value){
+
+		},
+		burstLineReachGrowth: function(value){
+
+		},
+		burstLineTaper: function(value){
+
+		},
+		burstLineProbeRadius: function(value){
+
+		},
+		burstSpokes: function(value){
+
+		},
+		burstSpokeLength: function(value){
+
+		},
+		burstSpokeSharpness: function(value){
+
+		},
+		burstSpokeRandom: function(value){
+
+		},
+		burstVaryRate: function(value){
+
+		},
+		burstLineWidth: function(value){
+
+		},
+		burstLineReach: function(value){
+
+		},
+		deadZone: function(value){
+
+		},
+		deadZoneFeather: function(value){
+
+		},
+		geometryEdges: function(value){
+
+		},
+		lumaBias: function(value){
+
+		},
+		depthBias: function(value){
+
+		},
+		normalBias: function(value){
+
+		},
+		lineColor: function(value){
+
+		},
+		flashColor: function(value){
+
 		},
 		lightIntensity: function(value){
 			
@@ -4560,7 +4804,7 @@ SRWEditor.prototype.getCommandContent = function(command, isInner){
 		displayInfo.params.forEach(function(param){
 			var value = params[param];
 			result+="<div data-param='"+param+"' class='command_param "+(isInner ? "" : "command_param_outer")+"'>";
-			result+="<div title='"+(_this._paramTooltips[param] || "")+"' class='param_label'>"+(aliases[param] || param)+": </div>";
+			result+="<div title='"+(_this._paramTooltips[param] || "").replace("'", "&apos;")+"' class='param_label'>"+(aliases[param] || param)+": </div>";
 			result+=_this.getParamContent(param, value, displayInfo);
 			result+="</div>";
 		});
