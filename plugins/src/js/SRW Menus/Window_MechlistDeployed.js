@@ -164,6 +164,7 @@ Window_MechListDeployed.prototype.update = function() {
 				this._handlingInput = true;
 				this._internalHandlers[this._currentKey].call(this);
 			}*/
+			
 			SoundManager.playOk();
 			/*if($gameTemp.searchInfo){
 				$gameTemp.killMenu("mech_list_deployed");	
@@ -176,6 +177,13 @@ Window_MechListDeployed.prototype.update = function() {
 				$gameTemp.pushMenu = "detail_pages";	
 			}*/			
 			const selectedActor = this.getCurrentSelection().actor;
+
+			if($gameTemp.searchInfo.disallowInvalidSelection && !this.rowEnabled(selectedActor)){
+				this.refresh();
+				SoundManager.playBuzzer();
+				return;
+			}
+
 			var event;
 			
 			if($statCalc.isBoarded(selectedActor)){

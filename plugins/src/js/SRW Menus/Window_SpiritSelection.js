@@ -377,11 +377,12 @@ Window_SpiritSelection.prototype.update = function() {
 				$gameTemp.searchInfo = {};
 				const spiritIdx = ENGINE_SETTINGS.ALLY_SPIRIT_LIST[_this._currentAllySelectionSlot];
 
-				if(_this._allySpiritLookup[spiritIdx]?.isEnabledForTarget){			
+				if(_this._allySpiritLookup[spiritIdx]?.isEnabledForTarget && _this._allySpiritLookup[spiritIdx]?.hasProviderWithSP){			
 					SoundManager.playOk();
 					$gameTemp.searchInfo.value = spiritIdx;
 			
 					$gameTemp.searchInfo.type = "spirit";		
+					$gameTemp.searchInfo.disallowInvalidSelection = true;
 					
 					$gameTemp.resumeSpiritMenuAfterActivation = true;
 					
@@ -389,6 +390,7 @@ Window_SpiritSelection.prototype.update = function() {
 						
 					}*/
 					$gameTemp.mechListWindowSearchSelectionCallback = function(actor){
+						$gameTemp.searchInfo = {};
 						$gameTemp.mechListWindowSearchSelectionCallback = null;
 						_this._uiState = "";
 											
@@ -715,19 +717,27 @@ Window_SpiritSelection.prototype.getCurrentBatchedSpirits = function(slot) {
 
 Window_SpiritSelection.prototype.prepareAllySpiritInfo = function(slot) {
 	const spiritLookup = {};
+	const actorsToCheck = [];
 	$statCalc.iterateAllActors("actor", function(actor){
+		actorsToCheck.push(actor);
+		for(let pilotId of $statCalc.getSubPilots(actor)){
+			actorsToCheck.push($gameActors.actor(pilotId));
+		}
+	});
+	for(let actor of actorsToCheck){
 		const spirits = $statCalc.getSpiritList(actor);
 		for(let spirit of spirits){
 			if(spirit.idx != ""){				
 				const displayInfo = $spiritManager.getSpiritDisplayInfo(spirit.idx);
 				const type = $spiritManager.getSpiritDef(spirit.idx).targetType;
 				if(type == "ally"){				
-					if(spirit.cost <= $statCalc.getCalculatedPilotStats(actor).currentSP && spirit.level <= $statCalc.getCurrentLevel(actor)){
+					if(spirit.level <= $statCalc.getCurrentLevel(actor)){
 						if(!spiritLookup[spirit.idx]){
 							spiritLookup[spirit.idx] = {
 								potentialProviders: [],
 								spiritDef: spirit,
-								isEnabledForTarget: false
+								isEnabledForTarget: false,
+								hasProviderWithSP: false
 							};
 						}
 						var target = $gameTemp.currentMenuUnit.actor;
@@ -735,11 +745,14 @@ Window_SpiritSelection.prototype.prepareAllySpiritInfo = function(slot) {
 						if(displayInfo.singleTargetEnabledHandler(target)){							
 							spiritLookup[spirit.idx].isEnabledForTarget = true;
 						}
+						if(spirit.cost <= $statCalc.getCalculatedPilotStats(actor).currentSP){
+							spiritLookup[spirit.idx].hasProviderWithSP = true;
+						}
 					}					
 				}
 			}
 		}
-	});
+	}
 	this._allySpiritLookup = spiritLookup;
 }
 
@@ -1025,7 +1038,7 @@ Window_SpiritSelection.prototype.redraw = function() {
 				}
 				
 				var displayClass = "";
-				if(spiritList[i].isEnabledForTarget){
+				if(spiritList[i].isEnabledForTarget && spiritList[i].hasProviderWithSP){
 					displayClass = "active";
 				} else {
 					displayClass = "disabled";
