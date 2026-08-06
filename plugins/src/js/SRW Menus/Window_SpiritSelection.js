@@ -392,8 +392,15 @@ Window_SpiritSelection.prototype.update = function() {
 						$gameTemp.mechListWindowSearchSelectionCallback = null;
 						_this._uiState = "";
 											
+						let spiritDef;
+						for(let spirit of $statCalc.getSpiritList(actor)){
+							if(spirit.idx == spiritIdx){
+								spiritDef = spirit;
+							}
+						}
+
 						var spiritInfo;
-						spiritInfo = JSON.parse(JSON.stringify(_this._allySpiritLookup[spiritIdx].spiritDef));		
+						spiritInfo = JSON.parse(JSON.stringify(spiritDef));		
 						spiritInfo.caster = actor;	
 						spiritInfo.target = $gameTemp.currentMenuUnit.actor;
 						spiritInfo.applyImmediate = true;
@@ -1003,7 +1010,7 @@ Window_SpiritSelection.prototype.redraw = function() {
 				if(entry != null && typeof entry != "undefined" && entry.idx !== ""){
 					targetType = $spiritManager.getSpiritDef(entry.idx).targetType;
 					var displayInfo = $spiritManager.getSpiritDisplayInfo(entry.idx);
-					displayName = "<div class='scaled_width spirit_label scaled_text fitted_text'>"+displayInfo.name+"</div>("+entry.cost+")" ;
+					displayName = "<div class='scaled_width spirit_label scaled_text fitted_text'>"+displayInfo.name+"</div>" ;
 					isDisplayed = true;
 				}
 				
