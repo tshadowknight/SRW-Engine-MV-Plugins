@@ -73,6 +73,7 @@ var ENGINE_SETTINGS = {
 		low: {color: "#eda316", percent: 15},
 		critical: {color: "#e11515", percent: 0}
 	},
+	SHOW_SUPPORT_ON_SUMMARY: true,
 	USE_SINGLE_MAP_SPRITE: false,
 	MAP_BUTTON_CONFIG: {
 		SPRITE_SHEET: {

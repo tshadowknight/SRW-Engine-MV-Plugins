@@ -344,3 +344,30 @@
 	--heightpixels: 159;
 	--widthpixels: 447;
 }
+
+#unit_summary .support_icon {
+	width: 48%;
+	opacity: 0.4;
+	margin-right: 8%;
+}
+
+#unit_summary .support_icon.active {	
+	opacity: 1;
+}
+
+#unit_summary .support_value {
+	opacity: 0.4;
+}
+
+#unit_summary .support_value.active {
+	opacity: 1;
+}
+
+#unit_summary .support_indicator {
+	display: flex;
+	margin-right: 1%;
+}
+
+#unit_summary .pilot_stats .score.support_display {
+	margin-left: 38%;
+}

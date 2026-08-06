@@ -291,13 +291,44 @@ Window_UnitSummary.prototype.redraw = async function() {
 			comp.willValue.textContent = $statCalc.getCurrentWill(actor);
 
 			// Score
-			const kills = $statCalc.getKills(actor);
-			if(kills){
-				comp.scoreDiv.style.display = "";
-				comp.scoreValue.textContent = kills;
+			if(ENGINE_SETTINGS.SHOW_SUPPORT_ON_SUMMARY){
+				comp.scoreDiv.style.display = "flex";
+				comp.scoreDiv.classList.add("support_display");
+				let supportText = "";
+				
+				const maxSupportDefends = $statCalc.applyStatModsToValue(actor, 0, ["support_defend"]);	
+				const usedSupportDefends = actor.SRWStats.battleTemp.supportDefendCount;
+				const supportDefendCount = maxSupportDefends - usedSupportDefends;
+				
+				supportText+="<div class='support_indicator'>";
+				supportText+="<img class='support_icon "+(supportDefendCount > 0 ?  "active" : "")+"' src='svg/shield.svg'/>";
+				supportText+="<div class='support_value "+(supportDefendCount > 0 ?  "active" : "")+"'>";
+				supportText+= supportDefendCount;
+				supportText+= "</div>";			
+				supportText+= "</div>";				
+				
+				const maxSupportAttacks = $statCalc.applyStatModsToValue(actor, 0, ["support_attack"]);	
+				const usedSupportAttacks = actor.SRWStats.battleTemp.supportAttackCount;
+				const supportAttackCount = maxSupportAttacks - usedSupportAttacks;
+
+				supportText+="<div class='support_indicator'>";
+				supportText+="<img class='support_icon "+(supportAttackCount > 0 ?  "active" : "")+"' src='svg/sword.svg'/>";
+				supportText+="<div class='support_value "+(supportAttackCount > 0 ?  "active" : "")+"'>";
+				supportText+= supportAttackCount;
+				supportText+= "</div>";
+				supportText+= "</div>";			
+
+				comp.scoreDiv.innerHTML = supportText;
 			} else {
-				comp.scoreDiv.style.display = "none";
+			const kills = $statCalc.getKills(actor);
+				if(kills){
+					comp.scoreDiv.style.display = "";
+					comp.scoreValue.textContent = kills;
+				} else {
+					comp.scoreDiv.style.display = "none";
+				}
 			}
+			
 
 			var calculatedStats = $statCalc.getCalculatedMechStats(actor);
 

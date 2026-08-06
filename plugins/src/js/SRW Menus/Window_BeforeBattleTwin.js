@@ -79,8 +79,6 @@ Window_BeforebattleTwin.prototype.counterValid = function(){
 Window_BeforebattleTwin.prototype.updateButtonPermissions = function(){
 	var _this = this;
 	
-	
-	
 	this._btnInfo.forEach(function(btnDef){
 		if(btnDef.type == "action"){
 			btnDef.enabled = false;
@@ -95,7 +93,7 @@ Window_BeforebattleTwin.prototype.updateButtonPermissions = function(){
 		}
 		if(btnDef.type == "spirit"){
 			btnDef.enabled = false;
-			if(ENGINE_SETTINGS.BEFORE_BATTLE_SPIRITS && !$statCalc.isAI($gameTemp.currentBattleActor)){
+			if((ENGINE_SETTINGS.BEFORE_BATTLE_SPIRITS || !$gameTemp.isEnemyAttack) && !$statCalc.isAI($gameTemp.currentBattleActor)){
 				btnDef.enabled = true;
 			}			
 		}
