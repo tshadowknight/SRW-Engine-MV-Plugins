@@ -17,6 +17,8 @@ Window_SpiritSelectionBeforeBattle.prototype.initialize = function() {
 	this._selectionRowSize = 3;
 	this._currentActor = [0, 0];
 	this._currentSlot = 0;
+	this._currentAllySelectionSlot = 0;
+	this._selectionMode = 0;
 	Window_CSS.prototype.initialize.call(this, 0, 0, 0, 0);	
 	window.addEventListener("resize", function(){
 		_this.requestRedraw();
@@ -34,6 +36,10 @@ Window_SpiritSelectionBeforeBattle.prototype.createComponents = function() {
 	windowNode.appendChild(contentContainer);
 	this._contentContainer = contentContainer;
 	//this._contentContainer.innerHTML = "";	
+
+	if(ENGINE_SETTINGS.ENABLE_ALLY_SPIRITS){
+		windowNode.classList.add("with_ally_spirits");		
+	}
 	
 }	
 

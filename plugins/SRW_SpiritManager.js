@@ -41,6 +41,7 @@ SpiritManager.prototype.getSpiritDisplayInfo = function(idx){
 		desc: "",
 		target: "",
 		enabledHandler: function(){return false;},
+		singleTargetEnabledHandler: function(){return false;},
 		animInfo: ""
 	};
 	if(spiritDef){
@@ -48,6 +49,7 @@ SpiritManager.prototype.getSpiritDisplayInfo = function(idx){
 		result.desc = spiritDef.desc;
 		result.target = this._targetTypeStrings[spiritDef.targetType];
 		result.enabledHandler = spiritDef.enabledHandler;
+		result.singleTargetEnabledHandler = spiritDef.singleTargetEnabledHandler;
 		result.animInfo = spiritDef.animInfo;
 	}
 	if (DataManager._abilityLocalizationData) {

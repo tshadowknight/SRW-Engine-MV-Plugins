@@ -668,8 +668,9 @@ Window_BeforebattleTwin.prototype.update = function() {
 					this.requestRedraw();	
 					
 					if(!$statCalc.isAI($gameTemp.currentBattleActor)){
-						SoundManager.playCursor();						
+						SoundManager.playCursor();
 						_this._currentUIState = "actor_spirit_selection";
+						$gameTemp.spiritSelectionReturnState = $gameSystem.isSubBattlePhase();
 						$gameTemp.pushMenu = "spirit_selection_before_battle";
 						
 						var storedMenuUnit = $gameTemp.currentMenuUnit;

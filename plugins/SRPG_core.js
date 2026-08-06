@@ -1917,7 +1917,15 @@ SceneManager.isInSaveScene = function(){
 			caster = battlerArray[1];
 		}
 		var referenceEvent = $statCalc.getReferenceEvent(caster);
-		var initialTargetingResult = $spiritManager.performInitialTargeting(spiritInfo.idx, target, {x: referenceEvent.posX(), y: referenceEvent.posY()});
+		var initialTargetingResult;
+		if(spiritInfo.applyImmediate){
+			initialTargetingResult = {
+				type: self,
+				targets: [target]
+			};
+		} else {
+			initialTargetingResult = $spiritManager.performInitialTargeting(spiritInfo.idx, target, {x: referenceEvent.posX(), y: referenceEvent.posY()});
+		}	
 		
 		if(initialTargetingResult.type == "enemy" || initialTargetingResult.type == "ally"){
 		 //manual Targeting required
@@ -1951,8 +1959,14 @@ SceneManager.isInSaveScene = function(){
 				
 				$gameTemp.spiritWindowDoneHandler = callback || function(){
 					$gameTemp.popMenu = true;
-					$gameSystem.setSrpgActorCommandWindowNeedRefresh($gameSystem.EventToUnit($gameTemp.activeEvent().eventId()));
-					$gameSystem.setSubBattlePhase("actor_command_window");
+					if($gameTemp.resumeSpiritMenuAfterActivation){
+						$gameTemp.resumeSpiritMenuAfterActivation = false;
+						const referenceEvent = $statCalc.getReferenceEvent(target);
+						$gamePlayer.locate(referenceEvent.posX(), referenceEvent.posY());
+					} else {
+						$gameSystem.setSrpgActorCommandWindowNeedRefresh($gameSystem.EventToUnit($gameTemp.activeEvent().eventId()));		
+						$gameSystem.setSubBattlePhase("actor_command_window");				
+					}			
 				}
 				
 					
@@ -3319,6 +3333,7 @@ SceneManager.isInSaveScene = function(){
 			actor: actionBattlerArray[1],
 			mech: actionBattlerArray[1].SRWStats.mech
 		};
+		$gameTemp.spiritSelectionReturnState = $gameSystem.isSubBattlePhase();
 		$gameTemp.pushMenu = "spirit_selection";
 		this._mapSrpgActorCommandWindow.hide()
     };	

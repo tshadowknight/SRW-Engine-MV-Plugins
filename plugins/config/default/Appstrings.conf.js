@@ -695,7 +695,9 @@ APPSTRINGS.BUTTON_HINTS = {
 	text_crawl_pause: {text: "Pause", action: "cancel"}, 
 };
 
-
+APPSTRINGS.SPIRIT_WINDOW = {
+	ALLY_LIST_LABEL: "Ally Support"
+}
 
 function EDITORSTRINGS(){
 	
@@ -1181,3 +1183,4 @@ EDITORSTRINGS.PILOT = {
 	label_effect: "Effect",
 	label_rel_level: "Level"
 }
+

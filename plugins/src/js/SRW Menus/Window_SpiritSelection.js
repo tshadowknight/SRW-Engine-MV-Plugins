@@ -16,6 +16,8 @@ Window_SpiritSelection.prototype.initialize = function() {
 	this._selectionRowSize = 3;
 	this._currentActor = [0, 0];
 	this._currentSlot = 0;
+	this._currentAllySelectionSlot = 0;
+	this._selectionMode = 0;
 	Window_CSS.prototype.initialize.call(this, 0, 0, 0, 0);	
 	window.addEventListener("resize", function(){
 		_this.requestRedraw();
@@ -35,9 +37,17 @@ Window_SpiritSelection.prototype.resetSelection = function(){
 	this._currentBatchedSpirits = {};
 	this._currentSlot = 0;
 	this._twinSpiritSelection = false;
+	this._allySpiritLookup = null;
 }
 
 Window_SpiritSelection.prototype.incrementSelection = function(){	
+	if(this._selectionMode == 1){
+		if(this._currentAllySelectionSlot < (ENGINE_SETTINGS.ALLY_SPIRIT_LIST.length - 1)){
+			this._currentAllySelectionSlot++;
+			SoundManager.playCursor();
+		}		
+		return;
+	}
 	if(this.getCurrentSelection() == this._maxSelection) {
 		return;
 	}
@@ -52,6 +62,13 @@ Window_SpiritSelection.prototype.incrementSelection = function(){
 }
 
 Window_SpiritSelection.prototype.decrementSelection = function(){	
+	if(this._selectionMode == 1){
+		if(this._currentAllySelectionSlot > 0){
+			this._currentAllySelectionSlot--;
+			SoundManager.playCursor();
+		}		
+		return;
+	}
 	if(this.getCurrentSelection() == 0) {
 		return;
 	}
@@ -66,6 +83,9 @@ Window_SpiritSelection.prototype.decrementSelection = function(){
 }
 
 Window_SpiritSelection.prototype.incrementPage = function(){	
+	if(this._selectionMode == 1){
+		return;
+	}
 	if(this._isTwinDisplay){
 		SoundManager.playCursor();
 		if(this._currentSlot == 1){
@@ -83,11 +103,20 @@ Window_SpiritSelection.prototype.incrementPage = function(){
 			this.setCurrentSelection(this.getCurrentSelection()-this._selectionRowSize);		
 			this.incrementCurrentActor();
 			SoundManager.playCursor();
+		} else if(ENGINE_SETTINGS.ENABLE_ALLY_SPIRITS){
+			this._selectionMode = 1;
+			SoundManager.playCursor();
 		}
 	}
 }
 
-Window_SpiritSelection.prototype.decrementPage = function(){		
+Window_SpiritSelection.prototype.decrementPage = function(){	
+	if(this._selectionMode == 1){
+		SoundManager.playCursor();
+		this._selectionMode = 0;
+		this.setCurrentActor(this.getMaxActor()-1);
+		return;
+	}	
 	if(this._isTwinDisplay){
 		SoundManager.playCursor();
 		if(this._currentSlot == 0){
@@ -126,6 +155,10 @@ Window_SpiritSelection.prototype.createComponents = function() {
 	contentContainer.classList.add("content_container");
 	windowNode.appendChild(contentContainer);
 	this._contentContainer = contentContainer;
+
+	if(ENGINE_SETTINGS.ENABLE_ALLY_SPIRITS){
+		windowNode.classList.add("with_ally_spirits");		
+	}
 	//this._contentContainer.innerHTML = "";	
 }	
 
@@ -205,142 +238,183 @@ Window_SpiritSelection.prototype.update = function() {
 		}
 		
 		if(Input.isTriggered('ok') || this._touchOK){			
-			var actor = this.getAvailableActors()[this.getCurrentActor()];
-			var currentLevel = $statCalc.getCurrentLevel(actor);
-			var spiritList = $statCalc.getSpiritList(actor);
-			var selectedIdx = this.getCurrentSelection();
 
+			if(this._selectionMode == 0){	
+
+				var actor = this.getAvailableActors()[this.getCurrentActor()];
+				var currentLevel = $statCalc.getCurrentLevel(actor);
+				var spiritList = $statCalc.getSpiritList(actor);
+				var selectedIdx = this.getCurrentSelection();
+
+				
+				var spiritIsAlreadyBatched = false;
+				var isValidTwinSpirit = true;
+				if(_this._twinSpiritSelection){
+					let actor;
+					if(_this._currentSlot == 0){
+						actor = $gameTemp.currentMenuUnit.actor;
+					} else {
+						actor = $gameTemp.currentMenuUnit.actor.subTwin;
+					}
+					const twinSpiritInfo = $statCalc.getTwinSpirit(actor);
+					if(twinSpiritInfo){
+						spiritIsAlreadyBatched = this.getCurrentBatchedSpirits(_this._currentSlot)[twinSpiritInfo.idx] != null;
+					} else {
+						isValidTwinSpirit = false;
+					}				
+				} else if(spiritList[selectedIdx] != null){
+					spiritIsAlreadyBatched = this.getCurrentBatchedSpirits(_this._currentSlot)[spiritList[selectedIdx].idx] != null;
+				}
 			
-			var spiritIsAlreadyBatched = false;
-			var isValidTwinSpirit = true;
-			if(_this._twinSpiritSelection){
-				let actor;
-				if(_this._currentSlot == 0){
-					actor = $gameTemp.currentMenuUnit.actor;
-				} else {
-					actor = $gameTemp.currentMenuUnit.actor.subTwin;
-				}
-				const twinSpiritInfo = $statCalc.getTwinSpirit(actor);
-				if(twinSpiritInfo){
-					spiritIsAlreadyBatched = this.getCurrentBatchedSpirits(_this._currentSlot)[twinSpiritInfo.idx] != null;
-				} else {
-					isValidTwinSpirit = false;
-				}				
-			} else if(spiritList[selectedIdx] != null){
-				spiritIsAlreadyBatched = this.getCurrentBatchedSpirits(_this._currentSlot)[spiritList[selectedIdx].idx] != null;
-			}
-		
-			var twinEnabledState = Math.min(_this.getSpiritEnabledState(null, 0, true, _this._currentSlot), _this.getSpiritEnabledState(null, 1, true, _this._currentSlot));
+				var twinEnabledState = Math.min(_this.getSpiritEnabledState(null, 0, true, _this._currentSlot), _this.getSpiritEnabledState(null, 1, true, _this._currentSlot));
 
-			let slotIsEnabled = true;
-			if(_this._twinSpiritSelection){
-				if(!isValidTwinSpirit){
-					slotIsEnabled = false;
+				let slotIsEnabled = true;
+				if(_this._twinSpiritSelection){
+					if(!isValidTwinSpirit){
+						slotIsEnabled = false;
+					}
+					if(twinEnabledState <= 0){
+						slotIsEnabled = false;
+					}
+				} else {
+					if(!spiritList[selectedIdx]){
+						slotIsEnabled = false;
+					} else {
+						if(spiritList[selectedIdx].level > currentLevel){
+							slotIsEnabled = false;
+						}
+						if(this.getSpiritEnabledState(selectedIdx) <= 0){
+							slotIsEnabled = false;
+						}
+					}
 				}
-				if(twinEnabledState <= 0){
-					slotIsEnabled = false;
+			
+				if(slotIsEnabled || spiritIsAlreadyBatched){
+					var spirits = [];				
+					var type;
+					
+					if(_this._twinSpiritSelection){
+						let twinSpiritInfo = getTwinSpiritInfo();
+						
+						type = $spiritManager.getSpiritDef(twinSpiritInfo.idx).targetType;	
+					} else {
+						type = $spiritManager.getSpiritDef(spiritList[selectedIdx].idx).targetType;
+					}
+					
+					if(type == "self"){
+						if(_this._twinSpiritSelection){
+							
+							let twinSpiritInfo = getTwinSpiritInfo();
+							//var displayInfo = $spiritManager.getSpiritDisplayInfo(twinSpiritInfo.idx);
+							this.getCurrentBatchedSpirits(0)[twinSpiritInfo.idx] = {actor: $gameTemp.currentMenuUnit.actor, target: $gameTemp.currentMenuUnit.actor, spiritInfo: twinSpiritInfo};
+							this.getCurrentBatchedSpirits(1)[twinSpiritInfo.idx] = {actor: $gameTemp.currentMenuUnit.actor.subTwin, target: $gameTemp.currentMenuUnit.actor.subTwin, spiritInfo: twinSpiritInfo};
+						} else {
+							this.getCurrentBatchedSpirits(_this._currentSlot)[spiritList[selectedIdx].idx] = {actor: actor, spiritInfo: spiritList[selectedIdx]};
+							
+							var affectsTwinInfo = $spiritManager.getSpiritDef(spiritList[selectedIdx].idx).affectsTwinInfo;
+							if(affectsTwinInfo){
+								var info = {
+									cost: 0,
+									idx: spiritList[selectedIdx].idx
+								}
+								if(_this._currentSlot == 0){
+									this.getCurrentBatchedSpirits(1)[spiritList[selectedIdx].idx] = {target: $gameTemp.currentMenuUnit.actor.subTwin, spiritInfo: info};
+								} else {
+									this.getCurrentBatchedSpirits(0)[spiritList[selectedIdx].idx] = {target: $gameTemp.currentMenuUnit.actor, spiritInfo: info};
+								}						
+							}
+						}				
+						
+						Object.keys(this._currentBatchedSpirits).forEach(function(slot){
+							var slotBatch = _this._currentBatchedSpirits[slot];
+							Object.keys(slotBatch).forEach(function(spiritIdx){
+								var info = slotBatch[spiritIdx];
+								var spiritInfo = JSON.parse(JSON.stringify(info.spiritInfo));
+								spiritInfo.caster = info.actor;
+								if(!spiritInfo.target){
+									if(slot == 0){
+										spiritInfo.target = $gameTemp.currentMenuUnit.actor;
+									} else {
+										spiritInfo.target = $gameTemp.currentMenuUnit.actor.subTwin;
+									}
+								}
+								if(spiritInfo.target){
+									spirits.push(spiritInfo);		
+								}											
+							});
+						});
+						let debug = [];
+						for(let entry of spirits){
+							debug.push(entry);
+						}
+						if(_this._callbacks["selectedMultiple"]){
+							_this._callbacks["selectedMultiple"](spirits);
+						}
+					} else {
+						var spiritInfo;
+						if(_this._twinSpiritSelection){
+							spiritInfo = JSON.parse(JSON.stringify(getTwinSpiritInfo()));
+							spiritInfo.caster = $gameTemp.currentMenuUnit.actor;
+							spiritInfo.additionalCaster = $gameTemp.currentMenuUnit.actor.subTwin;
+						} else {
+							spiritInfo = JSON.parse(JSON.stringify(spiritList[selectedIdx]));		
+							spiritInfo.caster = actor;
+						}
+						
+						spiritInfo.target = $gameTemp.currentMenuUnit.actor;
+						if(this._callbacks["selected"]){
+							this._callbacks["selected"](spiritInfo);
+						}
+					}	
+					
+					$gameTemp.popMenu = true;	
+					$gameTemp.buttonHintManager.hide();	
+					this._handlingInput = true;
+					
 				}
 			} else {
-				if(!spiritList[selectedIdx]){
-					slotIsEnabled = false;
-				} else {
-					if(spiritList[selectedIdx].level > currentLevel){
-						slotIsEnabled = false;
-					}
-					if(this.getSpiritEnabledState(selectedIdx) <= 0){
-						slotIsEnabled = false;
-					}
-				}
-			}
-		
-			if(slotIsEnabled || spiritIsAlreadyBatched){
-				var spirits = [];				
-				var type;
 				
-				if(_this._twinSpiritSelection){
-					let twinSpiritInfo = getTwinSpiritInfo();
+				$gameTemp.searchInfo = {};
+				const spiritIdx = ENGINE_SETTINGS.ALLY_SPIRIT_LIST[_this._currentAllySelectionSlot];
+
+				if(_this._allySpiritLookup[spiritIdx]?.isEnabledForTarget){			
+					SoundManager.playOk();
+					$gameTemp.searchInfo.value = spiritIdx;
+			
+					$gameTemp.searchInfo.type = "spirit";		
 					
-					type = $spiritManager.getSpiritDef(twinSpiritInfo.idx).targetType;	
-				} else {
-					type = $spiritManager.getSpiritDef(spiritList[selectedIdx].idx).targetType;
-				}
-				
-				if(type == "self"){
-					if(_this._twinSpiritSelection){
+					$gameTemp.resumeSpiritMenuAfterActivation = true;
+					
+					/*$gameTemp.mechListWindowCancelCallback = function(){
 						
-						let twinSpiritInfo = getTwinSpiritInfo();
-						//var displayInfo = $spiritManager.getSpiritDisplayInfo(twinSpiritInfo.idx);
-						this.getCurrentBatchedSpirits(0)[twinSpiritInfo.idx] = {actor: $gameTemp.currentMenuUnit.actor, target: $gameTemp.currentMenuUnit.actor, spiritInfo: twinSpiritInfo};
-						this.getCurrentBatchedSpirits(1)[twinSpiritInfo.idx] = {actor: $gameTemp.currentMenuUnit.actor.subTwin, target: $gameTemp.currentMenuUnit.actor.subTwin, spiritInfo: twinSpiritInfo};
-					} else {
-						this.getCurrentBatchedSpirits(_this._currentSlot)[spiritList[selectedIdx].idx] = {actor: actor, spiritInfo: spiritList[selectedIdx]};
-						
-						var affectsTwinInfo = $spiritManager.getSpiritDef(spiritList[selectedIdx].idx).affectsTwinInfo;
-						if(affectsTwinInfo){
-							var info = {
-								cost: 0,
-								idx: spiritList[selectedIdx].idx
-							}
-							if(_this._currentSlot == 0){
-								this.getCurrentBatchedSpirits(1)[spiritList[selectedIdx].idx] = {target: $gameTemp.currentMenuUnit.actor.subTwin, spiritInfo: info};
-							} else {
-								this.getCurrentBatchedSpirits(0)[spiritList[selectedIdx].idx] = {target: $gameTemp.currentMenuUnit.actor, spiritInfo: info};
-							}						
+					}*/
+					$gameTemp.mechListWindowSearchSelectionCallback = function(actor){
+						$gameTemp.mechListWindowSearchSelectionCallback = null;
+						_this._uiState = "";
+											
+						var spiritInfo;
+						spiritInfo = JSON.parse(JSON.stringify(_this._allySpiritLookup[spiritIdx].spiritDef));		
+						spiritInfo.caster = actor;	
+						spiritInfo.target = $gameTemp.currentMenuUnit.actor;
+						spiritInfo.applyImmediate = true;
+						if(_this._callbacks["selected"]){
+							_this._callbacks["selected"](spiritInfo);
 						}
-					}				
-					
-					Object.keys(this._currentBatchedSpirits).forEach(function(slot){
-						var slotBatch = _this._currentBatchedSpirits[slot];
-						Object.keys(slotBatch).forEach(function(spiritIdx){
-							var info = slotBatch[spiritIdx];
-							var spiritInfo = JSON.parse(JSON.stringify(info.spiritInfo));
-							spiritInfo.caster = info.actor;
-							if(!spiritInfo.target){
-								if(slot == 0){
-									spiritInfo.target = $gameTemp.currentMenuUnit.actor;
-								} else {
-									spiritInfo.target = $gameTemp.currentMenuUnit.actor.subTwin;
-								}
-							}
-							if(spiritInfo.target){
-								spirits.push(spiritInfo);		
-							}											
-						});
-					});
-					let debug = [];
-					for(let entry of spirits){
-						debug.push(entry);
 					}
-					if(_this._callbacks["selectedMultiple"]){
-						_this._callbacks["selectedMultiple"](spirits);
-					}
-				} else {
-					var spiritInfo;
-					if(_this._twinSpiritSelection){
-						spiritInfo = JSON.parse(JSON.stringify(getTwinSpiritInfo()));
-						spiritInfo.caster = $gameTemp.currentMenuUnit.actor;
-						spiritInfo.additionalCaster = $gameTemp.currentMenuUnit.actor.subTwin;
-					} else {
-						spiritInfo = JSON.parse(JSON.stringify(spiritList[selectedIdx]));		
-						spiritInfo.caster = actor;
-					}
-					
-					spiritInfo.target = $gameTemp.currentMenuUnit.actor;
-					if(this._callbacks["selected"]){
-						this._callbacks["selected"](spiritInfo);
-					}
-				}	
-				
-				$gameTemp.popMenu = true;	
-				$gameTemp.buttonHintManager.hide();	
-				this._handlingInput = true;
-				
+					_this._uiState = "pending_selection";
+					$gameTemp.pushMenu = "mech_list_deployed";
+				}
 			}
 			this.refresh();
 			return;	
 		} else if(Input.isTriggered('cancel') || TouchInput.isCancelled()){				
 			$gameTemp.popMenu = true;	
 			$gameTemp.buttonHintManager.hide();	
+			
+			if($gameTemp.spiritSelectionReturnState){
+				$gameSystem.setSubBattlePhase($gameTemp.spiritSelectionReturnState);
+				$gameTemp.spiritSelectionReturnState = null;
+			}
 			
 			if(this._callbacks["closed"]){
 				this._callbacks["closed"]();
@@ -632,6 +706,37 @@ Window_SpiritSelection.prototype.getCurrentBatchedSpirits = function(slot) {
 	return this._currentBatchedSpirits[slot];
 }
 
+Window_SpiritSelection.prototype.prepareAllySpiritInfo = function(slot) {
+	const spiritLookup = {};
+	$statCalc.iterateAllActors("actor", function(actor){
+		const spirits = $statCalc.getSpiritList(actor);
+		for(let spirit of spirits){
+			if(spirit.idx != ""){				
+				const displayInfo = $spiritManager.getSpiritDisplayInfo(spirit.idx);
+				const type = $spiritManager.getSpiritDef(spirit.idx).targetType;
+				if(type == "ally"){				
+					if(spirit.cost <= $statCalc.getCalculatedPilotStats(actor).currentSP){
+						if(!spiritLookup[spirit.idx]){
+							spiritLookup[spirit.idx] = {
+								potentialProviders: [],
+								spiritDef: spirit,
+								isEnabledForTarget: false
+							};
+						}
+						var target = $gameTemp.currentMenuUnit.actor;
+						spiritLookup[spirit.idx].potentialProviders.push(actor);
+						if(displayInfo.singleTargetEnabledHandler(target)){							
+							spiritLookup[spirit.idx].isEnabledForTarget = true;
+						}
+					}					
+				}
+			}
+		}
+	});
+	this._allySpiritLookup = spiritLookup;
+}
+
+
 Window_SpiritSelection.prototype.redraw = function() {	
 	var _this = this;
 	
@@ -671,7 +776,7 @@ Window_SpiritSelection.prototype.redraw = function() {
 		twinSpiritList = $statCalc.getSpiritList(twin);
 	}
 	
-	content+="<div class='spirit_selection_content'>";
+	content+="<div id='own_spirits' class='spirit_selection_section'>";
 	content+="<div class='spirit_selection_row spirit_selection'>";
 	//content+="<div id='spirit_selection_icons_container'>";//icons container
 	content+="<div data-slot=0 data-offset=-1 class='previous_selection_icon left selection_icon'></div>";//icon 	
@@ -775,7 +880,7 @@ Window_SpiritSelection.prototype.redraw = function() {
 			}
 			
 			
-			content+="<div data-slot='"+slot+"' data-idx='"+i+"' class='column "+(slot == _this._currentSlot && i == _this.getCurrentSelection(slot) && !_this._twinSpiritSelection ? "selected" : "")+"'>";
+			content+="<div data-slot='"+slot+"' data-idx='"+i+"' class='column "+((_this._selectionMode == 0 && (slot == _this._currentSlot && i == _this.getCurrentSelection(slot) && !_this._twinSpiritSelection)) ? "selected" : "")+"'>";
 			content+=displayName;
 			content+="</div>";
 			
@@ -876,12 +981,83 @@ Window_SpiritSelection.prototype.redraw = function() {
 	}
 	
 	
-	content+="</div>";
 	
 	content+="</div>";
+
+	
+	content+="</div>";
+	content+="</div>";
+
+	if(ENGINE_SETTINGS.ENABLE_ALLY_SPIRITS){
+
+		
+		function getAllySpiritListContent(spiritList){
+			var content = "";	
+			content+="<div class='section_column'>";
+			for(var i = 0; i < spiritList.length; i++){
+				const entry = spiritList[i].spiritDef;
+				var displayName = "---";
+				var isDisplayed = false;
+				var targetType;
+		
+				if(entry != null && typeof entry != "undefined" && entry.idx !== ""){
+					targetType = $spiritManager.getSpiritDef(entry.idx).targetType;
+					var displayInfo = $spiritManager.getSpiritDisplayInfo(entry.idx);
+					displayName = "<div class='scaled_width spirit_label scaled_text fitted_text'>"+displayInfo.name+"</div>("+entry.cost+")" ;
+					isDisplayed = true;
+				}
+				
+				var displayClass = "";
+				if(spiritList[i].isEnabledForTarget){
+					displayClass = "active";
+				} else {
+					displayClass = "disabled";
+				} 		
+							
+				content+="<div class='row scaled_text "+displayClass+"'>";				
+				
+				
+				content+="<div data-slot='"+slot+"' data-idx='"+i+"' class='allyColumn column "+displayClass+" "+((_this._selectionMode == 1 && i == _this._currentAllySelectionSlot) ? "selected" : "")+"'>";
+				content+=displayName;
+				content+="</div>";			
+			
+				
+				content+="</div>";
+			}
+			content+="</div>";
+			return content;
+		}
+
+		content+="<div id='ally_spirits' class='spirit_selection_section ally'>";	
+		content+="<div class='spirit_list_container'>";
+		content+="<div class='spirit_list'>";
+
+		content+="<div class='label scaled_text'>";
+		content+=APPSTRINGS.SPIRIT_WINDOW.ALLY_LIST_LABEL;
+		content+="</div>";
+
+		_this.prepareAllySpiritInfo();
+		spiritList = [];
+		for(let spiritIdx of ENGINE_SETTINGS.ALLY_SPIRIT_LIST){
+			const entry = _this._allySpiritLookup[spiritIdx];
+			if(entry?.potentialProviders.length){
+				spiritList.push(entry);
+			} else {
+				spiritList.push({spiritDef: null, isEnabledForTarget: false});
+			}
+		}
+		
+		content+=getAllySpiritListContent(spiritList);
+
+		content+="</div>";
+		content+="</div>";
+		content+="</div>";
+	}
 	_this._contentContainer.innerHTML = content;
 	
-	this.updateScaledDiv(_this._contentContainer, false, false, true);
+	//this.updateScaledDiv(_this._contentContainer, false, false, true);
+	this.updateScaledDiv(_this._contentContainer.querySelector("#own_spirits"), false, false, true);
+	this.updateScaledDiv(_this._contentContainer.querySelector("#ally_spirits"), false, false, true);
 	//this.updateScaledDiv(_this._contentContainer.querySelector("#spirit_selection_icon"));
 	//this.updateScaledDiv(_this._contentContainer.querySelector("#previous_selection_icon"));
 	//this.updateScaledDiv(_this._contentContainer.querySelector("#next_selection_icon"));
@@ -924,6 +1100,11 @@ Window_SpiritSelection.prototype.redraw = function() {
 	var multiChecks = _this._contentContainer.querySelectorAll(".multi_select_check");
 	multiChecks.forEach(function(multiCheck){
 		_this.updateScaledDiv(multiCheck);
+	});
+
+	var allyColumns = _this._contentContainer.querySelectorAll(".allyColumn");
+	allyColumns.forEach(function(allyCol){
+		_this.updateScaledDiv(allyCol, true);
 	});
 	
 	var entries = _this._contentContainer.querySelectorAll(".column");

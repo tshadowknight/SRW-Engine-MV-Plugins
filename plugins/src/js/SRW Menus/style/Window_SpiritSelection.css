@@ -17,17 +17,13 @@
 	display: none;
 }
 
-.spirit_selection_container .content_container {
-	--widthpixels: 600;
-	--heightpixels: 350;
-	background-color: var(--menu-bg-color);
-	border-radius: 10px;
+.spirit_selection_container .content_container {	
 	position: relative;
 	display: flex;
     align-items: center;
-    justify-content: center;
-	border: 0.4vw solid #FFFFFF;
+    justify-content: center;	
 	--fontsize: 2.4px;
+	width: 100%;
 }
 
 .spirit_selection_container.normal .content_container {
@@ -38,17 +34,67 @@
 	
 }
 
-.spirit_selection_container.twin .content_container {
-	--widthpixels: 700;
-	--heightpixels: 560;
+
+
+.spirit_selection_container.twin .spirit_selection_section {
+	/*--widthpixels: 700;*/
+	--heightpixels: 508;
 }
 
-.spirit_selection_container .spirit_selection_content {
+.spirit_selection_container .spirit_selection_section {
 	padding: 3%;
-    width: 100%;
-    height: 91%;
 	white-space: nowrap;
 	color: #FFFFFF;
+	--widthpixels: 600;
+	--heightpixels: 360;
+	background-color: var(--menu-bg-color);
+	border-radius: 10px;
+	border: 0.4vw solid #FFFFFF;
+}
+
+.spirit_selection_container .spirit_selection_section.ally .section_column {
+	width: 100%;
+	--fontsize: 1.6px;
+}
+
+.spirit_selection_container .spirit_selection_section.ally .label {
+	--fontsize: 2;
+	padding: 1%;
+}
+
+.spirit_selection_container .spirit_selection_section.ally .section_column .column.active {
+	color: #FFF;
+}	
+
+.spirit_selection_container .spirit_selection_section.ally {
+	margin-left: 2%;
+	--widthpixels: 200;
+	padding-top: 0;
+}
+
+.spirit_selection_container .spirit_selection_section.ally .column {
+	display: flex;
+    margin: 1%;
+    padding: 1%;
+    border: 0.1vw solid #FFFFFF;
+    height: 100%;
+    align-items: center;
+    width: 90%;
+    --heightpixels: 24;
+}
+
+.spirit_selection_container .spirit_selection_section.ally .column.selected {
+	background-color: var(--selected-color);
+}
+
+.spirit_selection_container .spirit_selection_section.ally .spirit_label {
+    --widthscaling: 10;
+    --fontsize: 2;
+}
+
+.spirit_selection_container .spirit_selection_section.ally .column {
+	display: flex;
+	align-items: center;
 }
 
 .spirit_selection_container .spirit_selection_row {
@@ -167,6 +213,8 @@
 	--widthscaling: 10;
 	--fontsize: 2;
 }
+
+
 
 .spirit_selection_container .spirit_selection_row.twin .spirit_label {
 	--widthscaling: 10;
