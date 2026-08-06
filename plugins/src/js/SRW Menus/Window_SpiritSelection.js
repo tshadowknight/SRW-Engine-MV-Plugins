@@ -722,7 +722,7 @@ Window_SpiritSelection.prototype.prepareAllySpiritInfo = function(slot) {
 				const displayInfo = $spiritManager.getSpiritDisplayInfo(spirit.idx);
 				const type = $spiritManager.getSpiritDef(spirit.idx).targetType;
 				if(type == "ally"){				
-					if(spirit.cost <= $statCalc.getCalculatedPilotStats(actor).currentSP){
+					if(spirit.cost <= $statCalc.getCalculatedPilotStats(actor).currentSP && spirit.level <= $statCalc.getCurrentLevel(actor)){
 						if(!spiritLookup[spirit.idx]){
 							spiritLookup[spirit.idx] = {
 								potentialProviders: [],
@@ -749,6 +749,8 @@ Window_SpiritSelection.prototype.redraw = function() {
 	
 	$gameTemp.buttonHintManager.setHelpButtons([["select_spirit"], ["to_sub_pilot"], ["multi_select"], ["confirm_spirits"]]);
 	$gameTemp.buttonHintManager.show();
+
+	_this.prepareAllySpiritInfo();
 	
 	var content = "";	
 	var isTwinDisplay = $gameTemp.currentMenuUnit.actor.subTwin != null;
@@ -791,35 +793,43 @@ Window_SpiritSelection.prototype.redraw = function() {
 	content+="<div data-slot=0 data-offset=1 class='next_selection_icon left selection_icon'></div>";//icon 	
 	//content+="</div>";
 	content+="<div data-slot=0 class='scaled_text spirit_selection_SP_display left'>SP "+(calculatedStats.currentSP + "/" + calculatedStats.SP)+"</div>";//icon 
-	content+="<div class='spirit_selection_block scaled_text fitted_text'>";	
-	var selectedIdx = this.getCurrentSelection();
-	
-	if(_this._twinSpiritSelection){		
-		var actor;
-		if(_this._currentSlot == 0){
-			actor = $gameTemp.currentMenuUnit.actor;
+	content+="<div class='spirit_selection_block scaled_text fitted_text'>";
+	if(this._selectionMode == 0){
+		var selectedIdx = this.getCurrentSelection();
+		
+		if(_this._twinSpiritSelection){		
+			var actor;
+			if(_this._currentSlot == 0){
+				actor = $gameTemp.currentMenuUnit.actor;
+			} else {
+				actor = $gameTemp.currentMenuUnit.actor.subTwin;
+			}
+			var twinSpiritInfo = $statCalc.getTwinSpirit(actor);
+			if(twinSpiritInfo){
+				var displayInfo = $spiritManager.getSpiritDisplayInfo(twinSpiritInfo.idx);	
+				content+=displayInfo.desc;	
+			}		
 		} else {
-			actor = $gameTemp.currentMenuUnit.actor.subTwin;
+			var referenceList;
+			if(this._currentSlot == 1){
+				referenceList = twinSpiritList;
+			} else {
+				referenceList = spiritList;
+			}
+			
+			if(referenceList[selectedIdx]){
+				if(referenceList[selectedIdx].level <= currentLevel){
+					var displayInfo = $spiritManager.getSpiritDisplayInfo(referenceList[selectedIdx].idx);
+					content+=displayInfo.desc;	
+				}
+			}	
 		}
-		var twinSpiritInfo = $statCalc.getTwinSpirit(actor);
-		if(twinSpiritInfo){
-			var displayInfo = $spiritManager.getSpiritDisplayInfo(twinSpiritInfo.idx);	
+	} else {
+		const spiritIdx = ENGINE_SETTINGS.ALLY_SPIRIT_LIST[this._currentAllySelectionSlot];
+		var displayInfo = $spiritManager.getSpiritDisplayInfo(spiritIdx);	
+		if(displayInfo && _this._allySpiritLookup != null && _this._allySpiritLookup[spiritIdx] != null && _this._allySpiritLookup[spiritIdx].potentialProviders.length){
 			content+=displayInfo.desc;	
 		}		
-	} else {
-		var referenceList;
-		if(this._currentSlot == 1){
-			referenceList = twinSpiritList;
-		} else {
-			referenceList = spiritList;
-		}
-		
-		if(referenceList[selectedIdx]){
-			if(referenceList[selectedIdx].level <= currentLevel){
-				var displayInfo = $spiritManager.getSpiritDisplayInfo(referenceList[selectedIdx].idx);
-				content+=displayInfo.desc;	
-			}
-		}	
 	}
 	
 	
@@ -1043,7 +1053,7 @@ Window_SpiritSelection.prototype.redraw = function() {
 		content+=APPSTRINGS.SPIRIT_WINDOW.ALLY_LIST_LABEL;
 		content+="</div>";
 
-		_this.prepareAllySpiritInfo();
+		
 		spiritList = [];
 		for(let spiritIdx of ENGINE_SETTINGS.ALLY_SPIRIT_LIST){
 			const entry = _this._allySpiritLookup[spiritIdx];
@@ -1065,6 +1075,7 @@ Window_SpiritSelection.prototype.redraw = function() {
 	//this.updateScaledDiv(_this._contentContainer, false, false, true);
 	this.updateScaledDiv(_this._contentContainer.querySelector("#own_spirits"), false, false, true);
 	this.updateScaledDiv(_this._contentContainer.querySelector("#ally_spirits"), false, false, true);
+	this.updateScaledDiv(_this._contentContainer.querySelector(".spirit_selection_section.ally .label"), false, false, true);
 	//this.updateScaledDiv(_this._contentContainer.querySelector("#spirit_selection_icon"));
 	//this.updateScaledDiv(_this._contentContainer.querySelector("#previous_selection_icon"));
 	//this.updateScaledDiv(_this._contentContainer.querySelector("#next_selection_icon"));

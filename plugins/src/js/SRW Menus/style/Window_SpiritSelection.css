@@ -60,6 +60,7 @@
 .spirit_selection_container .spirit_selection_section.ally .label {
 	--fontsize: 2;
 	padding: 1%;
+	--heightpixels: 33;
 }
 
 .spirit_selection_container .spirit_selection_section.ally .section_column .column.active {
