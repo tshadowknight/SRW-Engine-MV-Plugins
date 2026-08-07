@@ -22,22 +22,30 @@ Window_SpiritSelection.prototype.initialize = function() {
 	window.addEventListener("resize", function(){
 		_this.requestRedraw();
 	});	
+	this._isSwitchTouchInteraction = false;
 }
 
 Window_SpiritSelection.prototype.getMaxActor = function(){
 	return this.getAvailableActors().length;
 }
 
-Window_SpiritSelection.prototype.resetSelection = function(){
-	this._currentSelection = [0,0];
-	this._currentPage = 0;
+Window_SpiritSelection.prototype.resetSelection = function(){	
 	this._currentActor = [0, 0];
 	this._currentBatchInfo = {};
 	this._currentPlusSpirits = {};
-	this._currentBatchedSpirits = {};
-	this._currentSlot = 0;
+	this._currentBatchedSpirits = {};	
 	this._twinSpiritSelection = false;
 	this._allySpiritLookup = null;
+
+	if(!$gameTemp.isDoingInMenuSpirit){
+		this._currentSelection = [0,0];	
+		this._currentSlot = 0;
+		this._currentPage = 0;
+		this._currentAllySelectionSlot = 0;
+		this._selectionMode = 0;
+	} else {
+		$gameTemp.isDoingInMenuSpirit = false;
+	}	
 }
 
 Window_SpiritSelection.prototype.incrementSelection = function(){	
@@ -168,6 +176,19 @@ Window_SpiritSelection.prototype.update = function() {
 	
 	if(this.isOpen() && !this._handlingInput){	
 		
+		if(Input.isTriggered('menu')){
+			if(ENGINE_SETTINGS.ENABLE_ALLY_SPIRITS){
+				if(this._selectionMode == 0){
+					this._selectionMode = 1;
+				} else {
+					this._selectionMode = 0;
+				}
+				this.requestRedraw();
+				this.refresh();
+				return;	
+			}
+		}
+
 		if(Input.isTriggered('down') || Input.isRepeated('down')){
 			this.requestRedraw();
 			if(!this._twinSpiritSelection){
@@ -383,8 +404,12 @@ Window_SpiritSelection.prototype.update = function() {
 			
 					$gameTemp.searchInfo.type = "spirit";		
 					$gameTemp.searchInfo.disallowInvalidSelection = true;
+					$gameTemp.searchInfo.keepCursorPosition = true;
+					$gameTemp.searchInfo.preferredDetailPage = 11;
+					$gameTemp.searchInfo.isMenuSelection = true;
 					
 					$gameTemp.resumeSpiritMenuAfterActivation = true;
+					$gameTemp.isDoingInMenuSpirit = true;
 					
 					/*$gameTemp.mechListWindowCancelCallback = function(){
 						
@@ -760,7 +785,16 @@ Window_SpiritSelection.prototype.prepareAllySpiritInfo = function(slot) {
 Window_SpiritSelection.prototype.redraw = function() {	
 	var _this = this;
 	
-	$gameTemp.buttonHintManager.setHelpButtons([["select_spirit"], ["to_sub_pilot"], ["multi_select"], ["confirm_spirits"]]);
+	if(!ENGINE_SETTINGS.ENABLE_ALLY_SPIRITS){
+		$gameTemp.buttonHintManager.setHelpButtons([["select_spirit"], ["to_sub_pilot"], ["multi_select"], ["confirm_spirits"]]);
+	} else {
+		if(this._selectionMode == 0){
+			$gameTemp.buttonHintManager.setHelpButtons([["select_spirit"], ["to_ally_support"], ["to_sub_pilot"], ["multi_select"], ["confirm_spirits"]]);
+		} else {
+			$gameTemp.buttonHintManager.setHelpButtons([["select_spirit"], ["from_ally_support"], ["to_sub_pilot"], ["multi_select"], ["confirm_spirits"]]);
+		}		
+	}
+	
 	$gameTemp.buttonHintManager.show();
 
 	_this.prepareAllySpiritInfo();
@@ -1047,7 +1081,7 @@ Window_SpiritSelection.prototype.redraw = function() {
 				content+="<div class='row scaled_text "+displayClass+"'>";				
 				
 				
-				content+="<div data-slot='"+slot+"' data-idx='"+i+"' class='allyColumn column "+displayClass+" "+((_this._selectionMode == 1 && i == _this._currentAllySelectionSlot) ? "selected" : "")+"'>";
+				content+="<div data-slot='"+slot+"' data-idx='"+i+"' data-isally=1 class='allyColumn column "+displayClass+" "+((_this._selectionMode == 1 && i == _this._currentAllySelectionSlot) ? "selected" : "")+"'>";
 				content+=displayName;
 				content+="</div>";			
 			
@@ -1141,18 +1175,36 @@ Window_SpiritSelection.prototype.redraw = function() {
 	var entries = _this._contentContainer.querySelectorAll(".column");
 	entries.forEach(function(entry){
 		entry.addEventListener("click", function(){
+			var isAllySlot = this.getAttribute("data-isally") * 1;
 			var slot = this.getAttribute("data-slot") * 1;
 			var idx = this.getAttribute("data-idx") * 1;
 			var isTwin = !!(this.getAttribute("data-istwin") * 1);
-			
-			if(_this._currentSelection[slot] == idx && _this._currentSlot == slot && _this._twinSpiritSelection == isTwin){
-				_this._touchOK = true;
+			let isSwitchInteraction = false;
+			if(isAllySlot){				
+				if(_this._selectionMode != 1){
+					isSwitchInteraction = true;
+				}
+				_this._selectionMode = 1;
+				if(_this._currentAllySelectionSlot == idx && !isSwitchInteraction){
+					_this._touchOK = true;
+				} else {
+					_this._currentAllySelectionSlot = idx;	
+					_this.requestRedraw();
+				}
 			} else {
-				_this._currentSlot = slot;
-				_this._currentSelection[slot] = idx;			
-				_this._twinSpiritSelection = this.getAttribute("data-istwin") * 1;				
-				_this.requestRedraw();
-			}
+				if(_this._selectionMode != 0){
+					isSwitchInteraction = true;
+				}
+				_this._selectionMode = 0;
+				if(_this._currentSelection[slot] == idx && _this._currentSlot == slot && _this._twinSpiritSelection == isTwin && !isSwitchInteraction){
+					_this._touchOK = true;
+				} else {
+					_this._currentSlot = slot;
+					_this._currentSelection[slot] = idx;			
+					_this._twinSpiritSelection = this.getAttribute("data-istwin") * 1;				
+					_this.requestRedraw();
+				}
+			}	
 			
 		});
 	});

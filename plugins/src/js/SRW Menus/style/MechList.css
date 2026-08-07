@@ -584,3 +584,47 @@
     height: 35%;
     margin-top: 9%;
 }
+
+.unit_list_table.spirit_use .list_table_row .list_table_block:nth-child(6){
+	--fontsize: 1.8px;
+    width: 23%;
+    padding-left: 2%;
+}
+
+.unit_list_table.spirit_use .list_table_row.entry .list_table_block:nth-child(6) {
+	margin-top: 3%;
+}
+
+.unit_list_table.spirit_use .SP_cost_indicator {
+	--fontsize: 1.2px;
+}
+
+.unit_list_table.spirit_use .SP_cost_indicator.insufficient {
+	color: #ff4848;
+}
+
+.unit_list_table.spirit_use .SP_cost_indicator .SP_bar {
+	width: 41%;
+	border: 0.1vw solid #FFF;
+	--heightpixels: 10;
+	background-color: black;
+	display: flex;
+	align-items: flex-start;
+}
+
+.unit_list_table.spirit_use .SP_cost_indicator .SP_bar_section {
+	height: 100%;
+}
+
+.unit_list_table.spirit_use .SP_cost_indicator .SP_bar_section.available {
+	background-color: #49d38b;
+}
+
+.unit_list_table.spirit_use .SP_cost_indicator .SP_bar_section.cost {
+	background-color: #d34949;
+}
+
+.unit_list_table.spirit_use .SP_cost_indicator .SP_text {
+	width: 41%;
+	text-align: right;
+}

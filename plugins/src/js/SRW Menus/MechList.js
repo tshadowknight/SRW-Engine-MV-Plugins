@@ -968,6 +968,95 @@ MechList.prototype.defineContent = function(){
 					}
 				}
 			]
+		},11: {
+			cssClass: "spirit_use", 
+			title: APPSTRINGS.MECHLIST.tab_sp,
+			sortStart: 1,
+			content: [
+				{
+					title: "",
+					contentFunction: mechIcon,
+					noSort: true
+				}, 
+				{
+					title:  APPSTRINGS.MECHLIST.column_mech,
+					contentFunction: mechName,
+					compareFunction: compareMechName
+				}, 
+				{
+					title:  APPSTRINGS.MECHLIST.column_team,
+					contentFunction: mechTeam,
+					compareFunction: compareMechTeam
+				},
+				{
+					title: "",
+					contentFunction: function(pilot, mech){
+						if(pilot.isEmpty) return "";
+						return "<div class='list_pilot_icon' data-pilot='"+pilot.actorId()+"'></div>";
+					},
+					noSort: true
+				},
+				{
+					title:  APPSTRINGS.MECHLIST.column_pilot,
+					contentFunction: function(pilot, mech){
+						if(pilot.isEmpty) return "";
+						return pilot.name()
+					},
+					compareFunction: function(a, b){
+						var nameA = getUnitData(a).pilot.name();
+						var nameB = getUnitData(b).pilot.name();
+						return nameA.localeCompare(nameB) * _this._sortDirection;
+					}
+				},
+				{
+					title:  APPSTRINGS.MECHLIST.column_current_SP,
+					contentFunction: function(pilot, mech){
+						if(pilot.isEmpty) return "";
+						let display = "";
+						let maxSP = $statCalc.getMaxSP(pilot);
+						let currentSP = $statCalc.getCurrentSP(pilot);
+						let requiredSP = -1;
+						
+						if($gameTemp.searchInfo.type = "spirit"){
+							let targetSpirit;
+							for(let entry of $statCalc.getSpiritList(pilot)){
+								if(entry.idx == $gameTemp.searchInfo.value){
+									requiredSP = entry.cost;
+								}
+							}
+						}
+
+						
+
+						display+="<div class='SP_cost_indicator fitted_text scaled_text"+(requiredSP > currentSP ? " insufficient" : "")+"'>";
+						display+="<div class='SP_bar'>";
+						let greenSP = currentSP - requiredSP;
+						if(greenSP > 0){
+							display+="<div class='SP_bar_section available' style='width: "+(greenSP / maxSP * 100)+"%;'>";
+							display+="</div>";
+							display+="<div class='SP_bar_section cost' style='width: "+(requiredSP / maxSP * 100)+"%;'>";
+							display+="</div>";
+						} else {
+							display+="<div class='SP_bar_section cost' style='width: "+(currentSP / maxSP * 100)+"%;'>";
+							display+="</div>";
+						}
+						
+
+						display+="</div>";
+
+						display+="<div class='SP_text'>";
+						display+=$statCalc.getCurrentSP(pilot)+ (requiredSP != -1 ?"(-"+requiredSP+")" : "") +"/" + $statCalc.getMaxSP(pilot);					
+						display+="</div>";
+						display+="</div>";
+						return display;
+					},
+					compareFunction: function(a, b){
+						var SPA = $statCalc.getCurrentSP(a);
+						var SPB = $statCalc.getCurrentSP(b);
+						return (SPA - SPB) * _this._sortDirection;
+					}
+				}
+			]
 		},
 	}
 	
@@ -1006,6 +1095,12 @@ MechList.prototype.setUnitModeActor = function(){
 
 MechList.prototype.getCurrentInfoPage = function(){
 	return this._currentInfoPage;
+}
+
+MechList.prototype.setCurrentInfoPage = function(page){
+	if(this._usedPages.indexOf(page) != -1){
+		this._currentInfoPage = page;
+	}	
 }
 
 MechList.prototype.getCurrentSelection = function(){	
@@ -1225,7 +1320,7 @@ MechList.prototype.redraw = function() {
 	var start = pageOffset;
 	var end = Math.min(sortedViewData.length, (start + this._maxPageSize));
 	for(var i = start; i < end; i++){				
-		tableContent+="<div data-idx='"+(i - pageOffset)+"' class='list_table_row scaled_height "+(_this.rowEnabled(sortedViewData[i]) ? "on" : "off")+" "+(i == this._currentSelection + (_this._currentPage * _this._maxPageSize) ? "selected" : "")+"'>";
+		tableContent+="<div data-idx='"+(i - pageOffset)+"' class='list_table_row entry scaled_height "+(_this.rowEnabled(sortedViewData[i]) ? "on" : "off")+" "+(i == this._currentSelection + (_this._currentPage * _this._maxPageSize) ? "selected" : "")+"'>";
 		
 		for(var j = 0; j < contentDef.content.length; j++){
 			tableContent+="<div class='list_table_block scaled_text fitted_text'>";
@@ -1350,6 +1445,12 @@ MechList.prototype.redraw = function() {
 			}
 		});
 	});
+
+	const SPBars = windowNode.querySelectorAll(".SP_bar");
+
+	for(let SPBar of SPBars){
+		this.updateScaledDiv(SPBar, true);
+	}
 
 	Graphics._updateCanvas();
 }

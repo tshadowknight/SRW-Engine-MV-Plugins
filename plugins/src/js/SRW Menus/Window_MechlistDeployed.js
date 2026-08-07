@@ -11,10 +11,14 @@ Window_MechListDeployed.prototype = Object.create(Window_CSS.prototype);
 Window_MechListDeployed.prototype.constructor = Window_MechListDeployed;
 
 Window_MechListDeployed.prototype.initialize = function() {
-	
+	const _this = this;
 	this._layoutId = "mech_list_deployed";	
 	this._pageSize = 1;
 	Window_CSS.prototype.initialize.call(this, 0, 0, 0, 0);	
+
+	window.addEventListener("resize", function(){
+		_this.requestRedraw();
+	});
 }
 
 Window_MechListDeployed.prototype.getAvailableUnits = function(){
@@ -86,7 +90,7 @@ Window_MechListDeployed.prototype.createComponents = function() {
 	this._detailPilotContainer.classList.add("list_detail");
 	windowNode.appendChild(this._detailPilotContainer);	
 	
-	this._mechList = new MechList(this._listContainer, [0, 1, 2, 3], this);
+	this._mechList = new MechList(this._listContainer, [0, 1, 2, 3, 11], this);
 	this._mechList.createComponents();
 	this._mechList.registerTouchObserver("ok", function(){_this._touchOK = true;});
 	this._mechList.registerTouchObserver("left", function(){_this._touchLeft = true;});
@@ -196,7 +200,7 @@ Window_MechListDeployed.prototype.update = function() {
 				event = $statCalc.getReferenceEvent(selectedActor);
 			}	
 			
-			if(event){		
+			if(event && !$gameTemp.searchInfo.keepCursorPosition){		
 				$gamePlayer.locate(event.posX(), event.posY(), false);		
 			}
 			$gameTemp.popMenu = true;
@@ -233,11 +237,20 @@ Window_MechListDeployed.prototype.update = function() {
 };
 
 Window_MechListDeployed.prototype.redraw = function() {
+	if($gameTemp.searchInfo?.preferredDetailPage != null){		
+		this._mechList.setCurrentInfoPage($gameTemp.searchInfo.preferredDetailPage);
+		$gameTemp.searchInfo.preferredDetailPage = null;
+	}
+
 	this._mechList.redraw();
 	this._detailBarMech.redraw();		
 	this._detailBarPilot.redraw();
+	if($gameTemp.searchInfo.isMenuSelection){
+		$gameTemp.buttonHintManager.setHelpButtons([["select_mech", "page_nav"], ["confirm_selection"], ["det_page_nav", "det_page_sort"], ["det_sort_order"]]);
+	} else {
+		$gameTemp.buttonHintManager.setHelpButtons([["select_mech", "page_nav"], ["highlight_map"], ["det_page_nav", "det_page_sort"], ["det_sort_order"]]);
+	}
 	
-	$gameTemp.buttonHintManager.setHelpButtons([["select_mech", "page_nav"], ["highlight_map"], ["det_page_nav", "det_page_sort"], ["det_sort_order"]]);
 	$gameTemp.buttonHintManager.show();
 	
 	if(this._mechList.getCurrentInfoPage() == 0){

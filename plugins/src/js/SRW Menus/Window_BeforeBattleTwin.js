@@ -681,6 +681,8 @@ Window_BeforebattleTwin.prototype.update = function() {
 							_this._currentUIState = "main_selection";
 							$gameTemp.popMenu = true;
 							$gameTemp.currentMenuUnit = storedMenuUnit;
+							const referenceEvent = $statCalc.getReferenceEvent($gameTemp.currentMenuUnit.actor);
+							$gamePlayer.locate(referenceEvent.posX(), referenceEvent.posY());
 							_this.requestRedraw();	
 						}
 						

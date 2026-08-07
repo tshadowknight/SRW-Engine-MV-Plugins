@@ -177,6 +177,7 @@ APPSTRINGS.MECHLIST = {
 	tab_mech: "Mech",
 	tab_ability: "Ability",
 	tab_special_skills: "Special Skill",
+	tab_sp: "Pilot SP",
 	
 	column_mech: "Mech",
 	column_team: "Team",
@@ -187,7 +188,8 @@ APPSTRINGS.MECHLIST = {
 	column_support_attack: "Support ATK",
 	column_support_defend: "Support DEF",
 	column_slots: "Slots",
-	column_attribute: "Attr."
+	column_attribute: "Attr.",
+	column_current_SP: "SP",
 }
 
 APPSTRINGS.PILOTLIST = {
@@ -580,6 +582,7 @@ APPSTRINGS.BUTTON_HINTS = {
 	highlight_map: {text: "Show on Map", action: "ok"},
 	upgrade_unit: {text: "Upgrade Unit", action: "ok"},
 	upgrade_pilot: {text: "Upgrade Pilot", action: "ok"},
+	confirm_selection: {text: "Confirm Selection", action: "ok"},
 	
 	//Search
 	tab_selection: {text: "Select a Tab", action: "ok"},
@@ -649,6 +652,8 @@ APPSTRINGS.BUTTON_HINTS = {
 	to_sub_pilot: {text: "Switch Pilot", action: "d:shoulder_buttons"}, 
 	multi_select: {text: "Select Multiple", action: "shift"}, 
 	confirm_spirits: {text: "Apply", action: "ok"}, 
+	to_ally_support: {text: "To Ally Support", action: "menu"}, 
+	from_ally_support: {text: "To Own Spirits", action: "menu"}, 
 	
 	//Map
 	move_cursor: {text: "Move Cursor", action: "up"},
