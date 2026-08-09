@@ -9486,14 +9486,14 @@ BattleSceneManager.prototype.setUpParticipantsSprites = function(nextAction) {
 		_this._active_twin =  _this._actorTwinSprite.sprite;
 		_this._active_support_attacker = _this._actorSupporterSprite.sprite;
 		_this._active_support_defender = _this._enemySupporterSprite.sprite;
-		if(nextAction.attacked.type == "support defend" && nextAction.attacked.ref.isSubTwin){
+		if(nextAction.attacked?.type == "support defend" && nextAction.attacked.ref.isSubTwin){
 			
 			_this._active_support_defender = _this._enemyTwinSupporterSprite.sprite;
 		}
 		if(nextAction.attacked_all_sub){
 			_this._active_target = _this._enemySprite.sprite;									
 			_this._active_target_twin = _this._enemyTwinSprite.sprite;	
-		} else if(nextAction.originalTarget.ref.isSubTwin){
+		} else if(nextAction.originalTarget?.ref.isSubTwin){
 			_this._active_target = _this._enemyTwinSprite.sprite;		
 		} else {
 			_this._active_target = _this._enemySprite.sprite;		
