@@ -182,7 +182,7 @@ Window_MechListDeployed.prototype.update = function() {
 			}*/			
 			const selectedActor = this.getCurrentSelection().actor;
 
-			if($gameTemp.searchInfo.disallowInvalidSelection && !this.rowEnabled(selectedActor)){
+			if($gameTemp.searchInfo?.disallowInvalidSelection && !this.rowEnabled(selectedActor)){
 				this.refresh();
 				SoundManager.playBuzzer();
 				return;
@@ -200,7 +200,7 @@ Window_MechListDeployed.prototype.update = function() {
 				event = $statCalc.getReferenceEvent(selectedActor);
 			}	
 			
-			if(event && !$gameTemp.searchInfo.keepCursorPosition){		
+			if(event && !$gameTemp.searchInfo?.keepCursorPosition){		
 				$gamePlayer.locate(event.posX(), event.posY(), false);		
 			}
 			$gameTemp.popMenu = true;
@@ -245,7 +245,7 @@ Window_MechListDeployed.prototype.redraw = function() {
 	this._mechList.redraw();
 	this._detailBarMech.redraw();		
 	this._detailBarPilot.redraw();
-	if($gameTemp.searchInfo.isMenuSelection){
+	if($gameTemp.searchInfo?.isMenuSelection){
 		$gameTemp.buttonHintManager.setHelpButtons([["select_mech", "page_nav"], ["confirm_selection"], ["det_page_nav", "det_page_sort"], ["det_sort_order"]]);
 	} else {
 		$gameTemp.buttonHintManager.setHelpButtons([["select_mech", "page_nav"], ["highlight_map"], ["det_page_nav", "det_page_sort"], ["det_sort_order"]]);
