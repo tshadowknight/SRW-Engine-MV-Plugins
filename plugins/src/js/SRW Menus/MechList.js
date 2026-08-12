@@ -1017,7 +1017,7 @@ MechList.prototype.defineContent = function(){
 						let currentSP = $statCalc.getCurrentSP(pilot);
 						let requiredSP = -1;
 						
-						if($gameTemp.searchInfo.type = "spirit"){
+						if($gameTemp.searchInfo?.type == "spirit"){
 							let targetSpirit;
 							for(let entry of $statCalc.getSpiritList(pilot)){
 								if(entry.idx == $gameTemp.searchInfo.value){
