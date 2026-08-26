@@ -997,14 +997,21 @@
 		};
 
 		Game_Interpreter.prototype.applyActorSpirits = function(actorId, spiritIds){
-			this.applyEventSpirits($gameActors.actor(actorId).event.eventId(), spiritIds);
+			const actor = $gameActors.actor(actorId);
+			const referenceEvent = $statCalc.getReferenceEvent(actor);
+			if(referenceEvent){
+				this.applyEventSpirits(referenceEvent.eventId(), spiritIds, actor.isSubTwin);
+			}			
 		}
 
-		Game_Interpreter.prototype.applyEventSpirits = function(eventId, spiritIds){
+		Game_Interpreter.prototype.applyEventSpirits = function(eventId, spiritIds, isForSubTwin){
 			var spirits = [];
 			var event = $gameMap.event(eventId);
 			$gamePlayer.locate(event.posX(), event.posY());
 			var actor = $gameSystem.EventToUnit(eventId)[1];
+			if(isForSubTwin && actor.subTwin){
+				actor = actor.subTwin;
+			}
 			spiritIds.forEach(function(spiritId){
 				spirits.push({
 					idx: spiritId,
