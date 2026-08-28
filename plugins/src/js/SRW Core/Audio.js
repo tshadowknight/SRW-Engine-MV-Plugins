@@ -138,7 +138,14 @@
 			const _this = this;
 			return new Promise(function(resolve, reject){
 				var ext = _this.audioFileExt();
-				var url = _this._path + folder + '/' + encodeURIComponent(name) + ext;			
+				var url;
+				if(name && name.indexOf('file:///') === 0){
+					// Absolute file:// URL for custom BGMs in deployed builds — use directly
+					url = name + ext;
+				} else {
+					var encodedName = name.split('/').map(encodeURIComponent).join('/');
+					url = _this._path + folder + '/' + encodedName + ext;
+				}
 				const wAudio = new WebAudio(url);	
 				wAudio.addLoadListener(function() {
 					resolve(wAudio);

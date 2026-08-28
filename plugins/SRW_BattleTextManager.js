@@ -376,6 +376,102 @@ SRWBattleTextManager.prototype.getTextCandidate = function(definitions, target, 
 		}
 	} catch (e){
 		
-	} 
+	}
+	
+	
 	return text;
+}
+
+
+SRWBattleTextManager.prototype.preloadActorVoiceLines = function(actor){
+	const definitionsToPreload = [];
+	const promises = [];
+
+	try {
+		if($gameTemp.scriptedBattleDemoId != null){
+		var eventDefs = _this._eventDefinitions;
+		var def;
+		var ctr = 0;
+		while(!def && ctr < eventDefs.length){
+			if(eventDefs[ctr].refId == $gameTemp.scriptedBattleDemoId){
+				def = eventDefs[ctr].data;
+			}
+			ctr++;
+		}
+		if(def){
+			definitionsToPreload.push(def);
+		}		
+	}
+	if($gameSystem.stageTextId != null){
+		var eventDefs = _this._eventDefinitions;
+		var def;
+		var ctr = 0;
+		while(!def && ctr < eventDefs.length){
+			if(eventDefs[ctr].refId == $gameSystem.stageTextId){
+				def = eventDefs[ctr].data;
+			}
+			ctr++;
+		}
+		if(def){
+			definitionsToPreload.push(def);
+		}	
+	}
+	} catch(e){
+		console.log("Error while preloading special event text voice lines");
+	}
+	
+
+	definitionsToPreload.push(this._definitions);
+
+	function processTargetSet(lineSet){
+		for(let targetType in lineSet){
+			let lines = lineSet[targetType];
+			for(let line of lines){
+				for(let quote of line){
+					if(quote.voiceLine){
+						var se = {};
+						se.name = "voice/"+quote.voiceLine;
+						se.pan = 0;
+						se.pitch = 100;
+						se.volume = 100;
+						promises.push(AudioManager.preloadSe(se));
+					}
+				}
+			}
+		}
+	}
+
+	for(let def of definitionsToPreload){
+		try {
+			let targetSet = {};
+			let targetId;
+			if(actor.isActor()){
+				targetSet = def.actor;
+				targetId = actor.actorId();
+			} else {
+				targetSet = def.enemy;
+				targetId = actor.enemyId();
+			}
+
+			let actorTargetSet = targetSet[targetId];
+
+			
+
+			for(let category in actorTargetSet){
+				const categorySet = actorTargetSet[category];
+				if(category == "attacks"){
+					for(let attackId in categorySet){
+						processTargetSet(categorySet[attackId]);
+					}
+				} else {
+					processTargetSet(categorySet);
+				}
+			}
+
+		} catch(e){
+			console.log("Error while preloading special voice lines");
+		}
+	}
+
+	return promises;
 }

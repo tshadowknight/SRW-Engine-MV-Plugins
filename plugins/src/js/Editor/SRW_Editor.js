@@ -2593,6 +2593,7 @@ SRWEditor.prototype.showBattleTextEditorControls = function(){
 				duration: getQuoteLineValFromDOM(".quote_duration"),
 				variable: getQuoteLineValFromDOM(".quote_variable"),
 				variableValue: getQuoteLineValFromDOM(".quote_variable_value"),
+				voiceLine: getQuoteLineValFromDOM(".voice_line_value"),
 			}
 			var params = getLocatorInfo(elem);
 			if(params.type == "attacks"){
@@ -2624,6 +2625,11 @@ SRWEditor.prototype.showBattleTextEditorControls = function(){
 		});		
 		
 		var inputs = containerNode.querySelectorAll(".quote_duration");
+		inputs.forEach(function(input){
+			input.addEventListener("change", updateQuote);
+		});
+
+		var inputs = containerNode.querySelectorAll(".voice_line_value");
 		inputs.forEach(function(input){
 			input.addEventListener("change", updateQuote);
 		});
@@ -2899,6 +2905,12 @@ SRWEditor.prototype.createQuoteContent = function(type, idx, quote, unitBaseInfo
 		content+="<div class='command_label duration'>"+EDITORSTRINGS.TEXT.label_duration+":</div>";
 		content+="<input class='quote_duration' value='"+(quote.duration ||  "")+"'></input>";
 		content+=EDITORSTRINGS.TEXT.label_ticks;		
+		content+="</div>";
+	
+
+		content+="<div title='"+EDITORSTRINGS.TEXT.hint_voice_lines+"' class='duration_controls'>";
+		content+="<div class='command_label voice_line'>"+EDITORSTRINGS.TEXT.label_voice_line+":</div>";
+		content+="<input class='voice_line_value' value='"+(quote.voiceLine ||  "")+"'></input>";	
 		content+="</div>";
 		content+="</div>";
 		

@@ -359,6 +359,11 @@
 	margin-left: 5px;
 }
 
+#srw_editor .command_label.voice_line {
+	width: 26px;
+	margin-left: 5px;
+}
+
 #srw_editor .command_label.name {
 	font-size: 14px;
 }

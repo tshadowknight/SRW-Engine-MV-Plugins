@@ -197,6 +197,15 @@ BattleSceneTextLayer.prototype.showTextLines = function(lines, callback) {
 			_this.loadFaceByParams(line.faceName, line.faceIndex, actorIcon);
 			
 		} 
+
+		if(line.voiceLine){			
+			var se = {};
+			se.name = "voice/"+line.voiceLine;
+			se.pan = 0;
+			se.pitch = 100;
+			se.volume = 100;
+			AudioManager.playSe(se);			
+		}
 		
 		this.updateCanvas();
 		var duration = 90 * 1000/60;

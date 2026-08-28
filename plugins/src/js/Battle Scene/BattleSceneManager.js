@@ -9094,6 +9094,8 @@ BattleSceneManager.prototype.preloadSceneAssets = function(){
 			const cacheRef = keys[i];		
 			var battleEffect = $gameTemp.battleEffectCache[cacheRef];		
 			_this.preloadDefaultFrames(battleEffect.ref, promises);
+
+			promises = promises.concat(_this._battleTextManager.preloadActorVoiceLines(battleEffect.ref));
 		}			
 		
 		for(var i = 0; i < _this._actionQueue.length; i++){
@@ -10370,6 +10372,7 @@ BattleSceneManager.prototype.showEnvironmentScene = async function() {
 BattleSceneManager.prototype.showText = function(entityType, ref, name, type, subType, target, targetIdx, attackId, supported) {
 	var _this = this;
 	var battleText = _this._battleTextManager.getText(entityType, ref, type, subType, target, targetIdx, attackId, supported);
+	
 	_this._TextlayerManager.setTextBox(entityType, ref.actorId, name, battleText);
 }
 

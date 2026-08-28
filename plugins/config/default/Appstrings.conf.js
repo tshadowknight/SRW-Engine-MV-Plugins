@@ -844,6 +844,8 @@ EDITORSTRINGS.TEXT = {
 	label_duration: "Duration",
 	label_ticks: "ticks",
 	hint_duration: "The duration is expressed in animation ticks, each 1/60th of a second.",
+	hint_voice_lines: "Voice line samples should be paths to .ogg files in the se/voice directory.",
+	label_voice_line: "SE",
 	label_variable: "Variable",
 	label_value: "Value",
 	label_copy_face: "Copy Face",
