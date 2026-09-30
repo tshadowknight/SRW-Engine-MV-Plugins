@@ -1680,6 +1680,10 @@ GameState_normal.prototype.update = function(scene){
 
 	$gameTemp.enableCancelButton = true;
 	$gameTemp.forceCancelButton = false;
+
+	if($gamePlayer?.isTransferring()){
+		return;
+	}
 	
 	if(!scene._mapButtonsWindow.visible && !$gameTemp.onMapSaving){
 		scene._mapButtonsWindow.open();

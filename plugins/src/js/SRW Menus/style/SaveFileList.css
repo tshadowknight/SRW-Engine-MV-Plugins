@@ -1,0 +1,109 @@
+.save_file_list_control {
+	border: 0.1vw solid #FFFFFF;
+	border-radius: 1vw;
+	width: 98%;
+	height: 98%;
+	padding-left: 1%;
+	padding-right: 1%;
+	background-color: rgba(0,67,99,0.5);
+	position: relative;
+	overflow: hidden;
+}
+
+.save_file_list_control_page {
+	display: flex;
+	align-items: center;
+	justify-content: center;
+	border: 0.1vw solid #FFFFFF;
+	border-radius: 999px;
+	height: 7%;
+	width: 10%;
+	position: absolute;
+	right: -0.3%;
+	top: -4%;
+	background-color: rgba(0,67,99,0.9);
+	color: #FFFFFF;
+	--fontsize: 1.6px;
+	text-align: center;
+}
+
+.save_file_list_control.opaque {
+	background-color: var(--section-bg-color-solid);
+}
+
+.save_file_list_control_page.opaque {
+	background-color: var(--section-bg-color-solid);
+}
+
+.save_file_list_control_page .save_list_prev_page {
+	transform: scaleX(-1);
+	width: 29%;
+	margin-right: auto;
+	filter: var(--white-filter);
+	cursor: pointer;
+}
+
+.save_file_list_control_page .save_list_next_page {
+	width: 29%;
+	margin-left: auto;
+	filter: var(--white-filter);
+	cursor: pointer;
+}
+
+.save_file_row {
+	display: flex;
+	align-items: center;
+	width: 100%;
+	height: 20%;
+	color: #FFFFFF;
+	border: 0.15vw solid rgba(0,0,0,0);
+	border-radius: 0.5vw;
+	box-sizing: border-box;
+	padding-left: 1%;
+	padding-right: 1%;
+}
+
+.save_file_row.selected {
+	border: 0.15vw solid #FFFFFF;
+	background-color: var(--selected-color);
+}
+
+.save_file_row.empty {
+	justify-content: center;
+	height: 100%;
+	--fontsize: 1.8px;
+}
+
+.save_file_row .save_file_id {
+	width: 8%;
+	text-align: center;
+	--fontsize: 2px;
+}
+
+.save_file_row .save_file_details {
+	width: 62%;
+	overflow: hidden;
+}
+
+.save_file_row .save_file_title {
+	--fontsize: 1.8px;
+	white-space: nowrap;
+	overflow: hidden;
+	text-overflow: ellipsis;
+}
+
+.save_file_row .save_file_stats {
+	display: flex;
+	--fontsize: 1.4px;
+}
+
+.save_file_row .save_file_stats .save_file_stat {
+	margin-right: 5%;
+	white-space: nowrap;
+}
+
+.save_file_row .save_file_meta {
+	width: 30%;
+	text-align: right;
+	--fontsize: 1.4px;
+}

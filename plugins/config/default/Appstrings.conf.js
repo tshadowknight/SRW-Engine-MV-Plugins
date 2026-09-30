@@ -23,6 +23,7 @@ APPSTRINGS.GENERAL = {
 	label_player_phase: "Player Phase",
 	label_yes: "YES",
 	label_no: "NO",
+	label_ok: "OK",
 	label_ask_end_turn_single: "unit can still take an action, end your turn?",
 	label_ask_end_turn_multi: "units can still take an action, end your turn?",
 	label_hit: "Hit",
@@ -438,6 +439,17 @@ APPSTRINGS.MODE_SELECTION = {
 	desc_automatic: "The difficulty will start at the lowest setting and increase based on how many Mastery Conditions are met.",
 }
 
+APPSTRINGS.GAME_SELECTION = {
+	title: "Select Game",
+	instructions: "Please select which chapter you want to start.",
+	carry_over_question: "Carry over data from a previous game?",
+	save_selection_title: "Select the save file to carry over from",
+	label_no_save_data: "There is no save data to carry over from.",
+	msg_carry_over_success: "The data was carried over successfully.",
+	msg_carry_over_invalid: "This save file can not be carried over into this game.",
+	msg_carry_over_failed: "The data could not be carried over.",
+}
+
 APPSTRINGS.GAME_MODES = {
 	title: "Modes",
 	label_on: "On",
@@ -563,6 +575,7 @@ APPSTRINGS.BUTTON_HINTS = {
 	
 	//options
 	select_option: {text: "Select an Option", action: "d:up_down"},
+	select_option_lr: {text: "Select an Option", action: "d:left_right"},
 	confirm_option: {text: "Confirm", action: "ok"},
 	toggle_option: {text: "Toggle Current Option", action: "d:left_right"},
 	enter_sub_menu: {text: "Enter Sub-menu", action: "ok"},

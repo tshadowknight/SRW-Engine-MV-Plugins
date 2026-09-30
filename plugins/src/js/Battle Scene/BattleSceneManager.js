@@ -8342,6 +8342,7 @@ BattleSceneManager.prototype.resetScene = function() {
 	});	
 	_this._bgs = [];
 	_this._bgInstances = [];
+	this._bgLayerInfo = {};
 	
 	_this._fixedBgs.forEach(function(bg){
 		bg.dispose();

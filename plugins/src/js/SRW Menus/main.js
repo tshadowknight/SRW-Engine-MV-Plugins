@@ -149,6 +149,9 @@ window.Window_ButtonHints= Window_ButtonHints;
 import Window_ModeSelection from "./Window_ModeSelection.js";
 window.Window_ModeSelection= Window_ModeSelection;
 
+import Window_GameSelection from "./Window_GameSelection.js";
+window.Window_GameSelection= Window_GameSelection;
+
 import Window_Attribute_Chart from "./Window_Attribute_Chart.js";
 window.Window_Attribute_Chart = Window_Attribute_Chart;
 

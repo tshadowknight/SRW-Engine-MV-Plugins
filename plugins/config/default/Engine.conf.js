@@ -1,6 +1,34 @@
 var ENGINE_SETTINGS = {
 	GAMEID: "SRWMV",
 	CUSTOM_TITLE_SCREEN: "",
+	CHAPTER_SELECTION: {//lets a single package contain multiple games/chapters the player picks from. Shown by calling showGameSelection() from an event on the start map.
+		enabled: false,//when false the showGameSelection script command does nothing and the calling event continues immediately
+		autoSkipSingleChapter: true,//when only one chapter is defined it is started directly instead of showing the selection window
+		chapters: [
+			/*{
+				name: "Chapter 1", //the name shown in the game selection window
+				description: "The first game in this package.", //optional text shown below the name
+				color: "#FFFFFF", //optional color of the name
+				bgPicture: "chapter_1.png", //optional file in img/pictures/ shown as the background of the entry
+				bgPictureOpacity: 0.5, //optional opacity of the background picture, defaults to 1
+				startMapId: 3, //the map the player is transferred to when this chapter is selected
+				startX: 0, //optional x coordinate on the starting map
+				startY: 0, //optional y coordinate on the starting map
+				//when carryOver is present the player is asked whether to carry data over from an existing save file before this chapter starts.
+				//saveContents is the packed save file, it is deliberately not extracted into the globals, those hold the blank slate for the new game.
+				//It holds {system, screen, timer, switches, variables, selfSwitches, actors, party, map, player}, ex.: saveContents.system.actorData, saveContents.party.gold(), saveContents.variables.value(11).
+				//Do not call methods on it that read globals like $statCalc or $dataSystem, those would report the state of the new game instead of the save file.
+				carryOver: {
+					validate: function(saveContents, chapter){ //must return true for the save file to be accepted
+						return true;
+					},
+					apply: function(saveContents, chapter){ //copy whatever should be carried over into the current game state. Counts as successful unless it returns false or throws.
+
+					},
+				},
+			},*/
+		],
+	},
 	PHOTOSENSITIVITY_DISCLAIMER: {
 		show: false,
 		header: "PHOTOSENSITIVITY WARNING",

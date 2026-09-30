@@ -557,6 +557,10 @@ body {
 	padding: 1%; 
 }
 
+.confirm.opaque .content {
+	background-color: var(--menu-bg-color-solid);
+}
+
 .confirm .content .buttons {
 	display: flex;
     justify-content: center;  

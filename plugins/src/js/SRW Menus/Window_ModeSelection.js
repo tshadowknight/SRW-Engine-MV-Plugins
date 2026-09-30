@@ -158,7 +158,7 @@ Window_ModeSelection.prototype.update = function() {
 						$gameSystem.clearManualSetDifficulty();
 						$gameSystem.setAutomaticDifficultyLevel();
 					} else {
-						$gameSystem.setCurrentDifficultyLevel(selection - 1);
+						$gameSystem.setCurrentDifficultyLevel(selection - 1); 
 					}
 				} else {
 					$gameSystem.setCurrentDifficultyLevel(selection);
@@ -173,7 +173,7 @@ Window_ModeSelection.prototype.update = function() {
 		}	
 		
 		if(Input.isTriggered('cancel') || TouchInput.isCancelled()){		
-			if(!this._closing){
+			if(!this._closing && $gameTemp.modeSelectionAllowCancel){
 				if(this._callbacks["closed"]){
 					this._closing = true;
 					this.doFadeOut();

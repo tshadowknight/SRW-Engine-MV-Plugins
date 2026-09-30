@@ -89,7 +89,10 @@
 			}
 			var result;
 			try {
+				//!!script evals may include commands from the interpreter that mess with _index!!
+				const originalIdx = this._index;
 				result = eval(script);
+				this._index = originalIdx;
 			} catch (e){
 				var msg = "";
 				msg+="Error while executing a script command:";
@@ -960,7 +963,10 @@
 				break;	
 			case 'mode_selection':
 				waiting = $gameTemp.doingModeSelection;
-				break;		
+				break;
+			case 'game_selection':
+				waiting = $gameTemp.doingGameSelection;
+				break;
 			case 'move_to_point':
 				waiting = $gameSystem.srpgWaitMoving();
 				break;	
@@ -1249,6 +1255,7 @@
 			this.setWaitMode("mode_selection");
 			$gameTemp.doingModeSelection = true;
 			$gameTemp.pushMenu = "mode_selection";
+			$gameTemp.modeSelectionAllowCancel = !!allowCancel;
 			if(allowCancel){
 				$gameTemp.modeSelectionWindowCallback = function(){
 					$gameTemp.modeSelectionWindowCallback = null;
@@ -1257,6 +1264,29 @@
 			}
 		}
 		
+		Game_Interpreter.prototype.showGameSelection = function(allowCancel){
+			const config = ENGINE_SETTINGS.CHAPTER_SELECTION;
+			const chapters = $gameSystem.getChapterList();
+			if(!config || !config.enabled || !chapters.length){
+				return;
+			}
+			if(chapters.length == 1 && config.autoSkipSingleChapter){
+				$gameSystem.startChapter(0);
+				return;
+			}
+			this.setWaitMode("game_selection");
+			$gameTemp.doingGameSelection = true;
+			$gameTemp.pushMenu = "game_selection";
+			$gameTemp.gameSelectionAllowCancel = !!allowCancel;
+			if(allowCancel){
+				$gameTemp.gameSelectionWindowCallback = function(){
+					$gameTemp.gameSelectionWindowCallback = null;
+					$gameTemp.doingGameSelection = false;
+					SceneManager.goto(Scene_Title);
+				}
+			}
+		}
+
 		Game_Interpreter.prototype.showTextCrawl = function(id, canCancel, speed){
 			this.setWaitMode("opening_crawl");	
 			$gameTemp.textCrawlId = id;	

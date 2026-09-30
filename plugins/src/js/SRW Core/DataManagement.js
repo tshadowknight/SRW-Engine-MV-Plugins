@@ -1221,6 +1221,33 @@
 			return timestamp;
 		};	
 		
+		//reads a save file without extracting it into the globals, so the current game state stays untouched
+		DataManager.loadPackedSaveFile = function(savefileId) {
+			try {
+				var json = StorageManager.load(savefileId);
+				if(!json){
+					return null;
+				}
+				return JsonEx.parse(json);
+			} catch(e) {
+				console.log("Failed to read save file " + savefileId + ": " + e);
+				return null;
+			}
+		};
+
+		DataManager.listSavefileEntries = function() {
+			var result = [];
+			var globalInfo = this.loadGlobalInfo();//reads and prunes the whole global info, so this is only done once per listing
+			if(globalInfo){
+				for(var i = 1; i <= this.maxSavefiles(); i++){
+					if(globalInfo[i]){
+						result.push({savefileId: i, info: globalInfo[i]});
+					}
+				}
+			}
+			return result;
+		};
+
 		DataManager._databaseFiles = [
 			{ name: '$dataActors',       src: 'AllyPilots.json'       },
 			{ name: '$dataClasses',      src: 'Mechs.json'      },

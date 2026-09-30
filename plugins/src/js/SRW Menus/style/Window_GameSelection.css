@@ -1,0 +1,184 @@
+#game_selection .list_container {
+	height: 61.5%;
+    border: 0px;
+    border-radius: 1vw;
+    display: block;
+	width: 90%;
+    align-items: center;
+    background-color: rgba(0,0,0,0);
+    overflow: hidden;
+    padding: 1%;
+    top: 26%;
+	display: flex;
+}
+
+#game_selection .loader {
+	z-index: 999;
+	width: 100%;
+	height: 100%;
+	position: absolute;
+	top: 0;
+	left: 0;
+	background-color: #000;
+	pointer-events: none;
+}
+
+#game_selection .loader.doFade {
+	-webkit-animation: gameSelectionFadeIn 1s ease-out;
+	animation-fill-mode: forwards
+}
+
+@-webkit-keyframes gameSelectionFadeIn {
+	0% {
+		opacity: 1;
+	}
+
+	100% {
+		opacity: 0;
+	}
+}
+
+#game_selection .loader.fadeToNone {
+	-webkit-animation: gameSelectionFadeOut 1s ease-out;
+	animation-fill-mode: forwards
+}
+
+@-webkit-keyframes gameSelectionFadeOut {
+	0% {
+		opacity: 0;
+	}
+
+	100% {
+		opacity: 1;
+	}
+}
+
+#game_selection .chapter_entry {
+	width: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    height: 92%;
+    margin: 1%;
+}
+
+#game_selection .chapter_entry .content{
+	width: 98%;
+	background-color: rgba(0,67,99,0.7);
+	border: 0.2vw solid #044665;
+	border-radius: 1vw;
+	padding: 1%;
+	color: #FFFFFF;
+	height: 100%;
+	position: relative;
+	overflow: hidden;
+	z-index: 0;/* contains the stacking context of the entry, otherwise the text below escapes on top of the overlays */
+}
+
+#game_selection .chapter_entry .content .bg_picture {
+	position: absolute;
+	top: 0;
+	left: 0;
+	width: 100%;
+	height: 100%;
+	background-size: cover;
+	background-repeat: no-repeat;
+	background-position: center;
+	pointer-events: none;
+	opacity: 0.5;
+}
+
+#game_selection .chapter_entry.selected .content .bg_picture {
+	opacity: 0.85;
+}
+
+/* the picture is positioned, so the text needs a stacking order of its own to stay on top of it */
+#game_selection .chapter_entry .content .text_container {
+	position: relative;
+	z-index: 1;
+	background-color: rgba(0,0,0,0.33);
+	border-radius: 0.5vw;
+	padding: 2%;
+	opacity: 0.75;
+}
+
+#game_selection .chapter_entry.selected .content .text_container {
+	opacity: 1;
+}
+
+#game_selection .chapter_entry.selected .content{
+	border: 0.2vw solid #FFFFFF;
+}
+
+#game_selection .chapter_entry .content .description{
+	--fontsize: 1.5px;
+}
+
+#game_selection .instruction_container {
+	height: 7%;
+    border: 0.1vw solid #FFFFFF;
+    border-radius: 1vw;
+    display: block;
+    width: 81%;
+    align-items: center;
+    background-color: var(--section-bg-color);
+    overflow: hidden;
+    padding: 1%;
+    left: 8%;
+    position: absolute;
+    top: 14%;
+	color: #FFFFFF;
+	--fontsize: 1.5px;
+}
+
+#game_selection_header {
+	--fontsize: 3px;
+}
+
+#game_selection .confirm_container,
+#game_selection .message_container {
+	position: absolute;
+	top: 0;
+	left: 0;
+	width: 100%;
+	height: 100%;
+	display: flex;
+	align-items: center;
+	justify-content: center;
+	background-color: rgba(0, 0, 0, 0.3);
+	z-index: 20;
+}
+
+#game_selection .confirm_container .confirm,
+#game_selection .message_container .confirm {
+	width: 40%;
+}
+
+
+#game_selection .save_select_container {
+	position: absolute;
+	top: 0;
+	left: 0;
+	width: 100%;
+	height: 100%;
+	background-color: rgba(0, 0, 0, 0.6);
+	z-index: 10;
+}
+
+#game_selection .save_select_container .save_select_header {
+	position: absolute;
+	top: 8%;
+	left: 10%;
+	width: 80%;
+	text-align: center;
+	color: #FFFFFF;
+	--fontsize: 2.2px;
+}
+
+#game_selection .save_select_container .save_select_list {
+	position: absolute;
+	top: 18%;
+	left: 10%;
+	width: 80%;
+	height: 70%;
+}

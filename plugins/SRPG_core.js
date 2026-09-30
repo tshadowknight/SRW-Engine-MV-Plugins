@@ -985,7 +985,8 @@ SceneManager.isInSaveScene = function(){
 		this.createButtonHintsWindow();
 		this.createZoneSummaryWindow();
 		this.createModeSelectionWindow();
-		$battleSceneManager.init();	
+		this.createGameSelectionWindow();
+		$battleSceneManager.init();
     };
 	
 	Scene_Map.prototype.createPauseWindow = function() {
@@ -1294,8 +1295,26 @@ SceneManager.isInSaveScene = function(){
 		this._modeSelectionWindow.hide();
 		this.idToMenu["mode_selection"] = this._modeSelectionWindow;
     };
-	
-	
+
+	Scene_Map.prototype.createGameSelectionWindow = function() {
+		var _this = this;
+		this._gameSelectionWindow = new Window_GameSelection(0, 0, Graphics.boxWidth, Graphics.boxHeight);
+		this._gameSelectionWindow.close();
+		this.addWindow(this._gameSelectionWindow);
+		this._gameSelectionWindow.registerCallback("confirmed", function(idx){
+			$gameSystem.startChapter(idx);
+		});
+		this._gameSelectionWindow.registerCallback("closed", function(){
+			if($gameTemp.gameSelectionWindowCallback){
+				$gameTemp.gameSelectionWindowCallback();
+			}
+		});
+
+		this._gameSelectionWindow.hide();
+		this.idToMenu["game_selection"] = this._gameSelectionWindow;
+    };
+
+
 	Scene_Map.prototype.createMechListDeployedWindow = function() {
 		var _this = this;
 		this._mechListDeployedWindow = new Window_MechListDeployed(0, 0, Graphics.boxWidth, Graphics.boxHeight);
@@ -2205,6 +2224,15 @@ SceneManager.isInSaveScene = function(){
     var _SRPG_SceneMap_update = Scene_Map.prototype.update;
     Scene_Map.prototype.update = function() {
 		var _this = this;
+
+		if($gameTemp.forceSRPGAfterMapLoad){
+			if(!$gamePlayer.isTransferring()){
+				$gameTemp.forceSRPGAfterMapLoad = false;
+				$gameSystem.startSRPG();
+				return;
+			}
+		}
+
 		if($gameTemp.loadingIntoSaveCtr > 0){
 			$gameTemp.loadingIntoSaveCtr--;
 			Scene_Base.prototype.update.call(this);

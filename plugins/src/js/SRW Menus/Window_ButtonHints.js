@@ -164,7 +164,7 @@ Window_ButtonHints.prototype.update = function() {
 	if(messageWindowRef?.isOpen() || messageWindowRef?.isOpening()){
 		messageWindowIsOpen = true;
 	}
-	if(!this._animateHide && !$gameTemp.doingModeSelection && $gameSystem.isSubBattlePhase() != "deploy_selection_window" && (($gameMap && $gameMap._interpreter && $gameMap._interpreter.isRunning()) && !messageWindowIsOpen)){
+	if(!this._animateHide && !$gameTemp.doingModeSelection && !$gameTemp.doingGameSelection && $gameSystem.isSubBattlePhase() != "deploy_selection_window" && (($gameMap && $gameMap._interpreter && $gameMap._interpreter.isRunning()) && !messageWindowIsOpen)){
 		this.hide();
 	}	
 	

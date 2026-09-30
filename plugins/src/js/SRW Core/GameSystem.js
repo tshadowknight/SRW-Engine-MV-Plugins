@@ -3185,6 +3185,78 @@
 			}
 		}
 		
+		Game_System.prototype.getChapterList = function() {
+			if(ENGINE_SETTINGS.CHAPTER_SELECTION && ENGINE_SETTINGS.CHAPTER_SELECTION.chapters){
+				return ENGINE_SETTINGS.CHAPTER_SELECTION.chapters;
+			}
+			return [];
+		}
+
+		Game_System.prototype.getCurrentChapter = function() {
+			return this._currentChapter || 0;
+		}
+
+		Game_System.prototype.getCurrentChapterInfo = function() {
+			return this.getChapterList()[this.getCurrentChapter()];
+		}
+
+		Game_System.prototype.startChapter = function(idx) {
+			const _this = this;
+			const chapter = this.getChapterList()[idx];
+			if(!chapter){
+				console.log("Tried to start chapter " + idx + " which is not defined in ENGINE_SETTINGS.CHAPTER_SELECTION!");
+				return false;
+			}
+			this._currentChapter = idx;
+			/*$gamePlayer.reserveTransfer(chapter.startMapId, chapter.startX || 0, chapter.startY || 0);
+			const pollInterval = setInterval(function(){
+				if(!$gamePlayer.isTransferring()){
+					_this.startSRPG();
+					clearInterval(pollInterval);
+				}
+			}, 1);*/
+
+			$gamePlayer.reserveTransfer(chapter.startMapId, chapter.startX || 0, chapter.startY || 0);
+			$gameTemp.forceSRPGAfterMapLoad = true;
+			$gameTemp.buttonHintManager.hide();
+			
+			return true;
+		}
+
+		Game_System.prototype.getChapterCarryOver = function(idx) {
+			const chapter = this.getChapterList()[idx];
+			if(chapter && chapter.carryOver){
+				return chapter.carryOver;
+			}
+			return null;
+		}
+
+		Game_System.prototype.validateCarryOverSave = function(idx, saveContents) {
+			const carryOver = this.getChapterCarryOver(idx);
+			if(!carryOver || !carryOver.validate){
+				return false;
+			}
+			try {
+				return !!carryOver.validate(saveContents, this.getChapterList()[idx]);
+			} catch(e) {
+				console.log("The carryOver validate function of chapter " + idx + " threw an error: " + e);
+				return false;
+			}
+		}
+
+		Game_System.prototype.applyCarryOver = function(idx, saveContents) {
+			const carryOver = this.getChapterCarryOver(idx);
+			if(!carryOver || !carryOver.apply){
+				return false;
+			}
+			try {
+				return carryOver.apply(saveContents, this.getChapterList()[idx]) !== false;
+			} catch(e) {
+				console.log("The carryOver apply function of chapter " + idx + " threw an error: " + e);
+				return false;
+			}
+		}
+
 		Game_System.prototype.getMaxUpgradeLevel = function(value) {
 			return this._maxUpgradeLevel || 10;
 		}

@@ -19,7 +19,12 @@ DetailBarMech.prototype.createComponents = function(){
 DetailBarMech.prototype.redraw = function(){
 	const _this = this;
 	var detailContent = "";
-	var mechData = this.getCurrentSelection().mech;
+	const currentSelection = this.getCurrentSelection();
+	if(currentSelection == null){
+		this._container.innerHTML = "";
+		return;
+	}
+	var mechData = currentSelection.mech;
 	var calculatedStats = mechData.stats.calculated;
 	detailContent+="<div id='detail_list_icon'></div>";//icon 
 	detailContent+="<div class='mech_hp_en_container scaled_text'>";

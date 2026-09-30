@@ -136,7 +136,7 @@ Window_CSS.prototype.loadImages = async function() {
 			if(img.nodeName == "IMG"){
 				img.setAttribute("src", bitmaps[imgNameLookup[imgPath]]._image.src);
 			} else {
-				img.style.background = "url('" + bitmaps[imgNameLookup[imgPath]]._image.src + "')";
+				img.style.backgroundImage = "url('" + bitmaps[imgNameLookup[imgPath]]._image.src + "')";
 				img.setAttribute("data-naturalwidth", bitmaps[imgNameLookup[imgPath]]._image.naturalWidth);
 				img.setAttribute("data-naturalheight", bitmaps[imgNameLookup[imgPath]]._image.naturalHeight);
 				let xOff = img.getAttribute("data-xoff") || 0;
@@ -766,10 +766,10 @@ Window_CSS.prototype.createAttributeBlock = function(attack, jumpAmount) {
 
 
 
-Window_CSS.prototype.createConfirmContent = function(question, selection) {
+Window_CSS.prototype.createConfirmContent = function(question, selection, opaque) {
 	const _this = this;
 	let content = "";
-	content+="<div class='confirm scaled_text'>";
+	content+="<div class='confirm scaled_text "+(opaque ? "opaque" : "")+"'>";
 	content+="<div class='content'>";
 	content+="<div class='question'>";
 	
@@ -781,6 +781,24 @@ Window_CSS.prototype.createConfirmContent = function(question, selection) {
 	content+="</div>";
 	content+="<div class='button cancel_button "+(selection == 1 ? "active" : "")+"'>";
 	content+=APPSTRINGS.GENERAL.label_no;
+	content+="</div>";
+	content+="</div>";
+	content+="</div>";
+	content+="</div>";
+	return content;
+}
+
+//shares the markup of createConfirmContent so it inherits the same styling, but only offers a single button
+Window_CSS.prototype.createMessageContent = function(message, opaque) {
+	let content = "";
+	content+="<div class='confirm scaled_text "+(opaque ? "opaque" : "")+"'>";
+	content+="<div class='content'>";
+	content+="<div class='question'>";
+	content+="<div class='label_unit_count'>"+message+"</div>";
+	content+="</div>";
+	content+="<div class='buttons'>";
+	content+="<div class='button ok_button active'>";
+	content+=APPSTRINGS.GENERAL.label_ok;
 	content+="</div>";
 	content+="</div>";
 	content+="</div>";
