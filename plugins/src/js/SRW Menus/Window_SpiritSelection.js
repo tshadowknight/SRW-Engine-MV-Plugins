@@ -43,9 +43,7 @@ Window_SpiritSelection.prototype.resetSelection = function(){
 		this._currentPage = 0;
 		this._currentAllySelectionSlot = 0;
 		this._selectionMode = 0;
-	} else {
-		$gameTemp.isDoingInMenuSpirit = false;
-	}	
+	} 	
 }
 
 Window_SpiritSelection.prototype.incrementSelection = function(){	
@@ -175,6 +173,10 @@ Window_SpiritSelection.prototype.update = function() {
 	Window_Base.prototype.update.call(this);
 	
 	if(this.isOpen() && !this._handlingInput){	
+
+		//consume isDoingInMenuSpirit after the selection menu has been fully opened again
+		//when activating a spirit this menu is popped and pushed, triggering a resetselection on each otherwise
+		$gameTemp.isDoingInMenuSpirit = false;
 		
 		if(Input.isTriggered('menu')){
 			if(ENGINE_SETTINGS.ENABLE_ALLY_SPIRITS){
@@ -415,7 +417,7 @@ Window_SpiritSelection.prototype.update = function() {
 						
 					}*/
 					$gameTemp.mechListWindowSearchSelectionCallback = function(actor){
-						$gameTemp.searchInfo = {};
+						$gameTemp.searchInfo = null;
 						$gameTemp.mechListWindowSearchSelectionCallback = null;
 						_this._uiState = "";
 											

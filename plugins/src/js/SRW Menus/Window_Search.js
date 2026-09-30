@@ -247,7 +247,8 @@ Window_Search.prototype.update = function() {
 				$gameTemp.mechListWindowSearchSelectionCallback = function(actor){
 					$gameTemp.mechListWindowSearchSelectionCallback = null;
 					_this._uiState = "tab_selection";
-					$gameTemp.killMenu("search");						
+					$gameTemp.killMenu("search");		
+					$gameTemp.searchInfo = null;				
 					if(_this._callbacks["selected"]){
 						_this._callbacks["selected"](actor);
 					}	
