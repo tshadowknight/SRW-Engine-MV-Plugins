@@ -9169,6 +9169,13 @@ BattleSceneManager.prototype.preloadSceneAssets = function(){
 					animIdsToPreload[animId] = true;
 				}			
 				
+				if(nextAction.attacked_all_sub && nextAction.attacked_all_sub.isDestroyed){
+					let animId = $statCalc.getBattleSceneInfo(nextAction.attacked_all_sub.ref).deathAnimId;
+					if(animId == null || animId == ''){
+						animId = ENGINE_SETTINGS.BATTLE_SCENE.DEFAULT_ANIM.DESTROY;
+					}
+					animIdsToPreload[animId] = true;
+				}
 				
 				const visitedAnims = {};
 				
