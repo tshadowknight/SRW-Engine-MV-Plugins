@@ -8934,7 +8934,7 @@ BattleSceneManager.prototype.preloadSceneAssets = function(){
 		_this._dynamicUnitsUnderPreload = {}; //tracks dynamic units created during preload by target name so information is available to link them to battle actors for sprite frame preloading
 		_this._preloadAliases = {}; //track assigned aliases during preload so that default sprite mode units can get preloaded correctly if they were aliased
 		
-		function handleAnimCommand(action, animCommand, animId, animType, tick, flipX, animationIdx){
+		function handleAnimCommand(action, animCommand, animId, animType, tick, flipX, animationIdx, contextActor){
 			var target = animCommand.target;
 			var params = animCommand.params;
 			
@@ -8989,31 +8989,36 @@ BattleSceneManager.prototype.preloadSceneAssets = function(){
 			}
 			if(animCommand.type == "set_sprite_animation" || animCommand.type == "set_sprite_frame"){
 				
-	
-				var targetAction = action.attacked;
-				
-				var battleEffect;
-				if(target == "active_main" || target == "active_support_attacker" || target == "active_twin"){
-					battleEffect = action;
-				} else if(target == "active_target" || target == "active_support_defender" || target == "active_target_twin"){
-					battleEffect = targetAction;
+				if(contextActor){
+					battleEffect = {ref: contextActor};
 				} else {
-					for(let entry of _this._instantiatedUnits){
-						if(entry.name == target){
-							battleEffect = {ref: entry.ref};
-						}
-					}
-					if(!battleEffect &&  _this._dynamicUnitsUnderPreload[target]){
-						battleEffect = {ref: _this._dynamicUnitsUnderPreload[target]};
-					}
-					if(!battleEffect){
-						let alias = _this._preloadAliases[target];
-						if(alias && _this._dynamicUnitsUnderPreload[alias]){
-							battleEffect = {ref: _this._dynamicUnitsUnderPreload[alias]};
-						}						
-					}
+					var targetAction = action.attacked;
 					
-				}						
+					var battleEffect;
+					if(target == "active_main" || target == "active_support_attacker" || target == "active_twin"){
+						battleEffect = action;
+					} else if(target == "active_target" || target == "active_support_defender" || target == "active_target_twin"){
+						battleEffect = targetAction;
+					} else {
+						for(let entry of _this._instantiatedUnits){
+							if(entry.name == target){
+								battleEffect = {ref: entry.ref};
+							}
+						}
+						if(!battleEffect &&  _this._dynamicUnitsUnderPreload[target]){
+							battleEffect = {ref: _this._dynamicUnitsUnderPreload[target]};
+						}
+						if(!battleEffect){
+							let alias = _this._preloadAliases[target];
+							if(alias && _this._dynamicUnitsUnderPreload[alias]){
+								battleEffect = {ref: _this._dynamicUnitsUnderPreload[alias]};
+							}						
+						}
+						
+					}	
+				}
+
+									
 				if(battleEffect){
 					var battleSceneInfo = $statCalc.getBattleSceneInfo(battleEffect.ref);
 					if(!battleSceneInfo.use3D && !battleSceneInfo.useSpine && !battleSceneInfo.useSpriter && !battleSceneInfo.useDragonBones){						
@@ -9103,6 +9108,7 @@ BattleSceneManager.prototype.preloadSceneAssets = function(){
 			var nextAction = _this._actionQueue[i];
 			const animationIdx = nextAction.actionOrder;
 			if(nextAction){				
+				const visitedAnims = {};
 				
 				var attack = nextAction.action.attack;
 				
@@ -9157,7 +9163,7 @@ BattleSceneManager.prototype.preloadSceneAssets = function(){
 					if(animId == null || animId == ''){
 						animId = ENGINE_SETTINGS.BATTLE_SCENE.DEFAULT_ANIM.DESTROY;
 					}
-					animIdsToPreload[animId] = true;
+					processAnimation(animId,nextAction.action.ref);
 				}
 				
 				
@@ -9166,7 +9172,7 @@ BattleSceneManager.prototype.preloadSceneAssets = function(){
 					if(animId == null || animId == ''){
 						animId = ENGINE_SETTINGS.BATTLE_SCENE.DEFAULT_ANIM.DESTROY;
 					}
-					animIdsToPreload[animId] = true;
+					processAnimation(animId, nextAction.attacked.ref);
 				}			
 				
 				if(nextAction.attacked_all_sub && nextAction.attacked_all_sub.isDestroyed){
@@ -9174,39 +9180,38 @@ BattleSceneManager.prototype.preloadSceneAssets = function(){
 					if(animId == null || animId == ''){
 						animId = ENGINE_SETTINGS.BATTLE_SCENE.DEFAULT_ANIM.DESTROY;
 					}
-					animIdsToPreload[animId] = true;
+					processAnimation(animId, nextAction.attacked_all_sub.ref);
 				}
 				
-				const visitedAnims = {};
+				
 				
 				const stack = [];
 				for(let animId in animIdsToPreload){
 					stack.push(animId);
 				}
-				
-				while(stack.length){
-					const animId = stack.pop();
+
+				function processAnimation(animId, contextActor){
 					if(!visitedAnims[animId]){
 						visitedAnims[animId] = true;
 						var animationList = _this._animationBuilder.buildAnimation(animId, _this);
 						if(!animationList){
-							alert("Animation "+animId+" does not have a definition!");
+							alert("Animation "+animId+" does not have a	 definition!");
 							throw("Animation "+animId+" does not have a definition!");
 						}
 						Object.keys(animationList).forEach(function(animType){
 							Object.keys(animationList[animType]).forEach(function(tick){
 								const batch = animationList[animType][tick];
 								batch.forEach(function(animCommand){
-									handleAnimCommand(nextAction, animCommand, animId, animType, tick, nextAction.side == "enemy", animationIdx);
+									handleAnimCommand(nextAction, animCommand, animId, animType, tick, nextAction.side == "enemy", animationIdx, contextActor);
 									if(animCommand.type == "next_phase"){
 										if(animCommand.params.commands){
 											for(let command of animCommand.params.commands){
-												handleAnimCommand(nextAction, command, animId, animType, tick, nextAction.side == "enemy", animationIdx);	
+												handleAnimCommand(nextAction, command, animId, animType, tick, nextAction.side == "enemy", animationIdx, contextActor);	
 											}
 										}
 										if(animCommand.params.cleanUpCommands){
 											for(let command of animCommand.params.cleanUpCommands){
-												handleAnimCommand(nextAction, command, animId, animType, tick, nextAction.side == "enemy", animationIdx);	
+												handleAnimCommand(nextAction, command, animId, animType, tick, nextAction.side == "enemy", animationIdx, contextActor);	
 											}
 										}
 									}	
@@ -9221,6 +9226,11 @@ BattleSceneManager.prototype.preloadSceneAssets = function(){
 							});				
 						});	
 					}
+				}
+				
+				while(stack.length){
+					const animId = stack.pop();
+					processAnimation(animId);
 				}					
 			}	 
 			
