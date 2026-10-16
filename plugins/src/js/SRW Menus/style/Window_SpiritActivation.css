@@ -56,6 +56,13 @@
 	animation: playSpiritX 0.3s steps(5) infinite,  playSpiritY 1.2s steps(4) infinite;
 }
 
+.spirit_anim_extended {
+	position: absolute;
+	top: 0px;
+	left: 0px;
+	animation: playSpiritX 0.3s steps(5) infinite,  playSpiritYExtended 1.5s steps(5) infinite;
+}
+
 @keyframes playSpiritX {
   from {left: 0px;}
   to {left: -500%;}
@@ -64,6 +71,11 @@
 @keyframes playSpiritY {
   from {top: 0px;}
   to {top: -400%;}
+}
+
+@keyframes playSpiritYExtended {
+  from {top: 0px;}
+  to {top: -500%;}
 }
 
 #spirit_activation_HPBar {

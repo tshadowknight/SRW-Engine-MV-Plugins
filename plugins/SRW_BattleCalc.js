@@ -1263,7 +1263,13 @@ BattleCalc.prototype.generateBattleResult = function(isPrediction){
 						}						
 						activeDefenderCache.damageTaken = activeDefenderCache.currentAnimHP + (activeDefenderCache.HPRestored || 0) - 1;
 						aCache["damageInflicted"+attackedRef] = activeDefenderCache.damageTaken;
-					} else {
+					} else if($statCalc.applyMaxStatModsToValue(defenders[i].actor, 0, ["prevent_death"])){
+						if(!isPrediction && !isBuffingAttack){
+							$statCalc.setAbilityUsed(defenders[i].actor, "prevent_death");
+						}	
+						activeDefenderCache.damageTaken = activeDefenderCache.currentAnimHP;
+						aCache["damageInflicted"+attackedRef] = activeDefenderCache.damageTaken;
+					}else {
 						activeDefenderCache.isDestroyed = true;
 						activeDefenderCache.destroyer = aCache.ref;
 						activeDefenderCache.destroyedOrderIdx = orderIdx;

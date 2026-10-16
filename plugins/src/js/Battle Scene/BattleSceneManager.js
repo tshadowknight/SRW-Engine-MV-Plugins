@@ -474,7 +474,7 @@ BattleSceneManager.prototype.init = function(attachControl){
 		this._effksContextFgMirror.init(this._glContext, settings);
 		this._effksContextAttached.init(this._glContext, settings);
 		
-		this._engine = new BABYLON.Engine(this._canvas, true, {preserveDrawingBuffer: true, stencil: true, antialiasing: true}); // Generate the BABYLON 3D engine	
+		this._engine = new BABYLON.Engine(this._canvas, true, {preserveDrawingBuffer: false, stencil: true, antialiasing: true}); // Generate the BABYLON 3D engine	
 		this._engine.getCaps().parallelShaderCompile = false;
 		
 		this._textureCopier = new BABYLON.CopyTextureToTexture(this._engine);
@@ -2427,7 +2427,7 @@ BattleSceneManager.prototype.prepareModel = function(root, name, position, flipX
 			animInfoRef = current.animInfoRef;
 		}		
 		
-		if(current.id.indexOf("anim_") == 0){
+		if(current.id.match(/.*anim\_/)){
 			const parts = current.id.split("_");
 			animInfoRef = {
 				animInfo: {
@@ -3368,21 +3368,38 @@ BattleSceneManager.prototype.disposeAnimationBackgrounds = function(){
 	this._animationBackgroundsInfo = [];
 }
 
+//effekseer has no effect cache, every loadEffect allocates its own textures on the shared gl context and keeps them until released
+BattleSceneManager.prototype.releaseEffekseerEffect = function(context, effect){
+	if(context && effect && effect.isLoaded && effect.nativeptr != null){
+		context.releaseEffect(effect);
+	}
+}
+
 BattleSceneManager.prototype.disposeEffekseerInstances = function(preserveSysEffects){
+	const _this = this;
 	const tmp = []
 	this._effekseerInfo.forEach(function(effekInfo){
 		if(!effekInfo.isSysEffect || !preserveSysEffects){
 			if(effekInfo.handle){
 				effekInfo.handle.stop();
-				effekInfo.context.releaseEffect(effekInfo.effect);
+				_this.releaseEffekseerEffect(effekInfo.context, effekInfo.effect);
 				effekInfo.context.activeCount = 0;
 			}
 		} else {
 			tmp.push(effekInfo);
-		}		
+		}
 	});
-	this._effekseerInfo = tmp;	
-	
+	this._effekseerInfo = tmp;
+
+	//preloads are only reached through the played instances above, so any that never played would otherwise leak
+	if(!preserveSysEffects){
+		for(let preloadKey in this._preloadedEffekseerInfo){
+			const entry = this._preloadedEffekseerInfo[preloadKey];
+			this.releaseEffekseerEffect(entry.targetContext, entry.effect);
+		}
+		this._preloadedEffekseerInfo = {};
+	}
+
 	this.stopEffekContext(this._effksContext);
 	this.stopEffekContext(this._effksContextMirror);
 	this.stopEffekContext(this._effksContextFg);
@@ -3391,10 +3408,12 @@ BattleSceneManager.prototype.disposeEffekseerInstances = function(preserveSysEff
 }
 
 BattleSceneManager.prototype.disposeBarrierEffects = function(){
+	const _this = this;
 	this._barrierEffects.forEach(function(effekInfo){
 		if(effekInfo.handle){
 			effekInfo.handle.stop();
-		}		
+		}
+		_this.releaseEffekseerEffect(effekInfo.context, effekInfo.effect);
 	});
 	this._barrierEffects = [];
 }
@@ -4166,7 +4185,7 @@ BattleSceneManager.prototype.startScene = function(){
 
 			//effekseer sets its own blend, depth mask, cull and buffer bindings on the shared context. babylon caches gl state and skips redundant
 			//calls, so without this everything it draws after this point in the frame would be working from a stale cache.
-			_this._engine.wipeCaches(true);
+			//_this._engine.wipeCaches(true);
 		}
 	}
 	
@@ -4206,7 +4225,7 @@ BattleSceneManager.prototype.startScene = function(){
 		}
 		
 		_this._scene.render();
-		_this._engine.wipeCaches(true);
+		//_this._engine.wipeCaches(true);
 		var ratio = _this.getCurrentRatio();
 		ratio*=_this._animRatio;
 		

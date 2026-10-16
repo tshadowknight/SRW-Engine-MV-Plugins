@@ -1755,6 +1755,8 @@ StatCalc.prototype.initSRWStats = function(actor, level, itemIds, preserveVolati
 	
 	var dbAbilities = this.getPilotAbilityInfo(actorProperties, this.getCurrentLevel(actor));	
 	var dbRelationships = this.getPilotRelationshipInfo(actorProperties);
+
+	this.invalidateAbilityCache(actor);
 	
 	actor.SRWStats.pilot.spirits = this.getSpiritInfo(actor, actorProperties);	
 	
@@ -6824,6 +6826,10 @@ StatCalc.prototype.applyHPRegen = function(type, factionId){
 				_this.recoverHP(actor, _this.applyStatModsToValue(actor, 0, ["HP_regen_flat"]));			
 				_this.recoverHPPercent(actor, _this.getCurrentTerrainMods(actor).hp_regen);	
 				_this.recoverHPPercent(actor, ENGINE_SETTINGS.DEFAULT_HP_REGEN || 0);	
+			}
+
+			if($gameTemp.debugAttackAnims){
+				_this.recoverHPPercent(actor, 100);	
 			}
 
 			if(($gameTemp.debugAutoPlay && type == "actor") || $gameTemp.debugAttackAnims){
