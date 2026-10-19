@@ -6563,7 +6563,7 @@ StatCalc.prototype.setWill = function(actor, amount, noSubPilots){
 	}
 }
 
-StatCalc.prototype.modifyWill = function(actor, increment, preserveCache, noSubPilots){
+StatCalc.prototype.modifyWill = function(actor, increment, preserveCache, applyToSubPilots){
 	if(this.isActorSRWInitialized(actor)){
 		var maxWill = this.getMaxWill(actor);
 		actor.SRWStats.pilot.will+=increment;
@@ -6573,11 +6573,11 @@ StatCalc.prototype.modifyWill = function(actor, increment, preserveCache, noSubP
 		if(actor.SRWStats.pilot.will < 50){
 			actor.SRWStats.pilot.will = 50;
 		}
-		if(!noSubPilots && actor.isActor()){
+		if(applyToSubPilots && actor.isActor()){
 			const subPilots = this.getSubPilots(actor);
 			for(let pilotId of subPilots){
 				if(pilotId){
-					this.modifyWill($gameActors.actor(pilotId), increment, preserveCache, true);	
+					this.modifyWill($gameActors.actor(pilotId), increment, preserveCache, false);	
 				}				
 			}
 		}
@@ -6588,6 +6588,7 @@ StatCalc.prototype.modifyWill = function(actor, increment, preserveCache, noSubP
 		}		
 	}	
 }
+
 
 StatCalc.prototype.getMechTerrainString = function(actor, terrain){
 	if(this.isActorSRWInitialized(actor)){

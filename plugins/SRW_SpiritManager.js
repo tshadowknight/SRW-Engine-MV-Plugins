@@ -105,6 +105,8 @@ SpiritManager.prototype.applyEffect = function(idx, caster, targets, cost, addit
 	var _this = this;
 	var spiritDef = _this._spiritDefinitions[idx];
 	if(spiritDef){
+		//will gain called from spirit definitions also auto applies to sub pilots, which the spirit targets already include, causing erratic will gains
+		//this global is a hack to disable the sub pilot propagation while spirits are being applied
 		$statCalc.applySPCost(caster, cost);	
 		if(additionalCaster){
 			$statCalc.applySPCost(additionalCaster, cost);

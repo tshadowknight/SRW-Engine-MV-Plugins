@@ -999,6 +999,7 @@
 			
 			$statCalc.invalidateAbilityCache(actor_unit);
 			$statCalc.initSRWStats(actor_unit);
+			$statCalc.invalidateAbilityCache(actor_unit);
 			$statCalc.applyBattleStartWill(actor_unit);
 			let preferredSuperState = this.getPreferredSuperState(actor_unit);
 			if(preferredSuperState){
@@ -1020,6 +1021,9 @@
 				actor_unit.subTwin.SRPGActionTimesSet($statCalc.applyStatModsToValue(actor_unit.subTwin, 1, ["extra_action"]));
 				actor_unit.subTwin.setSrpgTurnEnd(false);	
 				actor_unit.subTwin.setBattleMode("");
+
+				$statCalc.invalidateAbilityCache(actor_unit.subTwin);
+				$statCalc.applyBattleStartWill(actor_unit.subTwin);
 			}
 			const subPilots = $statCalc.getSubPilots(actor_unit);
 			for(let subPilotId of subPilots){
@@ -1028,6 +1032,9 @@
 					subPilot.SRPGActionTimesSet($statCalc.applyStatModsToValue(subPilot, 1, ["extra_action"]));
 					subPilot.setSrpgTurnEnd(false);	
 					subPilot.setBattleMode("");
+
+					$statCalc.invalidateAbilityCache(subPilot);
+					$statCalc.applyBattleStartWill(subPilot);
 				}
 			}
 		}

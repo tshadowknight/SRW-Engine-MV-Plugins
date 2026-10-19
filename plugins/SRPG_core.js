@@ -2877,22 +2877,22 @@ SceneManager.isInSaveScene = function(){
 				var attackerPersonalityInfo = $statCalc.getPersonalityInfo(battleEffect.attackedBy);
 				
 				if(battleEffect.attackedBy && battleEffect.isDestroyed){
-					$statCalc.modifyWill(battleEffect.attackedBy.ref, Math.floor((attackerPersonalityInfo.destroy || 0) / 2));
+					$statCalc.modifyWill(battleEffect.attackedBy.ref, Math.floor((attackerPersonalityInfo.destroy || 0) / 2, false, true));
 					//$statCalc.modifyAllWill(battleEffect.isActor ? "actor" : "enemy", 1);	
 					$statCalc.applyEnemyDestroyedWill($gameSystem.getFactionId(battleEffect.attackedBy.ref));	
 				}
 				if(battleEffect.isAttacked){		
 					if(!battleEffect.isHit){
-						$statCalc.modifyWill(battleEffect.ref, $statCalc.applyStatModsToValue(battleEffect.ref, 0, ["evade_will"]));
-						$statCalc.modifyWill(battleEffect.ref, defenderPersonalityInfo.evade);
+						$statCalc.modifyWill(battleEffect.ref, $statCalc.applyStatModsToValue(battleEffect.ref, 0, ["evade_will"]), false, true);
+						$statCalc.modifyWill(battleEffect.ref, defenderPersonalityInfo.evade, false, true);
 						$statCalc.incrementEvadeCount(battleEffect.ref);
 					} else {						
 						$statCalc.resetEvadeCount(battleEffect.ref);
 					}					
 				}
 				if(battleEffect.isHit){		
-					$statCalc.modifyWill(battleEffect.ref, defenderPersonalityInfo.damage);
-					$statCalc.modifyWill(battleEffect.ref, $statCalc.applyStatModsToValue(battleEffect.ref, 0, ["damage_will"]));
+					$statCalc.modifyWill(battleEffect.ref, defenderPersonalityInfo.damage, false, true);
+					$statCalc.modifyWill(battleEffect.ref, $statCalc.applyStatModsToValue(battleEffect.ref, 0, ["damage_will"]), false, true);
 					if(battleEffect.attackedBy && battleEffect.statusReceived && (battleEffect.damageTaken > 0 || battleEffect.receivedBuff)){
 						applyStatusConditions(battleEffect.statusReceived, battleEffect.ref, battleEffect.attackedBy.hasFury);
 					}					
@@ -2995,11 +2995,11 @@ SceneManager.isInSaveScene = function(){
 				if(battleEffect.attacked){	
 					var defenderPersonalityInfo = $statCalc.getPersonalityInfo(battleEffect.attacked.ref);
 					if(battleEffect.hits){
-						$statCalc.modifyWill(battleEffect.ref, personalityInfo.hit || 0);
-						$statCalc.modifyWill(battleEffect.ref, $statCalc.applyStatModsToValue(battleEffect.ref, 0, ["hit_will"]));
+						$statCalc.modifyWill(battleEffect.ref, personalityInfo.hit || 0, false, true);
+						$statCalc.modifyWill(battleEffect.ref, $statCalc.applyStatModsToValue(battleEffect.ref, 0, ["hit_will"]), false, true);
 
-						$statCalc.modifyWill(battleEffect.attacked.ref, defenderPersonalityInfo.damage || 0);
-						$statCalc.modifyWill(battleEffect.attacked.ref, $statCalc.applyStatModsToValue(battleEffect.attacked.ref, 0, ["damage_will"]));						
+						$statCalc.modifyWill(battleEffect.attacked.ref, defenderPersonalityInfo.damage || 0, false, true);
+						$statCalc.modifyWill(battleEffect.attacked.ref, $statCalc.applyStatModsToValue(battleEffect.attacked.ref, 0, ["damage_will"]), false, true);						
 						
 						if(battleEffect.damageInflicted > 0|| battleEffect.attacked.receivedBuff){
 							applyStatusConditions(battleEffect.statusEffects, battleEffect.attacked.ref, battleEffect.hasFury);
@@ -3011,10 +3011,10 @@ SceneManager.isInSaveScene = function(){
 						}						
 					} else {
 						
-						$statCalc.modifyWill(battleEffect.attacked.ref, defenderPersonalityInfo.evade || 0)
-						$statCalc.modifyWill(battleEffect.attacked.ref, $statCalc.applyStatModsToValue(battleEffect.attacked.ref, 0, ["evade_will"]));
+						$statCalc.modifyWill(battleEffect.attacked.ref, defenderPersonalityInfo.evade || 0, false, true)
+						$statCalc.modifyWill(battleEffect.attacked.ref, $statCalc.applyStatModsToValue(battleEffect.attacked.ref, 0, ["evade_will"]), false, true);
 									
-						$statCalc.modifyWill(battleEffect.ref, personalityInfo.miss || 0);
+						$statCalc.modifyWill(battleEffect.ref, personalityInfo.miss || 0, false, true);
 					}					
 				}			
 				if(battleEffect.type == "initiator"){
