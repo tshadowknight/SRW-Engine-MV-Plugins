@@ -785,7 +785,20 @@ GameState_confirm_adjacent_spirit.prototype.update = function(scene){
 			var spiritInfo = $gameTemp.adjacentSpiritInfo.spiritInfo;
 			var caster = $gameTemp.adjacentSpiritInfo.caster;
 			var initialTargetingResult = $gameTemp.adjacentSpiritInfo.initialTargetingResult;
-			$spiritManager.applyEffect(spiritInfo.idx, caster, initialTargetingResult.targets, spiritInfo.cost, spiritInfo.additionalCaster);
+			
+			let targets = [];
+			for(let mapTarget of $gameTemp.adjacentSpiritInfo.initialTargetingResult.targets){
+				targets.push(mapTarget);
+
+				if($spiritManager.getSpiritDef($gameTemp.adjacentSpiritInfo.spiritInfo.idx).affectsSubsPilots){
+					let subPilotIds = $statCalc.getSubPilots(mapTarget);
+					for(let id of subPilotIds){
+						targets.push($gameActors.actor(id));
+					}						
+				}
+			}		
+			
+			$spiritManager.applyEffect(spiritInfo.idx, caster, targets, spiritInfo.cost, spiritInfo.additionalCaster);
 			$gameTemp.queuedEffectSpiritId = spiritInfo.idx; 
 			$gameSystem.setSubBattlePhase("map_spirit_animation");		
 		}
@@ -1276,9 +1289,19 @@ GameState_actor_target_spirit.prototype.updateMapEvent = function(x, y, triggers
 					} else {
 						caster = actionBattlerArray[1];
 					}
+
+					let targets = [];
+					targets.push(target);
+
+					if($spiritManager.getSpiritDef($gameTemp.currentTargetingSpirit.idx).affectsSubsPilots){
+						let subPilotIds = $statCalc.getSubPilots(target);
+						for(let id of subPilotIds){
+							targets.push($gameActors.actor(id));
+						}						
+					}
 					
-					if(spiritDef.singleTargetEnabledHandler(target)){
-						$spiritManager.applyEffect($gameTemp.currentTargetingSpirit.idx, caster, [target], $gameTemp.currentTargetingSpirit.cost, spiritInfo.additionalCaster);
+					if(targets.length){
+						$spiritManager.applyEffect($gameTemp.currentTargetingSpirit.idx, caster, targets, $gameTemp.currentTargetingSpirit.cost, spiritInfo.additionalCaster);
 						$gamePlayer.locate(event.posX(), event.posY());
 						
 						$gameTemp.spiritTargetActor = target;

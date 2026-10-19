@@ -11,7 +11,7 @@ function SpiritManager(){
 	}
 }
 
-SpiritManager.prototype.addDefinition = function(idx, name, desc, handler, targetType, enabledHandler, singleTargetEnabledHandler, animInfo, affectsTwinInfo){
+SpiritManager.prototype.addDefinition = function(idx, name, desc, handler, targetType, enabledHandler, singleTargetEnabledHandler, animInfo, affectsTwinInfo, affectsSubsPilots){
 	var _this = this;
 	
 	this._spiritDefinitions[idx] = {
@@ -21,6 +21,7 @@ SpiritManager.prototype.addDefinition = function(idx, name, desc, handler, targe
 		targetType: targetType,
 		animInfo: animInfo,
 		affectsTwinInfo: affectsTwinInfo || false,
+		affectsSubsPilots: affectsSubsPilots || false
 	};
 	if(enabledHandler){
 		this._spiritDefinitions[idx].enabledHandler = enabledHandler;

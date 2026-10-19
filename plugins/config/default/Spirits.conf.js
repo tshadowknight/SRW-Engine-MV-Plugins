@@ -208,7 +208,7 @@ $SRWConfig.spirits = function(){
 	);
 	this.addDefinition(
 		9, 
-		"Drive", 
+		"Drive", 	
 		"Increases Morale by 30.", 
 		function(target){
 			$statCalc.modifyWill(target, 30);
@@ -256,7 +256,9 @@ $SRWConfig.spirits = function(){
 		{
 			src: "Spirit",
 			duration: 800
-		}
+		},
+		false,
+		true
 	);
 	this.addDefinition(
 		12, 
@@ -850,7 +852,7 @@ $SRWConfig.spirits = function(){
 	
 	this.addDefinition(
 		39, 
-		"Rouse", 
+		"Invigorate", 
 		"Increases Morale by 10 for adjacent allies.", 
 		function(target){
 			$statCalc.modifyWill(target, 10);
@@ -872,7 +874,9 @@ $SRWConfig.spirits = function(){
 		}, 
 		{	
 			animId: 44,				
-		}
+		},
+		false,
+		true
 	);
 	
 	this.addDefinition(
