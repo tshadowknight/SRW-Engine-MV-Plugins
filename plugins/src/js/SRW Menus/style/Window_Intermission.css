@@ -199,7 +199,20 @@
 	display: flex;
 }
 
-#intermission_menu_ace_display {
+#intermission_menu #intermission_menu_ace_display.three_aces {
+	top: 10%;
+	right: 6%;
+}
+
+#intermission_menu #intermission_menu_ace_display {
+	border: 0.1vw solid #ffc31b;
+}
+
+#intermission_menu #intermission_menu_ace_display .ace_label {
+	/*color: #ffc31b;*/
+}
+
+#intermission_menu .ace_display {
 	position: absolute;
 	right: 2.6%;
 	border: 0.1vw solid #FFFFFF;
@@ -212,18 +225,18 @@
 	background-color: rgba(255, 255, 255, 0.4);
 }
 
-#intermission_menu_ace_display_inner{
+#intermission_menu .ace_display_inner{
 	width: 100%;
 	height: 100%;
 	position: relative;
 }
 
-#intermission_menu_ace_display .face_pic_container {
+#intermission_menu .ace_display .face_pic_container {
 	margin-left: auto;
 	width: 58%;
 }
 
-#intermission_menu_ace_display .ace_label {
+#intermission_menu .ace_display .ace_label {
 	position: absolute;
 	left: 4%;
 	top: 0;
@@ -231,7 +244,7 @@
 	font-style: italic;
 }
 
-#intermission_menu_ace_display .ace_value {
+#intermission_menu .ace_display .ace_value {
 	position: absolute;
 	right: 64%;
 	top: 20%;
@@ -239,7 +252,7 @@
 	margin-left: 30%;
 }
 
-#intermission_menu_ace_display .ace_name {
+#intermission_menu .ace_display .ace_name {
 	position: absolute;
 	display: flex;
 	top: 80%;
@@ -250,6 +263,35 @@
 	height: 20%;
 	justify-content: center;
     align-items: center;
+}
+
+#intermission_menu #intermission_menu_rank_two_display {
+	top: 32%;
+	display: none;
+	right: 4%;
+	border: 0.1vw solid #c6e7ef;
+}
+
+#intermission_menu #intermission_menu_rank_two_display .ace_label {
+	/*color: #c6e7ef;*/
+}
+
+#intermission_menu #intermission_menu_rank_two_display.three_aces {
+	display: block;
+}
+
+#intermission_menu #intermission_menu_rank_three_display {
+	top: 54%;
+	display: none;
+	border: 0.1vw solid #c57026;
+}
+
+#intermission_menu #intermission_menu_rank_three_display .ace_label {
+	/*color: #eb8e3e;*/
+}
+
+#intermission_menu #intermission_menu_rank_three_display.three_aces {
+	display: block;
 }
 
 #intermission_menu .stage_info {

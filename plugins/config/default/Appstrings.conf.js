@@ -125,6 +125,8 @@ APPSTRINGS.INTERMISSION = {
 	fav_points: "Fav. Points",
 	funds: "Funds",
 	top_ace: "Top Ace",
+	rank_two: "#2 Ace",
+	rank_three: "#3 Ace",
 	mech_label: "Mech",
 	list_label: "List",
 	upgrade_label: "Upgrade",

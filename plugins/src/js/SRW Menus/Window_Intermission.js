@@ -43,6 +43,8 @@ Window_Intermission.prototype.initialize = function() {
 	
 	_this.titleConfirmSelection = true;
 	
+	_this.aceDisplays = [];
+
 	function validateReassignMenu(){
 		var availableMechs = Window_CSS.prototype.getAvailableUnits.call(_this);
 		var tmp = [];	
@@ -370,41 +372,59 @@ Window_Intermission.prototype.createComponents = function() {
 	this._modeInfo.id = this.createId("mode_info");
 	this._modeInfo.classList.add("scaled_text");
 	windowNode.appendChild(this._modeInfo);
-	
-	
-	this._aceDisplay = document.createElement("div");
-	this._aceDisplay.id = this.createId("ace_display");
-	this._aceDisplayInner = document.createElement("div");
-	this._aceDisplayInner.id = this.createId("ace_display_inner");
-	
-	this._acePicContainer = document.createElement("div");	
-	this._aceDisplayInner.appendChild(this._acePicContainer);
-	
-	this._aceLabel = document.createElement("div");	
-	this._aceLabel.classList.add("ace_label");
-	this._aceLabel.classList.add("scaled_text");
-	this._aceLabel.innerHTML = APPSTRINGS.INTERMISSION.top_ace;
-	this._aceDisplayInner.appendChild(this._aceLabel);
-	
-	this._aceValue = document.createElement("div");	
-	this._aceValue.classList.add("ace_value");
-	this._aceValue.classList.add("scaled_text");
-	this._aceDisplayInner.appendChild(this._aceValue);
-	
-	this._aceName = document.createElement("div");	
-	this._aceName.classList.add("ace_name");
-	this._aceName.classList.add("scaled_text");
-	this._aceDisplayInner.appendChild(this._aceName);
-	
-	
 
-	
-	this._aceDisplay.appendChild(this._aceDisplayInner);
-	windowNode.appendChild(this._aceDisplay);
+	this.aceDisplays.push(this.createAceContainer("ace_display",  APPSTRINGS.INTERMISSION.top_ace));
+	this.aceDisplays.push(this.createAceContainer("rank_two_display",  APPSTRINGS.INTERMISSION.rank_two));
+	this.aceDisplays.push(this.createAceContainer("rank_three_display",  APPSTRINGS.INTERMISSION.rank_three));		
 	
 	this._confirmContainer = document.createElement("div");	
 	this._confirmContainer.classList.add("confirm_container");
 	windowNode.appendChild(this._confirmContainer);
+}
+
+Window_Intermission.prototype.createAceContainer = function(baseId, label) {
+	var windowNode = this.getWindowNode();
+
+	const aceDisplay = document.createElement("div");
+	aceDisplay.id = this.createId(baseId);
+	aceDisplay.classList.add("ace_display");
+	if(ENGINE_SETTINGS.SHOW_TOP_THREE_ACES){
+		aceDisplay.classList.add("three_aces");
+	}
+	const aceDisplayInner = document.createElement("div");
+	aceDisplayInner.id = this.createId(baseId + "_inner");
+	aceDisplayInner.classList.add("ace_display_inner");	
+
+	const acePicContainer = document.createElement("div");	
+	aceDisplayInner.appendChild(acePicContainer);
+	
+	const aceLabel = document.createElement("div");	
+	aceLabel.classList.add("ace_label");
+	aceLabel.classList.add("scaled_text");
+	aceLabel.innerHTML = label;
+	aceDisplayInner.appendChild(aceLabel);
+	
+	const aceValue = document.createElement("div");	
+	aceValue.classList.add("ace_value");
+	aceValue.classList.add("scaled_text");
+	aceDisplayInner.appendChild(aceValue);
+	
+	const aceName = document.createElement("div");	
+	aceName.classList.add("ace_name");
+	aceName.classList.add("scaled_text");
+	aceDisplayInner.appendChild(aceName);
+	
+	aceDisplay.appendChild(aceDisplayInner);
+	windowNode.appendChild(aceDisplay);
+
+	return {
+		aceDisplay,
+		aceDisplayInner,
+		acePicContainer,
+		aceLabel,
+		aceValue,
+		aceName
+	}
 }
 
 Window_Intermission.prototype.resetMenuState = function() {
@@ -614,24 +634,49 @@ Window_Intermission.prototype.redraw = function() {
 		this._modeInfo.innerHTML = modeInfo.name + " " +APPSTRINGS.GENERAL.label_mode;
 		this._modeInfo.style.color = modeInfo.color;
 	}
-	
-	if(!this._aceFacePicsLoaded && $gameSystem._availableUnits){
-		var ace = $statCalc.getTopAce();
-		if(ace){
-			if(ace.SRWStats.pilot.id != -1){
-				if(ace.isSubPilot && ace.mainPilot && $statCalc.getKills(ace) <= $statCalc.getKills(ace.mainPilot)){		
-					ace = ace.mainPilot;				
-				}
-				this._aceFacePicsLoaded = true;
-				this.loadActorFace(ace.SRWStats.pilot.id, this._acePicContainer);
-				this._aceValue.innerHTML = $statCalc.getKills(ace);
-				this._aceName.innerHTML = ace.name();
-			} else {
-				this._acePicContainer.innerHTML = "";
-				this._aceValue.innerHTML = "";
-				this._aceName.innerHTML = "";
+
+	function applyAceDisplay(displayInfo, ace){	
+		if(ace.SRWStats.pilot.id != -1){
+			if(ace.isSubPilot){	// && ace.mainPilot && $statCalc.getKills(ace) <= $statCalc.getKills(ace.mainPilot)
+				return 0;			
 			}			
-		}		
+			_this.loadActorFace(ace.SRWStats.pilot.id, displayInfo.acePicContainer);
+			displayInfo.aceValue.innerHTML = $statCalc.getKills(ace);
+			displayInfo.aceName.innerHTML = ace.name();
+			displayInfo.aceDisplay.style.display = "";
+		} 	
+		return 1;
+	}	
+	
+	if($gameSystem._availableUnits && !_this._aceFacePicsLoaded){
+		for(let i = 0; i < 3; i++){
+			_this.aceDisplays[i].aceDisplay.style.display = "none";
+			_this.aceDisplays[i].acePicContainer.innerHTML = "";
+			_this.aceDisplays[i].aceValue.innerHTML = "";
+			_this.aceDisplays[i].aceName.innerHTML = "";
+		}
+
+		const rankLookup = $statCalc.getActorRankLookup();
+		const rankToActorId = {};
+		for(let actorId in rankLookup){
+			rankToActorId[rankLookup[actorId]] = actorId;
+		}
+		let assignedCount = 0;
+		let ctr = 0;
+		while(ctr < $gameSystem._availableUnits.length && assignedCount < 3){
+			if(rankToActorId[ctr] != null && rankToActorId[ctr] != 0){
+				const actor = $gameActors.actor(rankToActorId[ctr]);
+				if(actor){
+					$statCalc.initSRWStats(actor);
+					const assignResult = applyAceDisplay(_this.aceDisplays[assignedCount], actor);	
+					if(assignResult != 0){
+						assignedCount++;
+					}
+				}					
+			}
+			ctr++;
+		}
+		_this._aceFacePicsLoaded = true;
 	}
 	
 	var windowNode = this.getWindowNode();

@@ -2977,7 +2977,7 @@ SceneManager.isInSaveScene = function(){
 				
 				
 				if(battleEffect.attacked && battleEffect.attacked.isDestroyed && battleEffect.attacked.destroyer == battleEffect.ref){					
-					$statCalc.modifyWill(battleEffect.ref, personalityInfo.destroy || 0);
+					$statCalc.modifyWill(battleEffect.ref, personalityInfo.destroy || 0, false, true);
 					//$statCalc.modifyAllWill(battleEffect.isActor ? "actor" : "enemy", 1);	
 					$statCalc.applyEnemyDestroyedWill($gameSystem.getFactionId(battleEffect.ref));	
 				}	

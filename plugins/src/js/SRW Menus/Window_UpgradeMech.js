@@ -15,8 +15,8 @@ Window_UpgradeMech.prototype.initialize = function() {
 	this.resetDeltas();
 	this._upgradeTypes = {
 		0: {title: APPSTRINGS.MECHSTATS.weapon, id: "weapons"},
-		1: {title: "HP", id: "maxHP"},	
-		2: {title: "EN", id: "maxEN"},	
+		1: {title: APPSTRINGS.GENERAL.label_HP, id: "maxHP"},	
+		2: {title: APPSTRINGS.GENERAL.label_EN, id: "maxEN"},	
 		3: {title: APPSTRINGS.MECHSTATS.armor, id: "armor"},	
 		4: {title: APPSTRINGS.MECHSTATS.mobility, id: "mobility"},	
 		5: {title: APPSTRINGS.MECHSTATS.accuracy, id: "accuracy"},	

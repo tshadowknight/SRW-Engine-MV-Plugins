@@ -992,6 +992,7 @@
 				$gameMap.setEventImages();			
 			}
 		
+			const visitedActors = {};
 			
 			if(subId != null && subId != actor_unit.actorId()){
 				actor_unit.subTwinId = subId;
@@ -1001,6 +1002,8 @@
 			$statCalc.initSRWStats(actor_unit);
 			$statCalc.invalidateAbilityCache(actor_unit);
 			$statCalc.applyBattleStartWill(actor_unit);
+			visitedActors[actor_unit.actorId()] = true;
+
 			let preferredSuperState = this.getPreferredSuperState(actor_unit);
 			if(preferredSuperState){
 				$statCalc.setSuperState(actor_unit, preferredSuperState);
@@ -1016,6 +1019,27 @@
 			
 			event.isShip = $statCalc.isShip(actor_unit);
 
+
+
+			function applyToSubPilots(actor_unit){
+				if(visitedActors[actor_unit.actorId()]){
+					return;
+				}
+				const subPilots = $statCalc.getSubPilots(actor_unit);
+				for(let subPilotId of subPilots){
+					const subPilot = $gameActors.actor(subPilotId);
+					if(subPilot){
+						subPilot.SRPGActionTimesSet($statCalc.applyStatModsToValue(subPilot, 1, ["extra_action"]));
+						subPilot.setSrpgTurnEnd(false);	
+						subPilot.setBattleMode("");
+
+						$statCalc.invalidateAbilityCache(subPilot);
+						$statCalc.applyBattleStartWill(subPilot);
+					}
+				}
+				visitedActors[actor_unit.actorId()] = true;
+			}
+
 			if(actor_unit.subTwin){
 				actor_unit.subTwin.event = null;//ensure the subtwin has no event assigned
 				actor_unit.subTwin.SRPGActionTimesSet($statCalc.applyStatModsToValue(actor_unit.subTwin, 1, ["extra_action"]));
@@ -1024,19 +1048,9 @@
 
 				$statCalc.invalidateAbilityCache(actor_unit.subTwin);
 				$statCalc.applyBattleStartWill(actor_unit.subTwin);
+				applyToSubPilots(actor_unit.subTwin);
 			}
-			const subPilots = $statCalc.getSubPilots(actor_unit);
-			for(let subPilotId of subPilots){
-				const subPilot = $gameActors.actor(subPilotId);
-				if(subPilot){
-					subPilot.SRPGActionTimesSet($statCalc.applyStatModsToValue(subPilot, 1, ["extra_action"]));
-					subPilot.setSrpgTurnEnd(false);	
-					subPilot.setBattleMode("");
-
-					$statCalc.invalidateAbilityCache(subPilot);
-					$statCalc.applyBattleStartWill(subPilot);
-				}
-			}
+			applyToSubPilots(actor_unit);
 		}
 		
 		Game_System.prototype.deployItemBox = function(event, items) {
