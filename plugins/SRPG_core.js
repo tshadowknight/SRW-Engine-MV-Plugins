@@ -1997,7 +1997,7 @@ SceneManager.isInSaveScene = function(){
 				let actorEffects = [];
 				for(let entry of targets){
 					if(!entry.isSubPilot){
-						actorEffects.push({type: "spirit", parameters: {target: entry, idx: $gameTemp.currentTargetingSpirit.idx}});
+						actorEffects.push({type: "spirit", parameters: {target: entry, idx: spiritInfo.idx}});
 					}						
 				}
 
