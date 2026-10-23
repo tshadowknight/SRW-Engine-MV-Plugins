@@ -1966,17 +1966,26 @@ SceneManager.isInSaveScene = function(){
 			
 			$gameSystem.setSubBattlePhase("confirm_adjacent_spirit");		
 		} else {
+			var spiritDef = $spiritManager.getSpiritDef(spiritInfo.idx);
+			function resolveTargetSpirits(target, targets){
+				if (($gameSystem.isFriendly(target, "player") && spiritDef.targetType == "ally") || (!$gameSystem.isFriendly(target, "player")  && spiritDef.targetType == "enemy")) {
+
+					targets.push(target);
+
+					if($spiritManager.getSpiritDef(spiritInfo.idx).affectsSubsPilots){
+						let subPilotIds = $statCalc.getSubPilots(target);
+						for(let id of subPilotIds){
+							targets.push($gameActors.actor(id));
+						}						
+					}																									
+				}
+			}
+
 			//apply immediately
 			let targets = [];
-			for(let mainPilotTarget of initialTargetingResult.targets){
-				targets.push(mainPilotTarget);
-
-				if($spiritManager.getSpiritDef(spiritInfo.idx).affectsSubsPilots){
-					let subPilotIds = $statCalc.getSubPilots(mainPilotTarget);
-					for(let id of subPilotIds){
-						targets.push($gameActors.actor(id));
-					}						
-				}
+			resolveTargetSpirits(target, targets);
+			if(target.subTwin){
+				resolveTargetSpirits(target.subTwin, targets);
 			}	
 
 			$spiritManager.applyEffect(spiritInfo.idx, caster, targets, spiritInfo.cost, spiritInfo.additionalCaster);
@@ -1984,9 +1993,16 @@ SceneManager.isInSaveScene = function(){
 			this.applyAdditionalSpiritEffects(spiritInfo, target, caster);
 			if(initialTargetingResult.type != "enemy_all" && initialTargetingResult.type != "ally_all"){
 				$gameTemp.spiritTargetActor = initialTargetingResult.targets[0];
-				$gameTemp.queuedActorEffects = [{type: "spirit", parameters: {target: initialTargetingResult.targets[0], idx: spiritInfo.idx}}];					
-				$gameSystem.setSubBattlePhase('spirit_activation');
-				
+
+				let actorEffects = [];
+				for(let entry of targets){
+					if(!entry.isSubPilot){
+						actorEffects.push({type: "spirit", parameters: {target: entry, idx: $gameTemp.currentTargetingSpirit.idx}});
+					}						
+				}
+
+				$gameTemp.queuedActorEffects = actorEffects;					
+				$gameSystem.setSubBattlePhase('spirit_activation');				
 				
 				$gameTemp.spiritWindowDoneHandler = callback || function(){
 					$gameTemp.popMenu = true;
