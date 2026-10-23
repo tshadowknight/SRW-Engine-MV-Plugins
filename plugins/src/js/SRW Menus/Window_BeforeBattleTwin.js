@@ -1191,19 +1191,19 @@ Window_BeforebattleTwin.prototype.createPercentIndicator = function(allyOrEnemy,
 		}
 		
 		content+="</div>";
-	} else {
-		let hitRateAcc = 0;
-		let critRateAcc = 0;
+	} else {	
+		if(hitRates.length){
+			let hitRateAcc = 0;
+			let critRateAcc = 0;
+			for(var i = 0; i < hitRates.length; i++){
+				hitRateAcc+=hitRates[i];
+				critRateAcc+=critRates[i];
+			}
 
-		for(var i = 0; i < hitRates.length; i++){
-			hitRateAcc+=hitRates[i];
-			critRateAcc+=critRates[i];
-		}
-
-		hitRates = [hitRateAcc / hitRates.length];
-		critRates = [critRateAcc / critRates.length];
-	}
-	
+			hitRates = [hitRateAcc / hitRates.length];
+			critRates = [critRateAcc / critRates.length];
+		}		
+	}	
 
 	for(var i = 0; i < hitRates.length; i++){
 		var hitRate = hitRates[i];

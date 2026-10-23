@@ -6503,6 +6503,7 @@ StatCalc.prototype.getSupportDefendCandidates = function(factionId, position, te
 	var result = [];
 	this.iterateAllActors(null, function(actor, event){
 		if(!event.isErased() && (Math.abs(event.posX() - position.x) + Math.abs(event.posY() - position.y)) == 1 && (eventId == null || event.eventId() != eventId)){
+			$statCalc.invalidateAbilityCache(actor);
 			var maxSupportDefends = $statCalc.applyStatModsToValue(actor, 0, ["support_defend"]);			
 			if(maxSupportDefends > actor.SRWStats.battleTemp.supportDefendCount && !_this.isDisabled(actor)){
 				var validTerrain = _this.canBeOnTerrain(actor, terrainIdx);	;
