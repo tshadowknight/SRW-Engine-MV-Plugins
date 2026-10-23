@@ -166,7 +166,12 @@ Window_SpiritActivation.prototype.loadImage = function(url){
 
 Window_SpiritActivation.prototype.getActorInfo = function() {
 	var _this = this;	
-	_this._participantInfo.actor.img = $statCalc.getBasicBattleImage($gameTemp.spiritTargetActor);	
+	if($gameTemp.queuedActorEffects[0] && $gameTemp.queuedActorEffects[0]?.parameters?.target){
+		_this._participantInfo.actor.img = $statCalc.getBasicBattleImage($gameTemp.queuedActorEffects[0]?.parameters?.target);	
+	} else {
+		_this._participantInfo.actor.img = $statCalc.getBasicBattleImage($gameTemp.spiritTargetActor);	
+	}
+	
 	/*var effectList = [];
 	if($gameTemp.queuedActorEffects){
 		effectList = JSON.parse(JSON.stringify($gameTemp.queuedActorEffects));
@@ -308,6 +313,8 @@ Window_SpiritActivation.prototype.update = async function() {
 		
 		if(!this._processingAction){
 			var nextAction = this._actionQueue.shift();
+
+			
 			
 			if(typeof nextAction == "undefined"){
 				if(!this._finishing){
@@ -315,6 +322,8 @@ Window_SpiritActivation.prototype.update = async function() {
 					this._finishTimer = 20;
 				}							
 			} else {
+				_this._participantInfo.actor.img = $statCalc.getBasicBattleImage(nextAction.parameters?.target || $gameTemp.spiritTargetActor);	
+				await this.redraw();
 				this._actor.className = "";				
 				this._processingAction = true;
 				this._processingAnimation = false;

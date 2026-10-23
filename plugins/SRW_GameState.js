@@ -780,21 +780,34 @@ GameState_confirm_adjacent_spirit.prototype.update = function(scene){
 		SoundManager.playCancel();
 		$gameTemp.clearMoveTable();		
 	} else if (Input.isTriggered('ok') || TouchInput.isTriggered()) {
+		var spiritInfo = $gameTemp.adjacentSpiritInfo.spiritInfo;
+		var spiritDef = $spiritManager.getSpiritDef(spiritInfo.idx);
+
+		function resolveTargetSpirits(target, targets){
+			if (($gameSystem.isFriendly(target, "player") && spiritDef.targetType == "ally_adjacent") || (!$gameSystem.isFriendly(target, "player")  && spiritDef.targetType == "enemy_adjacent")) {
+
+				targets.push(target);
+
+				if($spiritManager.getSpiritDef(spiritInfo.idx).affectsSubsPilots){
+					let subPilotIds = $statCalc.getSubPilots(target);
+					for(let id of subPilotIds){
+						targets.push($gameActors.actor(id));
+					}						
+				}																									
+			}
+		}
+
 		if(!$gamePlayer.wasTouchMoved){
-			$gamePlayer.locate($gameTemp.activeEvent().posX(), $gameTemp.activeEvent().posY());
-			var spiritInfo = $gameTemp.adjacentSpiritInfo.spiritInfo;
+			$gamePlayer.locate($gameTemp.activeEvent().posX(), $gameTemp.activeEvent().posY(), false, true);
+			
 			var caster = $gameTemp.adjacentSpiritInfo.caster;
 			var initialTargetingResult = $gameTemp.adjacentSpiritInfo.initialTargetingResult;
 			
 			let targets = [];
 			for(let mapTarget of $gameTemp.adjacentSpiritInfo.initialTargetingResult.targets){
-				targets.push(mapTarget);
-
-				if($spiritManager.getSpiritDef($gameTemp.adjacentSpiritInfo.spiritInfo.idx).affectsSubsPilots){
-					let subPilotIds = $statCalc.getSubPilots(mapTarget);
-					for(let id of subPilotIds){
-						targets.push($gameActors.actor(id));
-					}						
+				resolveTargetSpirits(mapTarget, targets);
+				if(mapTarget.subTwin){
+					resolveTargetSpirits(mapTarget.subTwin, targets);
 				}
 			}		
 			
@@ -1274,49 +1287,67 @@ GameState_actor_target_spirit.prototype.updateTriggerAction = function(cursor){
 
 GameState_actor_target_spirit.prototype.updateMapEvent = function(x, y, triggers){
 	var spiritDef = $spiritManager.getSpiritDef($gameTemp.currentTargetingSpirit.idx);
+
+	function resolveTargetSpirits(target, targets){
+		if (($gameSystem.isFriendly(target, "player") && spiritDef.targetType == "ally") || (!$gameSystem.isFriendly(target, "player")  && spiritDef.targetType == "enemy")) {
+
+			targets.push(target);
+
+			if($spiritManager.getSpiritDef($gameTemp.currentTargetingSpirit.idx).affectsSubsPilots){
+				let subPilotIds = $statCalc.getSubPilots(target);
+				for(let id of subPilotIds){
+					targets.push($gameActors.actor(id));
+				}						
+			}																									
+		}
+	}
+
 	$gameMap.eventsXy(x, y).forEach(function(event) {
 		if (event.isTriggerIn(triggers) && !event.isErased()) {
 			var actionBattlerArray = $gameSystem.EventToUnit($gameTemp.activeEvent().eventId());
 			var targetBattlerArray = $gameSystem.EventToUnit(event.eventId());
 			if(targetBattlerArray){		
+				let targets = [];
+
+				var spiritInfo = $gameTemp.currentTargetingSpirit;	
+		
+				var caster;
+				if(spiritInfo.caster){
+					caster = spiritInfo.caster;
+				} else {
+					caster = actionBattlerArray[1];
+				}
+
 				var target = targetBattlerArray[1];
-				if (($gameSystem.isFriendly(target, "player") && spiritDef.targetType == "ally") || (!$gameSystem.isFriendly(target, "player")  && spiritDef.targetType == "enemy")) {
-					var spiritInfo = $gameTemp.currentTargetingSpirit;	
-				
-					var caster;
-					if(spiritInfo.caster){
-						caster = spiritInfo.caster;
-					} else {
-						caster = actionBattlerArray[1];
-					}
+				resolveTargetSpirits(target, targets);
+				if(target.subTwin){
+					resolveTargetSpirits(target.subTwin, targets);
+				}
 
-					let targets = [];
-					targets.push(target);
+				if(targets.length){
+					$spiritManager.applyEffect($gameTemp.currentTargetingSpirit.idx, caster, targets, $gameTemp.currentTargetingSpirit.cost, spiritInfo.additionalCaster);
+					$gamePlayer.locate(event.posX(), event.posY());
+					
+					$gameTemp.spiritTargetActor = target;
 
-					if($spiritManager.getSpiritDef($gameTemp.currentTargetingSpirit.idx).affectsSubsPilots){
-						let subPilotIds = $statCalc.getSubPilots(target);
-						for(let id of subPilotIds){
-							targets.push($gameActors.actor(id));
+					let actorEffects = [];
+					for(let entry of targets){
+						if(!entry.isSubPilot){
+							actorEffects.push({type: "spirit", parameters: {target: entry, idx: $gameTemp.currentTargetingSpirit.idx}});
 						}						
 					}
+
+					$gameTemp.queuedActorEffects = actorEffects;
+					$gameSystem.setSubBattlePhase('spirit_activation');
 					
-					if(targets.length){
-						$spiritManager.applyEffect($gameTemp.currentTargetingSpirit.idx, caster, targets, $gameTemp.currentTargetingSpirit.cost, spiritInfo.additionalCaster);
-						$gamePlayer.locate(event.posX(), event.posY());
-						
-						$gameTemp.spiritTargetActor = target;
-						$gameTemp.queuedActorEffects = [{type: "spirit", parameters: {target: target, idx: $gameTemp.currentTargetingSpirit.idx}}];
-						$gameSystem.setSubBattlePhase('spirit_activation');
-						
-						$gameTemp.spiritWindowDoneHandler = function(){
-							$gamePlayer.locate($gameTemp.activeEvent().posX(), $gameTemp.activeEvent().posY());
-							$gameTemp.popMenu = true;
-							$gameSystem.setSrpgActorCommandWindowNeedRefresh($gameSystem.EventToUnit($gameTemp.activeEvent().eventId()));
-							$gameSystem.setSubBattlePhase("actor_command_window");
-						}	
-						$gameTemp.pushMenu = "spirit_activation";					
-					}																					
-				}
+					$gameTemp.spiritWindowDoneHandler = function(){
+						$gamePlayer.locate($gameTemp.activeEvent().posX(), $gameTemp.activeEvent().posY());
+						$gameTemp.popMenu = true;
+						$gameSystem.setSrpgActorCommandWindowNeedRefresh($gameSystem.EventToUnit($gameTemp.activeEvent().eventId()));
+						$gameSystem.setSubBattlePhase("actor_command_window");
+					}	
+					$gameTemp.pushMenu = "spirit_activation";					
+				}	
 			}
 		}
 	});
