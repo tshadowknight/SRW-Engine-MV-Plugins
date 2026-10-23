@@ -636,6 +636,9 @@ Window_Intermission.prototype.redraw = function() {
 	}
 
 	function applyAceDisplay(displayInfo, ace){	
+		if(!$statCalc.isActorSRWInitialized(ace)){
+			return 0;
+		}
 		if(ace.SRWStats.pilot.id != -1){
 			if(ace.isSubPilot){	// && ace.mainPilot && $statCalc.getKills(ace) <= $statCalc.getKills(ace.mainPilot)
 				return 0;			
@@ -667,7 +670,7 @@ Window_Intermission.prototype.redraw = function() {
 			if(rankToActorId[ctr] != null && rankToActorId[ctr] != 0){
 				const actor = $gameActors.actor(rankToActorId[ctr]);
 				if(actor){
-					$statCalc.initSRWStats(actor);
+					//$statCalc.initSRWStats(actor);
 					const assignResult = applyAceDisplay(_this.aceDisplays[assignedCount], actor);	
 					if(assignResult != 0){
 						assignedCount++;
