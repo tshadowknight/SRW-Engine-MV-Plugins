@@ -732,10 +732,16 @@ Window_BeforebattleTwin.prototype.update = function() {
 								
 								var targetPos = {
 									x: $gameTemp.currentBattleEnemy.event.posX(),
-									y: $gameTemp.currentBattleEnemy.event.posY()
+									y: $gameTemp.currentBattleEnemy.event.posY()  
 								};
-								
-								if($battleCalc.getBestWeapon({actor: supporter.actor.subTwin, pos: twinPos}, {actor: $gameTemp.currentBattleEnemy, pos: targetPos}, false, false, false)){
+
+								let canSupport = false;
+
+								var maxSupportAttacks = $statCalc.applyStatModsToValue(supporter.actor.subTwin, 0, ["support_attack"]);
+								if((maxSupportAttacks > supporter.actor.subTwin.SRWStats.battleTemp.supportAttackCount && (!supporter.actor.SRWStats.battleTemp.hasFinishedTurn || ENGINE_SETTINGS.ALLOW_TURN_END_SUPPORT) && !$statCalc.isDisabled(supporter.actor.subTwin))){
+									canSupport = true;
+								}
+								if(canSupport && $battleCalc.getBestWeapon({actor: supporter.actor.subTwin, pos: twinPos}, {actor: $gameTemp.currentBattleEnemy, pos: targetPos}, false, false, false)){
 										$gameTemp.currentMenuUnit = {
 										actor: supporter.actor.subTwin,
 										mech: supporter.actor.subTwin.SRWStats.mech
@@ -1021,7 +1027,7 @@ Window_BeforebattleTwin.prototype.update = function() {
 };
 
 
-Window_BeforebattleTwin.prototype.createPercentIndicator = function(allyOrEnemy, action, ref, isSupport){
+Window_BeforebattleTwin.prototype.createPercentIndicator = function(allyOrEnemy, action, ref, isSupport, isSmallBlock){
 	var _this = this;
 	var content = "";
 	content+="<div class='scaled_text percent_indicator'>";
@@ -1151,35 +1157,54 @@ Window_BeforebattleTwin.prototype.createPercentIndicator = function(allyOrEnemy,
 		
 		
 	}
-	content+="<div class='percent_indicator_containers "+initiatorType+" "+(hitRates.length > 1 ? "twin" : "")+"'>";
+	let maxDisplayedRates = hitRates.length;
+	if(isSmallBlock){
+		maxDisplayedRates = 1;
+	}
+
+	content+="<div class='percent_indicator_containers "+initiatorType+" "+(maxDisplayedRates > 1 ? "twin" : "")+"'>";
 	
-	content+="<div class='target_arrow_container "+initiatorType+" "+(hitRates.length > 1 ? "twin" : "")+" "+(ref.isSubTwin ? "sub_twin" : "")+"'>";
-	
-	if(targetType == "all"){		
-		if(realIdx > 1){//if there are actually two targets
-			content+="<img class='target_arrow main' data-img='img/system/targeting1.png'>";
-			content+="<img class='target_arrow twin' data-img='img/system/targeting2.png'>";
-		} else if(ref.isSubTwin){
-			content+="<img class='target_arrow twin' data-img='img/system/targeting2.png'>";
-		} else {
-			content+="<img class='target_arrow main' data-img='img/system/targeting1.png'>";
-		}		
-	} else if(targetType == "main"){
-		if(ref.isSubTwin){
-			content+="<img class='target_arrow main' data-img='img/system/targeting2.png'>";
-		} else {
-			content+="<img class='target_arrow main' data-img='img/system/targeting1.png'>";
-		}		
-	} else{		
-		if(ref.isSubTwin){
-			content+="<img class='target_arrow main' data-img='img/system/targeting1.png'>";
-		} else {
-			content+="<img class='target_arrow twin' data-img='img/system/targeting2.png'>";
-		}	
+	if(!isSmallBlock){
+		content+="<div class='target_arrow_container "+initiatorType+" "+(maxDisplayedRates > 1 ? "twin" : "")+" "+(ref.isSubTwin ? "sub_twin" : "")+"'>";
+		
+		if(targetType == "all"){		
+			if(realIdx > 1){//if there are actually two targets
+				content+="<img class='target_arrow main' data-img='img/system/targeting1.png'>";
+				content+="<img class='target_arrow twin' data-img='img/system/targeting2.png'>";
+			} else if(ref.isSubTwin){
+				content+="<img class='target_arrow twin' data-img='img/system/targeting2.png'>";
+			} else {
+				content+="<img class='target_arrow main' data-img='img/system/targeting1.png'>";
+			}		
+		} else if(targetType == "main"){
+			if(ref.isSubTwin){
+				content+="<img class='target_arrow main' data-img='img/system/targeting2.png'>";
+			} else {
+				content+="<img class='target_arrow main' data-img='img/system/targeting1.png'>";
+			}		
+		} else{		
+			if(ref.isSubTwin){
+				content+="<img class='target_arrow main' data-img='img/system/targeting1.png'>";
+			} else {
+				content+="<img class='target_arrow twin' data-img='img/system/targeting2.png'>";
+			}	
+		}
+		
+		content+="</div>";
+	} else {
+		let hitRateAcc = 0;
+		let critRateAcc = 0;
+
+		for(var i = 0; i < hitRates.length; i++){
+			hitRateAcc+=hitRates[i];
+			critRateAcc+=critRates[i];
+		}
+
+		hitRates = [hitRateAcc / hitRates.length];
+		critRates = [critRateAcc / critRates.length];
 	}
 	
-	content+="</div>";
-	
+
 	for(var i = 0; i < hitRates.length; i++){
 		var hitRate = hitRates[i];
 		var critRate = critRates[i];
@@ -1440,7 +1465,7 @@ Window_BeforebattleTwin.prototype.createSmallParticipantBlock = function(ref, ac
 	
 	
 	if(allyOrEnemy == "ally"){
-		content+=this.createPercentIndicator(allyOrEnemy, action, ref, "support");
+		content+=this.createPercentIndicator(allyOrEnemy, action, ref, "support", true);
 		content+="<div data-participantid='"+participantId+"' class='mech_icon_small pilot'>";
 		content+="</div>";
 		content+="<div data-type='"+(ref.isActor() ? "actor" : "enemy")+"' data-pilot='"+ref.SRWStats.pilot.id+"' class='pilot_icon display_icon'>";

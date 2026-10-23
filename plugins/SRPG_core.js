@@ -1967,7 +1967,19 @@ SceneManager.isInSaveScene = function(){
 			$gameSystem.setSubBattlePhase("confirm_adjacent_spirit");		
 		} else {
 			//apply immediately
-			$spiritManager.applyEffect(spiritInfo.idx, caster, initialTargetingResult.targets, spiritInfo.cost, spiritInfo.additionalCaster);
+			let targets = [];
+			for(let mainPilotTarget of initialTargetingResult.targets){
+				targets.push(mainPilotTarget);
+
+				if($spiritManager.getSpiritDef(spiritInfo.idx).affectsSubsPilots){
+					let subPilotIds = $statCalc.getSubPilots(mainPilotTarget);
+					for(let id of subPilotIds){
+						targets.push($gameActors.actor(id));
+					}						
+				}
+			}	
+
+			$spiritManager.applyEffect(spiritInfo.idx, caster, targets, spiritInfo.cost, spiritInfo.additionalCaster);
 			
 			this.applyAdditionalSpiritEffects(spiritInfo, target, caster);
 			if(initialTargetingResult.type != "enemy_all" && initialTargetingResult.type != "ally_all"){
@@ -3034,7 +3046,7 @@ SceneManager.isInSaveScene = function(){
 				if(battleEffect.isHit && !battleEffect.receivedBuff){
 					$statCalc.clearSpirit(battleEffect.ref, "persist");
 				}
-				if(battleEffect.type == "support attack" && battleEffect.hasActed){
+				if(battleEffect.type == "support attack" && battleEffect.hasActed && !battleEffect.isSelfSupport){
 					$statCalc.incrementSupportAttackCounter(battleEffect.ref);
 				}
 				if(battleEffect.type == "support defend" && battleEffect.hasActed){

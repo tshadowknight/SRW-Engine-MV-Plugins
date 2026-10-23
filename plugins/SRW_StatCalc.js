@@ -6438,8 +6438,10 @@ StatCalc.prototype.canSupportAttack = function(supportedActor, supportingActor){
 StatCalc.prototype.getSupportAttackCandidates = function(factionId, position, terrainIdx, eventId, ignoreConditions){
 	var _this = this;
 	var result = [];
+	
 	this.iterateAllActors(null, function(actor, event){
-		if(!event.isErased() && (Math.abs(event.posX() - position.x) + Math.abs(event.posY() - position.y)) == 1 && (eventId == null || event.eventId() != eventId) && !actor.isSubTwin){
+		if(!event.isErased() && (Math.abs(event.posX() - position.x) + Math.abs(event.posY() - position.y)) == 1 && (eventId == null || event.eventId() != eventId)){// && !actor.isSubTwin
+			_this.invalidateAbilityCache(actor);
 			var maxSupportAttacks = $statCalc.applyStatModsToValue(actor, 0, ["support_attack"]);
 			if(ignoreConditions || (maxSupportAttacks > actor.SRWStats.battleTemp.supportAttackCount && (!actor.SRWStats.battleTemp.hasFinishedTurn || ENGINE_SETTINGS.ALLOW_TURN_END_SUPPORT) && !_this.isDisabled(actor))){
 				var validTerrain = _this.canBeOnTerrain(actor, terrainIdx);							
@@ -6449,7 +6451,24 @@ StatCalc.prototype.getSupportAttackCandidates = function(factionId, position, te
 			}			
 		}					
 	});
-	return result;
+
+	//hack fix: subtwins that already have their main twin in the set shouldn't be kept in as they can mask the selection of the main twin
+	//map all subtwins already represented by a main twin
+	const subTwinMapping = {};
+	for(let entry of result){
+		if($statCalc.isMainTwin(entry.actor) && entry.actor.subTwin){
+			subTwinMapping[$statCalc.getReferenceEvent(entry.actor.subTwin).eventId()] = true;
+		}
+	}
+
+	//remove subTwwins already represented by a main twin
+	const tmp = [];
+	for(let entry of result){
+		if(!entry.actor.isSubTwin || !subTwinMapping[$statCalc.getReferenceEvent(entry.actor).eventId()]){
+			tmp.push(entry);
+		}
+	}
+	return tmp;
 }
 
 StatCalc.prototype.incrementSupportAttackCounter = function(actor){

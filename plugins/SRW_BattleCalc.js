@@ -1064,6 +1064,9 @@ BattleCalc.prototype.generateBattleResult = function(isPrediction){
 				return; //the support attacker does not get to attack if the main attacker is down
 			}			
 			aCache.mainAttacker = mainAttackerCache;
+			if(aCache.mainAttacker.ref == aCache.ref){
+				aCache.isSelfSupport = true;
+			}
 		}
 		if(aCache.type == "defender"){
 			aCache.counterActivated = $gameTemp.defenderCounterActivated;

@@ -1002,7 +1002,6 @@
 			$statCalc.initSRWStats(actor_unit);
 			$statCalc.invalidateAbilityCache(actor_unit);
 			$statCalc.applyBattleStartWill(actor_unit);
-			visitedActors[actor_unit.actorId()] = true;
 
 			let preferredSuperState = this.getPreferredSuperState(actor_unit);
 			if(preferredSuperState){
