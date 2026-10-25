@@ -806,9 +806,9 @@ GameState_confirm_adjacent_spirit.prototype.update = function(scene){
 			let targets = [];
 			for(let mapTarget of $gameTemp.adjacentSpiritInfo.initialTargetingResult.targets){
 				resolveTargetSpirits(mapTarget, targets);
-				if(mapTarget.subTwin){
-					resolveTargetSpirits(mapTarget.subTwin, targets);
-				}
+				//if(mapTarget.subTwin){
+				//	resolveTargetSpirits(mapTarget.subTwin, targets);
+				//}
 			}		
 			
 			$spiritManager.applyEffect(spiritInfo.idx, caster, targets, spiritInfo.cost, spiritInfo.additionalCaster);
