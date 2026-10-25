@@ -1982,16 +1982,19 @@ SceneManager.isInSaveScene = function(){
 			}
 
 			//apply immediately
-			let targets = [];
-			resolveTargetSpirits(target, targets);
-			if(target.subTwin){
-				resolveTargetSpirits(target.subTwin, targets);
-			}	
-
-			$spiritManager.applyEffect(spiritInfo.idx, caster, targets, spiritInfo.cost, spiritInfo.additionalCaster);
+			
 			
 			this.applyAdditionalSpiritEffects(spiritInfo, target, caster);
 			if(initialTargetingResult.type != "enemy_all" && initialTargetingResult.type != "ally_all"){
+
+				let targets = [];
+				resolveTargetSpirits(target, targets);
+				if(target.subTwin){
+					resolveTargetSpirits(target.subTwin, targets);
+				}	
+
+				$spiritManager.applyEffect(spiritInfo.idx, caster, targets, spiritInfo.cost, spiritInfo.additionalCaster);
+
 				$gameTemp.spiritTargetActor = initialTargetingResult.targets[0];
 
 				let actorEffects = [];
@@ -2022,6 +2025,7 @@ SceneManager.isInSaveScene = function(){
 							
 				//_this._mapSrpgActorCommandWindow.activate();
 			}  else {
+				$spiritManager.applyEffect(spiritInfo.idx, caster, initialTargetingResult.targets, spiritInfo.cost, spiritInfo.additionalCaster);
 				$gameTemp.queuedEffectSpiritId = spiritInfo.idx; 
 				$gameSystem.setSubBattlePhase("map_spirit_animation");				
 			}				
