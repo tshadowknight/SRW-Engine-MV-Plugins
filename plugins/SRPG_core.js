@@ -2737,7 +2737,7 @@ SceneManager.isInSaveScene = function(){
 			var subPilots = $statCalc.getSubPilots(battleEffect.ref);
 			var gainResults = [];
 			subPilots.forEach(function(id){	
-				if($gameActors.actor(id)){
+				if(id != 0 && $gameActors.actor(id)){
 					gainResults.push({actor: $gameActors.actor(id), expGain: 0, ppGain: battleEffect.ppGain});
 				}				
 			});
@@ -2782,6 +2782,13 @@ SceneManager.isInSaveScene = function(){
 					gainModifier = 1;
 				}
 				gainResults.unshift({actor: subTwin, expGain: Math.floor(battleEffect.expGain * gainModifier), ppGain: Math.floor(battleEffect.ppGain * gainModifier)});	
+			
+				let subPilots = $statCalc.getSubPilots(subTwin);
+				subPilots.forEach(function(id){	
+					if(id != 0 && $gameActors.actor(id)){
+						gainResults.push({actor: $gameActors.actor(id), expGain: Math.floor(battleEffect.expGain * gainModifier), ppGain: Math.floor(battleEffect.ppGain * gainModifier)});
+					}				
+				});
 			}	
 			
 			gainResults.unshift({actor: battleEffect.ref, expGain: battleEffect.expGain, ppGain: battleEffect.ppGain});			

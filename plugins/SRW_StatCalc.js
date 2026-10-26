@@ -5248,7 +5248,7 @@ StatCalc.prototype.getCombinationWeaponParticipants = function(actor, weapon){
 					participants.push(subTwin);
 				}	
 				
-				var adjacent = this.getAdjacentActorsWithDiagonal(actor.isActor() ? "actor" : "enemy", {x: event.posX(), y: event.posY()});
+				var adjacent = this.getAdjacentActorsWithDiagonal(actor.isActor() ? "actor" : "enemy", {x: event.posX(), y: event.posY()}, true);
 				for(var i = 0; i < adjacent.length; i++){
 					var event = this.getReferenceEvent(adjacent[i]);
 					if(!visited[event.eventId()] ){						
@@ -6388,7 +6388,7 @@ StatCalc.prototype.getAdjacentActors = function(type, position){
 	return result;
 }
 
-StatCalc.prototype.getAdjacentActorsWithDiagonal = function(type, position){
+StatCalc.prototype.getAdjacentActorsWithDiagonal = function(type, position, noSubTwins){
 	var result = [];
 	this.iterateAllActors(type, function(actor, event){
 		var isDirect = false;
@@ -6399,7 +6399,7 @@ StatCalc.prototype.getAdjacentActorsWithDiagonal = function(type, position){
 		if((Math.abs(event.posX() - position.x) == 1 && Math.abs(event.posY() - position.y)) == 1){
 			isDiagonal = true;
 		}	
-		if(!event.isErased() && (isDirect || isDiagonal)){				
+		if(!event.isErased() && (isDirect || isDiagonal) && (!noSubTwins || !actor.isSubTwin)){				
 			result.push(actor);							
 		}					
 	});
