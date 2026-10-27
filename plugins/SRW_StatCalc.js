@@ -1166,6 +1166,21 @@ StatCalc.prototype.setArmorDown = function(actor, amount){
 	} 
 }
 
+StatCalc.prototype.isSkillDown = function(actor){
+	if(this.isActorSRWInitialized(actor)){
+		return actor.SRWStats.stageTemp.status.skillDown;
+	} else {
+		return false;
+	}
+}
+
+StatCalc.prototype.setSkillDown = function(actor, amount){
+	if(this.isActorSRWInitialized(actor)){		
+		actor.SRWStats.stageTemp.status.skillDown = amount;		
+	} 
+}
+
+
 StatCalc.prototype.isMovementDown = function(actor){
 	if(this.isActorSRWInitialized(actor)){
 		return actor.SRWStats.stageTemp.status.movementDown;

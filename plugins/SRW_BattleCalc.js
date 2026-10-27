@@ -130,8 +130,12 @@ BattleCalc.prototype.performCritCalculation = function(attackerInfo, defenderInf
 		var weaponInfo = attackerAction.attack;			
 		var attackerTerrainMod = $statCalc.getTerrainMod(attackerInfo.actor) || 0;
 		
-		var attackerSkill = attackerPilotStats.skill;
+		var attackerSkill = attackerPilotStats.skill;		
 		attackerSkill = $statCalc.applyStatModsToValue(attackerInfo.actor, attackerSkill, ["stat_skill"]);
+		var skillDown = $statCalc.isSkillDown(attackerInfo.actor);
+		if(skillDown){
+			attackerSkill-=skillDown;
+		}
 		
 		var baseCrit = (attackerSkill) * attackerTerrainMod + (weaponInfo.critMod);
 		
@@ -140,7 +144,11 @@ BattleCalc.prototype.performCritCalculation = function(attackerInfo, defenderInf
 		var defenderTerrainMod = $statCalc.getTerrainMod(defenderInfo.actor) || 0;
 		
 		var defenderSkill = defenderPilotStats.skill;
-		defenderSkill = $statCalc.applyStatModsToValue(attackerInfo.actor, defenderSkill, ["stat_skill"]);
+		defenderSkill = $statCalc.applyStatModsToValue(defenderInfo.actor, defenderSkill, ["stat_skill"]);
+		var skillDown = $statCalc.isSkillDown(defenderInfo.actor);
+		if(skillDown){
+			defenderSkill-=skillDown;
+		}
 		
 		var baseCritEvade = (defenderSkill) * defenderTerrainMod + (SRW_CONSTANTS.CRIT_OFFSET || 0);
 		
@@ -1308,6 +1316,7 @@ BattleCalc.prototype.generateBattleResult = function(isPrediction){
 						inflict_SP_down: $statCalc.applyStatModsToValue(aCache.ref, 0, ["inflict_SP_down"]),
 						inflict_will_down: $statCalc.applyStatModsToValue(aCache.ref, 0, ["inflict_will_down"]),		
 						inflict_spirit_seal: $statCalc.applyStatModsToValue(aCache.ref, 0, ["inflict_spirit_seal"]),	
+						inflict_skill_down: $statCalc.applyStatModsToValue(aCache.ref, 0, ["inflict_skill_down"]),	
 					};		
 					aCache.statusEffects = statusEffects;				
 				
@@ -1832,6 +1841,7 @@ BattleCalc.prototype.generateMapBattleResult = function(){
 					inflict_SP_down: $statCalc.applyStatModsToValue(aCache.ref, 0, ["inflict_SP_down"]),
 					inflict_will_down: $statCalc.applyStatModsToValue(aCache.ref, 0, ["inflict_will_down"]),		
 					inflict_spirit_seal: $statCalc.applyStatModsToValue(aCache.ref, 0, ["inflict_spirit_seal"]),	
+					inflict_skill_down: $statCalc.applyStatModsToValue(aCache.ref, 0, ["inflict_skill_down"]),	
 				};				
 				dCache.statusReceived = statusEffects;
 			}

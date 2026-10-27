@@ -2875,6 +2875,9 @@ SceneManager.isInSaveScene = function(){
 				if(statusEffects.inflict_spirit_seal){
 					$statCalc.setSpiritsSealed(defender);
 				}
+				if(statusEffects.inflict_skill_down){
+					$statCalc.setSkillDown(defender);
+				}
 				var SPReduction = statusEffects.inflict_SP_down || 0;
 				$statCalc.applySPCost(defender, SPReduction);
 				
