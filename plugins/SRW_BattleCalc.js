@@ -450,7 +450,8 @@ BattleCalc.prototype.performDamageCalculation = function(attackerInfo, defenderI
 		}				
 		
 		
-		finalDamage = $statCalc.applyStatModsToValue(attackerInfo.actor, finalDamage, ["final_damage"]);	
+		finalDamage = $statCalc.applyStatModsToValue(attackerInfo.actor, finalDamage, ["final_damage"]);
+
 
 		if($statCalc.applyStatModsToValue(attackerInfo.actor, 0, ["hit_cap_break"])){
 			if($gameTemp.battleTargetInfo){			
@@ -1953,6 +1954,10 @@ BattleCalc.prototype.generateMapBattleResult = function(){
 							fundGain*=modSet.fundsMultiplier;
 						}
 					}
+				}
+
+				if(isHit){
+					fundGain+=$statCalc.applyStatModsToValue(gainRecipient, 0, ["fund_gain_hit"]) || 0;
 				}
 				
 				aCache.expGain+= expGain;
