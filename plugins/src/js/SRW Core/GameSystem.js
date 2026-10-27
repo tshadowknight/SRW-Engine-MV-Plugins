@@ -1628,6 +1628,8 @@
 			} else {			
 				_this.setSubBattlePhase('initialize');
 			}	
+
+			
 		};
 
 		//自動行動アクターターンの開始

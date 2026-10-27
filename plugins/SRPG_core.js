@@ -3107,6 +3107,8 @@ SceneManager.isInSaveScene = function(){
 		}
 		$statCalc.resetCurrentAttack($gameTemp.currentBattleActor);	
 		$statCalc.resetCurrentAttack($gameTemp.currentBattleEnemy);	
+
+		
 		
 	}	
 	
@@ -5466,10 +5468,7 @@ SceneManager.isInSaveScene = function(){
     //戦闘処理の実行
     Scene_Map.prototype.srpgBattleStart = function(actionArray, targetArray) {		
 		
-		$battleCalc.generateBattleResult();
-		
-				
-				
+		$battleCalc.generateBattleResult();				
      
 		Object.keys($gameTemp.battleEffectCache).forEach(function(cacheRef){
 			var battleEffect = $gameTemp.battleEffectCache[cacheRef];				
@@ -5483,16 +5482,19 @@ SceneManager.isInSaveScene = function(){
 			){						
 				battleEffect.isDestroyed = true;
 				battleEffect.attacked.isDestroyed = true;
-			}					
+			}				
 			
-		});
-		
+		});		
+
+		//if the unit attacked after moving, clear the twin position info
+		//it should be retained if the unit did not move to prevent the unit from using disband to change unit positions on the next turn or after getting another move on the same turn.
+		if($gameTemp.isPostMove && !$gameTemp.isEnemyAttack){
+			$statCalc.clearTwinPositionInfo($gameTemp.currentBattleActor);
+		}
 		
 		$gameTemp.clearMoveTable();
 		$gameTemp.isEnemyAttack = false;
-		$gameTemp.battleOccurred = true;
-		
-				
+		$gameTemp.battleOccurred = true;				
 		
 		this.eventBeforeBattle();		
 			
