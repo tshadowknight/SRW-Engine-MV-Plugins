@@ -1136,16 +1136,23 @@ MechUI.prototype.initPropertyHandlers = function(){
 				content+="<div class='row'>";	
 				content+="<div class='cell'>";
 				content+=EDITORSTRINGS.MECH.label_required_will;
-				content+="</div>";
-		
-						
+				content+="</div>";						
 		
 				content+="<div class='cell'>";
 				content+="<input id='combine_will' value='"+_this.getMetaValue("mechCombineWill")+"'></input>";
+				content+="</div>";						
 				content+="</div>";
-	
-						
+				
+				content+="<div class='row'>";	
+				content+="<div class='cell'>";
+				content+=EDITORSTRINGS.MECH.label_cannot_separate;
+				content+="</div>";						
+		
+				content+="<div class='cell'>";
+				content+="<input id='cannot_separate' type=checkbox "+(_this.getMetaValue("mechNoSeparate") * 1 ? "checked" : "")+"></input>";
+				content+="</div>";						
 				content+="</div>";
+
 				content+="</div>";
 				
 		
@@ -1196,6 +1203,12 @@ MechUI.prototype.initPropertyHandlers = function(){
 					//_this.show();
 					_this._mainUIHandler.setModified();
 				});	
+
+				containerNode.querySelector("#cannot_separate").addEventListener("change", function(){
+					_this.setMetaValue("mechNoSeparate", this.checked ? 1 : 0);
+					//_this.show();
+					_this._mainUIHandler.setModified();
+				});				
 			}
 		},
 		deployment: {

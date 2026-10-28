@@ -311,6 +311,7 @@ APPSTRINGS.ATTACKLIST = {
 	label_EN_cost: "EN Cost",
 	label_MP_cost: "MP Cost",
 	label_required_will: "Required Will",
+
 	label_terrain_rating: "Terrain Rating",
 	label_special_effect: "Special Effect",
 	label_upgrades: "Upgrades",
@@ -1060,6 +1061,7 @@ EDITORSTRINGS.MECH = {
 	label_command_name: "Command Name",
 	label_available: "Available",
 	label_required_will: "Required Will",
+	label_cannot_separate: "Cannot Separate",
 	label_restores: "Restores",
 	
 	label_on_destruction: "On Destruction",

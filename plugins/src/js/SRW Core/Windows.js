@@ -484,7 +484,7 @@
 						if($statCalc.canCombine(_this._actor).isValid){
 							_this.addCommand(APPSTRINGS.MAPMENU.cmd_combine, 'combine');
 						}	
-						if($statCalc.isCombined(_this._actor)){
+						if($statCalc.isCombined(_this._actor) && !_this._actor.SRWStats.mech.cannotSeparate){
 							_this.addCommand(APPSTRINGS.MAPMENU.cmd_split, 'split');
 						}
 						if(ENGINE_SETTINGS.ENABLE_TWIN_SYSTEM && !ENGINE_SETTINGS.DISABLE_ALLY_TWINS){

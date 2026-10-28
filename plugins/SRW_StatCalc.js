@@ -2081,6 +2081,8 @@ StatCalc.prototype.getMechData = function(mech, forActor, items, previousWeapons
 		result.deployConditions = JSON.parse(mechProperties.mechDeployConditions || "{}");
 		
 		result.forcePilots = parseInt(mechProperties.mechForcePilots || 0);
+
+		result.cannotSeparate = parseInt(mechProperties.mechNoSeparate || 0);
 		
 		result.canQuickSwap = parseInt(mechProperties.mechCanQuickSwap || 0)
 		
@@ -3219,12 +3221,14 @@ StatCalc.prototype.combine = function(actor, forced){
 		let combineReversalInfo = [];
 		if(combineResult.isValid){
 			var HPRatioSum = 0;
-			var HPRatioCount = 0;
+			var HPRatioCount = 0; 
 			var ENRatioSum = 0;
 			var ENRatioCount = 0;
 			var combinesInto = combineResult.combinesInto;
 			var isEssential = actor.SRWStats.stageTemp.isEssential;
 			let potentialSuperStates = {}; 
+
+			let combinedBoardedUnits = [];
 			
 			for(var i = 0; i < combineResult.participants.length; i++){
 				var combineActor = $gameActors.actor(combineResult.participants[i]);
@@ -3240,6 +3244,8 @@ StatCalc.prototype.combine = function(actor, forced){
 				ENRatioSum+=calculatedStats.currentEN / calculatedStats.maxEN;
 				ENRatioCount++;	
 				potentialSuperStates[this.getSuperState(combineActor)] = true;
+
+				combinedBoardedUnits = combinedBoardedUnits.concat(combineActor.SRWStats.mech.unitsOnBoard);
 			}
 			
 			var targetMechData = this.getMechDataById(combinesInto, true);
@@ -3273,6 +3279,8 @@ StatCalc.prototype.combine = function(actor, forced){
 			//this invalidation and reload ensures that the spawned unit has its stats calculated with abilities taken into account
 			this.invalidateAbilityCache();
 			this.reloadSRWStats(actor, true);
+
+			targetActor.SRWStats.mech.unitsOnBoard = combinedBoardedUnits;
 			
 			calculatedStats = this.getCalculatedMechStats(targetActor);
 			calculatedStats.currentHP = Math.round(calculatedStats.maxHP * HPRatioSum / HPRatioCount);
@@ -7028,7 +7036,7 @@ StatCalc.prototype.setAllSPPercent = function(type, percent){
 StatCalc.prototype.recoverSP = function(actor, amount){		
 	if(this.isActorSRWInitialized(actor)){			
 		var pilotStats = this.getCalculatedPilotStats(actor);
-		pilotStats.currentSP+=amount;
+		pilotStats.currentSP+=(amount || 0);
 		if(pilotStats.currentSP > pilotStats.SP){
 			pilotStats.currentSP = pilotStats.SP;
 		}

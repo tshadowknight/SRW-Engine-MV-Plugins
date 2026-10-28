@@ -1606,6 +1606,7 @@ BattleCalc.prototype.generateBattleResult = function(isPrediction){
 		aCache.expGain = 0;
 		aCache.ppGain = 0;
 		aCache.fundGain = 0;
+		aCache.SPGain = 0;
 		
 		var gainDonors = [];
 		gainDonors.push($gameTemp.currentBattleEnemy);
@@ -1632,7 +1633,7 @@ BattleCalc.prototype.generateBattleResult = function(isPrediction){
 					expGain*=2;
 					aCache.isGainBoosted = true;
 				}
-				
+				var SPGain = 0;
 				var ppGain = _this.performPPCalculation(gainRecipient, gainDonor);
 				var fundGain = $statCalc.getAwardedFunds(gainDonor);
 				if($statCalc.getActiveSpirits(gainRecipient).fortune){
@@ -1648,6 +1649,7 @@ BattleCalc.prototype.generateBattleResult = function(isPrediction){
 					fundGain = 0;
 				} else {
 					fundGain = $statCalc.applyStatModsToValue(gainRecipient, fundGain, ["fund_gain_destroy"]);
+					SPGain = $statCalc.applyStatModsToValue(gainRecipient, SPGain, ["sp_on_destroy"]);
 					
 					if(ENGINE_SETTINGS.DIFFICULTY_MODS && ENGINE_SETTINGS.DIFFICULTY_MODS.enabled > 0){
 						const modSet = ENGINE_SETTINGS.DIFFICULTY_MODS.levels[$gameSystem.getCurrentDifficultyLevel()];
@@ -1656,13 +1658,17 @@ BattleCalc.prototype.generateBattleResult = function(isPrediction){
 						}
 					}
 				}
-				
+
+				if(dCache.isHit){
+					fundGain+=$statCalc.applyStatModsToValue(gainRecipient, 0, ["fund_gain_hit"]) || 0;
+					SPGain+=$statCalc.applyStatModsToValue(gainRecipient, 0, ["sp_on_hit"]) || 0;
+				}
 				
 				
 				aCache.expGain+= expGain;
 				aCache.ppGain+= ppGain;
 				aCache.fundGain+= fundGain;
-				
+				aCache.SPGain+=SPGain;
 				
 			}
 		});
@@ -1788,6 +1794,7 @@ BattleCalc.prototype.generateMapBattleResult = function(){
 	aCache.ppGain = 0;
 	aCache.fundGain = 0;	
 	aCache.gainDonors = [];
+	aCache.SPGain = 0;
 
 	aCache.attackedMap = [];
 
@@ -1849,7 +1856,7 @@ BattleCalc.prototype.generateMapBattleResult = function(){
 			
 			dCache.isAttacked = true;
 			dCache.attackedBy = aCache;
-			
+			var isHit;
 			if(isBetweenFriendlies && interactionType == Game_System.INTERACTION_STATUS){//you can't dodge status effects by allies(assumed to be beneficial ones)
 				isHit = 1;
 				dCache.receivedBuff = true;
@@ -1890,7 +1897,7 @@ BattleCalc.prototype.generateMapBattleResult = function(){
 				hasReductionBarrier: false,
 				hasPercentBarrier: false
 			};
-			if(isHit){
+			if(dCache.isHit){
 				if(interactionType == Game_System.INTERACTION_STATUS){
 					damageResult.isStatusInteraction = true;
 				} else {
@@ -1936,6 +1943,7 @@ BattleCalc.prototype.generateMapBattleResult = function(){
 					expGain*=2;
 					aCache.isGainBoosted = true;
 				}
+				var SPGain = 0;
 				var ppGain = _this.performPPCalculation(gainRecipient, gainDonor);
 				var fundGain = $statCalc.getAwardedFunds(gainDonor);
 				if($statCalc.getActiveSpirits(gainRecipient).fortune){
@@ -1947,6 +1955,7 @@ BattleCalc.prototype.generateMapBattleResult = function(){
 					fundGain = 0;
 				} else {
 					fundGain = $statCalc.applyStatModsToValue(gainRecipient, fundGain, ["fund_gain_destroy"]);
+					SPGain = $statCalc.applyStatModsToValue(gainRecipient, SPGain, ["sp_on_destroy"]);
 
 					if(ENGINE_SETTINGS.DIFFICULTY_MODS && ENGINE_SETTINGS.DIFFICULTY_MODS.enabled > 0){
 						const modSet = ENGINE_SETTINGS.DIFFICULTY_MODS.levels[$gameSystem.getCurrentDifficultyLevel()];
@@ -1958,12 +1967,14 @@ BattleCalc.prototype.generateMapBattleResult = function(){
 
 				if(isHit){
 					fundGain+=$statCalc.applyStatModsToValue(gainRecipient, 0, ["fund_gain_hit"]) || 0;
+					SPGain+=$statCalc.applyStatModsToValue(gainRecipient, 0, ["sp_on_hit"]) || 0;
 				}
 				
 				aCache.expGain+= expGain;
 				aCache.ppGain+= ppGain;
 				aCache.fundGain+= fundGain;
 				aCache.gainDonors.push(dCache);
+				aCache.SPGain+=SPGain;
 			}		
 		}
 	});

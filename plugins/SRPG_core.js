@@ -2791,7 +2791,7 @@ SceneManager.isInSaveScene = function(){
 				});
 			}	
 			
-			gainResults.unshift({actor: battleEffect.ref, expGain: battleEffect.expGain, ppGain: battleEffect.ppGain});			
+			gainResults.unshift({actor: battleEffect.ref, expGain: battleEffect.expGain, ppGain: battleEffect.ppGain, SPGain: battleEffect.SPGain});			
 			
 			var expResults = [];
 			gainResults.forEach(function(entry){						
@@ -2801,7 +2801,9 @@ SceneManager.isInSaveScene = function(){
 					expGain = ENGINE_SETTINGS.EXP_YIELD.MAX;
 					entry.expGain = expGain; //also cap the displayed gain
 				}
-				expResults.push({actor: entry.actor, details: $statCalc.addExp(entry.actor, expGain)});				
+				expResults.push({actor: entry.actor, details: $statCalc.addExp(entry.actor, expGain)});			
+				
+				$statCalc.recoverSP(entry.actor, entry.SPGain || 0);
 			});				
 			
 			$gameTemp.rewardsInfo = {
