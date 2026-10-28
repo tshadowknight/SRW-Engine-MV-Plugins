@@ -203,6 +203,7 @@ DeployActionUI.prototype.show = async function(){
 	content+="</div>";
 	content+="<div class='controls'>";
 	content+="<button id='apply_deploy_actions'>Save</button>";
+	content+="<button id='apply_swap_setup'>Generate</button>";
 	content+="</div>";
 	content+="</div>";
 	
@@ -459,4 +460,29 @@ DeployActionUI.prototype.hook = function(){
 		_this.save();
 		_this._editorContainer.removeChild(_this._container);
 	});	
+
+	this._container.querySelector("#apply_swap_setup").addEventListener("click", function(){
+		let p = prompt("Enter a comma separated list of pilot ids");
+		if(p){
+			_this._data[_this._managedMech] = {};
+			let ids = p.split(",");
+			for(let id of ids){
+				_this._data[_this._managedMech][id] = {};
+				_this._data[_this._managedMech][id][_this._managedMech] = [];
+
+				let subSlotCtr = 0;
+				for(let id2 of ids){
+					let entry = {source: {type: "direct", id: id2}};
+					if(id2 == id){
+						entry.target = {type: "main"};
+					} else {
+						entry.target = {type: "sub", slot: "" + subSlotCtr++};
+					}
+					_this._data[_this._managedMech][id][_this._managedMech].push(entry);
+				}
+			}
+		}
+		_this.show();
+	});
+	
 }
