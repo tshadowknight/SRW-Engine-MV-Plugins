@@ -341,7 +341,7 @@
 			var result = false;
 			if($gameTemp.deathQueue && $gameTemp.deathQueue.length){
 				$gameTemp.deathQueue.forEach(function(queuedDeath){
-					if(queuedDeath.actor.isActor() && queuedDeath.actor.actorId() == id && (!$gameTemp.preventedDeathQuotes || !$gameTemp.preventedDeathQuotes[id])){
+					if(queuedDeath.actor.isActor() && queuedDeath.actor.actorId() == id && (!$gameTemp.preventedDeathQuotes || !$gameTemp.preventedDeathQuotes[id]) && (!$gameTemp.respawnLookup || !$gameTemp.respawnLookup["actor_" + queuedDeath.actor.actorId()])){
 						result = true;
 					}
 				});
@@ -353,7 +353,7 @@
 			var result = false;
 			if($gameTemp.deathQueue && $gameTemp.deathQueue.length){
 				$gameTemp.deathQueue.forEach(function(queuedDeath){
-					if(!queuedDeath.actor.isActor() && queuedDeath.actor.enemyId() == id){
+					if(!queuedDeath.actor.isActor() && queuedDeath.actor.enemyId() == id && (!$gameTemp.respawnLookup || !$gameTemp.respawnLookup["enemy_" + queuedDeath.actor.enemyId()])){
 						result = true;
 					}
 				});
@@ -366,7 +366,19 @@
 			if($gameTemp.deathQueue && $gameTemp.deathQueue.length){
 				$gameTemp.deathQueue.forEach(function(queuedDeath){
 					if(queuedDeath.actor.event.eventId() == id){
-						result = true;
+						if(!$gameTemp.respawnLookup){
+							result = true;
+						} else {
+							if(queuedDeath.actor.isActor()){
+								if(!$gameTemp.respawnLookup["actor_" + queuedDeath.actor.actorId()]){
+									result = true;
+								}
+							} else {
+								if(!$gameTemp.respawnLookup["enemy_" + queuedDeath.actor.enemyId()]){
+									result = true;
+								}
+							}
+						}						
 					}
 				});
 			}

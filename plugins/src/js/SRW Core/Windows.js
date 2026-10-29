@@ -560,9 +560,16 @@
 								_this.addCommand(APPSTRINGS.MAPMENU.cmd_join, 'join');
 							}	
 						}
-						if($statCalc.canSwapPilot(_this._actor)){
-							_this.addCommand(APPSTRINGS.MAPMENU.cmd_swap_pilot, 'swap_pilot');
-						}	
+						if(!ENGINE_SETTINGS.ENABLE_PILOT_HOT_SWAP){
+							if($statCalc.canSwapPilot(_this._actor)){
+								_this.addCommand(APPSTRINGS.MAPMENU.cmd_swap_pilot, 'swap_pilot');
+							}	
+						}
+						
+
+						if($statCalc.canCombine(_this._actor).isValid && $statCalc.applyStatModsToValue(_this._actor, 0, ["combine_after_move"])){
+							_this.addCommand(APPSTRINGS.MAPMENU.cmd_combine, 'combine');
+						}
 						
 						_this.addWaitCommand(true);
 					}

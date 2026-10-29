@@ -1686,7 +1686,7 @@
 					
 					autoSpirits.forEach(function(autoSpirit){	
 						$statCalc.setAbilityUsed(battlerArray[1], "auto_spirit_"+autoSpirit.stackId);
-						spiritActivations.push({actor: battlerArray[1], spirit: autoSpirit.value});				
+						spiritActivations.push({actor: battlerArray[1], spirit: autoSpirit.value, damage: autoSpirit.damage});				
 					});	
 				}
 			});
@@ -1706,6 +1706,8 @@
 			$statCalc.applyHPRegen("enemy", factionId);
 			$statCalc.resetAllBattleTemp(null, factionId);
 			$statCalc.resetAllStatus("actor");
+
+
 			$gameTemp.AIWaitTimer = 0;
 			
 			$gameTemp.autoSpirits = spiritActivations;

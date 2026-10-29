@@ -50,6 +50,7 @@ function GameStateManager(){
 		//auto_actor_action: "GameState_auto_actor_action",
 		//auto_actor_move: "GameState_auto_actor_move",
 		auto_spirits: "GameState_auto_spirits", //OK
+		respawns: "GameState_respawns", //OK
 		await_character_anim: "GameState_await_character_anim", //OK
 		battle_basic: "GameState_battle_basic", //OK
 		battle_window: "GameState_battle_window",
@@ -1388,6 +1389,11 @@ GameState_auto_spirits.prototype.update = function(scene){
 		return true;
 	}
 
+	if($gameTemp.respawnSpiritsDelay > 0){
+		$gameTemp.respawnSpiritsDelay--;
+		return;
+	}
+
 	if(!scene.handlingAutoSpirits){
 		scene.handlingAutoSpirits = true;
 		$gameTemp.spiritWindowDoneHandler = function(){
@@ -1432,7 +1438,14 @@ GameState_auto_spirits.prototype.update = function(scene){
 							$gameTemp.spiritTargetActor = autoSpirit.actor;
 							$gamePlayer.locate(autoSpirit.actor.event.posX(), autoSpirit.actor.event.posY());
 							$spiritManager.applyEffect(autoSpirit.spirit, autoSpirit.actor, [autoSpirit.actor], 0);
-							$gameTemp.queuedActorEffects.push({type: "spirit", parameters: {idx: autoSpirit.spirit, target: autoSpirit.actor}})
+							if(autoSpirit.damage){
+								var oldHP = $statCalc.getCalculatedMechStats(autoSpirit.actor).currentHP;
+								autoSpirit.actor.setHp(Math.max(oldHP - autoSpirit.damage, 1));
+								$gameTemp.queuedActorEffects.push({type: "damage", parameters: {idx: autoSpirit.spirit, target: autoSpirit.actor, damage: autoSpirit.damage }});
+							} else {
+								$gameTemp.queuedActorEffects.push({type: "spirit", parameters: {idx: autoSpirit.spirit, target: autoSpirit.actor}});
+							}
+							
 						} else {
 							remaining.push(autoSpirit);
 						}
@@ -1447,16 +1460,73 @@ GameState_auto_spirits.prototype.update = function(scene){
 					
 			} else {
 				scene.handlingAutoSpirits = false;
-				if($gameTemp.AIActors.length){
-					$gameSystem.setBattlePhase('AI_phase');
-					$gameSystem.setSubBattlePhase('enemy_command');
-				} else {			
-					$gameSystem.setSubBattlePhase('initialize');
-				}	
+				if($gameTemp.isRespawnSpirits){
+					$gameTemp.isRespawnSpirits = false;
+					scene.handlingRespawns = false;
+					$gameSystem.setSubBattlePhase("after_battle");
+					scene.srpgAfterAction();
+				} else {
+					if($gameTemp.AIActors.length){
+						$gameSystem.setBattlePhase('AI_phase');
+						$gameSystem.setSubBattlePhase('enemy_command');
+					} else {			
+						$gameSystem.setSubBattlePhase('initialize');
+					}
+				}					
 			}			
 		}
 		handleAutoSpirits();
 	}		
+	return true;
+}
+
+
+function GameState_respawns(){
+	GameState.call(this);
+}
+
+GameState_respawns.prototype = Object.create(GameState.prototype);
+GameState_respawns.prototype.constructor = GameState_respawns;
+
+GameState_respawns.prototype.update = function(scene){	
+	if($gameMap._interpreter.isRunning()){
+		return true;
+	}
+
+	if(!scene.handlingRespawns){
+		scene.handlingRespawns = true; 	
+
+		$gameTemp.respawnSpiritActivations = [];
+
+		if(!$gameTemp.enemyAppearQueue){
+			$gameTemp.enemyAppearQueue = [];
+		}	
+
+		if($gameTemp.respawnQueue.length){
+			for(let entry of $gameTemp.respawnQueue){
+				$gameTemp.enemyAppearQueue.push(entry.event);
+				entry.autoSpirits.forEach(function(autoSpirit){		
+					$gameTemp.respawnSpiritActivations.push({actor: entry.actor, spirit: autoSpirit.value});				
+				});		
+				$statCalc.setAbilityUsed(entry.actor, "prevent_death");
+
+				entry.actor.setHp(1);
+			}
+			$gameMap._interpreter.processEnemyAppearQueue();		
+			$gameTemp.respawnQueue = [];
+		}			
+	} else {
+		if($gameTemp.respawnSpiritActivations?.length){
+			$gameTemp.autoSpirits = $gameTemp.respawnSpiritActivations;
+			$gameTemp.respawnSpiritsDelay = $gameSystem.getScaledTime(20);
+			$gameTemp.isRespawnSpirits = true;
+			$gameSystem.setSubBattlePhase('auto_spirits');
+		} else {
+			scene.handlingRespawns = false;
+			$gameSystem.setSubBattlePhase("after_battle");
+			scene.srpgAfterAction();
+		}		
+	}	
 	return true;
 }
 

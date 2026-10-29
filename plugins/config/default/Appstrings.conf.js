@@ -479,6 +479,13 @@ APPSTRINGS.STATUS = {
 	movementDown: {name: "Move", description: "The movement range of the unit is reduced"},
 	attackDown: {name: "Weapon", description: "The power of the unit's weapons is reduced"},
 	rangeDown: {name: "Range", description: "The range of the unit's weapons is reduced"},	
+
+	accuracyDownPermanent: {name: "Accuracy[P]", description: "The unit's accuracy is reduced"},
+	mobilityDownPermanent: {name: "Mobility[P]", description: "The unit's mobility is reduced"},
+	armorDownPermanent: {name: "Armor[P]", description: "The unit's armor is reduced"},
+	movementDownPermanent: {name: "Move[P]", description: "The movement range of the unit is reduced"},
+	attackDownPermanent: {name: "Weapon[P]", description: "The power of the unit's weapons is reduced"},
+	rangeDownPermanent: {name: "Range[P]", description: "The range of the unit's weapons is reduced"},	
 }
 
 APPSTRINGS.STATUS_BY_INFLICTION_ID = {

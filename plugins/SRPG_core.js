@@ -2669,6 +2669,8 @@ SceneManager.isInSaveScene = function(){
 		$gameTemp.currentMapTargets = [];
 		$gameTemp.deathQueue = [];
 		$gameTemp.destroyTransformQueue = [];
+		$gameTemp.respawnQueue = [];
+		$gameTemp.respawnLookup = {};
 
 		let multiKilledSubTwins = {};
 		let multiKilledMainTwins = {};
@@ -2716,6 +2718,18 @@ SceneManager.isInSaveScene = function(){
 			$gameSystem.setSubBattlePhase("process_destroy_transform_queue");
 			this.eventBeforeDestruction();
 		} else if($gameTemp.deathQueue.length){
+			for(let entry of $gameTemp.deathQueue){
+				if($statCalc.applyStatModsToValue(entry.actor, 0, ["prevent_death"])){
+					var autoSpirits = $statCalc.getModDefinitions(entry.actor, ["death_spirit"]);					
+					entry.autoSpirits = autoSpirits;
+					$gameTemp.respawnQueue.push(entry);
+					if(entry.actor.isActor()){
+						$gameTemp.respawnLookup["actor_" + entry.actor.actorId()] = true;
+					} else {
+						$gameTemp.respawnLookup["enemy_" + entry.actor.enemyId()] = true;
+					}					
+				}
+			}
 			$gameSystem.setSubBattlePhase("process_death_queue");
 			this.eventBeforeDestruction();
 		} else if($gameTemp.isEnemyAttack){
@@ -2729,6 +2743,12 @@ SceneManager.isInSaveScene = function(){
     //行動終了時の処理
     //戦闘終了の判定はイベントで行う。
     Scene_Map.prototype.srpgAfterAction = function() {	
+
+		if($gameTemp.respawnQueue?.length){
+			$gameSystem.setSubBattlePhase("respawns");
+			return;
+		}
+
 		if(ENGINE_SETTINGS.EXPIRE_ZONES_ON_DEATH){
 			$gameSystem.expireAbilityZones(true);
 		}
@@ -2898,6 +2918,8 @@ SceneManager.isInSaveScene = function(){
 						battleEffect.attacked.isDestroyed = false;
 					}
 				}
+
+				
 				
 				if(battleEffect.isActor && (battleEffect.type == "initiator" || battleEffect.type == "defender")){
 					if(battleEffect.isDestroyed) {
@@ -2992,6 +3014,24 @@ SceneManager.isInSaveScene = function(){
 					battleEffect.isDestroyed = false;
 					if(battleEffect.attacked){
 						battleEffect.attacked.isDestroyed = false;
+					}
+				}
+
+				if(battleEffect.ref){
+					if(battleEffect.ref.SRWStats.stageTemp.lastTargetAttributeCtr == null){
+						battleEffect.ref.SRWStats.stageTemp.lastTargetAttributeCtr = 0;
+					}
+					if(battleEffect.attacked?.ref){
+						const newAttribute = $statCalc.getParticipantAttribute(battleEffect.attacked.ref, "attribute1");
+						if(newAttribute != battleEffect.ref.SRWStats.stageTemp.lastTargetAttribute){
+							battleEffect.ref.SRWStats.stageTemp.lastTargetAttribute = newAttribute;
+							battleEffect.ref.SRWStats.stageTemp.lastTargetAttributeCtr = 1;
+						} else {
+							battleEffect.ref.SRWStats.stageTemp.lastTargetAttributeCtr++;
+						}
+					} else {
+						battleEffect.ref.SRWStats.stageTemp.lastTargetAttribute = null;
+						battleEffect.ref.SRWStats.stageTemp.lastTargetAttributeCtr = 0;
 					}
 				}
 				
@@ -3773,13 +3813,20 @@ SceneManager.isInSaveScene = function(){
 		var actor = $gameSystem.EventToUnit($gameTemp.activeEvent().eventId())[1];
         var item = this._swapPilotWindow.item();		
 		$statCalc.swapPilot(actor, item);
-		$gameSystem.clearSrpgActorCommandWindowNeedRefresh();
+		
 		//$gameSystem.setSubBattlePhase('normal')
 		this._swapPilotWindow.hide();
 		
-		actor.onAllActionsEnd();
-		$gameTemp.eraseActorAfterTurn = true; //indicate that hit and away and multi action must be ignored when ending the turn for the unit to prevent a softlock after the pilot swap
-		this.srpgAfterAction();	
+		if(!ENGINE_SETTINGS.ENABLE_PILOT_HOT_SWAP || $gameTemp.isPostMove){
+			$gameSystem.clearSrpgActorCommandWindowNeedRefresh();
+			actor.onAllActionsEnd();
+			$gameTemp.eraseActorAfterTurn = true; //indicate that hit and away and multi action must be ignored when ending the turn for the unit to prevent a softlock after the pilot swap
+			this.srpgAfterAction();	
+		} else {
+			$gameSystem.setSrpgActorCommandWindowNeedRefresh();
+			this._mapSrpgActorCommandWindow.activate();
+			this._mapSrpgActorCommandWindow.show();
+		}		
     };	
 	
 	Scene_Map.prototype.onAbilityCancel = function() {

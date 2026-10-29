@@ -1030,7 +1030,7 @@ StatCalc.prototype.resetStageTemp = function(actor){
 			disabledTurn: -1,
 			popUpAnimsPlayed: {}
 		};
-		this.resetStatus(actor);
+		this.resetStatus(actor, true);
 	}
 }
 
@@ -1046,17 +1046,33 @@ StatCalc.prototype.setStageTemp = function(actor, property, value){
 	}
 }
 
-StatCalc.prototype.resetStatus = function(actor){
+StatCalc.prototype.resetStatus = function(actor, includePermanent){
 	if(this.isActorSRWInitialized(actor)){
+		const previousStatus = actor.SRWStats.stageTemp.status;
 		actor.SRWStats.stageTemp.status = {
 			accuracyDown: 0,
 			mobilityDown: 0,
 			armorDown: 0,
 			movementDown: 0,
 			attackDown: 0,
-			rangeDown: 0
+			rangeDown: 0,
+			accuracyDownPermanent: 0,
+			mobilityDownPermanent: 0,
+			armorDownPermanent: 0,
+			movementDownPermanent: 0,
+			attackDownPermanent: 0,
+			rangeDownPermanent: 0,
 		}
-	}
+
+		if(!includePermanent){
+			actor.SRWStats.stageTemp.status.accuracyDownPermanent = previousStatus.accuracyDownPermanent;
+			actor.SRWStats.stageTemp.status.mobilityDownPermanent = previousStatus.mobilityDownPermanent;
+			actor.SRWStats.stageTemp.status.armorDownPermanent = previousStatus.armorDownPermanent;
+			actor.SRWStats.stageTemp.status.movementDownPermanent = previousStatus.movementDownPermanent;
+			actor.SRWStats.stageTemp.status.attackDownPermanent = previousStatus.attackDownPermanent;
+			actor.SRWStats.stageTemp.status.rangeDownPermanent = previousStatus.rangeDownPermanent;
+		} 
+	}	
 }
 
 StatCalc.prototype.resetAllStatus = function(type){		
@@ -1126,7 +1142,7 @@ StatCalc.prototype.isSpiritsSealed = function(actor){
 
 StatCalc.prototype.isAccuracyDown = function(actor){
 	if(this.isActorSRWInitialized(actor)){
-		return actor.SRWStats.stageTemp.status.accuracyDown;
+		return (actor.SRWStats.stageTemp.status.accuracyDown + actor.SRWStats.stageTemp.status.accuracyDownPermanent) || 0;
 	} else {
 		return false;
 	}
@@ -1138,9 +1154,15 @@ StatCalc.prototype.setAccuracyDown = function(actor, amount){
 	} 
 }
 
+StatCalc.prototype.setAccuracyDownPermanent = function(actor, amount){
+	if(this.isActorSRWInitialized(actor)){		
+		actor.SRWStats.stageTemp.status.accuracyDownPermanent = amount;				
+	} 
+}
+
 StatCalc.prototype.isMobilityDown = function(actor){
 	if(this.isActorSRWInitialized(actor)){
-		return actor.SRWStats.stageTemp.status.mobilityDown;
+		return (actor.SRWStats.stageTemp.status.mobilityDown + actor.SRWStats.stageTemp.status.mobilityDownPermanent) || 0;
 	} else {
 		return false;
 	}
@@ -1152,9 +1174,15 @@ StatCalc.prototype.setMobilityDown = function(actor, amount){
 	} 
 }
 
+StatCalc.prototype.setMobilityDownPermanent = function(actor, amount){
+	if(this.isActorSRWInitialized(actor)){		
+		actor.SRWStats.stageTemp.status.mobilityDownPermanent = amount;		
+	} 
+}
+
 StatCalc.prototype.isArmorDown = function(actor){
 	if(this.isActorSRWInitialized(actor)){
-		return actor.SRWStats.stageTemp.status.armorDown;
+		return (actor.SRWStats.stageTemp.status.armorDown + actor.SRWStats.stageTemp.status.armorDownPermanent) || 0;
 	} else {
 		return false;
 	}
@@ -1166,9 +1194,15 @@ StatCalc.prototype.setArmorDown = function(actor, amount){
 	} 
 }
 
+StatCalc.prototype.setArmorDownPermanent = function(actor, amount){
+	if(this.isActorSRWInitialized(actor)){		
+		actor.SRWStats.stageTemp.status.armorDownPermanent = amount;		
+	} 
+}
+
 StatCalc.prototype.isSkillDown = function(actor){
 	if(this.isActorSRWInitialized(actor)){
-		return actor.SRWStats.stageTemp.status.skillDown;
+		return (actor.SRWStats.stageTemp.status.skillDown + actor.SRWStats.stageTemp.status.skillDownPermanent) || 0;
 	} else {
 		return false;
 	}
@@ -1180,10 +1214,15 @@ StatCalc.prototype.setSkillDown = function(actor, amount){
 	} 
 }
 
+StatCalc.prototype.setSkillDownPermanent = function(actor, amount){
+	if(this.isActorSRWInitialized(actor)){		
+		actor.SRWStats.stageTemp.status.skillDownPermanent = amount;		
+	} 
+}
 
 StatCalc.prototype.isMovementDown = function(actor){
 	if(this.isActorSRWInitialized(actor)){
-		return actor.SRWStats.stageTemp.status.movementDown;
+		return (actor.SRWStats.stageTemp.status.movementDown + actor.SRWStats.stageTemp.status.movementDownPermanent) || 0;
 	} else {
 		return false;
 	}
@@ -1195,9 +1234,15 @@ StatCalc.prototype.setMovementDown = function(actor, amount){
 	} 
 }
 
+StatCalc.prototype.setMovementDownPermanent = function(actor, amount){
+	if(this.isActorSRWInitialized(actor)){		
+		actor.SRWStats.stageTemp.status.movementDownPermanent = amount;		
+	} 
+}
+
 StatCalc.prototype.isRangeDown = function(actor){
 	if(this.isActorSRWInitialized(actor)){
-		return actor.SRWStats.stageTemp.status.rangeDown;
+		return (actor.SRWStats.stageTemp.status.rangeDown + actor.SRWStats.stageTemp.status.rangeDownPermanent) || 0;
 	} else {
 		return false;
 	}
@@ -1209,9 +1254,15 @@ StatCalc.prototype.setRangeDown = function(actor, amount){
 	} 
 }
 
+StatCalc.prototype.setRangeDownPermanent = function(actor, amount){
+	if(this.isActorSRWInitialized(actor)){		
+		actor.SRWStats.stageTemp.status.rangeDownPermanent = amount;		
+	} 
+}
+
 StatCalc.prototype.isAttackDown = function(actor){
 	if(this.isActorSRWInitialized(actor)){
-		return actor.SRWStats.stageTemp.status.attackDown;
+		return (actor.SRWStats.stageTemp.status.attackDown + actor.SRWStats.stageTemp.status.attackDownPermanent) || 0;
 	} else {
 		return false;
 	}
@@ -1220,6 +1271,12 @@ StatCalc.prototype.isAttackDown = function(actor){
 StatCalc.prototype.setAttackDown = function(actor, amount){
 	if(this.isActorSRWInitialized(actor)){		
 		actor.SRWStats.stageTemp.status.attackDown = amount;		
+	} 
+}
+
+StatCalc.prototype.setAttackDownPermanent = function(actor, amount){
+	if(this.isActorSRWInitialized(actor)){		
+		actor.SRWStats.stageTemp.status.attackDownPermanent = amount;		
 	} 
 }
 
@@ -9178,10 +9235,23 @@ StatCalc.prototype.getActiveCombatInfo = function(actor){
 	return null;
 }
 
-
 StatCalc.prototype.getParticipantAttribute = function(participant, attribute, weaponInfo){
 	let result = "";
-	if(weaponInfo && ENGINE_SETTINGS.USE_WEAPON_ATTRIBUTE){
+	let forcePilotAttribute = false;
+	if(weaponInfo){
+		for(let entry of weaponInfo.effects){
+			const abilityDef = $weaponEffectManager.getAbilityDef(entry.idx);
+			if(abilityDef.isActiveHandler(participant)){
+				const mods = abilityDef.statmodHandler();
+				for(let mod of mods){
+					if(mod.type == "match_attribute"){
+						forcePilotAttribute = true;
+					}
+				}
+			}
+		}
+	}
+	if(weaponInfo && ENGINE_SETTINGS.USE_WEAPON_ATTRIBUTE && !forcePilotAttribute){
 		/*const weapAttributeOverrides = $statCalc.getModDefinitions(participant, ["weapon_attribute"]);
 		if(weapAttributeOverrides.length){
 			result = weapAttributeOverrides[0].attribute;
