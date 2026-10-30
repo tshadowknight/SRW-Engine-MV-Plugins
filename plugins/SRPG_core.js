@@ -3408,6 +3408,7 @@ SceneManager.isInSaveScene = function(){
 		
 		this._mapSrpgActorCommandWindow.refresh();
 		this._mapSrpgActorCommandWindow.deactivate();
+		$gameTemp.incrementSupportIndicatorsGeneration()
     };
 	
 	Scene_Map.prototype.commandFly = function() {
@@ -3421,6 +3422,7 @@ SceneManager.isInSaveScene = function(){
 		
 		this._mapSrpgActorCommandWindow.refresh();
 		this._mapSrpgActorCommandWindow.deactivate();
+		$gameTemp.incrementSupportIndicatorsGeneration()
     };
 	
 	Scene_Map.prototype.commandChangeSuperState = function(idx) {
@@ -3435,6 +3437,7 @@ SceneManager.isInSaveScene = function(){
 		
 		this._mapSrpgActorCommandWindow.refresh();
 		this._mapSrpgActorCommandWindow.deactivate();
+		$gameTemp.incrementSupportIndicatorsGeneration()
     };	
 	
 	Scene_Map.prototype.commandSpirit = function() {
@@ -3489,6 +3492,7 @@ SceneManager.isInSaveScene = function(){
 			_this._mapSrpgActorCommandWindow.show();
 			_this._mapSrpgActorCommandWindow.activate();
 		}
+		$gameTemp.incrementSupportIndicatorsGeneration()
     };	
 	
 	Scene_Map.prototype.commandBoard = function() {
@@ -3511,6 +3515,7 @@ SceneManager.isInSaveScene = function(){
 			$gameTemp.targetShip = null;
 			
 		}
+		$gameTemp.incrementSupportIndicatorsGeneration()
     };	
 	
 	Scene_Map.prototype.commandHeal = function() {
@@ -3587,6 +3592,7 @@ SceneManager.isInSaveScene = function(){
 			this._transformWindow.show();
 			this._transformWindow.activate();
 		}		
+		$gameTemp.incrementSupportIndicatorsGeneration()
     };	
 	
 	Scene_Map.prototype.swapPilotMenuCommand = function() { 
@@ -3624,12 +3630,14 @@ SceneManager.isInSaveScene = function(){
 		$statCalc.swap($gameSystem.EventToUnit($gameTemp.activeEvent().eventId())[1]);
 		$gameSystem.clearSrpgActorCommandWindowNeedRefresh();
 		$gameSystem.setSubBattlePhase('normal');
+		$gameTemp.incrementSupportIndicatorsGeneration()
     };
 	
 	Scene_Map.prototype.separateActorMenuCommand = function() {   
 		$statCalc.separate($gameSystem.EventToUnit($gameTemp.activeEvent().eventId())[1]);
 		$gameSystem.clearSrpgActorCommandWindowNeedRefresh();
 		$gameSystem.setSubBattlePhase('normal');
+		$gameTemp.incrementSupportIndicatorsGeneration()
     };	
 	
 	Scene_Map.prototype.statusActorMenuCommand = function() { 
@@ -3680,6 +3688,7 @@ SceneManager.isInSaveScene = function(){
 		se.pitch = 100;
 		se.volume = 80;
 		AudioManager.playSe(se);
+		$gameTemp.incrementSupportIndicatorsGeneration()
     };
 	
 	Scene_Map.prototype.combineActorMenuCommand = function() {   
@@ -3692,6 +3701,7 @@ SceneManager.isInSaveScene = function(){
 		se.pitch = 100;
 		se.volume = 80;
 		AudioManager.playSe(se);
+		$gameTemp.incrementSupportIndicatorsGeneration()
     };
 		
 	Scene_Map.prototype.persuadeActorMenuCommand = function() {

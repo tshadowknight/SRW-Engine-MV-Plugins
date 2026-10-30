@@ -436,4 +436,15 @@
 		Game_Temp.prototype.getMoveBudgetsRef = function() {
 			return {freshFor: ++this._moveBudgetFreshCtr, budgets: this._moveBudgets};
 		}
+
+		Game_Temp.prototype.getSupportIndicatorsGeneration = function() {
+			if(this.supportIndicatorGeneration == null){
+				this.supportIndicatorGeneration = 0;
+			}
+			return this.supportIndicatorGeneration;			
+		}
+
+		Game_Temp.prototype.incrementSupportIndicatorsGeneration = function() {
+			this.supportIndicatorGeneration++;	
+		}
 	}

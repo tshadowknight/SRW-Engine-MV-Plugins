@@ -8633,6 +8633,10 @@ StatCalc.prototype.getActorSlotInfo = function(actor){
 }
 
 StatCalc.prototype.validateEffectTarget = function(effect, actor){
+	if(actor.SRWStats.stageTemp.getsAllSlotAbilities){
+		return (effect.appliesTo == null || effect.appliesTo == actor.SRWStats.pilot.id);
+	}
+
 	var slotInfo = this.getActorSlotInfo(actor);
 	var validSlot = true;
 	//workaround to prevent ship pilot effects from bleeding onto a unit being deployed from the ship
@@ -8684,6 +8688,44 @@ StatCalc.prototype.checkInnerAbility = function(actor, value, types, excludedSki
 	return result;
 }
 
+StatCalc.prototype.generateAbiEntryKey = function(entry){
+	return entry.stackId;
+}
+
+StatCalc.prototype.applySubSlotDuplicateFiltering = function(actor, modsList){
+	if(actor.SRWStats.stageTemp?.getsAllSlotAbilities){
+		const fieldsToFilter = [
+			"addFlat",
+			"addPercent",
+			"list",
+			"mult",
+			"mult_ceil",
+		];
+
+		for(let field of fieldsToFilter){
+			let sourcedFromMain = {};
+			const list = modsList[field];
+			for(let entry of list){
+				if(entry.slotType == "main"){
+					sourcedFromMain[this.generateAbiEntryKey(entry)] = true;
+				}
+			}
+			let tmp = [];
+			for(let entry of list){
+				if(entry.slotType == "main_sub"){
+					if(!sourcedFromMain[this.generateAbiEntryKey(entry)]){
+						tmp.push(entry);
+					}
+				} else {
+					tmp.push(entry);
+				}
+			}
+			modsList[field] = tmp;
+		}
+	}
+}
+
+
 StatCalc.prototype.applyStatModsToValue = function(actor, value, types, excludedSkills){
 	const _this = this;
 	
@@ -8717,6 +8759,7 @@ StatCalc.prototype.applyStatModsToValue = function(actor, value, types, excluded
 		}		
 	}
 	var statModInfo = this.getActorStatMods(actor, excludedSkills);
+	this.applySubSlotDuplicateFiltering(actor, statModInfo.statMods);
 	appendResults(statModInfo.statMods);
 	appendResults(statModInfo.zoneMods);
 	
@@ -8765,6 +8808,7 @@ StatCalc.prototype.applyMaxStatModsToValue = function(actor, value, types, exclu
 		}
 	}
 	var statModInfo = this.getActorStatMods(actor, excludedSkills);
+	this.applySubSlotDuplicateFiltering(actor, statModInfo.statMods);
 	appendResults(statModInfo.statMods);
 	appendResults(statModInfo.zoneMods);
 	

@@ -1267,6 +1267,7 @@
 			this.y = this._character.screenY() - 2;
 			var unit = battlerArray[1];
 			var isShown = true;
+
 			if(!$gameSystem.isEnemy(unit)){
 				if(!$gameTemp.showAllyDefendIndicator){
 					isShown = false;
@@ -1278,30 +1279,45 @@
 				}
 				this.x = this._character.screenX() - 15;
 			}
-			if($gameSystem.isBattlePhase() === 'AI_phase' || $gameSystem.isSubBattlePhase() === 'actor_target'){
-				var activeEvent = $gameTemp.activeEvent();
-				if(activeEvent){
-					var actor = $gameSystem.EventToUnit(activeEvent.eventId())[1];
-					if($gameSystem.isFriendly(actor, $gameSystem.getFactionId(unit))){
-						if(!actor || !$statCalc.canSupportDefend(actor, unit)){
-							isShown = false;
+
+			if(isShown){
+				if(this.lastSummaryUnit == $gameTemp.summaryUnit && this.supportGenerationTracker == $gameTemp.getSupportIndicatorsGeneration()){
+					isShown = this.lastVisibility;
+				} else {	
+					this.lastSummaryUnit = $gameTemp.summaryUnit;
+					this.supportGenerationTracker = $gameTemp.getSupportIndicatorsGeneration()
+
+					if(!$gameTemp.summaryUnit){
+						isShown = false;
+					}
+
+					if(isShown){						
+						if($gameSystem.isBattlePhase() === 'AI_phase' || $gameSystem.isSubBattlePhase() === 'actor_target'){
+							var activeEvent = $gameTemp.activeEvent();
+							if(activeEvent){
+								var actor = $gameSystem.EventToUnit(activeEvent.eventId())[1];
+								if($gameSystem.isFriendly(actor, $gameSystem.getFactionId(unit))){
+									if(!actor || !$statCalc.canSupportDefend(actor, unit)){
+										isShown = false;
+									}
+								} else {
+									if(!$statCalc.hasSupportDefend(unit)){
+										isShown = false;
+									}
+								}					
+							} else {
+								isShown = false;
+							}
+						} else {
+							if($gameTemp.summaryUnit && !$statCalc.canSupportDefend($gameTemp.summaryUnit, unit)){
+								isShown = false;
+							}
 						}
-					} else {
-						if(!$statCalc.hasSupportDefend(unit)){
-							isShown = false;
-						}
-					}					
-				} else {
-					isShown = false;
+					}			
 				}
-			} else {
-				if($gameTemp.summaryUnit && !$statCalc.canSupportDefend($gameTemp.summaryUnit, unit)){
-					isShown = false;
-				}
-			}
-			if(!$gameTemp.summaryUnit){
-				isShown = false;
-			}
+				this.lastVisibility = isShown;
+			}			
+			
 			if(isShown && unit && !this._character.isErased()){
 			
 				this._frameCount+=2;
@@ -1352,6 +1368,7 @@
 			
 			var unit = battlerArray[1];
 			var isShown = true;
+
 			if(!$gameSystem.isEnemy(unit)){
 				if(!$gameTemp.showAllyAttackIndicator){
 					isShown = false;
@@ -1363,30 +1380,43 @@
 				}
 				this.x = this._character.screenX() + 15;
 			}
-			
-			if($gameSystem.isBattlePhase() === 'AI_phase' || $gameSystem.isSubBattlePhase() === 'actor_target'){
-				var activeEvent = $gameTemp.activeEvent();
-				if(activeEvent){
-					var actor = $gameSystem.EventToUnit(activeEvent.eventId())[1];
-					if($gameSystem.isFriendly(actor, $gameSystem.getFactionId(unit))){
-						if(!actor || !$statCalc.canSupportAttack(actor, unit)){
-							isShown = false;
-						}
-					} else {
-						if(!$statCalc.hasSupportAttack(unit)){
-							isShown = false;
-						}
-					}
+
+			if(isShown){
+				if(this.lastSummaryUnit == $gameTemp.summaryUnit && this.supportGenerationTracker == $gameTemp.getSupportIndicatorsGeneration()){
+					isShown = this.lastVisibility;
 				} else {
-					isShown = false;
-				}				
-			} else {
-				if(!$gameTemp.summaryUnit || !$statCalc.canSupportAttack($gameTemp.summaryUnit, unit)){
-					isShown = false;
+					this.lastSummaryUnit = $gameTemp.summaryUnit;
+					this.supportGenerationTracker = $gameTemp.getSupportIndicatorsGeneration()
+					
+					if(!$gameTemp.summaryUnit){
+						isShown = false;
+					}
+
+					if(isShown){					
+						if($gameSystem.isBattlePhase() === 'AI_phase' || $gameSystem.isSubBattlePhase() === 'actor_target'){
+							var activeEvent = $gameTemp.activeEvent();
+							if(activeEvent){
+								var actor = $gameSystem.EventToUnit(activeEvent.eventId())[1];
+								if($gameSystem.isFriendly(actor, $gameSystem.getFactionId(unit))){
+									if(!actor || !$statCalc.canSupportAttack(actor, unit)){
+										isShown = false;
+									}
+								} else {
+									if(!$statCalc.hasSupportAttack(unit)){
+										isShown = false;
+									}
+								}
+							} else {
+								isShown = false;
+							}				
+						} else {
+							if(!$gameTemp.summaryUnit || !$statCalc.canSupportAttack($gameTemp.summaryUnit, unit)){
+								isShown = false;
+							}
+						}
+					}	
 				}
-			}
-			if(!$gameTemp.summaryUnit){
-				isShown = false;
+				this.lastVisibility = isShown;
 			}
 			
 			if(isShown && unit && !this._character.isErased()){
