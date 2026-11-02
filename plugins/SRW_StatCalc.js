@@ -6523,7 +6523,18 @@ StatCalc.prototype.getSupportAttackCandidates = function(factionId, position, te
 		if(!event.isErased() && (Math.abs(event.posX() - position.x) + Math.abs(event.posY() - position.y)) == 1 && (eventId == null || event.eventId() != eventId)){// && !actor.isSubTwin
 			_this.invalidateAbilityCache(actor);
 			var maxSupportAttacks = $statCalc.applyStatModsToValue(actor, 0, ["support_attack"]);
-			if(ignoreConditions || (maxSupportAttacks > actor.SRWStats.battleTemp.supportAttackCount && (!actor.SRWStats.battleTemp.hasFinishedTurn || ENGINE_SETTINGS.ALLOW_TURN_END_SUPPORT) && !_this.isDisabled(actor))){
+			let hasValidAction = true;
+			if(!ENGINE_SETTINGS.ALLOW_TURN_END_SUPPORT){
+				if(actor.isSubTwin){
+					const mainTwin = _this.getMainTwin(actor)
+					if(mainTwin){
+						hasValidAction = !mainTwin.SRWStats.battleTemp.hasFinishedTurn;
+					}					
+				} else {
+					hasValidAction = !actor.SRWStats.battleTemp.hasFinishedTurn;
+				}				
+			}
+			if(ignoreConditions || (maxSupportAttacks > actor.SRWStats.battleTemp.supportAttackCount && hasValidAction && !_this.isDisabled(actor))){
 				var validTerrain = _this.canBeOnTerrain(actor, terrainIdx);							
 				if($gameSystem.isFriendly(actor, factionId) && validTerrain){
 					result.push({actor: actor, pos: {x: event.posX(), y: event.posY()}});	

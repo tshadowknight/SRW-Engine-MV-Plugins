@@ -1881,6 +1881,10 @@ BattleCalc.prototype.generateMapBattleResult = function(){
 					}
 				}
 			}
+
+			dCache.isHit = isHit;
+			dCache.type = "defender";
+			
 			
 			var damageResult = {
 				damage: 0,
@@ -1913,14 +1917,12 @@ BattleCalc.prototype.generateMapBattleResult = function(){
 						aCache.selfDestructed = true;
 					}				
 			} 
-			dCache.isHit = isHit;
-			dCache.type = "defender";
+			
 			dCache.tookCritical = damageResult.isCritical;
 			dCache.barrierCost = damageResult.barrierCost;
 			dCache.hasBarrier = damageResult.hasThresholdBarrier || damageResult.hasReductionBarrier || damageResult.hasPercentBarrier;
 			dCache.hasThresholdBarrier = damageResult.hasThresholdBarrier;
 			dCache.barrierBroken = damageResult.thresholdBarrierBroken;
-			
 			dCache.damageTaken+=damageResult.damage;
 			
 			if(dCache.damageTaken >= dCache.currentAnimHP){

@@ -2766,7 +2766,7 @@ SceneManager.isInSaveScene = function(){
 			var itemDrops = [];
 			gainDonors.forEach(function(gainDonor){
 				if(gainDonor.isDestroyed){
-					$statCalc.addKill(battleEffect.ref);
+					$statCalc.addKill(gainDonor.destroyer);
 				}				
 				if(gainDonor.isDestroyed){
 					var items = $statCalc.getEquipInfo(gainDonor.ref);
@@ -2972,10 +2972,10 @@ SceneManager.isInSaveScene = function(){
 					if(battleEffect.attacked && battleEffect.attacked.ref && $statCalc.getCalculatedMechStats(battleEffect.attacked.ref).currentHP <= 100000){
 						$statCalc.setRevealed(battleEffect.attacked.ref);
 					}
-					if(battleEffect.isAttacked){
+					if(battleEffect.isAttacked && !battleEffect.receivedBuff){
 						$statCalc.clearSpirit(battleEffect.ref, "alert");
 					}
-					if(battleEffect.isHit){
+					if(battleEffect.isHit && !battleEffect.receivedBuff){
 						$statCalc.clearSpirit(battleEffect.ref, "persist");
 					}
 				}				

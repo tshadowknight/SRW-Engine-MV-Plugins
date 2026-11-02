@@ -810,7 +810,16 @@ GameState_confirm_adjacent_spirit.prototype.update = function(scene){
 				//if(mapTarget.subTwin){
 				//	resolveTargetSpirits(mapTarget.subTwin, targets);
 				//}
-			}		
+			}	
+			
+			var tmp  = [];
+			for(let entry of targets){
+				if(spiritDef.singleTargetEnabledHandler(entry)){
+					tmp.push(entry);
+				}
+			}
+			targets = tmp;
+
 			
 			$spiritManager.applyEffect(spiritInfo.idx, caster, targets, spiritInfo.cost, spiritInfo.additionalCaster);
 			$gameTemp.queuedEffectSpiritId = spiritInfo.idx; 
@@ -1324,6 +1333,14 @@ GameState_actor_target_spirit.prototype.updateMapEvent = function(x, y, triggers
 				if(target.subTwin){
 					resolveTargetSpirits(target.subTwin, targets);
 				}
+
+				var tmp  = [];
+				for(let entry of targets){
+					if(spiritDef.singleTargetEnabledHandler(entry)){
+						tmp.push(entry);
+					}
+				}
+				targets = tmp;
 
 				if(targets.length){
 					$spiritManager.applyEffect($gameTemp.currentTargetingSpirit.idx, caster, targets, $gameTemp.currentTargetingSpirit.cost, spiritInfo.additionalCaster);
