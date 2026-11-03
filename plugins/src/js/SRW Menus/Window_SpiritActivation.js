@@ -435,7 +435,7 @@ Window_SpiritActivation.prototype.update = async function() {
 						_this.setMessage("BUFF");
 
 						this._spiritAnimImage.style.display = "block";
-						this._spiritAnimImage.setAttribute("data-img", this.makeSpiritAnimationURL("buff"));
+						this._spiritAnimImage.setAttribute("data-img", this.makeSpiritAnimationURL("Buff"));
 						this._spiritAnimImage.style["animation-duration"] = "";
 						this.applyDoubleTime(this._spiritAnimImage);
 													
@@ -455,7 +455,7 @@ Window_SpiritActivation.prototype.update = async function() {
 						_this.setMessage("DEBUFF");
 
 						this._spiritAnimImage.style.display = "block";
-						this._spiritAnimImage.setAttribute("data-img", this.makeSpiritAnimationURL("debuff"));
+						this._spiritAnimImage.setAttribute("data-img", this.makeSpiritAnimationURL("Debuff"));
 						this._spiritAnimImage.style["animation-duration"] = "";
 						this.applyDoubleTime(this._spiritAnimImage);
 													
