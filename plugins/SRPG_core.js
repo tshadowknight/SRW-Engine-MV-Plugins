@@ -2606,14 +2606,40 @@ SceneManager.isInSaveScene = function(){
 			var battleEffect = $gameTemp.battleEffectCache[cacheRef];
 			if(battleEffect.type == "defender"){
 				var effect = {parameters: {target: battleEffect.ref}};
-				if(battleEffect.isHit){
-					effect.type = "damage";
-					effect.parameters.damage = battleEffect.damageTaken;
-				} else if(battleEffect.isDoubleImage){
-					effect.type = "double_image";
+
+				const isBetweenFriendlies = $gameSystem.areUnitsFriendly(battleEffect.ref, battleEffect.attackedBy.ref);
+				let interactionType;
+				if(battleEffect.attackedBy?.action?.attack){
+					if(!isBetweenFriendlies){
+						interactionType = battleEffect.attackedBy.action.attack.enemiesInteraction;
+					} else {  
+						interactionType = battleEffect.attackedBy.action.attack.alliesInteraction;
+					}
+				}
+
+				if(isBetweenFriendlies && interactionType == Game_System.INTERACTION_STATUS){
+					let isBuff = true;
+					for(let debuff of Object.keys(battleEffect.statusReceived)){
+						if(battleEffect.statusReceived[debuff] > 0){
+							isBuff = false;
+						}
+					}
+					if(isBuff){
+						effect.type = "buff";
+					} else {
+						effect.type = "debuff";
+					}
 				} else {
-					effect.type = "miss";
-				}				
+					 if(battleEffect.isHit){
+						effect.type = "damage";
+						effect.parameters.damage = battleEffect.damageTaken;
+					} else if(battleEffect.isDoubleImage){
+						effect.type = "double_image";
+					} else {
+						effect.type = "miss";
+					}
+				}
+								
 				$gameTemp.mapAttackEffectQueue.push(effect);
 			}
 		});
@@ -4262,10 +4288,7 @@ SceneManager.isInSaveScene = function(){
 		var bestMapAttack;
 		if(mapWeapons.length){
 			mapWeapons.forEach(function(mapWeapon){
-				var type = "";
-				if(mapWeapon.ignoresFriendlies || $gameTemp.debugAutoPlay){ //prevent autoplay being interrupted by allies shooting each other down and triggering loss conditions
-					type = $gameSystem.isEnemy(enemy) ? "actor" : "enemy";
-				}
+				var type = $gameSystem.isEnemy(enemy) ? "actor" : "enemy";				
 				var targetInfo = _this.getBestMapAttackTargets(event, mapWeapon, type);
 				if(targetInfo.targets.length && (!bestMapAttack || targetInfo.targets.length > bestMapAttack.targets.length)){
 					bestMapAttack = targetInfo;

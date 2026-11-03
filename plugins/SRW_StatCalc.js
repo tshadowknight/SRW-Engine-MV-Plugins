@@ -1065,12 +1065,12 @@ StatCalc.prototype.resetStatus = function(actor, includePermanent){
 		}
 
 		if(!includePermanent){
-			actor.SRWStats.stageTemp.status.accuracyDownPermanent = previousStatus.accuracyDownPermanent;
-			actor.SRWStats.stageTemp.status.mobilityDownPermanent = previousStatus.mobilityDownPermanent;
-			actor.SRWStats.stageTemp.status.armorDownPermanent = previousStatus.armorDownPermanent;
-			actor.SRWStats.stageTemp.status.movementDownPermanent = previousStatus.movementDownPermanent;
-			actor.SRWStats.stageTemp.status.attackDownPermanent = previousStatus.attackDownPermanent;
-			actor.SRWStats.stageTemp.status.rangeDownPermanent = previousStatus.rangeDownPermanent;
+			actor.SRWStats.stageTemp.status.accuracyDownPermanent = previousStatus.accuracyDownPermanent || 0;
+			actor.SRWStats.stageTemp.status.mobilityDownPermanent = previousStatus.mobilityDownPermanent || 0;
+			actor.SRWStats.stageTemp.status.armorDownPermanent = previousStatus.armorDownPermanent || 0;
+			actor.SRWStats.stageTemp.status.movementDownPermanent = previousStatus.movementDownPermanent || 0;
+			actor.SRWStats.stageTemp.status.attackDownPermanent = previousStatus.attackDownPermanent || 0;
+			actor.SRWStats.stageTemp.status.rangeDownPermanent = previousStatus.rangeDownPermanent || 0;
 		} 
 	}	
 }
@@ -4373,6 +4373,10 @@ StatCalc.prototype.getWeaponPower = function(actor, weapon){
 	//	return weapon.power - this.isAttackDown(actor);
 	//}
 	if(this.isActorSRWInitialized(actor)){
+		if($gameSystem.isBuffingWeaponOnly(weapon)){
+			//is buffing attack
+			return 0;
+		}
 		var levels = [];
 		if(weapon.isEquipable){
 			for(let i = 0; i < weapon.upgrades; i++){

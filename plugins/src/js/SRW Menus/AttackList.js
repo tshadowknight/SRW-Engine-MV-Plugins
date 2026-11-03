@@ -172,17 +172,21 @@ AttackList.prototype.createSummaryViewRow = function(refData, attack) {
 
 	listContent+="<div class='attack_list_block scaled_text fitted_text'>"+DataManager.getLocalizedName('weapon', attack.id, attack.name)+"</div>";
 	listContent+="<div class='attack_list_block scaled_text'>"+this.createAttributeBlock(attack, jumpAmount)+"</div>";
-
-	var currentPower = $statCalc.getWeaponPowerWithMods(refData, attack)*1;
+	if($gameSystem.isBuffingWeaponOnly(attack)){
+		listContent+="<div class='attack_list_block scaled_text described_element' data-type='attack' data-subtype='power' data-value=''>-</div>";
+	} else {
+		var currentPower = $statCalc.getWeaponPowerWithMods(refData, attack)*1;
 	
-	var tagBoostInfo = $statCalc.getModDefinitions(refData, ["weapon_type_boost"]);
-	for(const modDef of tagBoostInfo){
-		if(modDef.tag == attack.particleType){
-			currentPower+=modDef.value;
+		var tagBoostInfo = $statCalc.getModDefinitions(refData, ["weapon_type_boost"]);
+		for(const modDef of tagBoostInfo){
+			if(modDef.tag == attack.particleType){
+				currentPower+=modDef.value;
+			}
 		}
+		
+		listContent+="<div class='attack_list_block scaled_text "+$statCalc.getWeaponPowerStatState(refData, attack)+" described_element' data-jump='"+jumpAmount+"' data-type='attack' data-subtype='power' data-value=''>"+currentPower+"</div>";
 	}
-	
-	listContent+="<div class='attack_list_block scaled_text "+$statCalc.getWeaponPowerStatState(refData, attack)+" described_element' data-jump='"+jumpAmount+"' data-type='attack' data-subtype='power' data-value=''>"+currentPower+"</div>";
+
 	if(attack.isMap){
 		listContent+="<div class='attack_list_block scaled_text described_element' data-jump='"+jumpAmount+"' data-type='attack' data-subtype='range' data-value=''>---</div>";
 	} else {

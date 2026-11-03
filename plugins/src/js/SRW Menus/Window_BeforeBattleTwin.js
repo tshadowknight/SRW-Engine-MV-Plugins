@@ -82,7 +82,7 @@ Window_BeforebattleTwin.prototype.updateButtonPermissions = function(){
 	this._btnInfo.forEach(function(btnDef){
 		if(btnDef.type == "action"){
 			btnDef.enabled = false;
-			if(!$statCalc.isAI($gameTemp.currentBattleActor) && _this.counterValid()){
+			if(!$statCalc.isAI($gameTemp.currentBattleActor) && _this.counterValid() && !_this.isBuffingAttack()){
 				if($gameTemp.isEnemyAttack){
 					btnDef.enabled = true;
 				}
@@ -636,7 +636,7 @@ Window_BeforebattleTwin.prototype.update = function() {
 					
 					this.requestRedraw();	
 					
-					if(!$statCalc.isAI($gameTemp.currentBattleActor)){
+					if(!$statCalc.isAI($gameTemp.currentBattleActor) && !this.isBuffingAttack()){
 						SoundManager.playCursor();
 						if($statCalc.isMainTwin($gameTemp.currentBattleActor)){
 							_this._currentTwinTargetSelection = 1;
@@ -1940,27 +1940,27 @@ Window_BeforebattleTwin.prototype.redraw = function() {
 	
 	if(this.isBuffingAttack()){
 		if($gameTemp.isEnemyAttack){
-			let elem = windowNode.querySelector(".percent_indicator_containers.enemy .percent_indicator_container");
-			if(elem){
+			let elems = Array.from(windowNode.querySelectorAll(".percent_indicator_containers.enemy .percent_indicator_container"));
+			for(let elem of elems){
 				elem.style.visibility = "hidden";	
 			}			
 		} else {
-			let elem = windowNode.querySelector(".percent_indicator_containers.actor .percent_indicator_container")
-			if(elem){
+			let elems = Array.from(windowNode.querySelectorAll(".percent_indicator_containers.actor .percent_indicator_container"));
+			for(let elem of elems){
 				elem.style.visibility = "hidden";	
-			}
+			}	
 		}	
 	} else {
 		if($gameTemp.isEnemyAttack){
-			let elem = windowNode.querySelector(".percent_indicator_containers.enemy .percent_indicator_container")
-			if(elem){
-				elem.style.visibility = "visible";
-			}			
-		} else {
-			let elem = windowNode.querySelector(".percent_indicator_containers.actor .percent_indicator_container")
-			if(elem){
-				elem.style.visibility = "visible";
-			}				
+			let elems = Array.from(windowNode.querySelectorAll(".percent_indicator_containers.enemy .percent_indicator_container"));
+			for(let elem of elems){
+				elem.style.visibility = "visible";	
+			}	
+		} else {		
+			let elems = Array.from(windowNode.querySelectorAll(".percent_indicator_containers.actor .percent_indicator_container"));
+			for(let elem of elems){
+				elem.style.visibility = "visible";	
+			}
 		}			
 	}
 	

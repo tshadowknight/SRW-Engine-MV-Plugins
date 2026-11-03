@@ -3121,6 +3121,9 @@
 		Game_System.INTERACTION_DAMAGE_AND_STATUS = "damage_and_status";
 		
 		Game_System.prototype.getCombatInteractionInfo = function(weapon) {
+			if($gameTemp.currentBattleActor == null || $gameTemp.currentBattleEnemy == null){
+				return null;
+			}
 			const isBetweenFriendlies = this.areUnitsFriendly($gameTemp.currentBattleActor, $gameTemp.currentBattleEnemy);
 			let interactionType;
 			if(weapon){
@@ -3135,6 +3138,13 @@
 				isBetweenFriendlies: isBetweenFriendlies,
 				interactionType: interactionType
 			};
+		}
+
+		Game_System.prototype.isBuffingWeaponOnly = function(weapon) {
+			if(weapon && weapon.enemiesInteraction == Game_System.INTERACTION_STATUS && weapon.alliesInteraction == Game_System.INTERACTION_STATUS){
+				return true;
+			}
+			return false;
 		}
 		
 		Game_System.prototype.awardFavPoints = function(amount) {

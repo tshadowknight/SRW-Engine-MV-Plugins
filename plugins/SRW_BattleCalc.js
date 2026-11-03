@@ -1827,6 +1827,8 @@ BattleCalc.prototype.generateMapBattleResult = function(){
 			if(!isBuffingAttack){
 				inflictedDamge = true;
 			}
+
+			aCache.isBuffingAttack = isBuffingAttack;
 			
 			_this.prepareBattleCache(defender, "defender");
 			var dCache = $gameTemp.battleEffectCache[defender.actor._cacheReference];
@@ -1932,7 +1934,7 @@ BattleCalc.prototype.generateMapBattleResult = function(){
 			
 			gainDonor = defender.actor;
 					
-			if(aCache && dCache && !$gameSystem.isFriendly(aCache.ref, $gameSystem.getFactionId(dCache.ref))){			
+			if(aCache && dCache && (!$gameSystem.isFriendly(aCache.ref, $gameSystem.getFactionId(dCache.ref)) || isBuffingAttack)){			
 				var expGain = _this.performExpCalculation(gainRecipient, gainDonor);
 				expGain = $statCalc.applyStatModsToValue(gainRecipient, expGain, ["exp"]);
 				if($statCalc.getActiveSpirits(gainRecipient).gain){
@@ -1946,7 +1948,11 @@ BattleCalc.prototype.generateMapBattleResult = function(){
 					fundGain*=2;
 				}
 				if(!dCache.isDestroyed){
-					expGain = Math.floor(expGain / 10);
+					if(isBuffingAttack){
+						expGain = Math.floor(expGain / 4);
+					} else {
+						expGain = Math.floor(expGain / 10);
+					}	
 					ppGain = 0;
 					fundGain = 0;
 				} else {

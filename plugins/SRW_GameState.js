@@ -1039,7 +1039,7 @@ GameState_actor_target.prototype.updateMapEvent = function(x, y, triggers){
 	
 	$gameMap.eventsXy(x, y).forEach(function(event) {
 		if (event.isTriggerIn(triggers) && !event.isErased()) {
-			if (event.isType() == 'actor' || event.isType() == 'enemy') {
+			if (event.isType() == 'actor' || event.isType() == 'enemy' || event.isType() == 'ship') {
 				var actionBattlerArray = $gameSystem.EventToUnit($gameTemp.activeEvent().eventId());
 				var targetBattlerArray = $gameSystem.EventToUnit(event.eventId());
 			   

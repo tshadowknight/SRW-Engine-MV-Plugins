@@ -430,7 +430,48 @@ Window_SpiritActivation.prototype.update = async function() {
 						se.pitch = 100;
 						se.volume = 90;
 						AudioManager.playSe(se);
-					} else if(effectDef.type == "repair"){
+					}  else if(effectDef.type == "buff"){
+						this._processingAnimation = true;			
+						_this.setMessage("BUFF");
+
+						this._spiritAnimImage.style.display = "block";
+						this._spiritAnimImage.setAttribute("data-img", this.makeSpiritAnimationURL("buff"));
+						this._spiritAnimImage.style["animation-duration"] = "";
+						this.applyDoubleTime(this._spiritAnimImage);
+													
+						setTimeout(function(){ 
+							_this._spiritAnimImage.style.display = "none" 
+							_this._processingAnimation = false;
+						}, 800 * this.getAnimTimeRatio());	
+						
+						var se = {};
+						se.name = 'SRW_Buff';
+						se.pan = 0;
+						se.pitch = 100;
+						se.volume = 90;
+						AudioManager.playSe(se);
+					}  else if(effectDef.type == "debuff"){
+						this._processingAnimation = true;			
+						_this.setMessage("DEBUFF");
+
+						this._spiritAnimImage.style.display = "block";
+						this._spiritAnimImage.setAttribute("data-img", this.makeSpiritAnimationURL("debuff"));
+						this._spiritAnimImage.style["animation-duration"] = "";
+						this.applyDoubleTime(this._spiritAnimImage);
+													
+						setTimeout(function(){ 
+							_this._spiritAnimImage.style.display = "none" 
+							_this._processingAnimation = false;
+						}, 800 * this.getAnimTimeRatio());	
+						
+						var se = {};
+						se.name = 'SRWMiss';
+						se.name = 'SRW_Debuff';
+						se.pan = 0;
+						se.pitch = 100;
+						se.volume = 90;
+						AudioManager.playSe(se);
+					}  else if(effectDef.type == "repair"){
 						this._processingAnimation = true;			
 						
 						this._spiritAnimImage.style.display = "block";
