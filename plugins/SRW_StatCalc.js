@@ -9297,7 +9297,7 @@ StatCalc.prototype.getActiveCombatInfo = function(actor){
 StatCalc.prototype.getParticipantAttribute = function(participant, attribute, weaponInfo){
 	let result = "";
 	let forcePilotAttribute = false;
-	if(weaponInfo){
+	if(weaponInfo?.effects){
 		for(let entry of weaponInfo.effects){
 			const abilityDef = $weaponEffectManager.getAbilityDef(entry.idx);
 			if(abilityDef.isActiveHandler(participant)){
