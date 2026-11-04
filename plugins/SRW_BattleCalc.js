@@ -1949,7 +1949,7 @@ BattleCalc.prototype.generateMapBattleResult = function(){
 				}
 				if(!dCache.isDestroyed){
 					if(isBuffingAttack){
-						expGain = Math.floor(expGain / 4);
+						expGain = Math.floor(expGain / 8);
 					} else {
 						expGain = Math.floor(expGain / 10);
 					}	
