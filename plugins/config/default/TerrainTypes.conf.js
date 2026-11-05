@@ -23,6 +23,7 @@ $SRWConfig.terrainTypes = function(){
 		true,//canAttack, if false a unit in this terrain state cannot attack
 		[],//regionBlacklist, any region ids in this list will be treated as solid when on this terrain, even if ignoresTerrainCollision is enabled
 		1,//enemyPreference, if set enemies will spawn with the highest preferred terrain available. Should only be set on super states!
+		1,//bonusMultiplier, //the multiplier for terrain effects when on this terrain/superstate. If not Equal to 1 or 0 displayed in the UI as ex.: x2. Only applies to hit/evade.
 	);
 	
 	this.addDefinition(//lnd
@@ -61,6 +62,8 @@ $SRWConfig.terrainTypes = function(){
 		true,//canBeTargeted, if false a unit in this terrain state cannot be targeted
 		true,//canAttack, if false a unit in this terrain state cannot attack
 		[],//regionBlacklist, any region ids in this list will be treated as solid when on this terrain, even if ignoresTerrainCollision is enabled
+		0,
+		2,//bonusMultiplier, //the multiplier for terrain effects when on this terrain/superstate. If not Equal to 1 or 0 displayed in the UI as ex.: x2. Only applies to hit/evade.
 	);
 	
 	this.addDefinition(//water

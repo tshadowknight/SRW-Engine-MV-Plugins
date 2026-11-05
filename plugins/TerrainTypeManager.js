@@ -7,7 +7,7 @@ TerrainTypeManager.prototype.initDefinitions = function(){
 	$SRWConfig.terrainTypes.call(this);
 }
 
-TerrainTypeManager.prototype.addDefinition = function(tileAssociation, alias, abilityName, moveCost, hideBattleShadows, entryRules, entryForbiddenRules, superStateRules, opacityMod, displaysFlying, ignoresTerrainCost, ignoresTerrainCollision, moveCostMod, priority, supersedingPriority, canBeTargeted, canAttack, regionBlackList, enemyPreference){
+TerrainTypeManager.prototype.addDefinition = function(tileAssociation, alias, abilityName, moveCost, hideBattleShadows, entryRules, entryForbiddenRules, superStateRules, opacityMod, displaysFlying, ignoresTerrainCost, ignoresTerrainCollision, moveCostMod, priority, supersedingPriority, canBeTargeted, canAttack, regionBlackList, enemyPreference, bonusMultiplier){
 	this._tileToTerrainType[tileAssociation] = {
 		tileAssociation: tileAssociation,
 		alias: alias,
@@ -27,7 +27,8 @@ TerrainTypeManager.prototype.addDefinition = function(tileAssociation, alias, ab
 		canBeTargeted: canBeTargeted,
 		canAttack: canAttack,
 		regionBlackList: regionBlackList,
-		enemyPreference: enemyPreference || 0
+		enemyPreference: enemyPreference || 0,
+		bonusMultiplier: bonusMultiplier != null ? bonusMultiplier : 1
 	};
 }
 

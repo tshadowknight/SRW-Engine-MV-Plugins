@@ -11,7 +11,7 @@
      -webkit-mask-image: none;
     justify-content: center;
     --fontsize: 2.4px;
-    --widthpixels: 250;
+    --widthpixels: 260;
     --heightpixels: 120;
     padding: 0;
     margin: 0;
@@ -42,6 +42,15 @@
 	display: flex;
 	white-space: nowrap;
 }
+
+#terrain_details .terrain_boost_section .value.buffed{
+	color: #caffee;
+}
+
+#terrain_details .terrain_boost_section .value.reduced{
+	color: #ffa4b2;
+}
+
 
 #terrain_details .defense_boost {
 	top: 0%;

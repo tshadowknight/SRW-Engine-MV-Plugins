@@ -349,6 +349,13 @@ StatCalc.prototype.setCurrentTerrainModsFromTilePropertyString = function(actor,
 				actor.SRWStats.mech.currentTerrainMods.hp_regen*=2;				
 				actor.SRWStats.mech.currentTerrainMods.en_regen*=2;				
 			}		
+			let currentTerrain = this.getCurrentTerrainIdx(actor);
+			let terrainDef = $terrainTypeManager.getTerrainDefinition(currentTerrain);		
+			actor.SRWStats.mech.currentTerrainMods.defense*=terrainDef.bonusMultiplier;				
+			actor.SRWStats.mech.currentTerrainMods.evasion*=terrainDef.bonusMultiplier;		
+			
+			actor.SRWStats.mech.currentTerrainMods.defenseMult = terrainDef.bonusMultiplier;
+			actor.SRWStats.mech.currentTerrainMods.evasionMult = terrainDef.bonusMultiplier;
 		}
 		
 		if(this.isMainTwin(actor)){

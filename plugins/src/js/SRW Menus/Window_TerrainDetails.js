@@ -72,6 +72,18 @@ Window_TerrainDetails.prototype.refresh = function() {
 	this.getWindowNode().style.display = this._visibility;
 }
 
+Window_TerrainDetails.prototype.applyBuffClass = function(elem, value) {
+	elem.classList.remove("buffed");
+	elem.classList.remove("reduced");
+	if(value != null){
+		if(value > 1){
+			elem.classList.add("buffed");
+		} else if(value < 1){
+			elem.classList.add("reduced");
+		}
+	}
+}
+
 Window_TerrainDetails.prototype.redraw = function() {
 	if($gameTemp.terrainDetails){
 		this._contentContainer.style.display = "";
@@ -79,6 +91,9 @@ Window_TerrainDetails.prototype.redraw = function() {
 		this._evasionValue.textContent = $gameTemp.terrainDetails.evasion + "%";
 		this._hpRegenValue.textContent = $gameTemp.terrainDetails.hp_regen + "%";
 		this._enRegenValue.textContent = $gameTemp.terrainDetails.en_regen + "%";
+
+		this.applyBuffClass(this._defenseValue, $gameTemp.terrainDetails.defenseMult);
+		this.applyBuffClass(this._evasionValue, $gameTemp.terrainDetails.evasionMult);
 	}
 	this.updateScaledDiv(this._bgFadeContainer);
 	Graphics._updateCanvas();

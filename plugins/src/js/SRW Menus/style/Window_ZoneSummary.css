@@ -90,6 +90,14 @@
 	white-space: nowrap;
 }
 
+#zone_summary .terrain_boost_section .value.buffed{
+	color: #a4ffe2;
+}
+
+#zone_summary .terrain_boost_section .value.reduced{
+	color: #ffa4b2;
+}
+
 #zone_summary .defense_boost {
 	top: 0%;
 	left: 5%;
