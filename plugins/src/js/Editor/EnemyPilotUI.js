@@ -112,3 +112,4 @@ EnemyPilotUI.prototype.hookPageControls = function(){
 	});
 
 }
+

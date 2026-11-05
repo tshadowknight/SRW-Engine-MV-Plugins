@@ -883,7 +883,29 @@ AllyPilotUI.prototype.initPropertyHandlers = function(){
 	}
 }
 
+AllyPilotUI.prototype.copyEntry = function(id){
+	window._PilotCopyBuffer = JSON.parse(JSON.stringify(this._data[id]));
+	if(window._PilotCopyBuffer.characterName == null || window._PilotCopyBuffer.characterName == ""){
+		window._PilotCopyBuffer.characterName = window._PilotCopyBuffer.meta.faceName;
+		window._PilotCopyBuffer.characterIndex = window._PilotCopyBuffer.meta.faceIndex - 1;
+	}
+	if(window._PilotCopyBuffer.meta.faceName == null || window._PilotCopyBuffer.meta.faceName == ""){
+		window._PilotCopyBuffer.meta.faceName = window._PilotCopyBuffer.faceName;
+		window._PilotCopyBuffer.meta.faceIndex = window._PilotCopyBuffer.faceIndex + 1;
+	}
+}
+		
+AllyPilotUI.prototype.pasteEntry = function(id){
+	if(window._PilotCopyBuffer){
+		this._data[id] = JSON.parse(JSON.stringify(window._PilotCopyBuffer));
+		this._data[id].id = id * 1;
+		this.show();
+	}
+}
 
+AllyPilotUI.prototype.copyIsBuffered = function(){
+	return !!window._PilotCopyBuffer;
+}
 
 AllyPilotUI.prototype.show = async function(){
 	let _this = this;
