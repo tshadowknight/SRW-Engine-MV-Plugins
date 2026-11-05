@@ -47,7 +47,7 @@ Window_DetailPages.prototype.resetSelection = function(){
 	if($gameTemp.currentMenuUnit){
 		if($gameTemp.currentMenuUnit.actor?.isSubPilot){
 			const refId = $gameTemp.currentMenuUnit.actor.SRWStats.pilot.id;
-			this._subPilotIdx = $statCalc.getSubPilots($gameTemp.currentMenuUnit.actor).indexOf(refId) + 1;
+			this._subPilotIdx = $statCalc.getSubPilotsIncludingEnemy($gameTemp.currentMenuUnit.actor).indexOf(refId) + 1;
 		}
 	}
 	
@@ -73,11 +73,16 @@ Window_DetailPages.prototype.getCurrentSelection = function(){
 	}
 	
 	if(this._subPilotIdx != 0){
-		var subPilots = $statCalc.getSubPilots(unit.actor);
+		var subPilots = $statCalc.getSubPilotsIncludingEnemy(unit.actor);
 		var subPilotId = subPilots[this._subPilotIdx - 1];
 		if(subPilotId != null && subPilotId != 0){
-			var actor = $gameActors.actor(subPilotId);
-			unit = {actor: actor, mech: actor.SRWStats.mech};
+			if(unit.actor.isActor()){
+				var actor = $gameActors.actor(subPilotId);
+				unit = {actor: actor, mech: actor.SRWStats.mech};
+			} else if(unit.actor.enemySubPilots){
+				var actor = unit.actor.enemySubPilotsLookup[subPilotId];
+				unit = {actor: actor, mech: unit.actor.SRWStats.mech};
+			}			
 		}
 	}
 	return unit;
@@ -351,7 +356,7 @@ Window_DetailPages.prototype.update = function() {
 		if(Input.isTriggered('left_trigger') || this._touchL2){//|| Input.isRepeated('left_trigger') 
 			this.requestRedraw();
 			//if($gameTemp.detailPageMode == "map"){
-				var subPilots = $statCalc.getSubPilots($gameTemp.currentMenuUnit.actor);
+				var subPilots = $statCalc.getSubPilotsIncludingEnemy($gameTemp.currentMenuUnit.actor);
 				
 				var sanity = 10;
 				this._subPilotIdx--;
@@ -374,7 +379,7 @@ Window_DetailPages.prototype.update = function() {
 		} else if (Input.isTriggered('right_trigger')  || this._touchR2) {//|| Input.isRepeated('right_trigger')
 			this.requestRedraw();
 			//if($gameTemp.detailPageMode == "map"){
-				var subPilots = $statCalc.getSubPilots($gameTemp.currentMenuUnit.actor);
+				var subPilots = $statCalc.getSubPilotsIncludingEnemy($gameTemp.currentMenuUnit.actor);
 				
 				var sanity = 10;
 				this._subPilotIdx++;					
@@ -805,7 +810,7 @@ Window_DetailPages.prototype.drawPilotStats1 = function() {
 				}
 			}
 		} else {
-			var subPilotIds = $statCalc.getSubPilots(actor);
+			var subPilotIds = $statCalc.getSubPilotsIncludingEnemy(actor);
 			var list = JSON.parse(JSON.stringify(subPilotIds));
 			if(actor.isActor()){
 				list.unshift(actor.actorId());
@@ -822,9 +827,12 @@ Window_DetailPages.prototype.drawPilotStats1 = function() {
 			}
 			//prevent the left icon from being filled in if there's only one two total pilots(main + 1 sub)
 			if(list.length > 1 && list[idx] && (offset != -1 || list.length > 2)){
-				_this.loadActorFace(list[idx], selectionIcon);
-			}
-			
+				if(actor.isActor()){
+					_this.loadActorFace(list[idx], selectionIcon);
+				} else {
+					_this.loadEnemyFace(list[idx], selectionIcon);
+				}			
+			}			
 		}
 		
 		selectionIcon.addEventListener("click", function(){

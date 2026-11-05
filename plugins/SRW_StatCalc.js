@@ -1744,6 +1744,9 @@ StatCalc.prototype.initSRWStats = function(actor, level, itemIds, preserveVolati
 		//setting the originalLevel is only done the first time a unit is initialized, to avoid the modified level from propagating as the original level on save load
 		actor.originalLevel = origLevel;
 		actor.SRWStats = _this.createEmptySRWStats(level);
+		actor.SRWInitialized = true;
+		this.resetBattleTemp(actor);
+		this.resetStageTemp(actor);	
 	}
 	
 	if(actor.originalLevel == null){//support for existing save files
@@ -1948,24 +1951,61 @@ StatCalc.prototype.initSRWStats = function(actor, level, itemIds, preserveVolati
 	
 	actor.SRWStats.pilot.personalityInfo = this.getPersonalityDef(actorProperties);
 	
-	var subPilots = this.getSubPilots(actor);
-	if(!actor.isSubPilot){
-		var mainPilot = actor;
-		var ctr = 0;
-		subPilots.forEach(function(pilotId){
-			var actor = $gameActors.actor(pilotId);
-			if(actor){
-				actor.isSubPilot = true;
-				actor.subPilotSlot = ctr;
-				actor.mainPilot = mainPilot;
-				if(isReload){
-					_this.reloadSRWStats(actor);
-				} else {
-					_this.initSRWStats(actor, 1, [], preserveVolatile);
-				}				
-			}			
-		});	
-	}		
+	if(actor.isActor()){
+		var subPilots = this.getSubPilots(actor);
+		if(!actor.isSubPilot){
+			var mainPilot = actor;
+			var ctr = 0;
+			subPilots.forEach(function(pilotId){
+				var actor = $gameActors.actor(pilotId);
+				if(actor){
+					actor.isSubPilot = true;
+					actor.subPilotSlot = ctr;
+					actor.mainPilot = mainPilot;
+					if(isReload){
+						_this.reloadSRWStats(actor);
+					} else {
+						_this.initSRWStats(actor, 1, [], preserveVolatile);
+					}				
+				}			
+			});	
+		}	
+	} else {
+		var subPilots = [];
+		actor.enemySubPilots = [];
+		actor.enemySubPilotsLookup = {};
+		if(mech && mech.id != -1){
+			if($gameSystem.enemySubpilots && $gameSystem.enemySubpilots[mech.id]){
+				for(let slotId in $gameSystem.enemySubpilots[mech.id]){
+					subPilots[slotId] = $gameSystem.enemySubpilots[mech.id][slotId];
+				}
+			}
+			if(!actor.isSubPilot){
+				var mainPilot = actor;
+				var ctr = 0;
+				subPilots.forEach(function(pilotId){
+					if(pilotId != null){
+						var actor = new Game_Enemy(pilotId, 0, 0);				
+						if(actor){
+							actor._classId = mech.id;
+							actor._mechClass = mech.id;
+							actor.isSubPilot = true;
+							actor.subPilotSlot = ctr++;
+							actor.mainPilot = mainPilot;
+							if(isReload){
+								_this.reloadSRWStats(actor, level);
+							} else {
+								_this.initSRWStats(actor, level, [], preserveVolatile);
+							}			
+							mainPilot.enemySubPilots.push(actor.enemyId());
+							mainPilot.enemySubPilotsLookup[actor.enemyId()] = actor;
+						}		
+					}					
+				});	
+			}	
+		}		
+	}
+		
 	
 	if(actor.isActor() && !actor.isSubTwin){
 		var subTwinId = this.getSubTwinId(actor);
@@ -2574,6 +2614,18 @@ StatCalc.prototype.getDestroyAnimInfo = function(actor){
 StatCalc.prototype.getSubPilots = function(actor){
 	if(this.isActorSRWInitialized(actor) && actor.SRWStats.mech){
 		return actor.SRWStats.mech.subPilots || [];
+	} else {
+		return [];
+	}
+}
+
+StatCalc.prototype.getSubPilotsIncludingEnemy = function(actor){
+	if(this.isActorSRWInitialized(actor) && actor.SRWStats.mech){
+		if(actor.isActor()){
+			return this.getSubPilots(actor);
+		} else {
+			return actor.enemySubPilots;
+		}			
 	} else {
 		return [];
 	}

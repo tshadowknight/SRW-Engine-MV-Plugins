@@ -1540,6 +1540,8 @@
 				setEventEN: true,
 				setEventENPercent: true,
 				addSubPilot: true,
+				addEnemySubPilot: true,
+				clearEnemySubPilots: true,
 				removeSubPilot: true,
 				setPortraitOverlay: true,
 				hidePortraitOverlay: true,

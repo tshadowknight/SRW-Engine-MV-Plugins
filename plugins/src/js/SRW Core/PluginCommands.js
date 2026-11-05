@@ -1374,6 +1374,28 @@
 					$gameSystem.overwritePilotFallbackInfo(actor);
 				}
 				
+				if (command === 'addEnemySubPilot') {				
+					if(!$gameSystem.enemySubpilots){
+						$gameSystem.enemySubpilots = {};
+					}	
+					const mechId = args[0] * 1;
+					const slot = args[1] * 1;
+					const enemyId = args[2] * 1;
+
+					if(!$gameSystem.enemySubpilots[mechId]){
+						$gameSystem.enemySubpilots[mechId] = {};
+					}
+					$gameSystem.enemySubpilots[mechId][slot] = enemyId;
+				}	
+				
+				if (command === 'clearEnemySubPilots') {				
+					if(!$gameSystem.enemySubpilots){
+						$gameSystem.enemySubpilots = {};
+					}	
+					const mechId = $dataClasses[args[0] * 1];					
+					delete $gameSystem.enemySubpilots[mechId];					
+				}	
+				
 				if (command === 'setPortraitOverlay') {		
 					if(!$gameTemp.portraitOverlays){
 						$gameTemp.portraitOverlays = [];
