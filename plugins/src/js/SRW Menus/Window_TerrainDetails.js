@@ -94,6 +94,11 @@ Window_TerrainDetails.prototype.redraw = function() {
 
 		this.applyBuffClass(this._defenseValue, $gameTemp.terrainDetails.defenseMult);
 		this.applyBuffClass(this._evasionValue, $gameTemp.terrainDetails.evasionMult);
+
+		this.applyBuffClass(this._hpRegenValue, $gameTemp.terrainDetails.hp_regenMult);
+		this.applyBuffClass(this._enRegenValue, $gameTemp.terrainDetails.en_regenMult);
+
+		
 	}
 	this.updateScaledDiv(this._bgFadeContainer);
 	Graphics._updateCanvas();

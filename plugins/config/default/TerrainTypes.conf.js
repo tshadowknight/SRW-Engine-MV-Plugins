@@ -63,7 +63,8 @@ $SRWConfig.terrainTypes = function(){
 		true,//canAttack, if false a unit in this terrain state cannot attack
 		[],//regionBlacklist, any region ids in this list will be treated as solid when on this terrain, even if ignoresTerrainCollision is enabled
 		0,
-		2,//bonusMultiplier, //the multiplier for terrain effects when on this terrain/superstate. Only applies to hit/evade.
+		2,//bonusMultiplier, the multiplier for terrain effects when on this terrain/superstate. Only applies to hit/evade.
+		2,//regenBonusMultiplier, the multiplier for terrain effects when on this terrain/superstate. Only applies to hp/en
 	);
 	
 	this.addDefinition(//water

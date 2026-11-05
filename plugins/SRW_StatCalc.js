@@ -353,9 +353,16 @@ StatCalc.prototype.setCurrentTerrainModsFromTilePropertyString = function(actor,
 			let terrainDef = $terrainTypeManager.getTerrainDefinition(currentTerrain);		
 			actor.SRWStats.mech.currentTerrainMods.defense*=terrainDef.bonusMultiplier;				
 			actor.SRWStats.mech.currentTerrainMods.evasion*=terrainDef.bonusMultiplier;		
+
+			actor.SRWStats.mech.currentTerrainMods.hp_regen*=terrainDef.regenBonusMultiplier;		
+			actor.SRWStats.mech.currentTerrainMods.en_regen*=terrainDef.regenBonusMultiplier;				
 			
 			actor.SRWStats.mech.currentTerrainMods.defenseMult = terrainDef.bonusMultiplier;
 			actor.SRWStats.mech.currentTerrainMods.evasionMult = terrainDef.bonusMultiplier;
+
+			actor.SRWStats.mech.currentTerrainMods.hp_regenMult = terrainDef.regenBonusMultiplier;
+			actor.SRWStats.mech.currentTerrainMods.en_regenMult = terrainDef.regenBonusMultiplier;
+			
 		}
 		
 		if(this.isMainTwin(actor)){
