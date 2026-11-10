@@ -1553,6 +1553,7 @@
 				clearCustomSpirit: true,
 				awardFavPoints: true,
 				deployItemBox: true,
+				setNotAParticipant: true,
 				collectItemsBoxes: true
 			}
 			var scriptCommands = {

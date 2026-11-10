@@ -543,6 +543,10 @@
 						_this.addCommand(APPSTRINGS.MAPMENU.cmd_status, 'status');	
 						_this.addWaitCommand(true);								
 					}
+
+					function notAParticipantMenu(){					
+						_this.addCommand(APPSTRINGS.MAPMENU.cmd_status, 'status');												
+					}
 					
 					function postMoveMenu(){
 						if((hasTarget || hasMapWeapon) && $statCalc.canAttackOnCurrentTerrain(_this._actor)){
@@ -598,6 +602,8 @@
 						disabledMenu();
 					} else if($statCalc.isDisabled(this._actor)){
 						statusDisabledMenu();
+					} else if($statCalc.notAParticipant(this._actor)){
+						notAParticipantMenu();
 					} else if($statCalc.isShip(_this._actor) && $statCalc.hasBoardedUnits(_this._actor) && !_this._actor.canInput()){
 						shipPostActionMenu();
 					} else {	

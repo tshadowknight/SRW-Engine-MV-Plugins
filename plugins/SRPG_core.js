@@ -4624,7 +4624,7 @@ SceneManager.isInSaveScene = function(){
         var targets = $statCalc.getAllInRange(battler, false, $gameTemp.isPostMove);
 		var tmp = [];
 		for(var i = 0; i < targets.length; i++){
-			if((!battler.isEnemy() || !$gameSystem.untargetableAllies[targets[i].eventId()]) && $statCalc.canBeTargetedOnCurrentTerrain($gameSystem.EventToUnit(targets[i].eventId())[1])){		
+			if((!battler.isEnemy() || !$gameSystem.untargetableAllies[targets[i].eventId()]) && $statCalc.canBeTargetedOnCurrentTerrain($gameSystem.EventToUnit(targets[i].eventId())[1]) && !$statCalc.notAParticipant($gameSystem.EventToUnit(targets[i].eventId())[1])){		
 				var actor = $gameSystem.EventToUnit(targets[i].eventId())[1];
 				
 				if($battleCalc.getBestWeapon({actor: battler, pos: {x: referenceEvent.posX(), y: referenceEvent.posY()}}, {actor: actor, pos: {x: targets[i].posX(), y: targets[i].posY()}}, false, false, false)){
@@ -4670,7 +4670,7 @@ SceneManager.isInSaveScene = function(){
         var targets =  $statCalc.getAllInRange(battler, true);
 		var tmp = [];
 		for(var i = 0; i < targets.length; i++){
-			if((!battler.isEnemy() || !$gameSystem.untargetableAllies[targets[i].eventId()]) && $statCalc.canBeTargetedOnCurrentTerrain($gameSystem.EventToUnit(targets[i].eventId())[1])){		
+			if((!battler.isEnemy() || !$gameSystem.untargetableAllies[targets[i].eventId()]) && $statCalc.canBeTargetedOnCurrentTerrain($gameSystem.EventToUnit(targets[i].eventId())[1]) && !$statCalc.notAParticipant($gameSystem.EventToUnit(targets[i].eventId())[1])){		
 				var actor = $gameSystem.EventToUnit(targets[i].eventId())[1];
 				if($battleCalc.getBestWeapon({actor: battler}, {actor: actor}, false, true, false)){
 					tmp.push(targets[i]);
@@ -4730,7 +4730,7 @@ SceneManager.isInSaveScene = function(){
 		var tauntTargetEvent = -1;
 		
 		canAttackTargets.forEach(function(event) {
-			if(!event.isErased() && !$gameSystem.untargetableAllies[event.eventId()] && $statCalc.canBeTargetedOnCurrentTerrain($gameSystem.EventToUnit(event.eventId())[1])){					
+			if(!event.isErased() && !$gameSystem.untargetableAllies[event.eventId()] && $statCalc.canBeTargetedOnCurrentTerrain($gameSystem.EventToUnit(event.eventId())[1]) && !$statCalc.notAParticipant($gameSystem.EventToUnit(event.eventId())[1])){					
 				var defender = $gameSystem.EventToUnit(event.eventId())[1];
 				if(defender.isActor() && defender.actorId() == priorityTargetId){
 					priorityTargetEvent = event;

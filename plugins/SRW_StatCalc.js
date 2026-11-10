@@ -1042,7 +1042,8 @@ StatCalc.prototype.resetStageTemp = function(actor){
 			isEssential: false,
 			additionalActions: 0,
 			disabledTurn: -1,
-			popUpAnimsPlayed: {}
+			popUpAnimsPlayed: {},
+			notAParticipant: false
 		};
 		this.resetStatus(actor, true);
 	}
@@ -1144,6 +1145,19 @@ StatCalc.prototype.isDisabled = function(actor){
 		return false;
 	}
 	return this.hasTurnStatus(actor, "disabledTurn") || actor._battleMode == "disabled";
+}
+
+StatCalc.prototype.setNotAParticipant = function(actor, state){
+	if(this.isActorSRWInitialized(actor)){		
+		actor.SRWStats.stageTemp.notAParticipant = !!state;			
+	}
+}
+
+StatCalc.prototype.notAParticipant = function(actor){
+	if(!actor?.SRWStats?.stageTemp){
+		return false;
+	}
+	return actor.SRWStats.stageTemp.notAParticipant;
 }
 
 StatCalc.prototype.setSpiritsSealed = function(actor){
@@ -6473,9 +6487,10 @@ StatCalc.prototype.getOccupiedPositionsLookup = function(type, factionConfig){
 }
 
 StatCalc.prototype.getAllCandidates = function(type, excludeTurnEnd){
+	const _this = this;
 	var result = [];
 	this.iterateAllActors(type, function(actor, event){	
-		if(!event.isErased() && (!excludeTurnEnd || !actor.srpgTurnEnd())){
+		if(!event.isErased() && (!excludeTurnEnd || !actor.srpgTurnEnd()) && !_this.notAParticipant(actor)){
 			result.push({actor: actor, pos: {x: event.posX(), y: event.posY()}, event: event});	
 		}					
 	});

@@ -1457,6 +1457,19 @@
 				if (command === 'deployItemBox') {					
 					$gameSystem.deployItemBox($gameMap.event(args[0] * 1), JSON.parse(args[1] || "[]"))
 				}
+
+				if (command === 'setNotAParticipant') {	
+					const eventId = args[0] * 1;
+					if(eventId){
+						var event = $gameMap.event(eventId);						
+						if(event){
+							var battlerArray = $gameSystem.EventToUnit(event.eventId());
+							if(battlerArray){						
+								$statCalc.setNotAParticipant(battlerArray[1], args[1] * 1);							
+							}
+						}	
+					}										
+				}				
 				
 				if (command === 'collectItemsBoxes') {		
 					let targetId = args[0];

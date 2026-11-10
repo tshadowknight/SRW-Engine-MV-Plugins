@@ -12,6 +12,9 @@
 		var _SRPG_Game_System_initialize = Game_System.prototype.initialize;
 		Game_System.prototype.initialize = function() {
 			_SRPG_Game_System_initialize.call(this);
+
+			Game_System.ABI_ZONE_MAX = ENGINE_SETTINGS.ABI_ZONE_MAX || 8;
+			
 			this._SRPGMode = false;
 			this._isBattlePhase = 'initialize';
 			this._isSubBattlePhase = 'initialize';
@@ -28,6 +31,8 @@
 			this.initOptions();
 			this.purchasableAbilities = structuredClone(ENGINE_SETTINGS.PURCHASABLE_ABILITIES);
 			this._controlSet = "mkb";
+
+			
 		};
 		
 		Game_System.prototype.initOptions = function() {
@@ -802,7 +807,7 @@
 				var battlerArray = _this.EventToUnit(event.eventId());
 				if(!event.isErased() && battlerArray){
 					var actor = battlerArray[1];
-					if(actor.isActor() && !actor.srpgTurnEnd() && !$statCalc.isAI(actor)){
+					if(actor.isActor() && !actor.srpgTurnEnd() && !$statCalc.isAI(actor) && !$statCalc.notAParticipant(actor)){
 						result.push(actor);
 					}
 				}
@@ -1518,7 +1523,7 @@
 			
 			$gameTemp.currentFaction = -1;
 			$songManager.playStageSong();
-			this.aliveActorIdList = [];
+			this.aliveActorEventIdList = [];
 			this.actorLRId = 0;
 			this.targetLRId = 0;
 			this.targetSpiritLRId = 0;
@@ -1531,7 +1536,7 @@
 				}
 				var battlerArray = $gameSystem.EventToUnit(event.eventId());
 				if (battlerArray && battlerArray[0] === 'actor' && battlerArray[1].isAlive() && !event.isErased()) {
-					$gameSystem.aliveActorIdList.push(event.eventId());
+					$gameSystem.aliveActorEventIdList.push(event.eventId());
 					battlerArray[1].SRPGActionTimesSet($statCalc.applyStatModsToValue(battlerArray[1], 1, ["extra_action"]));
 
 					var SPRegen = 0;
@@ -1604,13 +1609,26 @@
 			$statCalc.applyENRegen("actor");
 			$statCalc.applyAmmoRegen("actor");
 			$statCalc.applyHPRegen("actor");
-			this.aliveActorIdList.sort(function(a, b) {
+			this.aliveActorEventIdList.sort(function(a, b) {
 				return a - b;
 			});
-			var actor1 = $gameMap.event(this.aliveActorIdList[0]);
-			if (actor1) {
-				$gamePlayer.locate(actor1.posX(), actor1.posY());
+			let turnStartActorEventId = null;
+			for(let entry of this.aliveActorEventIdList){
+				var battlerArray = $gameSystem.EventToUnit(entry);
+				if(battlerArray){
+					if(!$statCalc.notAParticipant(battlerArray[1])){
+						turnStartActorEventId = entry;
+						break;
+					}
+				}				
 			}
+			if(turnStartActorEventId != null){
+				let event = $gameMap.event(turnStartActorEventId);
+				if (event) {
+					$gamePlayer.locate(event.posX(), event.posY());
+				}
+			}
+			
 			$gameTemp.autoSpirits = spiritActivations;
 			$gameTemp.autoSpiritsDelay = 150;
 			
@@ -2689,7 +2707,7 @@
 			return time / this.getBattleSpeed();
 		}
 		
-		Game_System.ABI_ZONE_MAX = 8;
+		
 		
 		Game_System.prototype.validateAbilityZoneInfo = function(id) {
 			if(!this.abilityZoneInfo){
