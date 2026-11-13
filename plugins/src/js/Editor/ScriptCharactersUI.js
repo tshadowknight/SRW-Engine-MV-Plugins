@@ -117,6 +117,7 @@ ScriptCharactersUI.prototype._renderCharacterForm = function(key, char) {
 	var _this = this;
 	var nameVar = char.nameVar != null ? char.nameVar : -1;
 	var actorId = char.actorId != null ? char.actorId : 0;
+	var actorIdSecondary = char.actorIdSecondary != null ? char.actorIdSecondary : 0;
 	var expressions = char.expressions || {};
 	var exprIndices = Object.keys(expressions).sort(function(a, b) {
 		var ai = parseInt(a), bi = parseInt(b);
@@ -149,6 +150,16 @@ ScriptCharactersUI.prototype._renderCharacterForm = function(key, char) {
 	c += "<div class='sc_field_row'>";
 	c += "<label class='sc_label'>Actor ID</label>";
 	c += "<input type='number' id='sc_actor_id' value='" + actorId + "' class='sc_num_input'>";
+	c += "<span class='sc_hint'>(0 = none)</span>";
+	c += "</div>";
+	c += "</div>";
+
+
+	// actorId secondary
+	c += "<div class='sc_field_section'>";
+	c += "<div class='sc_field_row'>";
+	c += "<label class='sc_label'>Actor ID Secondary</label>";
+	c += "<input type='number' id='sc_actor_id_secondary' value='" + actorIdSecondary + "' class='sc_num_input'>";
 	c += "<span class='sc_hint'>(0 = none)</span>";
 	c += "</div>";
 	c += "</div>";
@@ -288,6 +299,20 @@ ScriptCharactersUI.prototype._hookUI = function() {
 			_this._setModified();
 		});
 	}
+
+	// actorIdSecondary
+	var actorIdInput = c.querySelector('#sc_actor_id_secondary');
+	if (actorIdInput) {
+		actorIdInput.addEventListener('change', function() {
+			var val = parseInt(this.value) || 0;
+			if (val === 0) {
+				delete _this._data[_this._currentKey].actorIdSecondary;
+			} else {
+				_this._data[_this._currentKey].actorIdSecondary = val;
+			}
+			_this._setModified();
+		});
+	}	
 
 	// Add expression
 	var addExprBtn = c.querySelector('#sc_add_expr');

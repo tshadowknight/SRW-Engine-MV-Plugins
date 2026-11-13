@@ -2343,6 +2343,14 @@
 								parameters: ["focusActor "+characterDef.actorId]
 							});
 						}
+
+						if(!skipFocus && characterDef && characterDef.actorIdSecondary != null){
+							eventList.push({
+								code: 356,
+								indent: indent,
+								parameters: ["focusActor "+characterDef.actorIdSecondary]
+							});
+						}						
 						
 						if(!skipFocus && characterDef && characterDef.enemyId != null){
 							eventList.push({
