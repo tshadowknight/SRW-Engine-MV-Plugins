@@ -2710,7 +2710,7 @@
 		
 		
 		Game_System.prototype.validateAbilityZoneInfo = function(id) {
-			if(!this.abilityZoneInfo){
+			if(!this.abilityZoneInfo || Object.keys(this.abilityZoneInfo).length != (Game_System.ABI_ZONE_MAX)){
 				const initZoneInfo = (id) => {
 					this.abilityZoneInfo[id] = {
 						pattern: [],
@@ -2730,7 +2730,7 @@
 				
 			}
 			
-			if(!this.abilityZoneRefreshInfo){
+			if(!this.abilityZoneRefreshInfo || Object.keys(this.abilityZoneRefreshInfo).length != (Game_System.ABI_ZONE_MAX)){
 				this.abilityZoneRefreshInfo = {};				
 				for(var i = 0; i < Game_System.ABI_ZONE_MAX; i++){
 					this.abilityZoneRefreshInfo[i] = false;
