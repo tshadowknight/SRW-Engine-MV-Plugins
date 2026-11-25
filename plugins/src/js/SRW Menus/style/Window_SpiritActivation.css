@@ -42,6 +42,13 @@
     z-index: 5;
 }
 
+#spirit_activation_spirit_anim.extended {
+	top: -5%;
+	left: auto;
+	right: auto;
+	transform: scale(0.8);
+}
+
 .spirit_anim_container {
 	overflow: hidden;
 	width: 100%;

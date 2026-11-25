@@ -8640,52 +8640,71 @@ StatCalc.prototype.getActorStatMods = function(actor, excludedSkills){
 					if(unitZoneInfo){
 						for(let zoneInfo of unitZoneInfo){
 							var battlerArray = $gameSystem.EventToUnit(zoneInfo.ownerEventId);
+							let isActor;
+							let originId;
 							if(battlerArray){
-								let zoneSetter =  battlerArray[1];
+								let zoneSetter = battlerArray[1];
 								let mods;
+								isActor = zoneSetter.isActor();
+								originId = zoneSetter.SRWStats.pilot.id;
 								if($gameSystem.isFriendly(actor, $gameSystem.getFactionId(zoneSetter))){
 									mods = $abilityZoneManager.getAllyMod(actor, zoneInfo.abilityId, unitZoneInfo.length);
 								} else {
 									mods = $abilityZoneManager.getEnemyMod(actor, zoneInfo.abilityId, unitZoneInfo.length);
 								}
-								if(mods){
-									for(let statMod of mods){
-										var targetList;	
-										if(statMod.modType == "mult"){
-											targetList = tileMods.mult;
-										} else if(statMod.modType == "addPercent"){
-											targetList = tileMods.addPercent;
-										} else if(statMod.modType == "addFlat"){
-											targetList = tileMods.addFlat;
-										} else if(statMod.modType == "mult_ceil"){
-											targetList = tileMods.mult_ceil;
-										}
-										
-										statMod.rangeInfo = {min: 0, max: 0, targets: "own"};
-										
-										statMod.stackId = "zone_ability";
-										statMod.canStack = true;
-										
-										statMod.appliesTo = null;
-										
-										statMod.slotType = "main";
-										
-										statMod.originType = zoneSetter.isActor() ? "actor" : "enemy";
-										statMod.originId = zoneSetter.SRWStats.pilot.id;
-										
-										if(targetList){
-											targetList.push(statMod);
-										}
-										var listEntry = structuredClone(statMod);
-										if(!listEntry.name){
-											listEntry.name = "Zone Ability";
-										}
-										
-										tileMods.list.push(listEntry);
+							} else if(zoneInfo.isForActor != null){
+								isActor = zoneInfo.isForActor;
+								originId = "event_stage";
+								if(zoneInfo.isForActor){
+									if($gameSystem.isFriendly(actor, "player")){
+										mods = $abilityZoneManager.getAllyMod(actor, zoneInfo.abilityId, unitZoneInfo.length);
+									} else {
+										mods = $abilityZoneManager.getEnemyMod(actor, zoneInfo.abilityId, unitZoneInfo.length);
+									}										
+								} else {
+									if(!$gameSystem.isFriendly(actor, "player")){
+										mods = $abilityZoneManager.getAllyMod(actor, zoneInfo.abilityId, unitZoneInfo.length);
+									} else {
+										mods = $abilityZoneManager.getEnemyMod(actor, zoneInfo.abilityId, unitZoneInfo.length);
 									}
 								}
-														
-							}					
+							}	
+							if(mods){
+								for(let statMod of mods){
+									var targetList;	
+									if(statMod.modType == "mult"){
+										targetList = tileMods.mult;
+									} else if(statMod.modType == "addPercent"){
+										targetList = tileMods.addPercent;
+									} else if(statMod.modType == "addFlat"){
+										targetList = tileMods.addFlat;
+									} else if(statMod.modType == "mult_ceil"){
+										targetList = tileMods.mult_ceil;
+									}
+									
+									statMod.rangeInfo = {min: 0, max: 0, targets: "own"};
+									
+									statMod.stackId = "zone_ability";
+									statMod.canStack = true;
+									
+									statMod.appliesTo = null;
+									
+									statMod.slotType = "main";
+									
+									statMod.originType = isActor ? "actor" : "enemy";
+									statMod.originId = originId;
+									
+									if(targetList){
+										targetList.push(statMod);
+									}
+									var listEntry = structuredClone(statMod);
+									if(!listEntry.name){
+										listEntry.name = "Zone Ability";
+									}
+									
+									tileMods.list.push(listEntry);
+								}
+							}								
 						}
 					}
 				}	

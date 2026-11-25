@@ -100,6 +100,7 @@ Window_SpiritActivation.prototype.createComponents = function() {
 	this._spiritAnimImageContainer.classList.add("spirit_anim_container");
 	this._spiritAnimImage = document.createElement("img");
 	if(ENGINE_SETTINGS.EXTENDED_SPIRIT_ANIMS){
+		this._spiritAnim.classList.add("extended");
 		this._spiritAnimImage.classList.add("spirit_anim_extended");
 	} else {
 		this._spiritAnimImage.classList.add("spirit_anim");		

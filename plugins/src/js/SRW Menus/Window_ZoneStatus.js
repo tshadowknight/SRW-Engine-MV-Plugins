@@ -91,7 +91,16 @@ Window_ZoneStatus.prototype.redraw = function() {
 	let content = "";
 	for(let entry of zoneInfo){
 		let displayInfo = $abilityZoneManager.getAbilityDisplayInfo(entry.abilityId);
-		let isFriendly = $gameSystem.isFriendly($gameSystem.EventToUnit(entry.ownerEventId)[1], "player");
+		var actorInfo = $gameSystem.EventToUnit(entry.ownerEventId);
+
+		let isFriendly = null;	
+		
+		if(actorInfo == null && entry.isForActor != null) {
+			isFriendly = entry.isForActor;
+		} else if (actorInfo) { 
+			isFriendly = $gameSystem.isFriendly(actorInfo[1], "player");
+		}
+
 		content+="<div class='entry "+(isFriendly ? "friendly" : "")+"'>";
 		content+="<div class='title'>";
 		content+="<div class='label scaled_text fitted_text'>";

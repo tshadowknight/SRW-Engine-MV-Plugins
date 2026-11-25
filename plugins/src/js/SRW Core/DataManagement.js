@@ -1146,7 +1146,7 @@
 			if(stageId != null){
 				var stageInfo = $SRWStageInfoManager.getStageInfo(stageId);
 				if(stageInfo){
-					title = APPSTRINGS.INTERMISSION.stage_label+" "+stageInfo.displayId+" - ";
+					title = (stageInfo.chapter != null ? "Ch. " + stageInfo.chapter + " - " : "") + APPSTRINGS.INTERMISSION.stage_label+" "+stageInfo.displayId+" - ";
 				}
 			}			
 			title+=$gameSystem.saveDisplayName || $dataSystem.gameTitle;

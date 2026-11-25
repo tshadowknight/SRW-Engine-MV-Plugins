@@ -636,6 +636,11 @@
 			var enemy_unit = new Game_Enemy(enemyId, 0, 0);
 			enemy_unit.AIFlags = AIFlags;
 			var event = $gameMap.event(eventId);
+
+			if(!event){
+				console.log("Could not spawn enemy on event with id " + eventId + ", the event does not exist.");
+				return;
+			}
 			
 			let tmp;
 			if(lockedDropSlots){

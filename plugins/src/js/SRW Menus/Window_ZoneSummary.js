@@ -104,8 +104,16 @@ Window_ZoneSummary.prototype.redraw = function() {
 		var entry = zoneInfo[i];
 		var displayInfo = $abilityZoneManager.getAbilityDisplayInfo(entry.abilityId);
 		var actorInfo = $gameSystem.EventToUnit(entry.ownerEventId);
-		if (actorInfo) {
-			var isFriendly = $gameSystem.isFriendly(actorInfo[1], "player");
+
+		let isFriendly = null;	
+		
+		if(actorInfo == null && entry.isForActor != null) {
+			isFriendly = entry.isForActor;
+		} else if (actorInfo) { 
+			isFriendly = $gameSystem.isFriendly(actorInfo[1], "player");
+		}
+		
+		if(isFriendly != null){
 			if (stackCount <= 4 || ctr < 3) {
 				var slot = this._entrySlots[slotIdx];
 				slot.container.style.display = "";
@@ -123,7 +131,7 @@ Window_ZoneSummary.prototype.redraw = function() {
 				slotIdx++;
 			}
 			ctr++;
-		}
+		}					
 	}
 
 	// Hide unused slots

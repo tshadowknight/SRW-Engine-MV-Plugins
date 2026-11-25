@@ -2755,12 +2755,20 @@
 					let referenceEvent = $gameMap.event(this.abilityZoneInfo[i].ownerEventId);
 					if(referenceEvent){
 						let battlerArray = this.EventToUnit(this.abilityZoneInfo[i].ownerEventId);	
-						if(battlerArray[0] == "actor"){
-							actorCount++;
+						if(battlerArray){
+							if(battlerArray[0] == "actor"){
+								actorCount++;
+							} else {
+								enemyCount++;
+							}
 						} else {
-							enemyCount++;
-						}						
-					}					
+							if(this.abilityZoneInfo[i].isForActor){
+								actorCount++;
+							} else {
+								enemyCount++;
+							}
+						}												
+					}				
 				}
 			}
 			if(forActor){
@@ -2807,14 +2815,21 @@
 			this.setEventAbilityZone(referenceEvent.eventId(), params);
 		}
 		
-		Game_System.prototype.setEventAbilityZone = function(eventId, params) {			
-			let event = $gameMap.event(eventId);
-			let battlerArray = this.EventToUnit(eventId);	
-			let zoneId = this.getNextAbilityZoneId(battlerArray[0] == "actor");
+		Game_System.prototype.setEventAbilityZone = function(eventId, params, isForActor) {			
+			let event = $gameMap.event(eventId);	
+
+			let zoneId;
+			if(isForActor != null){
+				zoneId = this.getNextAbilityZoneId(isForActor);
+			} else {
+				//derive from assigned actor
+				let battlerArray = this.EventToUnit(eventId);	
+				zoneId = this.getNextAbilityZoneId(battlerArray[0] == "actor");
+			}
 			if(zoneId != -1){	
 				params.center = {x: event.posX(), y: event.posY()};
 				params.ownerEventId = eventId;
-				this.setAbilityZone(zoneId, params);							
+				this.setAbilityZone(zoneId, params, isForActor);							
 			}			
 		}
 		
@@ -2828,7 +2843,7 @@
 			}			
 		}
 		
-		Game_System.prototype.setAbilityZone = function(id, params) {
+		Game_System.prototype.setAbilityZone = function(id, params, isForActor) {
 			this.validateAbilityZoneInfo();
 			if(id < 0 || id >= Game_System.ABI_ZONE_MAX){
 				throw("Invalid ability zone id("+id+") used during init");
@@ -2843,7 +2858,8 @@
 				abilityId: params.abilityId,
 				phaseCount: params.phaseCount || 1,
 				expires: params.expires || false,
-				trackingId: params.trackingId
+				trackingId: params.trackingId,
+				isForActor: isForActor
 			}
 			$gameSystem.setAbilityZoneNeedsRefresh(id);
 		}
