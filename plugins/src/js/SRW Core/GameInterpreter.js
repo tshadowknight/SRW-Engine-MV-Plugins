@@ -603,23 +603,27 @@
 				}
 				return unrolledParams[param][-1];
 			}
+
+
 			
 			for (let eventId = settings.events.start; eventId <= settings.events.end; eventId++) {
-				this.addEnemyFromObj({
-					toAnimQueue: getParamSetting("toAnimQueue", eventId),
-					eventId: eventId,
-					enemyId: getParamSetting("enemyId", eventId),
-					mechClass: getParamSetting("mechClass", eventId),
-					level: getParamSetting("level", eventId) || 1,
-					mode: getParamSetting("mode", eventId) || "",
-					attribute1: getParamSetting("attribute1", eventId) || "",
-					items: getParamSetting("items", eventId) || [],
-					squadId: getParamSetting("squadId", eventId),
-					targetRegion: getParamSetting("targetRegion", eventId),
-					AIFlags: getParamSetting("AIFlags", eventId),
-					kills: getParamSetting("kills", eventId) || 0,
-					lockedDropSlots: getParamSetting("lockedDropSlots", eventId),
-				});
+				if(!getParamSetting("exclude", eventId)){
+					this.addEnemyFromObj({
+						toAnimQueue: getParamSetting("toAnimQueue", eventId),
+						eventId: eventId,
+						enemyId: getParamSetting("enemyId", eventId),
+						mechClass: getParamSetting("mechClass", eventId),
+						level: getParamSetting("level", eventId) || 1,
+						mode: getParamSetting("mode", eventId) || "",
+						attribute1: getParamSetting("attribute1", eventId) || "",
+						items: getParamSetting("items", eventId) || [],
+						squadId: getParamSetting("squadId", eventId),
+						targetRegion: getParamSetting("targetRegion", eventId),
+						AIFlags: getParamSetting("AIFlags", eventId),
+						kills: getParamSetting("kills", eventId) || 0,
+						lockedDropSlots: getParamSetting("lockedDropSlots", eventId),
+					});
+				}				
 			}
 		}
 

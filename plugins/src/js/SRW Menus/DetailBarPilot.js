@@ -20,6 +20,10 @@ DetailBarPilot.prototype.redraw = function(){
 	const _this = this;
 	var detailContent = "";
 	var currentSelection = this.getCurrentSelection();
+	if(!currentSelection){
+		this._container.innerHTML = "";
+		return;
+	}
 	var mechData = currentSelection.mech;
 	var actor = currentSelection.actor;
 	var calculatedStats = mechData.stats.calculated;
