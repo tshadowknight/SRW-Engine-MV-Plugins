@@ -8642,9 +8642,9 @@ StatCalc.prototype.getActorStatMods = function(actor, excludedSkills){
 							var battlerArray = $gameSystem.EventToUnit(zoneInfo.ownerEventId);
 							let isActor;
 							let originId;
+							let mods;
 							if(battlerArray){
-								let zoneSetter = battlerArray[1];
-								let mods;
+								let zoneSetter = battlerArray[1];								
 								isActor = zoneSetter.isActor();
 								originId = zoneSetter.SRWStats.pilot.id;
 								if($gameSystem.isFriendly(actor, $gameSystem.getFactionId(zoneSetter))){
